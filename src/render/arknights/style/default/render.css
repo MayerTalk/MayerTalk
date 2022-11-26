@@ -1,0 +1,271 @@
+/*class: render*/
+
+#body {
+    background: #353535;
+    width: 100vw;
+    height: 100vh;
+}
+
+.avatar-uploader {
+    display: flex;
+    width: 100px;
+    height: 100px;
+}
+
+.avatar-uploader .el-upload {
+    border: 1px dashed var(--el-border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: var(--el-color-primary);
+}
+
+.avatar-uploader .container {
+    width: 98px;
+    height: 98px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-uploader img {
+    width: 100%;
+    height: 100%;
+}
+
+.el-icon.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+}
+
+.avatar-bar {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    --witdh: calc(25% - 2px);
+}
+
+.avatar-bar img {
+    width: var(--witdh);
+    height: var(--witdh);
+    margin: 1px;
+}
+
+.avatar-bar img:hover {
+    width: calc(var(--witdh) - 2px);
+    height: calc(var(--witdh) - 2px);;
+    border: grey solid 1px;
+}
+
+.edit-bar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.operateBar {
+    width: var(--witdh);
+    position: fixed;
+    display: flex;
+    bottom: 0;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+    border: white solid 1px;
+    border-bottom: none;
+}
+
+.char-bar {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 55px;
+    background: #A0A0A0;
+    margin-top: 4px;
+    border-top: 1px solid lightgrey;
+}
+
+.char-bar .container {
+    display: flex;
+    align-items: center;
+    width: calc(100% - 55px);
+    height: 55px;
+    flex-shrink: 0;
+}
+
+.char {
+    flex-shrink: 0;
+    margin: 0 2px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #808080;
+    overflow: hidden;
+}
+
+.char-curr {
+    flex-shrink: 0;
+    margin: 0 2px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #505050;
+    overflow: hidden;
+    border: grey solid 1px;
+}
+
+.char:hover {
+    background: #686868;
+}
+
+.char img {
+    width: 50px;
+    height: 50px;
+}
+
+.char-curr img {
+    width: 48px;
+    height: 48px;
+}
+
+.option {
+    margin: 0 2px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #A0A0A0;
+}
+
+.roll {
+    transition: transform ease 1s;
+}
+
+.roll:hover {
+    transform: rotate(180deg);
+}
+
+.scale {
+    width: 40px;
+    height: 40px;
+    transition: all ease 5ms;
+}
+
+.scale:hover {
+    width: 35px;
+    height: 35px;
+}
+
+.edit {
+    position: absolute;
+    margin: 0;
+    right: 0;
+    align-self: center;
+    border-radius: 0;
+    border-left: lightgrey solid 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.textarea {
+    border-radius: 0;
+    outline: none;
+    border: none;
+    border-bottom: white solid 1px;
+    color: white;
+    font-size: 15px;
+    height: 20px;
+    width: calc(100% - 140px);
+    padding: 0 0 1px 0;
+    margin: 15px 0 5px 0;
+    background-color: transparent;
+    resize: none;
+}
+
+.button-bar {
+    display: flex;
+    align-items: center;
+    height: 35px;
+    flex-grow: 1;
+    margin: 0 7px 3px 7px;
+    align-self: flex-end;
+}
+
+.button-bar button {
+    height: 100%;
+    width: 48%;
+    margin-right: 2%;
+    background-color: transparent;
+    border-radius: 1px;
+    border: lightgrey solid 1px;
+    box-shadow: 0 0 3px 1px grey;
+    /*border: none;*/
+}
+
+.button-bar button:hover {
+    background-color: #B0B0B0;
+}
+
+.body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.window {
+    height: 100%;
+    position: relative;
+    /*width: calc(var(--width));*/
+    padding: 20px 10px 10px 10px;
+    background: #353535;
+}
+
+
+/*drawer*/
+
+.drawer {
+    width: 80px;
+    height: 100%;
+    position: fixed;
+    right: -100px;
+    background: #404040;
+    border-left: grey solid 1px;
+    transition: right ease 0.5s;
+    z-index: 404;
+    padding: 5px;
+}
+
+.drawer.show {
+    right: 0;
+}
+
+.drawer .bar {
+    height: 50px;
+    border-bottom: grey solid 1px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightgrey;
+}
+
+.drawer .bar svg {
+    margin-right: 5px;
+}
+
+.drawer-mask {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    opacity: 0.5;
+    z-index: 100;
+}

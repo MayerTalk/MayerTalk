@@ -1,0 +1,109 @@
+/*class: dialogue*/
+
+pre {
+    margin: 0;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+.avatar {
+    position: relative;
+    flex-shrink: 0;
+    width: 55px;
+    height: 55px;
+}
+
+.avatar img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.thought-box {
+    align-self: flex-start;
+    flex-grow: 1;
+    margin: 0 10px 0 10px;
+    padding: 8px;
+    font-size: 13px;
+    background: #606060;
+    color: white;
+    opacity: 0.6;
+}
+
+.image-box {
+    align-self: flex-start;
+    margin: 0 10px 0 10px;
+    position: relative;
+    padding: 7px;
+    background: var(--dialogue-background);
+    border: var(--dialogue-border-color) solid 1px;
+    color: var(--dialogue-color);
+}
+
+.image-box img {
+    width: 100%;
+    display: flex;
+}
+
+.narration-box {
+    align-self: flex-start;
+    flex-grow: 1;
+    margin: 0 10px 0 10px;
+    padding: 8px;
+    font-size: 13px;
+}
+
+.dialogue-box {
+    align-self: flex-start;
+    flex-grow: 1;
+    margin: 0 10px 0 10px;
+    padding: 8px;
+    font-size: 13px;
+    position: relative;
+    background: var(--dialogue-background);
+    border: var(--dialogue-border-color) solid 1px;
+    color: var(--dialogue-color);
+}
+
+.left .tail {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    left: -10px;
+    transform: rotate(-2deg);
+    border-bottom: var(--dialogue-border-color) solid 1px;
+    overflow: hidden;
+}
+
+.left .tail2 {
+    position: absolute;
+    width: 13px;
+    left: 1px;
+    height: 10px;
+    top: 6px;
+    transform: rotate(-35deg);
+    background: var(--dialogue-background);
+    border-top: var(--dialogue-border-color) solid 1px;
+}
+
+.right .tail {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    left: 100%;
+    top: 9px;
+    transform: rotate(2deg);
+    border-bottom: var(--dialogue-border-color) solid 1px;
+    overflow: hidden;
+}
+
+.right .tail2 {
+    position: absolute;
+    width: 13px;
+    left: -4px;
+    height: 10px;
+    top: 6px;
+    transform: rotate(35deg);
+    background: var(--dialogue-background);
+    border-top: var(--dialogue-border-color) solid 1px;
+}

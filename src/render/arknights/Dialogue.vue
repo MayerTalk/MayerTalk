@@ -43,41 +43,43 @@
 </script>
 
 <template>
-    <div class="dialogue" :class="config.style">
-        <div style="display: flex; width: 100%; margin-bottom: 10px">
-            <div class="avatar" @click="$emit('edit', index)">
-                <div v-if="right === false">
-                    <img src="/avatar-bg.png">
-                    <img :src="char.avatar">
-                </div>
-            </div>
-            <div v-if="data.image" class="image-box">
-                <div v-if="data.char" :class="[right? 'right':'left']">
-                    <div class="tail">
-                        <div class="tail2"></div>
+    <div :class="config.style">
+        <div class="dialogue">
+            <div style="display: flex; width: 100%; margin-bottom: 10px">
+                <div class="avatar" @click="$emit('edit', index)">
+                    <div v-if="right === false">
+                        <img src="/avatar-bg.png">
+                        <img :src="char.avatar">
                     </div>
                 </div>
-                <img :id="id" :src="data.url">
-            </div>
-            <div v-else-if="!data.char" class="narration-box"
-                 :style="{color: data.thought?'#909090':'#CCCCCC'}">
-                <pre>{{data.text}}</pre>
-            </div>
-            <div v-else-if="data.thought" class="thought-box">
-                <pre>{{data.text}}</pre>
-            </div>
-            <div v-else class="dialogue-box">
-                <div :class="[right? 'right':'left']">
-                    <div class="tail">
-                        <div class="tail2"></div>
+                <div v-if="data.image" class="image-box">
+                    <div v-if="data.char" :class="[right? 'right':'left']">
+                        <div class="tail">
+                            <div class="tail2"></div>
+                        </div>
                     </div>
+                    <img :id="id" :src="data.url">
                 </div>
-                <pre>{{data.text}}</pre>
-            </div>
-            <div class="avatar" @click="$emit('edit', index)">
-                <div v-if="right === true">
-                    <img src="/avatar-bg.png">
-                    <img :src="char.avatar">
+                <div v-else-if="!data.char" class="narration-box"
+                     :style="{color: data.thought?'#909090':'#CCCCCC'}">
+                    <pre>{{data.text}}</pre>
+                </div>
+                <div v-else-if="data.thought" class="thought-box">
+                    <pre>{{data.text}}</pre>
+                </div>
+                <div v-else class="dialogue-box">
+                    <div :class="[right? 'right':'left']">
+                        <div class="tail">
+                            <div class="tail2"></div>
+                        </div>
+                    </div>
+                    <pre>{{data.text}}</pre>
+                </div>
+                <div class="avatar" @click="$emit('edit', index)">
+                    <div v-if="right === true">
+                        <img src="/avatar-bg.png">
+                        <img :src="char.avatar">
+                    </div>
                 </div>
             </div>
         </div>
