@@ -15,7 +15,6 @@ dist-ssr
 public
 coverage
 *.local
-*.py
 
 /cypress/videos/
 /cypress/screenshots/
@@ -29,3 +28,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+.scoped.css
+.global.css
