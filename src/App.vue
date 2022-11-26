@@ -5,9 +5,10 @@
 
     const showAnnouncement = ref(false);
     const config = ref({
-        'render': 'Arknights',
-        'style': 'default'
-    })
+        render: 'Arknights',
+        style: 'default',
+        background: null
+    });
     const chars = ref({});
     const chats = ref([]);
 
@@ -25,3 +26,8 @@
 </template>
 
 <style src="./font.css"></style>
+<style>
+    body, html {
+        margin: 0;
+    }
+</style>
