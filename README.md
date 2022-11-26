@@ -7,7 +7,7 @@
  ## 参考
  
  - [yuzutalk](https://www.yuzutalk.net/) 对话形式二创的启发
- - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现(2022.5.9)，不过在本项目启动时(2022.11.5)并没有注意到，不可避免地撞车了（
+ - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现(2022.5.9)，不过在本项目启动时(2022.11.5)并不知晓，不可避免地撞车了（
  
  ## 与ClosureTalk的区别
  
@@ -33,6 +33,7 @@
  | 换行方式 | enter | shift + enter |
  | 发送方式 | 点击 / ctrl + enter | 点击 / enter | 
  | 撤回 | 不支持 | ctrl + z |
+ | 重做 | 不支持 | ctrl + y |
  
  ### 角色
  
@@ -45,6 +46,7 @@
  | 右侧角色(参考叙拉古对话) | ✅ | ❌ |
  | 内置头像库 | ✅ | ✅ |
  | i18n搜索头像(非中文) | ❌ | ✅ |
+ | 快捷切换 | 不支持 | ctrl + 0~9 |
  
  ### 对话类型
  
