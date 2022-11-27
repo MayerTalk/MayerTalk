@@ -1,10 +1,9 @@
 <script setup>
     import {ref, computed, watch, inject, nextTick} from 'vue'
     import Dialogue from './Dialogue.vue'
-    import html2canvas from 'html2canvas'
     import avatars from "@/avatars";
     import message from '@/lib/message'
-    import {copy, uuid} from "@/lib/tool";
+    import {copy, uuid, downloadImage} from "@/lib/tool";
 
     const showAnnouncement = inject('showAnnouncement');
     const config = inject('config');
@@ -207,12 +206,8 @@
     function screenshot() {
         preScreenshot.value = true;
         setTimeout(() => {
-            html2canvas(document.getElementById('window')).then(canvas => {
-                const el = document.createElement('a');
-                el.download = 'screenshot.png';
-                el.href = canvas.toDataURL();
-                el.click();
-                preScreenshot.value = false;
+            downloadImage(document.getElementById('window'), () => {
+                preScreenshot.value = false
             })
         }, 100)
     }
