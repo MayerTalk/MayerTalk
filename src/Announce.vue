@@ -1,5 +1,6 @@
 <script setup>
     import {onMounted} from 'vue'
+    import {saveData, getData} from './lib/tool';
 
     const {modelValue} = defineProps(['modelValue']);
     const emit = defineEmits(['update:modelValue']);
@@ -8,9 +9,9 @@
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
 
     onMounted(() => {
-        if (localStorage.getItem('a_version') !== version) {
+        if (getData('a_version') !== version) {
             emit('update:modelValue', true);
-            localStorage.setItem('a_version', version)
+            saveData('a_version', version)
         }
     })
 </script>
