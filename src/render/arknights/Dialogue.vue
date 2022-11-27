@@ -8,7 +8,6 @@
     const char = computed(() => {
         return chars.value[data.char] || {};
     });
-    const id = Date.now() + '';
 
     const right = computed(() => {
         if (data.char) {
@@ -20,8 +19,8 @@
 
     function resize(t) {
         // 当height为小数时，html2canvas 会有1px的误差，在此赋值为整数
-        if (data.image) {
-            const el = document.getElementById(id);
+        if (data.type === 'image') {
+            const el = document.getElementById(data.id);
             if (el.offsetHeight === 0) {
                 if (t > 10) {
                     return
@@ -52,29 +51,35 @@
                         <img :src="char.avatar">
                     </div>
                 </div>
-                <div v-if="data.image" class="image-box">
+                <div v-if="data.type==='image'" class="image-box">
                     <div v-if="data.char" :class="[right? 'right':'left']">
                         <div class="tail">
                             <div class="tail2"></div>
                         </div>
                     </div>
-                    <img :id="id" :src="data.url">
+                    <img :id="data.id" :src="data.content">
                 </div>
-                <div v-else-if="!data.char" class="narration-box"
-                     :style="{color: data.thought?'#909090':'#CCCCCC'}">
-                    <pre>{{data.text}}</pre>
-                </div>
-                <div v-else-if="data.thought" class="thought-box">
-                    <pre>{{data.text}}</pre>
-                </div>
-                <div v-else class="dialogue-box">
-                    <div :class="[right? 'right':'left']">
-                        <div class="tail">
-                            <div class="tail2"></div>
+                <template v-if="data.type==='chat'">
+                    <div v-if="data.char" class="dialogue-box">
+                        <div :class="[right? 'right':'left']">
+                            <div class="tail">
+                                <div class="tail2"></div>
+                            </div>
                         </div>
+                        <pre style="font-family: Harmony">{{data.content}}</pre>
                     </div>
-                    <pre>{{data.text}}</pre>
-                </div>
+                    <div v-else style="color: #CCCCCC" class="narration-box">
+                        <pre>{{data.content}}</pre>
+                    </div>
+                </template>
+                <template v-if="data.type==='monologue'">
+                    <div v-if="data.char" class="monologue-box">
+                        <pre>{{data.content}}</pre>
+                    </div>
+                    <div v-else style="color: #909090" class="narration-box">
+                        <pre>{{data.content}}</pre>
+                    </div>
+                </template>
                 <div class="avatar" @click="$emit('edit', index)">
                     <div v-if="right === true">
                         <img src="/avatar-bg.png">

@@ -4,7 +4,7 @@
     import html2canvas from 'html2canvas'
     import avatars from "@/avatars";
     import message from '@/lib/message'
-    import {copy} from "@/lib/tool";
+    import {copy, uuid} from "@/lib/tool";
 
     const showAnnouncement = inject('showAnnouncement');
     const config = inject('config');
@@ -20,7 +20,7 @@
     const createChar = ref(true);
     const showSelectAvatar = ref(false);
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 520) * 0.9);
-    const newChar = ref({});
+    const newChar = ref({name: ''});
     const searchChar = ref('');
 
     const _showEditDialogue = ref(false);
@@ -46,13 +46,13 @@
 
     const scrollHeight = ref(window.innerHeight - 95 + 'px');
 
-    function createDialogue(thought) {
+    function createDialogue(monologue) {
         if (textarea.value) {
             chats.value.push({
-                text: textarea.value,
                 char: currChar.value,
-                thought,
-                id: Symbol()
+                content: textarea.value,
+                type: monologue ? 'monologue' : 'chat',
+                id: uuid()
             });
             textarea.value = '';
             nextTick(() => {
@@ -67,9 +67,9 @@
         if (url) {
             chats.value.push({
                 char: currChar.value,
-                id: Symbol(),
-                image: true,
-                url
+                content: url,
+                type: 'image',
+                id: uuid(),
             });
             nextTick(() => {
                 scroll.value.setScrollTop(10000)
@@ -143,18 +143,9 @@
 
     function editChar() {
         if (createChar.value) {
-            if (chars.value.hasOwnProperty(newChar.value.name)) {
-                message.notify('角色名重复', message.error);
-                return
-            }
-            if (newChar.value.name === '') {
-                message.notify('名字是必须的', message.error);
-                return
-            }
             _showEditChar.value = false;
-            chars.value[newChar.value.name] = copy(newChar.value);
+            chars.value[uuid()] = copy(newChar.value);
             newChar.value = {name: ''};
-            console.log(chars.value);
             message.notify('创建成功', message.success);
         } else {
             message.confirm(

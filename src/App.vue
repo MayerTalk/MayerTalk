@@ -16,8 +16,6 @@
     provide('config', config);
     provide('chars', chars);
     provide('chats', chats)
-
-
 </script>
 
 <template>
