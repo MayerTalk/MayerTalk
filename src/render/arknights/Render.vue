@@ -142,6 +142,10 @@
 
     function editChar() {
         if (createChar.value) {
+            if (newChar.value.name === '') {
+                message.notify('名字是必须的', message.error);
+                return
+            }
             _showEditChar.value = false;
             chars.value[uuid()] = copy(newChar.value);
             newChar.value = {name: ''};
@@ -297,7 +301,7 @@
                                 <el-option
                                         v-for="(char, id) in chars"
                                         :key="id"
-                                        :label="id"
+                                        :label="char.name"
                                         :value="id"
                                 />
                                 <el-option
@@ -316,7 +320,7 @@
                         <div style="width: 23%;">
                             {{currDialogueData.char?'内心':'提示'}}
                             <el-switch
-                                    v-model="currDialogueData.thought"
+                                    v-model="currDialogueData.monologue"
                             ></el-switch>
                         </div>
                         <div v-if="editDialogue" style="width: 100%; margin-top: 5px">
