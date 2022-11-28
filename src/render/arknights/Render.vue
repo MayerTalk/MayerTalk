@@ -5,6 +5,12 @@
     import message from '@/lib/message'
     import {copy, uuid, downloadImage} from "@/lib/tool";
 
+    const TypeDict = {
+        chat: '对话',
+        monologue: '独白',
+        image: '图片'
+    };
+
     const showAnnouncement = inject('showAnnouncement');
     const config = inject('config');
     const chars = inject('chars');
@@ -27,10 +33,6 @@
     const currDialogueData = ref({});
     const editDialogue = ref(true);
 
-    for (let i = 0; i < chats.value.length; i++) {
-        chats.value[i].id = Symbol()
-    }
-
     function resize() {
         const el = document.getElementById('tare');
         el.style.height = '20px';
@@ -38,7 +40,6 @@
         el.style.height = height + 'px';
         scrollHeight.value = window.innerHeight - height - 75 + 'px'
     }
-
 
     watch(textarea, resize);
     window.onresize = resize;
@@ -289,14 +290,14 @@
                 <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth">
 
                     <el-input
-                            v-model="currDialogueData.text"
+                            v-model="currDialogueData.content"
                             :autosize="{minRows: 1, maxRows: 5}"
                             resize="none"
                             type="textarea"
                             style="margin-bottom: 5px"
                     ></el-input>
                     <div class="edit-bar">
-                        <div style="width: 50%; margin-right: 2%; display: flex">
+                        <div style="width: 50%; display: flex">
                             <el-select v-model="currDialogueData.char" style="flex-grow: 1">
                                 <el-option
                                         v-for="(char, id) in chars"
@@ -311,19 +312,17 @@
                                 />
                             </el-select>
                         </div>
-                        <div style="width: 23%; margin-right: 2%;">
-                            反向
-                            <el-switch
-                                    v-model="currDialogueData.opposite"
-                            ></el-switch>
+                        <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
+                            <el-select v-model="currDialogueData.type" style="flex-grow: 1">
+                                <el-option
+                                        v-for="(text, type) in TypeDict"
+                                        :key="type"
+                                        :label="text"
+                                        :value="type"
+                                />
+                            </el-select>
                         </div>
-                        <div style="width: 23%;">
-                            {{currDialogueData.char?'内心':'提示'}}
-                            <!--TODO fix-->
-                            <el-switch
-                                    v-model="currDialogueData.monologue"
-                            ></el-switch>
-                        </div>
+                        <div style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
                         <div v-if="editDialogue" style="width: 100%; margin-top: 5px">
                             <el-button style="width: 50%" @click="delDialogue">删除</el-button>
                             <el-button style="width: calc(50% - 5px); margin-left: 5px" @click="switchEdit(false)">向上插入

@@ -1,5 +1,5 @@
 <script setup>
-    import {inject, computed, watch, onMounted} from 'vue';
+    import {inject, computed, watch, onMounted, nextTick} from 'vue';
 
     const chars = inject('chars');
     const config = inject('config');
@@ -11,7 +11,9 @@
 
     const right = computed(() => {
         if (data.char) {
-            return data.opposite ? !char.value.right : !!char.value.right
+            // opposite is deprecated
+            // return data.opposite ? !char.value.right : !!char.value.right
+            return !!char.value.right
         } else {
             return null
         }
@@ -35,7 +37,9 @@
         }
     }
 
-    watch(data, resize);
+    watch(data, () => {
+        nextTick(resize)
+    });
     onMounted(() => {
         resize()
     })
