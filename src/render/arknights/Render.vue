@@ -274,7 +274,7 @@
                     <!--        素材库选择头像-->
                     <el-input placeholder="输入角色名" v-model="searchChar"></el-input>
                     <div v-if="searchResult" class="avatar-bar">
-                        <el-scrollbar max-height="50vh">
+                        <el-scrollbar max-height="50vh" style="width: 100%">
                             <img v-for="src in searchResult" :key="src" :src="'/avatar/' + src + '.png'" loading="lazy"
                                  :title="src"
                                  @click="selectAvatar(src)">
@@ -319,6 +319,7 @@
                         </div>
                         <div style="width: 23%;">
                             {{currDialogueData.char?'内心':'提示'}}
+                            <!--TODO fix-->
                             <el-switch
                                     v-model="currDialogueData.monologue"
                             ></el-switch>
