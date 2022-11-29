@@ -165,6 +165,9 @@
         blob2base64(uploadFile, (b64) => {
             const imageId = uuid();
             images.value[imageId] = b64;
+            if (images.value.hasOwnProperty(newChar.value.avatar)) {
+                delete images.value[newChar.value.avatar]
+            }
             newChar.value.avatar = imageId
         });
         return false
@@ -225,7 +228,10 @@
             '即将删除该对话',
             '提示',
             () => {
-                chats.value.splice(currDialogue.value, 1);
+                let chat = chats.value.splice(currDialogue.value, 1);
+                if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
+                    delete images.value[char.content]
+                }
                 message.notify('删除成功', message.success);
                 _showEditDialogue.value = false
             }
@@ -334,6 +340,7 @@
                             resize="none"
                             type="textarea"
                             style="margin-bottom: 5px"
+                            :disabled="currDialogueData.type==='image'"
                     ></el-input>
                     <div class="edit-bar">
                         <div style="width: 50%; display: flex">
