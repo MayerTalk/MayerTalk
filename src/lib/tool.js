@@ -40,11 +40,32 @@ function getData(name) {
     }
 }
 
+function blob2url(blob) {
+    let url = null;
+    if (window.createObjectURL !== undefined) {
+        url = window.createObjectURL(blob)
+    } else if (window.URL.createObjectURL !== undefined) {
+        url = window.URL.createObjectURL(blob)
+    } else if (window.webkitURL !== undefined) {
+        url = window.webkitURL.createObjectURL(blob)
+    }
+    return url
+}
+
+function blob2base64(blob, callback) {
+    const reader = new FileReader();
+    reader.onloadend = (b64) => {
+        callback(reader.result)
+    };
+    reader.readAsDataURL(blob);
+
+}
 
 export {
     copy,
     uuid,
     saveData,
     getData,
-    downloadImage
+    downloadImage,
+    blob2base64
 }
