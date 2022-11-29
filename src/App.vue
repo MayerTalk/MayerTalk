@@ -73,7 +73,7 @@
 </script>
 
 <template>
-    <Test/>
+<!--    <Test/>-->
     <Announce v-model="showAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>
