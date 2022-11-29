@@ -15,11 +15,12 @@
 
     const showAnnouncement = inject('showAnnouncement');
     const config = inject('config');
-    const settings = ref({});
-    const width = ref({});
     const chars = inject('chars');
     const chats = inject('chats');
     const images = inject('images');
+    const save = inject('save');
+    const settings = ref({});
+    const width = ref({});
     provide('settings', settings);
     provide('width', width);
 
@@ -97,6 +98,7 @@
                 id: uuid()
             });
             textarea.value = '';
+            save();
             nextTick(() => {
                 resizeScroll();
                 scroll.value.setScrollTop(10000)
@@ -115,6 +117,7 @@
                     type: 'image',
                     id: uuid(),
                 });
+                save();
                 nextTick(() => {
                     scroll.value.setScrollTop(10000)
                 })
@@ -204,8 +207,6 @@
                             chats.value.splice(i, 1)
                         }
                     }
-
-
                     message.notify('删除成功', message.success);
                     _showEditChar.value = false;
                 }
@@ -240,7 +241,7 @@
                     delete images.value[chat.content];
                 }
                 message.notify('删除成功', message.success);
-                _showEditDialogue.value = false
+                _showEditDialogue.value = false;
             }
         );
     }
@@ -285,7 +286,7 @@
     <div :class="config.style">
         <div class="render">
             <div id="body" :style="{background: settings.background}">
-                <el-dialog v-model="_showEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth">
+                <el-dialog v-model="_showEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth" @closed="save">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
                             <el-upload
@@ -340,8 +341,7 @@
                         <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth">
-
+                <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth" @closed="save">
                     <el-input
                             v-model="currDialogueData.content"
                             :autosize="{minRows: 1, maxRows: 5}"
@@ -352,7 +352,7 @@
                     ></el-input>
                     <div class="edit-bar">
                         <div style="width: 50%; display: flex">
-                            <el-select v-model="currDialogueData.char" style="flex-grow: 1">
+                            <el-select v-model="currDialogueData.char" style="flex-grow: 1" placeholder="角色">
                                 <el-option
                                         v-for="(char, id) in chars"
                                         :key="id"
@@ -369,12 +369,14 @@
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
                                        :disabled="currDialogueData.type==='image'"
+                                       placeholder="类型"
                             >
                                 <el-option
                                         v-for="(text, type) in TypeDict"
                                         :key="type"
                                         :label="text"
                                         :value="type"
+                                        :disabled="type==='image'"
                                 />
                             </el-select>
                         </div>
