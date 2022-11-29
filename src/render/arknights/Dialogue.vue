@@ -3,6 +3,8 @@
 
     const chars = inject('chars');
     const config = inject('config');
+    const width = inject('width');
+    const charDirection = inject('charDirection');
     const {data, index} = defineProps(['data', 'index']);
     defineEmits(['edit']);
     const char = computed(() => {
@@ -49,7 +51,7 @@
     <div :class="config.style">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px">
-                <div class="avatar" @click="$emit('edit', index)">
+                <div v-if="charDirection[0]" class="avatar" @click="$emit('edit', index)">
                     <div v-if="right === false">
                         <img src="/avatar-bg.png">
                         <img :src="char.avatar">
@@ -84,7 +86,7 @@
                         <pre>{{data.content}}</pre>
                     </div>
                 </template>
-                <div class="avatar" @click="$emit('edit', index)">
+                <div v-if="charDirection[1]" class="avatar" @click="$emit('edit', index)">
                     <div v-if="right === true">
                         <img src="/avatar-bg.png">
                         <img :src="char.avatar">
@@ -97,3 +99,13 @@
 
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
+<style scoped>
+    .avatar {
+        width: v-bind('width.avatar');
+        height: v-bind('width.avatar');
+    }
+
+    .dialogue pre {
+        font-size: v-bind('width.fontsize');
+    }
+</style>

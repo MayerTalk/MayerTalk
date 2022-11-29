@@ -1,7 +1,6 @@
 /*class: render*/
 
 #body {
-    background: #353535;
     width: 100vw;
     height: 100vh;
 }
@@ -236,7 +235,7 @@
     height: 100%;
     position: fixed;
     right: -100px;
-    background: #404040;
+    background: #606060;
     border-left: grey solid 1px;
     transition: right ease 0.5s;
     z-index: 404;

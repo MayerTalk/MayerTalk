@@ -1,10 +1,3 @@
-@font-face {
-    font-family: 'Harmony';
-    src: url('/HarmonyOS_Sans_SC_Regular.ttf');
-    font-weight: normal;
-    font-style: normal;
-}
-
 * {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, Courier New, 'Harmony', serif !important
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important
 }

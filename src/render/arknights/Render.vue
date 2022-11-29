@@ -1,6 +1,7 @@
 <script setup>
-    import {ref, computed, watch, inject, nextTick} from 'vue'
+    import {ref, computed, watch, inject, nextTick, provide} from 'vue'
     import Dialogue from './Dialogue.vue'
+    import Settings from './Setting.vue'
     import avatars from "@/avatars";
     import message from '@/lib/message'
     import {copy, uuid, downloadImage} from "@/lib/tool";
@@ -11,10 +12,50 @@
         image: '图片'
     };
 
+
     const showAnnouncement = inject('showAnnouncement');
     const config = inject('config');
+    const settings = ref({});
+    const width = ref({});
     const chars = inject('chars');
     const chats = inject('chats');
+    provide('settings', settings);
+    provide('width', width);
+
+    const charDirection = computed(() => {
+        const dict = chars.value;
+        let left = false;
+        let right = false;
+        for (let char in dict) {
+            if (dict.hasOwnProperty(char)) {
+                if (dict[char].right) {
+                    right = true
+                } else {
+                    left = true
+                }
+            }
+        }
+        return [left, right]
+    });
+    provide('charDirection', charDirection);
+
+    function resizeWindow(order) {
+        let w = order || Math.min(500, document.body.clientWidth);
+        width.value.window = w;
+        w -= 5;
+        if (charDirection.value[0] && charDirection.value[1]) {
+            width.value.avatar = Math.ceil(w / 8.5) + 'px';
+            width.value.fontsize = Math.ceil(w / 8.5 / 4) + 'px'
+        } else {
+            width.value.avatar = Math.ceil(w / 7.5) + 'px';
+            width.value.fontsize = Math.ceil(w / 7.5 / 4) + 'px'
+        }
+    }
+
+    resizeWindow();
+    watch(charDirection, () => {
+        resizeWindow()
+    });
 
     const textarea = ref('');
     const scroll = ref();
@@ -33,7 +74,7 @@
     const currDialogueData = ref({});
     const editDialogue = ref(true);
 
-    function resize() {
+    function resizeScroll() {
         const el = document.getElementById('tare');
         el.style.height = '20px';
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
@@ -41,8 +82,8 @@
         scrollHeight.value = window.innerHeight - height - 75 + 'px'
     }
 
-    watch(textarea, resize);
-    window.onresize = resize;
+    watch(textarea, resizeScroll);
+    window.onresize = resizeScroll;
 
     const scrollHeight = ref(window.innerHeight - 95 + 'px');
 
@@ -56,7 +97,7 @@
             });
             textarea.value = '';
             nextTick(() => {
-                resize();
+                resizeScroll();
                 scroll.value.setScrollTop(10000)
             });
         }
@@ -210,11 +251,15 @@
 
     function screenshot() {
         preScreenshot.value = true;
-        setTimeout(() => {
-            downloadImage(document.getElementById('window'), () => {
-                preScreenshot.value = false
-            })
-        }, 100)
+        resizeWindow(500);
+        nextTick(() => {
+            setTimeout(() => {
+                downloadImage(document.getElementById('window'), {windowWidth: 520, width: 520}, () => {
+                    preScreenshot.value = false;
+                    setTimeout(resizeWindow, 50)
+                })
+            }, 100)
+        })
     }
 
     const showToolBar = ref(false);
@@ -230,9 +275,10 @@
 
 
 <template>
+    <Settings/>
     <div :class="config.style">
         <div class="render">
-            <div id="body">
+            <div id="body" :style="{background: settings.background}">
                 <el-dialog v-model="_showEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
@@ -359,7 +405,8 @@
                 <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
-                        <div class="window" id="window" :style="{width:(preScreenshot?'520px':'min(100vw, 520px)')}">
+                        <div class="window" id="window"
+                             :style="{width:(preScreenshot?'520px':'min(100vw, 520px)'), background: settings.background}">
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id"></Dialogue>
                         </div>

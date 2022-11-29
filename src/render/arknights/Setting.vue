@@ -1,15 +1,27 @@
 <script setup>
-    import {inject} from 'vue'
+    import {inject, watch} from 'vue'
     import {getData, saveData} from "@/lib/tool";
 
-    const defaultConfig = {
-        background: null
+    const defaultSettings = {
+        background: '#303030',
+        width: 520
     };
 
     const config = inject('config');
-    config.value.settings.value = getData('setting.Arknights') || defaultConfig
+    const settings = inject('settings');
+
+    config.value.settings = getData('setting.Arknights') || {};
+
+    function sync() {
+        const value = config.value.settings;
+        settings.value.background = value.background || defaultSettings.background;
+        settings.value.width = value.width || defaultSettings.width;
+    }
+
+    sync();
+    watch(config, sync);
 </script>
 
 <template>
-<!--    TODO-->
+    <!--    TODO-->
 </template>
