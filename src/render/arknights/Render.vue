@@ -289,7 +289,8 @@
                                     accept="image/png, image/jpeg, image/gif"
                                     :before-upload="uploadAvatar"
                             >
-                                <div class="container"><img v-if="newChar.avatar" :src="images[newChar.avatar] || newChar.avatar"/>
+                                <div class="container"><img v-if="newChar.avatar"
+                                                            :src="images[newChar.avatar] || newChar.avatar"/>
                                     <el-icon v-else class="avatar-uploader-icon">
                                         <Plus/>
                                     </el-icon>
@@ -359,7 +360,9 @@
                             </el-select>
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
-                            <el-select v-model="currDialogueData.type" style="flex-grow: 1">
+                            <el-select v-model="currDialogueData.type" style="flex-grow: 1"
+                                       :disabled="currDialogueData.type==='image'"
+                            >
                                 <el-option
                                         v-for="(text, type) in TypeDict"
                                         :key="type"
