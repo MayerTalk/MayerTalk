@@ -7,11 +7,7 @@
     import Test from './Test.vue'
 
     const showAnnouncement = ref(false);
-    const config = ref({
-        render: 'Arknights',
-        style: 'default',
-        settings: {}
-    });
+    const config = ref({render: 'Arknights'});
     const chars = ref({});
     const chats = ref([]);
     const images = ref({});
@@ -21,10 +17,10 @@
 
     function save() {
         let data = {
+            config: config.value,
             chars: chars.value,
             chats: chats.value,
-            images: images.value,
-            config: config.value
+            images: images.value
         };
         let dataStr = JSON.stringify(data);
         if (dataStr.length > 4 * 1024 * 1024) {
@@ -48,16 +44,8 @@
         localStorage.setItem('data', dataStr);
     }
 
-    provide('showAnnouncement', showAnnouncement);
-    provide('config', config);
-    provide('chars', chars);
-    provide('chats', chats);
-    provide('images', images);
-    provide('save', save);
-
-    onMounted(() => {
-        const data = getData('data') || {};
-        if (data.hasOwnProperty('config')) {
+    function setData(data, enableConfig) {
+        if (data.hasOwnProperty('config') && enableConfig) {
             config.value = data.config
         }
         if (data.hasOwnProperty('chars')) {
@@ -69,11 +57,23 @@
         if (data.hasOwnProperty('images')) {
             images.value = data.images
         }
+    }
+
+    provide('showAnnouncement', showAnnouncement);
+    provide('config', config);
+    provide('chars', chars);
+    provide('chats', chats);
+    provide('images', images);
+    provide('save', save);
+    provide('setData', setData);
+
+    onMounted(() => {
+        setData(getData('data') || {}, true)
     })
 </script>
 
 <template>
-<!--    <Test/>-->
+    <Test/>
     <Announce v-model="showAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>

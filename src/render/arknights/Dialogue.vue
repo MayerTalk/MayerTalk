@@ -4,7 +4,7 @@
 
     const chars = inject('chars');
     const images = inject('images');
-    const config = inject('config');
+    const settings = inject('settings');
     const width = inject('width');
     const charDirection = inject('charDirection');
     const {data, index} = defineProps(['data', 'index']);
@@ -55,7 +55,7 @@
 </script>
 
 <template>
-    <div :class="config.style">
+    <div :class="settings.style">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px">
                 <div v-if="charDirection[0]" class="avatar" @click="$emit('edit', index)">

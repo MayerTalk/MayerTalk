@@ -19,15 +19,6 @@ function saveData(name, data) {
     }
 }
 
-function downloadImage(node, options, callback) {
-    html2canvas(node, options).then(canvas => {
-        const el = document.createElement('a');
-        el.download = 'arktalk-' + Date.now() + '.png';
-        el.href = canvas.toDataURL();
-        el.click();
-        callback && callback()
-    }).catch(message.notify)
-}
 
 function getData(name) {
     let data = localStorage.getItem(name);
@@ -38,6 +29,20 @@ function getData(name) {
         }
         return data
     }
+}
+
+function download(url, filename) {
+    const el = document.createElement('a');
+    el.download = filename;
+    el.href = url;
+    el.click();
+}
+
+function downloadImage(node, options, callback) {
+    html2canvas(node, options).then(canvas => {
+        download(canvas.toDataURL(), 'arktalk-' + Date.now() + '.png');
+        callback && callback()
+    }).catch(message.notify)
 }
 
 function blob2url(blob) {
@@ -66,6 +71,8 @@ export {
     uuid,
     saveData,
     getData,
+    download,
     downloadImage,
+    blob2url,
     blob2base64
 }

@@ -4,7 +4,7 @@
     import Settings from './Setting.vue'
     import avatars from "@/avatars";
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage, blob2base64} from "@/lib/tool";
+    import {copy, uuid, downloadImage, download, blob2url, blob2base64} from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
@@ -19,6 +19,7 @@
     const chats = inject('chats');
     const images = inject('images');
     const save = inject('save');
+    const setData = inject('setData');
     const settings = ref({});
     const width = ref({});
     provide('settings', settings);
@@ -75,6 +76,16 @@
     const currDialogue = ref(-1);
     const currDialogueData = ref({});
     const editDialogue = ref(true);
+
+    const showToolBar = ref(false);
+    const toolBarMask = ref(true);
+    if (window.innerWidth - 520 > 250) {
+        showToolBar.value = true;
+        toolBarMask.value = false
+    } else {
+        showToolBar.value = false;
+        toolBarMask.value = true
+    }
 
     function resizeScroll() {
         const el = document.getElementById('tare');
@@ -256,6 +267,7 @@
         _showEditDialogue.value = false;
     }
 
+
     function screenshot() {
         preScreenshot.value = true;
         resizeWindow(500);
@@ -269,24 +281,57 @@
         })
     }
 
-    const showToolBar = ref(false);
-    const toolBarMask = ref(true);
-    if (window.innerWidth - 520 > 250) {
-        showToolBar.value = true;
-        toolBarMask.value = false
-    } else {
-        showToolBar.value = false;
-        toolBarMask.value = true
+
+    function clear() {
+        message.confirm(
+            '即将清空所有角色、对话',
+            '提示',
+            () => {
+                chars.value = {};
+                chats.value = [];
+                images.value = {};
+                message.notify('清空成功', message.success);
+                save()
+            }
+        )
+    }
+
+    function downloadData() {
+        const url = blob2url(new Blob([JSON.stringify({
+            config: config.value,
+            chars: chars.value,
+            chats: chats.value,
+            images: images.value
+        })], {type: 'application/json'}));
+        download(url, 'arktalk-data-' + Date.now() + '.json')
+    }
+
+    function uploadData(uploadFile) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            try {
+                const data = JSON.parse(reader.result);
+                setData(data);
+                message.notify('导入成功', message.success);
+                save()
+            } catch (e) {
+                message.notify('导入失败，请确认文件名为 arktalk-data-xxx.json', message.error)
+            }
+
+        };
+        reader.readAsText(uploadFile);
+        return false
     }
 </script>
 
 
 <template>
     <Settings/>
-    <div :class="config.style">
+    <div :class="settings.style">
         <div class="render">
             <div id="body" :style="{background: settings.background}">
-                <el-dialog v-model="_showEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth" @closed="save">
+                <el-dialog v-model="_showEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
+                           @closed="save">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
                             <el-upload
@@ -341,7 +386,8 @@
                         <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth" @closed="save">
+                <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
+                           @closed="save">
                     <el-input
                             v-model="currDialogueData.content"
                             :autosize="{minRows: 1, maxRows: 5}"
@@ -406,6 +452,36 @@
                             <Notification/>
                         </el-icon>
                         公告
+                    </div>
+                    <div class="bar" @click="clear">
+                        <el-icon color="lightgrey" :size="35">
+                            <Delete/>
+                        </el-icon>
+                        清空
+                    </div>
+                    <div class="bar" @click="downloadData">
+                        <el-icon color="lightgrey" :size="35">
+                            <Download/>
+                        </el-icon>
+                        导出
+                    </div>
+                    <div class="bar" style="position: relative">
+                        <el-icon color="lightgrey" :size="35">
+                            <Upload/>
+                        </el-icon>
+                        导入
+                        <el-upload
+                                action="#"
+                                :show-file-list="false"
+                                class="avatar-uploader"
+                                accept="application/json"
+                                :before-upload="uploadData"
+                                style="position: absolute; width: 100%; height: 50px; overflow: hidden"
+                        >
+                            <div style=" width: 80px; height: 50px; user-select: none">
+                            </div>
+                        </el-upload>
+
                     </div>
                     <!--        <div class="bar">-->
                     <!--            <el-icon color="lightgrey" :size="35">-->
