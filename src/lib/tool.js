@@ -1,5 +1,6 @@
 import {v4 as uuid} from 'uuid'
 import html2canvas from 'html2canvas';
+import message from "./message";
 
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj))
@@ -18,15 +19,14 @@ function saveData(name, data) {
     }
 }
 
-
-function downloadImage(node, callback) {
-    html2canvas(node).then(canvas => {
+function downloadImage(node, options, callback) {
+    html2canvas(node, options).then(canvas => {
         const el = document.createElement('a');
-        el.download = 'screenshot.png';
+        el.download = 'arktalk-' + Date.now() + '.png';
         el.href = canvas.toDataURL();
         el.click();
         callback && callback()
-    })
+    }).catch(message.notify)
 }
 
 function getData(name) {
