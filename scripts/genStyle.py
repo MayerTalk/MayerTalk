@@ -45,12 +45,14 @@ class Render:
                 css = f.read()
             tmp_classes = re.findall(r'/\*class:? (.+?)\*/', css)
 
-            repl = ' '.join(['.' + c for c in classes + tmp_classes]) + ' '
+            repl = ' '.join(['.' + c for c in classes + tmp_classes])
+            if repl:
+                repl += ' '
 
             def sub(match: Match):
                 return repl + match.group(0)
 
-            _from = f'/*from {"/".join(classes)}/{file}*/\n\n'
+            _from = f'/*from {"/".join(classes + [file])}*/\n\n'
 
             if file.endswith('.global.css'):
                 self.global_cache[file_path] = _from + re.sub(r'[^\s{}/](?:[^{}/]|/\*\*/)*\{[^{}]*\}', sub, css)
