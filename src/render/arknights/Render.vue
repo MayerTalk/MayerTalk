@@ -2,7 +2,6 @@
     import {ref, computed, watch, inject, nextTick, provide} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
-    import avatars from "@/avatars";
     import message from '@/lib/message'
     import {copy, uuid, downloadImage, download, blob2url, blob2base64} from "@/lib/tool";
 
@@ -71,6 +70,21 @@
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 520) * 0.9);
     const newChar = ref({name: ''});
     const searchChar = ref('');
+    let avatars = [];
+
+    const searchResult = computed(() => {
+        if (searchChar.value) {
+            const search = searchChar.value;
+            const list = [];
+            for (let i = 0; i < avatars.length; i++) {
+                if (avatars[i].indexOf(search) !== -1) {
+                    list.push(avatars[i])
+                }
+            }
+            return list || false
+        }
+        return false
+    });
 
     const _showEditDialogue = ref(false);
     const currDialogue = ref(-1);
@@ -144,20 +158,6 @@
             currChar.value = id
         }
     }
-
-    const searchResult = computed(() => {
-        if (searchChar.value) {
-            const search = searchChar.value;
-            const list = [];
-            for (let i = 0; i < avatars.length; i++) {
-                if (avatars[i].indexOf(search) !== -1) {
-                    list.push(avatars[i])
-                }
-            }
-            return list || false
-        }
-        return false
-    });
 
     function showEditChar(create) {
         createChar.value = create;
@@ -322,6 +322,12 @@
         reader.readAsText(uploadFile);
         return false
     }
+
+    function loadAvatar() {
+        import("@/avatars").then(module => {
+            avatars = module.default
+        })
+    }
 </script>
 
 
@@ -370,7 +376,7 @@
                         </div>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="showSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh">
+                <el-dialog v-model="showSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
                     <!--        素材库选择头像-->
                     <el-input placeholder="输入角色名" v-model="searchChar"></el-input>
                     <div v-if="searchResult" class="avatar-bar">
