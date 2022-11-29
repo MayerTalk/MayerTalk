@@ -323,7 +323,7 @@
                     <div v-else
                          style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
                         <p>No Result</p>
-                        <p>Tips: 素材库仅包含干员/召唤物/装置头像</p>
+                        <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
                     </div>
                 </el-dialog>
                 <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth">
