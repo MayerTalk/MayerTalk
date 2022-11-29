@@ -2,6 +2,7 @@
     import {inject, computed, watch, onMounted, nextTick} from 'vue';
 
     const chars = inject('chars');
+    const images = inject('images');
     const config = inject('config');
     const width = inject('width');
     const charDirection = inject('charDirection');
@@ -54,7 +55,7 @@
                 <div v-if="charDirection[0]" class="avatar" @click="$emit('edit', index)">
                     <div v-if="right === false">
                         <img src="/avatar-bg.png">
-                        <img :src="char.avatar">
+                        <img :src="images[char.avatar] || char.avatar">
                     </div>
                 </div>
                 <div v-if="data.type==='image'" class="image-box">
@@ -63,7 +64,7 @@
                             <div class="tail2"></div>
                         </div>
                     </div>
-                    <img :id="data.id" :src="data.content">
+                    <img :id="data.id" :src="images[data.content]">
                 </div>
                 <template v-if="data.type==='chat'">
                     <div v-if="data.char" class="dialogue-box">
@@ -89,7 +90,7 @@
                 <div v-if="charDirection[1]" class="avatar" @click="$emit('edit', index)">
                     <div v-if="right === true">
                         <img src="/avatar-bg.png">
-                        <img :src="char.avatar">
+                        <img :src="images[char.avatar] || char.avatar">
                     </div>
                 </div>
             </div>

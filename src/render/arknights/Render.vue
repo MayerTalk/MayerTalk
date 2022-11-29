@@ -4,7 +4,7 @@
     import Settings from './Setting.vue'
     import avatars from "@/avatars";
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage} from "@/lib/tool";
+    import {copy, uuid, downloadImage, blob2base64} from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
@@ -19,6 +19,7 @@
     const width = ref({});
     const chars = inject('chars');
     const chats = inject('chats');
+    const images = inject('images');
     provide('settings', settings);
     provide('width', width);
 
@@ -104,18 +105,21 @@
     }
 
     function createImageDialogue(fileUpload) {
-        const url = upload(fileUpload);
-        if (url) {
-            chats.value.push({
-                char: currChar.value,
-                content: url,
-                type: 'image',
-                id: uuid(),
-            });
-            nextTick(() => {
-                scroll.value.setScrollTop(10000)
-            })
-        }
+        blob2base64(fileUpload, (b64) => {
+            if (b64) {
+                const imageId = uuid();
+                images.value[imageId] = b64;
+                chats.value.push({
+                    char: currChar.value,
+                    content: imageId,
+                    type: 'image',
+                    id: uuid(),
+                });
+                nextTick(() => {
+                    scroll.value.setScrollTop(10000)
+                })
+            }
+        });
         return false
     }
 
@@ -158,23 +162,12 @@
     }
 
     function uploadAvatar(uploadFile) {
-        const url = upload(uploadFile);
-        if (url) {
-            newChar.value.avatar = url
-        }
+        blob2base64(uploadFile, (b64) => {
+            const imageId = uuid();
+            images.value[imageId] = b64;
+            newChar.value.avatar = imageId
+        });
         return false
-    }
-
-    function upload(uploadFile) {
-        let url = null;
-        if (window.createObjectURL !== undefined) {
-            url = window.createObjectURL(uploadFile)
-        } else if (window.URL.createObjectURL !== undefined) {
-            url = window.URL.createObjectURL(uploadFile)
-        } else if (window.webkitURL !== undefined) {
-            url = window.webkitURL.createObjectURL(uploadFile)
-        }
-        return url
     }
 
     function selectAvatar(src) {
@@ -290,7 +283,7 @@
                                     accept="image/png, image/jpeg, image/gif"
                                     :before-upload="uploadAvatar"
                             >
-                                <div class="container"><img v-if="newChar.avatar" :src="newChar.avatar"/>
+                                <div class="container"><img v-if="newChar.avatar" :src="images[newChar.avatar] || newChar.avatar"/>
                                     <el-icon v-else class="avatar-uploader-icon">
                                         <Plus/>
                                     </el-icon>
@@ -449,7 +442,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <img :src="char.avatar">
+                                            <img :src="images[char.avatar] || char.avatar">
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">

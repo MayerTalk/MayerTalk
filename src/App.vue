@@ -12,17 +12,17 @@
     });
     const chars = ref({});
     const chats = ref([]);
-
-
+    const images = ref({});
 
     provide('showAnnouncement', showAnnouncement);
     provide('config', config);
     provide('chars', chars);
-    provide('chats', chats)
+    provide('chats', chats);
+    provide('images', images)
 </script>
 
 <template>
-<!--    <Test/>-->
+    <!--    <Test/>-->
     <Announce v-model="showAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>
