@@ -5,7 +5,7 @@
     const {modelValue} = defineProps(['modelValue']);
     const emit = defineEmits(['update:modelValue']);
 
-    const version = 'v0.0.2';
+    const version = 'v0.0.3';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
 
     onMounted(() => {
@@ -23,13 +23,15 @@
 
             <h2>明日方舟对话编辑器(beta)</h2>
             <p>开发阶段，功能尚不完善，还请谅解</p>
-            <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能，导出/导入功能尚待开发</b></p>
+            <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <h3>
-                v0.0.2
+                v0.0.3
             </h3>
-            - 增加了图片插入<br/>
-            - 调整了对话框位置<br/>
-            - 对话框按钮功能依次为 图片-内心-对话
+            - 新增自动保存<br/>
+            - 新增一键清空<br/>
+            - 支持导入导出<br/>
+            - <i>以上两项功能都在侧边栏中</i><br/>
+            - <i>自动保存需要图片总大小在4MB内，导入导出无此限制</i>
             <p>
                 <el-link href="/guide.mp4" type="primary">一个简陋的视频教程</el-link>
             </p>
