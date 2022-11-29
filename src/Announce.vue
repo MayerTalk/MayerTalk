@@ -21,7 +21,7 @@
                @close="$emit('update:modelValue',false)">
         <div style="position:relative;">
 
-            <h2>明日方舟对话编辑器(beta)</h2>
+            <h2 style="display: inline">明日方舟对话编辑器(beta)</h2>
             <p>开发阶段，功能尚不完善，还请谅解</p>
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <h3>
