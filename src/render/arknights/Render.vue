@@ -193,12 +193,19 @@
                 '即将删除该角色',
                 '提示',
                 () => {
+                    const avatar = chars.value[currChar.value].avatar;
+                    if (images.value.hasOwnProperty(avatar)) {
+                        delete images.value[avatar]
+                    }
+
                     delete chars.value[currChar.value];
                     for (let i = chats.value.length - 1; i > -1; i--) {
                         if (chats.value[i].char === currChar.value) {
                             chats.value.splice(i, 1)
                         }
                     }
+
+
                     message.notify('删除成功', message.success);
                     _showEditChar.value = false;
                 }
@@ -228,9 +235,9 @@
             '即将删除该对话',
             '提示',
             () => {
-                let chat = chats.value.splice(currDialogue.value, 1);
+                let chat = chats.value.splice(currDialogue.value, 1)[0];
                 if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
-                    delete images.value[char.content]
+                    delete images.value[chat.content];
                 }
                 message.notify('删除成功', message.success);
                 _showEditDialogue.value = false
