@@ -1,5 +1,6 @@
 <script setup>
-    import {inject, computed, watch, onMounted, nextTick} from 'vue';
+    import {ref, inject, computed, watch, onMounted, nextTick} from 'vue';
+    import {uuid} from '@/lib/tool'
 
     const chars = inject('chars');
     const images = inject('images');
@@ -11,6 +12,7 @@
     const char = computed(() => {
         return chars.value[data.char] || {};
     });
+    const id = ref(uuid());
 
     const right = computed(() => {
         if (data.char) {
@@ -45,6 +47,10 @@
     });
     onMounted(() => {
         resize()
+    });
+
+    watch(charDirection, () => {
+        id.value = uuid();
     })
 </script>
 
@@ -64,7 +70,7 @@
                             <div class="tail2"></div>
                         </div>
                     </div>
-                    <img :id="data.id" :src="images[data.content]">
+                    <img :id="data.id" :key="id" :src="images[data.content]">
                 </div>
                 <template v-if="data.type==='chat'">
                     <div v-if="data.char" class="dialogue-box">
