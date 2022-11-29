@@ -41,8 +41,11 @@
                 notifyMaxStorage = false
             }
         }
+        if (dataStr === lastSave) {
+            return
+        }
+        lastSave = dataStr;
         localStorage.setItem('data', dataStr);
-        console.log(dataStr)
     }
 
     provide('showAnnouncement', showAnnouncement);
