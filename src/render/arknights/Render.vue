@@ -82,8 +82,14 @@
                 }
             }
             return list || false
+        } else {
+            return [
+                '博士',
+                'PRTS',
+                'mon3tr',
+                '凯尔希'
+            ]
         }
-        return false
     });
 
     const _showEditDialogue = ref(false);
@@ -123,7 +129,6 @@
         index: 0,
         cd: 5000,
         loop() {
-            console.log(this);
             if (Date.now() > this.until) {
                 if (++this.index >= this.texts.length) {
                     this.index = 0
@@ -407,7 +412,7 @@
                 </el-dialog>
                 <el-dialog v-model="showSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
                     <!--        素材库选择头像-->
-                    <el-input placeholder="输入角色名" v-model="searchChar"></el-input>
+                    <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
                     <div v-if="searchResult" class="avatar-bar">
                         <el-scrollbar max-height="50vh" style="width: 100%">
                             <img v-for="src in searchResult" :key="src" :src="'/avatar/' + src + '.png'" loading="lazy"
