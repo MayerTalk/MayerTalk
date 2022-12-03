@@ -57,8 +57,8 @@
 <template>
     <div :class="settings.style">
         <div class="dialogue">
-            <div style="display: flex; width: 100%; margin-bottom: 10px">
-                <div v-if="charDirection[0]" class="avatar" @click="$emit('edit', index)">
+            <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)">
+                <div v-if="charDirection[0]" class="avatar">
                     <div v-if="right === false">
                         <img src="/avatar-bg.png">
                         <img :src="images[char.avatar] || char.avatar">
