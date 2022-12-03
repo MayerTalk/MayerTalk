@@ -68,6 +68,25 @@ function blob2base64(blob, callback) {
 
 }
 
+function image2square(image) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    console.log(image.width, image.height);
+    const w = image.width;
+    const h = image.height;
+    const crop = Math.ceil(Math.abs(w - h) / 2);
+    const m = Math.min(w, h);
+    const size = Math.min(m, 512);
+    canvas.width = size;
+    canvas.height = size;
+    if (w > h) {
+        ctx.drawImage(image, crop, 0, m, m, 0, 0, size, size);
+    } else {
+        ctx.drawImage(image, 0, crop, m, m, 0, 0, size, size);
+    }
+    return canvas.toDataURL()
+}
+
 export {
     copy,
     uuid,
@@ -76,5 +95,6 @@ export {
     download,
     downloadImage,
     blob2url,
-    blob2base64
+    blob2base64,
+    image2square
 }

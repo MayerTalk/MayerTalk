@@ -3,7 +3,7 @@
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage, download, blob2url, blob2base64} from "@/lib/tool";
+    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square} from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
@@ -212,14 +212,19 @@
     }
 
     function uploadAvatar(uploadFile) {
-        blob2base64(uploadFile, (b64) => {
-            const imageId = uuid();
-            images.value[imageId] = b64;
-            if (images.value.hasOwnProperty(newChar.value.avatar)) {
-                delete images.value[newChar.value.avatar]
-            }
-            newChar.value.avatar = imageId
-        });
+        const url = blob2url(uploadFile);
+        if (url) {
+            const image = new Image();
+            image.onload = () => {
+                const imageId = uuid();
+                images.value[imageId] = image2square(image);
+                if (images.value.hasOwnProperty(newChar.value.avatar)) {
+                    delete images.value[newChar.value.avatar]
+                }
+                newChar.value.avatar = imageId
+            };
+            image.src = url;
+        }
         return false
     }
 
