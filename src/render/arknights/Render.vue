@@ -347,11 +347,11 @@
                 const data = JSON.parse(reader.result);
                 setData(data);
                 message.notify('导入成功', message.success);
+                resizeScroll();
                 save()
             } catch (e) {
                 message.notify('导入失败，请确认文件名为 arktalk-data-xxx.json', message.error)
             }
-
         };
         reader.readAsText(uploadFile);
         return false
