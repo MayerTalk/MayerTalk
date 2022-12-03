@@ -111,12 +111,12 @@
 .char-curr {
     flex-shrink: 0;
     margin: 0 2px;
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: #505050;
     overflow: hidden;
-    border: grey solid 1px;
+    border: mediumslateblue solid 2px;
 }
 
 .char:hover {
@@ -129,8 +129,8 @@
 }
 
 .char-curr img {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
 }
 
 .option {
