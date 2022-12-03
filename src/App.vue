@@ -4,7 +4,6 @@
     import {getData} from './lib/tool';
     import Renders from './render'
     import Announce from './Announce.vue'
-    import Test from './Test.vue'
 
     const showAnnouncement = ref(false);
     const config = ref({render: 'Arknights'});
@@ -85,7 +84,6 @@
 </script>
 
 <template>
-    <!--    <Test/>-->
     <Announce v-model="showAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>
