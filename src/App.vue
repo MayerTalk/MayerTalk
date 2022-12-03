@@ -45,6 +45,21 @@
     }
 
     function setData(data, enableConfig) {
+        if (data.hasOwnProperty('images')) {
+            let tmp = data.images;
+            for (let imageId in tmp) {
+                if (tmp.hasOwnProperty(imageId)) {
+                    console.log(tmp[imageId].indexOf('/avatar/'));
+                    if (tmp[imageId].indexOf('/avatar/') !== 0 && tmp[imageId].indexOf('data:image') !== 0) {
+                        // 非/avatar/(内置)和data:image(b64)视为不安全数据
+                        message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告');
+                        delete tmp[imageId];
+                        throw TypeError
+                    }
+                }
+            }
+            images.value = data.images
+        }
         if (data.hasOwnProperty('config') && enableConfig) {
             config.value = data.config
         }
@@ -53,9 +68,6 @@
         }
         if (data.hasOwnProperty('chats')) {
             chats.value = data.chats
-        }
-        if (data.hasOwnProperty('images')) {
-            images.value = data.images
         }
     }
 
@@ -73,7 +85,7 @@
 </script>
 
 <template>
-<!--    <Test/>-->
+    <!--    <Test/>-->
     <Announce v-model="showAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>
