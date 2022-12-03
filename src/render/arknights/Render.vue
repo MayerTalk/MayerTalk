@@ -102,7 +102,7 @@
     }
 
     function resizeScroll() {
-        const el = document.getElementById('tare');
+        const el = document.getElementById('textarea');
         el.style.height = '20px';
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
         el.style.height = height + 'px';
@@ -113,6 +113,33 @@
     window.onresize = resizeScroll;
 
     const scrollHeight = ref(window.innerHeight - 95 + 'px');
+
+    const tipControl = {
+        tip: ref(''),
+        texts: [
+            ''
+        ],
+        until: 0,
+        index: 0,
+        cd: 5000,
+        loop() {
+            console.log(this);
+            if (Date.now() > this.until) {
+                if (++this.index >= this.texts.length) {
+                    this.index = 0
+                }
+                this.tip.value = this.texts[this.index];
+            }
+            setTimeout(() => {
+                this.loop()
+            }, this.cd)
+        },
+        setTmpTip(tip, timeout = 5000) {
+            this.tip.value = tip;
+            this.until = Date.now() + timeout
+        }
+    };
+    tipControl.loop();
 
     function createDialogue(monologue) {
         if (textarea.value) {
@@ -128,6 +155,9 @@
                 resizeScroll();
                 scroll.value.setScrollTop(10000)
             });
+        } else {
+            message.notify('请在输入框内输入文本', message.info);
+            tipControl.setTmpTip('请在此输入文本')
         }
     }
 
@@ -280,7 +310,6 @@
             }, 100)
         })
     }
-
 
     function clear() {
         message.confirm(
@@ -508,9 +537,7 @@
                              style="background: #B0B0B0"
                         >
                             <div class="button-bar">
-                                <el-icon @click="createDialogue(false)" color="#707070" :size="35"
-                                         style="margin-right: 5px; position: relative">
-
+                                <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">
                                     <Picture/>
                                     <el-upload
                                             action="#"
@@ -528,7 +555,8 @@
                                     <ChatDotSquare/>
                                 </el-icon>
                             </div>
-                            <textarea class="textarea" id="tare" v-model="textarea"
+                            <textarea class="textarea" id="textarea" v-model="textarea"
+                                      :placeholder="tipControl.tip.value"
                                       @keydown.ctrl.enter="createDialogue(false)"></textarea>
                             <div class="button-bar">
 
