@@ -1,5 +1,5 @@
 <script setup>
-    import {ref, computed, watch, inject, nextTick, provide} from 'vue'
+    import {ref, computed, watch, inject, provide, nextTick} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import message from '@/lib/message'
@@ -21,6 +21,7 @@
     const setData = inject('setData');
     const settings = ref({});
     const width = ref({});
+    const windowWidth = Math.min(520, document.body.clientWidth);
     provide('settings', settings);
     provide('width', width);
 
@@ -67,7 +68,7 @@
     const _showEditChar = ref(false);
     const createChar = ref(true);
     const showSelectAvatar = ref(false);
-    const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 520) * 0.9);
+    const dialogWidth = Math.ceil(windowWidth * 0.9);
     const newChar = ref({name: ''});
     const searchChar = ref('');
     let avatars = [];
@@ -534,7 +535,8 @@
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
                         <div class="window" id="window"
-                             :style="{width:(preScreenshot?'520px':'min(100vw, 520px)'), background: settings.background}">
+                             :style="{width:(preScreenshot?'520px': windowWidth + 'px'), background: settings.background}"
+                        >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id"></Dialogue>
                         </div>

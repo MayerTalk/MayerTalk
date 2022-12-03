@@ -222,7 +222,6 @@
 .window {
     height: 100%;
     position: relative;
-    /*width: calc(var(--width));*/
     padding: 20px 10px 10px 10px;
     background: #353535;
 }

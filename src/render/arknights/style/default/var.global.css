@@ -3,7 +3,3 @@
     --dialogue-background: #222222;
     --dialogue-color: #EEEEEE;
 }
-
-.render {
-    --witdh: min(100vw, 520px);
-}
