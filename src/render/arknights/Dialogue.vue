@@ -6,7 +6,6 @@
     const images = inject('images');
     const settings = inject('settings');
     const width = inject('width');
-    const preScreenshot = inject('width');
     const charDirection = inject('charDirection');
     const {data, index} = defineProps(['data', 'index']);
     defineEmits(['edit']);
@@ -44,7 +43,9 @@
     }
 
     watch(data, () => {
-        nextTick(resize)
+        nextTick(() => {
+            resize()
+        })
     });
     onMounted(() => {
         resize()

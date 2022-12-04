@@ -83,7 +83,7 @@
                     list.push(avatars[i])
                 }
             }
-            return list || false
+            return list.length ? list : false
         } else {
             return [
                 '博士',
@@ -125,10 +125,14 @@
     const tipControl = {
         tip: ref(''),
         texts: [
-            ''
+            '素材库里除了有干员头像，还有召唤物/敌人/装置的',
+            '上传的头像会自动剪裁成正方形',
+            '博士，剿灭打了吗？',
+            '点击对话框可以编辑对话',
+            '不选中任何角色时，将以旁白发送对话'
         ],
         until: 0,
-        index: 0,
+        index: -1,
         cd: 5000,
         loop() {
             if (Date.now() > this.until) {
@@ -136,6 +140,9 @@
                     this.index = 0
                 }
                 this.tip.value = this.texts[this.index];
+                nextTick(() => {
+                    resizeScroll()
+                })
             }
             setTimeout(() => {
                 this.loop()
@@ -146,7 +153,9 @@
             this.until = Date.now() + timeout
         }
     };
-    tipControl.loop();
+    onMounted(() => {
+        tipControl.loop();
+    });
 
     function createDialogue(monologue) {
         if (textarea.value) {
