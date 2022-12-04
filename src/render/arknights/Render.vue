@@ -55,7 +55,9 @@
         }
     }
 
-    onMounted(resizeWindow);
+    onMounted(() => {
+        resizeWindow()
+    });
     watch(charDirection, () => {
         resizeWindow()
     });
@@ -118,7 +120,9 @@
     }
 
     watch(textarea, resizeScroll);
-    window.onresize = resizeScroll;
+    window.onresize = () => {
+        resizeScroll()
+    };
 
     const scrollHeight = ref(window.innerHeight - 95 + 'px');
 
