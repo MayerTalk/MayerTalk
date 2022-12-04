@@ -118,7 +118,7 @@
         el.style.height = '20px';
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
         el.style.height = height + 'px';
-        scrollHeight.value = window.innerHeight - height - 75 + 'px'
+        scrollHeight.value = window.innerHeight - height - 70 + 'px'
     }
 
     watch(textarea, resizeScroll);
@@ -126,7 +126,7 @@
         resizeScroll()
     };
 
-    const scrollHeight = ref(window.innerHeight - 95 + 'px');
+    const scrollHeight = ref(window.innerHeight - 90 + 'px');
 
     const tipControl = {
         tip: ref(''),
