@@ -40,8 +40,10 @@ function download(url, filename) {
 
 function downloadImage(node, options, callback) {
     html2canvas(node, options).then(canvas => {
-        download(canvas.toDataURL(), 'arktalk-' + Date.now() + '.png');
-        callback && callback();
+        canvas.toBlob(blob => {
+            download(blob2url(blob), 'arktalk-' + Date.now() + '.jpg');
+            callback && callback()
+        }, 'image/jpeg')
     }).catch((reason => {
         message.confirm(reason + '，如果可以，请截图此页面，并加入交流群反馈 (๑╹◡╹)ﾉ"""', '工口发生')
     }))
