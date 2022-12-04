@@ -185,7 +185,7 @@
     height: 20px;
     width: calc(100% - 140px);
     padding: 0 0 1px 0;
-    margin: 15px 0 5px 0;
+    margin: 5px 0 5px 0;
     background-color: transparent;
     resize: none;
 }
@@ -195,7 +195,7 @@
     align-items: center;
     height: 35px;
     flex-grow: 1;
-    margin: 0 7px 3px 7px;
+    margin: 5px 7px 3px 7px;
     align-self: flex-end;
 }
 
