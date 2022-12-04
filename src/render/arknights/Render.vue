@@ -45,6 +45,7 @@
         const max = settings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60);
         if (preScreenshot.value) {
             width.value.window = max;
+            width.value.image = settings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px';
             width.value.avatar = '60px';
             width.value.fontsize = '16px'
         } else {
@@ -326,13 +327,17 @@
     function screenshot() {
         preScreenshot.value = true;
         resizeWindow();
+        const node = document.getElementById('window');
         nextTick(() => {
+            // 将height定为整数，防止截图下方出现白条
+            node.style.height = node.scrollHeight - 30 + 'px';
             setTimeout(() => {
-                downloadImage(document.getElementById('window'), {
+                downloadImage(node, {
                     windowWidth: width.value.window + 20,
                     scale: settings.value.scale
                 }, () => {
                     preScreenshot.value = false;
+                    node.style.height = null;
                     setTimeout(resizeWindow, 50)
                 })
             }, 100)

@@ -7,6 +7,7 @@
     const settings = inject('settings');
     const width = inject('width');
     const charDirection = inject('charDirection');
+    const preScreenshot = inject('preScreenshot');
     const {data, index} = defineProps(['data', 'index']);
     defineEmits(['edit']);
     const char = computed(() => {
@@ -24,40 +25,19 @@
         }
     });
 
-    function resize(t) {
-        // 当height为小数时，html2canvas 会有1px的误差，在此赋值为整数
+    function resizeImage() {
         if (data.type === 'image') {
-            const el = document.getElementById(data.id);
-            if (el.offsetHeight === 0) {
-                if (t > 10) {
-                    return
-                }
-                if (!t) {
-                    t = 1
-                }
-                setTimeout(resize, 5, t++)
-            } else {
-                el.style.height = el.offsetHeight + 'px'
-            }
+            id.value = uuid();
         }
     }
 
-    watch(data, () => {
-        nextTick(() => {
-            resize()
-        })
-    });
-    onMounted(() => {
-        resize()
-    });
-
     watch(() => width.value.window, () => {
         // window改变时调整图片大小
-        id.value = uuid();
+        resizeImage()
     });
     watch(charDirection, () => {
         // 头像列改变时调整图片大小
-        id.value = uuid();
+        resizeImage()
     })
 </script>
 
@@ -77,7 +57,9 @@
                             <div class="tail2"></div>
                         </div>
                     </div>
-                    <img :id="data.id" :key="id" :src="images[data.content]">
+                    <img :id="data.id" :key="id" :src="images[data.content]"
+                         :style="{width: preScreenshot?width.image:'100%'}"
+                    >
                 </div>
                 <template v-if="data.type==='chat'">
                     <div v-if="data.char" class="dialogue-box">
