@@ -419,7 +419,7 @@
                             </el-upload>
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px"></el-input>
+                                <el-input v-model="newChar.name" style="margin-top: 10px" @keypress.enter="createChar && editChar()"></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
                                     <el-switch
