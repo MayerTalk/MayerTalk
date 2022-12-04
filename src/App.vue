@@ -6,6 +6,7 @@
     import Announce from './Announce.vue'
 
     const ifShowAnnouncement = ref(false);
+    const ifShowGuide = ref(false);
     const config = ref({render: 'Arknights'});
     const chars = ref({});
     const chats = ref([]);
@@ -70,6 +71,7 @@
     }
 
     provide('ifShowAnnouncement', ifShowAnnouncement);
+    provide('ifShowGuide', ifShowGuide);
     provide('config', config);
     provide('chars', chars);
     provide('chats', chats);
@@ -83,7 +85,7 @@
 </script>
 
 <template>
-    <Announce v-model="ifShowAnnouncement"/>
+    <Announce @showGuide="() => {ifShowAnnouncement=false; ifShowGuide=true}" v-model="ifShowAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>
 

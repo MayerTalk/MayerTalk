@@ -12,6 +12,7 @@
     };
 
     const ifShowAnnouncement = inject('ifShowAnnouncement');
+    const ifShowGuide = inject('ifShowGuide');
     const config = inject('config');
     const chars = inject('chars');
     const chats = inject('chats');
@@ -63,7 +64,6 @@
         resizeWindow()
     });
 
-    const ifShowGuide = ref(false);
     const textarea = ref('');
     const scroll = ref();
     const preScreenshot = ref(false);
