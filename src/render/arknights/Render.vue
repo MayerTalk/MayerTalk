@@ -11,7 +11,7 @@
         image: '图片'
     };
 
-    const showAnnouncement = inject('showAnnouncement');
+    const ifShowAnnouncement = inject('ifShowAnnouncement');
     const config = inject('config');
     const chars = inject('chars');
     const chats = inject('chats');
@@ -63,15 +63,16 @@
         resizeWindow()
     });
 
+    const ifShowGuide = ref(false);
     const textarea = ref('');
     const scroll = ref();
     const preScreenshot = ref(false);
     provide('preScreenshot', preScreenshot);
 
     const currChar = ref('');
-    const _showEditChar = ref(false);
+    const ifShowEditChar = ref(false);
+    const ifShowSelectAvatar = ref(false);
     const createChar = ref(true);
-    const showSelectAvatar = ref(false);
     const dialogWidth = Math.ceil(windowWidth * 0.9);
     const newChar = ref({name: ''});
     const searchChar = ref('');
@@ -97,7 +98,7 @@
         }
     });
 
-    const _showEditDialogue = ref(false);
+    const ifShowEditDialogue = ref(false);
     const currDialogue = ref(-1);
     const currDialogueData = ref({});
     const editDialogue = ref(true);
@@ -133,8 +134,9 @@
             '素材库里除了有干员头像，还有召唤物/敌人/装置的',
             '上传的头像会自动剪裁成正方形',
             '博士，剿灭打了吗？',
-            '点击对话框可以编辑对话',
-            '不选中任何角色时，将以旁白发送对话'
+            '点击对话框可以编辑/插入对话',
+            '不选中任何角色时，将以旁白视角发送对话',
+            'Ctrl+Enter可以快捷发送'
         ],
         until: 0,
         index: -1,
@@ -158,6 +160,7 @@
             this.until = Date.now() + timeout
         }
     };
+    tipControl.index = Math.ceil(Math.random() * tipControl.texts.length) - 1;
     onMounted(() => {
         tipControl.loop();
     });
@@ -223,7 +226,7 @@
             }
         }
         searchChar.value = '';
-        _showEditChar.value = true
+        ifShowEditChar.value = true
     }
 
     function uploadAvatar(uploadFile) {
@@ -245,7 +248,7 @@
 
     function selectAvatar(src) {
         newChar.value.avatar = '/avatar/' + src + '.png';
-        showSelectAvatar.value = false
+        ifShowSelectAvatar.value = false
     }
 
     function editChar() {
@@ -254,7 +257,7 @@
                 message.notify('名字是必须的', message.error);
                 return
             }
-            _showEditChar.value = false;
+            ifShowEditChar.value = false;
             chars.value[uuid()] = copy(newChar.value);
             newChar.value = {name: ''};
             message.notify('创建成功', message.success);
@@ -275,7 +278,7 @@
                         }
                     }
                     message.notify('删除成功', message.success);
-                    _showEditChar.value = false;
+                    ifShowEditChar.value = false;
                 }
             )
         }
@@ -286,7 +289,7 @@
         editDialogue.value = true;
         currDialogue.value = index;
         currDialogueData.value = chats.value[currDialogue.value];
-        _showEditDialogue.value = true
+        ifShowEditDialogue.value = true
     }
 
     function switchEdit(edit) {
@@ -308,7 +311,7 @@
                     delete images.value[chat.content];
                 }
                 message.notify('删除成功', message.success);
-                _showEditDialogue.value = false;
+                ifShowEditDialogue.value = false;
             }
         );
     }
@@ -320,7 +323,7 @@
         }
         chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value));
         message.notify('插入成功', message.success);
-        _showEditDialogue.value = false;
+        ifShowEditDialogue.value = false;
     }
 
 
@@ -398,7 +401,51 @@
     <div :class="settings.style">
         <div class="render">
             <div id="body" :style="{background: settings.background}">
-                <el-dialog v-model="_showEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
+                <el-dialog v-model="ifShowGuide" title="指南" :width="dialogWidth">
+                    <h2>编辑栏</h2>
+                    <div style="display: flex; align-items: center; margin-bottom: 5px">
+                        <el-icon :size="35" style="margin: 0 5px">
+                            <Picture/>
+                        </el-icon>
+                        图片
+                        <el-icon :size="35" style="margin: 0 5px">
+                            <ChatDotSquare/>
+                        </el-icon>
+                        独白
+                        <el-icon :size="35" style="margin: 0 5px">
+                            <Promotion/>
+                        </el-icon>
+                        对话
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 10px">
+                        <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                             data-v-029747aa="" style="width:35px; background: white; margin: 0 5px">
+                            <path fill="#858585"
+                                  d="M512 64a448 448 0 1 1 0 896 448 448 0 0 1 0-896zm-38.4 409.6H326.4a38.4 38.4 0 1 0 0 76.8h147.2v147.2a38.4 38.4 0 0 0 76.8 0V550.4h147.2a38.4 38.4 0 0 0 0-76.8H550.4V326.4a38.4 38.4 0 1 0-76.8 0v147.2z"></path>
+                        </svg>
+                        添加角色
+                        <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                             data-v-029747aa="" style="width: 35px; margin: 0 5px">
+                            <path fill="#606060"
+                                  d="M600.704 64a32 32 0 0 1 30.464 22.208l35.2 109.376c14.784 7.232 28.928 15.36 42.432 24.512l112.384-24.192a32 32 0 0 1 34.432 15.36L944.32 364.8a32 32 0 0 1-4.032 37.504l-77.12 85.12a357.12 357.12 0 0 1 0 49.024l77.12 85.248a32 32 0 0 1 4.032 37.504l-88.704 153.6a32 32 0 0 1-34.432 15.296L708.8 803.904c-13.44 9.088-27.648 17.28-42.368 24.512l-35.264 109.376A32 32 0 0 1 600.704 960H423.296a32 32 0 0 1-30.464-22.208L357.696 828.48a351.616 351.616 0 0 1-42.56-24.64l-112.32 24.256a32 32 0 0 1-34.432-15.36L79.68 659.2a32 32 0 0 1 4.032-37.504l77.12-85.248a357.12 357.12 0 0 1 0-48.896l-77.12-85.248A32 32 0 0 1 79.68 364.8l88.704-153.6a32 32 0 0 1 34.432-15.296l112.32 24.256c13.568-9.152 27.776-17.408 42.56-24.64l35.2-109.312A32 32 0 0 1 423.232 64H600.64zm-23.424 64H446.72l-36.352 113.088-24.512 11.968a294.113 294.113 0 0 0-34.816 20.096l-22.656 15.36-116.224-25.088-65.28 113.152 79.68 88.192-1.92 27.136a293.12 293.12 0 0 0 0 40.192l1.92 27.136-79.808 88.192 65.344 113.152 116.224-25.024 22.656 15.296a294.113 294.113 0 0 0 34.816 20.096l24.512 11.968L446.72 896h130.688l36.48-113.152 24.448-11.904a288.282 288.282 0 0 0 34.752-20.096l22.592-15.296 116.288 25.024 65.28-113.152-79.744-88.192 1.92-27.136a293.12 293.12 0 0 0 0-40.256l-1.92-27.136 79.808-88.128-65.344-113.152-116.288 24.96-22.592-15.232a287.616 287.616 0 0 0-34.752-20.096l-24.448-11.904L577.344 128zM512 320a192 192 0 1 1 0 384 192 192 0 0 1 0-384zm0 64a128 128 0 1 0 0 256 128 128 0 0 0 0-256z"></path>
+                        </svg>
+                        编辑角色
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" focusable="false"
+                             style="width: 35px; margin: 0 5px; stroke: #606060">
+                            <path d="M14 3.5H2v1h12v-1zM14 7.5H2v1h12v-1zM14 11.5H2v1h12v-1z"></path>
+                        </svg>
+                        菜单
+                    </div>
+                    不选中角色时，将以旁白视角发送对话，隐藏编辑角色选项
+                    <h2>Tips</h2>
+                    <ol style="margin-bottom:0; padding-left: 30px">
+                        <li>点击对话框可以编辑/插入对话</li>
+                        <li>上传的头像会自动剪裁成正方形</li>
+                        <li>删除角色后会清空该角色的对话</li>
+                        <li>Ctrl+Enter可以快捷发送</li>
+                    </ol>
+                </el-dialog>
+                <el-dialog v-model="ifShowEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
                            @closed="save">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
@@ -419,7 +466,8 @@
                             </el-upload>
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px" @keypress.enter="createChar && editChar()"></el-input>
+                                <el-input v-model="newChar.name" style="margin-top: 10px"
+                                          @keypress.enter="createChar && editChar()"></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
                                     <el-switch
@@ -432,13 +480,13 @@
                             </div>
                         </div>
                         <div style="width: 100%; margin-top: 10px">
-                            <el-button style="width: 60%" @click="showSelectAvatar=true">从素材库中选择头像</el-button>
+                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">从素材库中选择头像</el-button>
                             <el-button style="width: calc(40% - 12px)" @click="editChar">{{createChar?'创建':'删除'}}
                             </el-button>
                         </div>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="showSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
+                <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
                     <!--        素材库选择头像-->
                     <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
                     <div v-if="searchResult" class="avatar-bar">
@@ -454,7 +502,7 @@
                         <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="_showEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
+                <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                            @closed="save">
                     <el-input
                             v-model="currDialogueData.content"
@@ -515,11 +563,17 @@
                         </el-icon>
                         截屏
                     </div>
-                    <div class="bar" @click="showAnnouncement=true">
+                    <div class="bar" @click="ifShowAnnouncement=true">
                         <el-icon color="lightgrey" :size="35">
                             <Notification/>
                         </el-icon>
                         公告
+                    </div>
+                    <div class="bar" @click="ifShowGuide=true">
+                        <el-icon :size="35">
+                            <Compass/>
+                        </el-icon>
+                        指南
                     </div>
                     <div class="bar" @click="clear">
                         <el-icon color="lightgrey" :size="35">
@@ -551,12 +605,6 @@
                         </el-upload>
 
                     </div>
-                    <!--        <div class="bar">-->
-                    <!--            <el-icon color="lightgrey" :size="35">-->
-                    <!--                <HelpFilled/>-->
-                    <!--            </el-icon>-->
-                    <!--            帮助-->
-                    <!--        </div>-->
                 </div>
                 <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
                 <el-scrollbar :height="scrollHeight" ref="scroll">
@@ -567,9 +615,7 @@
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id"></Dialogue>
                         </div>
-                        <div v-if="!preScreenshot" class="operateBar"
-                             :style="{width: windowWidth + 'px'}"
-                        >
+                        <div class="operateBar" :style="{width: windowWidth + 'px'}">
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">
                                     <Picture/>

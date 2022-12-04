@@ -5,7 +5,7 @@
     import Renders from './render'
     import Announce from './Announce.vue'
 
-    const showAnnouncement = ref(false);
+    const ifShowAnnouncement = ref(false);
     const config = ref({render: 'Arknights'});
     const chars = ref({});
     const chats = ref([]);
@@ -69,7 +69,7 @@
         }
     }
 
-    provide('showAnnouncement', showAnnouncement);
+    provide('ifShowAnnouncement', ifShowAnnouncement);
     provide('config', config);
     provide('chars', chars);
     provide('chats', chats);
@@ -83,7 +83,7 @@
 </script>
 
 <template>
-    <Announce v-model="showAnnouncement"/>
+    <Announce v-model="ifShowAnnouncement"/>
     <component :is="Renders[config.render]"/>
 </template>
 

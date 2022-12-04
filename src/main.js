@@ -4,7 +4,7 @@ import App from './App.vue'
 import {
     Plus,
     Crop,
-    HelpFilled,
+    Compass,
     Notification,
     Promotion,
     Picture,
@@ -18,7 +18,7 @@ const app = createApp(App);
 
 app.component('Plus', Plus);
 app.component('Crop', Crop);
-app.component('HelpFilled', HelpFilled);
+app.component('Compass', Compass);
 app.component('Notification', Notification);
 app.component('Promotion', Promotion);
 app.component('Picture', Picture);
