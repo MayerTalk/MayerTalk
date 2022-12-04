@@ -71,7 +71,6 @@ function blob2base64(blob, callback) {
 function image2square(image) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    console.log(image.width, image.height);
     const w = image.width;
     const h = image.height;
     const crop = Math.ceil(Math.abs(w - h) / 2);

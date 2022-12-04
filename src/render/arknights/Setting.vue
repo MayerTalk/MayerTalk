@@ -4,8 +4,9 @@
 
     const defaultSettings = {
         background: '#303030',
-        width: 520,
-        style: 'default'
+        width: 400,
+        style: 'default',
+        scale: 1.5
     };
 
     const config = inject('config');
@@ -18,6 +19,7 @@
         settings.value.background = value.background || defaultSettings.background;
         settings.value.width = value.width || defaultSettings.width;
         settings.value.style = value.style || defaultSettings.style;
+        settings.value.scale = value.scale || defaultSettings.scale
     }
 
     sync();

@@ -1,5 +1,5 @@
 <script setup>
-    import {ref, computed, watch, inject, provide, nextTick} from 'vue'
+    import {ref, computed, watch, inject, provide, nextTick, onMounted} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import message from '@/lib/message'
@@ -10,7 +10,6 @@
         monologue: '独白',
         image: '图片'
     };
-
 
     const showAnnouncement = inject('showAnnouncement');
     const config = inject('config');
@@ -42,20 +41,21 @@
     });
     provide('charDirection', charDirection);
 
-    function resizeWindow(order) {
-        let w = order || Math.min(500, document.body.clientWidth);
-        width.value.window = w;
-        w -= 5;
-        if (charDirection.value[0] && charDirection.value[1]) {
-            width.value.avatar = Math.ceil(w / 8.5) + 'px';
-            width.value.fontsize = Math.ceil(w / 8.5 / 4) + 'px'
+    function resizeWindow() {
+        const max = settings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60);
+        if (preScreenshot.value) {
+            width.value.window = max;
+            width.value.avatar = '60px';
+            width.value.fontsize = '16px'
         } else {
-            width.value.avatar = Math.ceil(w / 7.5) + 'px';
-            width.value.fontsize = Math.ceil(w / 7.5 / 4) + 'px'
+            const w = Math.min(max, document.body.clientWidth);
+            width.value.window = w;
+            width.value.avatar = Math.ceil(w / max * 60) + 'px';
+            width.value.fontsize = Math.ceil(w / max * 16) + 'px';
         }
     }
 
-    resizeWindow();
+    onMounted(resizeWindow);
     watch(charDirection, () => {
         resizeWindow()
     });
@@ -63,6 +63,7 @@
     const textarea = ref('');
     const scroll = ref();
     const preScreenshot = ref(false);
+    provide('preScreenshot', preScreenshot);
 
     const currChar = ref('');
     const _showEditChar = ref(false);
@@ -311,10 +312,13 @@
 
     function screenshot() {
         preScreenshot.value = true;
-        resizeWindow(500);
+        resizeWindow();
         nextTick(() => {
             setTimeout(() => {
-                downloadImage(document.getElementById('window'), {windowWidth: 520, width: 520}, () => {
+                downloadImage(document.getElementById('window'), {
+                    windowWidth: width.value.window + 20,
+                    scale: settings.value.scale
+                }, () => {
                     preScreenshot.value = false;
                     setTimeout(resizeWindow, 50)
                 })
@@ -540,13 +544,13 @@
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
                         <div class="window" id="window"
-                             :style="{width:(preScreenshot?'520px': windowWidth + 'px'), background: settings.background}"
+                             :style="{width: width.window+'px', background: settings.background}"
                         >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id"></Dialogue>
                         </div>
                         <div v-if="!preScreenshot" class="operateBar"
-                             style="background: #B0B0B0"
+                             :style="{width: windowWidth + 'px'}"
                         >
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">

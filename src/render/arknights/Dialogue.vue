@@ -6,6 +6,7 @@
     const images = inject('images');
     const settings = inject('settings');
     const width = inject('width');
+    const preScreenshot = inject('width');
     const charDirection = inject('charDirection');
     const {data, index} = defineProps(['data', 'index']);
     defineEmits(['edit']);
@@ -49,7 +50,12 @@
         resize()
     });
 
+    watch(() => width.value.window, () => {
+        // window改变时调整图片大小
+        id.value = uuid();
+    });
     watch(charDirection, () => {
+        // 头像列改变时调整图片大小
         id.value = uuid();
     })
 </script>
@@ -58,7 +64,7 @@
     <div :class="settings.style">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)">
-                <div v-if="charDirection[0]" class="avatar">
+                <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                     <div v-if="right === false">
                         <img src="/avatar-bg.png">
                         <img :src="images[char.avatar] || char.avatar">
@@ -93,7 +99,7 @@
                         <pre>{{data.content}}</pre>
                     </div>
                 </template>
-                <div v-if="charDirection[1]" class="avatar" @click="$emit('edit', index)">
+                <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                     <div v-if="right === true">
                         <img src="/avatar-bg.png">
                         <img :src="images[char.avatar] || char.avatar">

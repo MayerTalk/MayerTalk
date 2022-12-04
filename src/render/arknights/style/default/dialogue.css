@@ -20,7 +20,6 @@ pre {
 .monologue-box {
     align-self: flex-start;
     flex-grow: 1;
-    margin: 0 10px 0 10px;
     padding: 8px;
     /*font-size: var(--font-size);*/
     background: #606060;
@@ -30,7 +29,6 @@ pre {
 
 .image-box {
     align-self: flex-start;
-    margin: 0 10px 0 10px;
     position: relative;
     padding: 7px;
     background: var(--dialogue-background);
@@ -46,7 +44,6 @@ pre {
 .narration-box {
     align-self: flex-start;
     flex-grow: 1;
-    margin: 0 10px 0 10px;
     padding: 8px;
     /*font-size: var(--font-size);*/
 }
@@ -54,7 +51,6 @@ pre {
 .dialogue-box {
     align-self: flex-start;
     flex-grow: 1;
-    margin: 0 10px 0 10px;
     padding: 8px;
     /*font-size: var(--font-size);*/
     position: relative;
