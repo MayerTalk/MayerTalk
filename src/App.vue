@@ -36,20 +36,22 @@
             // })
         }
 
-        save() {
-            this.update = false;
-            const lastSave = this.lastSave;
-            const dataStr = JSON.stringify(this.obj.value);
-            if (dataStr === lastSave) {
-                return false
-            }
-            localStorage.setItem('data.' + this.key, dataStr);
-            this.lastSave = dataStr;
-            return {
-                key: this.key,
-                new: dataStr,
-                old: lastSave,
-                type: 'modify'
+        save(force) {
+            if (this.update || force) {
+                this.update = false;
+                const lastSave = this.lastSave;
+                const dataStr = JSON.stringify(this.obj.value);
+                if (dataStr === lastSave) {
+                    return false
+                }
+                localStorage.setItem('data.' + this.key, dataStr);
+                this.lastSave = dataStr;
+                return {
+                    key: this.key,
+                    new: dataStr,
+                    old: lastSave,
+                    type: 'modify'
+                }
             }
         }
 
@@ -84,8 +86,8 @@
             // })
         }
 
-        save() {
-            if (this.update) {
+        save(force) {
+            if (this.update || force) {
                 this.update = false;
                 const lastSave = this.lastSave;
                 const dataStr = JSON.stringify(this.obj.value);
@@ -148,7 +150,7 @@
     const DataControl = {
         storage: {},
         version: [],
-        index: 0,
+        index: -1,
         update(update) {
             if (typeof update === "string") {
                 if (this.storage.hasOwnProperty(update)) {
@@ -163,8 +165,12 @@
                 }
             }
         },
-        save(update = []) {
-            this.update(update);
+        save(update) {
+            if (this.index > -1) {
+                this.version.splice(0, this.index + 1);
+                this.index = -1;
+            }
+            update && this.update(update);
             const operator = [];
             for (let key in this.storage) {
                 if (this.storage.hasOwnProperty(key)) {
@@ -175,9 +181,8 @@
                 }
             }
 
-            if (operator) {
+            if (operator.length > 0) {
                 this.version.unshift(operator);
-                console.log(this.version)
             }
 
         },
@@ -196,6 +201,43 @@
                     this.storage[key].set(data[key]);
                     this.storage[key].update = true
                 }
+            }
+        },
+        withdraw() {
+            if (this.index + 1 < this.version.length) {
+                const data = this.version[++this.index];
+                for (let i = 0; i < data.length; i++) {
+                    const operator = data[i];
+                    if (this.storage.hasOwnProperty(operator.key)) {
+                        if (operator.type === 'modify') {
+                            const storage = this.storage[operator.key];
+                            storage.set(JSON.parse(operator.old));
+                            storage.save(true)
+                        }
+                    }
+                }
+                message.notify('撤回成功', message.success)
+            } else {
+                message.notify('没有数据可以撤回')
+            }
+        },
+        redo() {
+            if (this.index > -1) {
+                const data = this.version[this.index--];
+                for (let i = 0; i < data.length; i++) {
+                    const operator = data[i];
+                    if (this.storage.hasOwnProperty(operator.key)) {
+                        if (operator.type === 'modify') {
+                            const storage = this.storage[operator.key];
+                            storage.set(JSON.parse(operator.new));
+                            storage.save(true)
+                        }
+                    }
+                }
+                message.notify('重做成功', message.success)
+
+            } else {
+                message.notify('没有数据可以重做')
             }
         }
     };
@@ -219,7 +261,19 @@
     provide('images', images);
     provide('DataControl', DataControl);
 
-    DataControl.load();
+    document.addEventListener('keydown', event => {
+        if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
+            if (event.code === 'KeyZ') {
+                DataControl.withdraw();
+                event.preventDefault()
+            } else if (event.code === 'KeyY') {
+                DataControl.redo();
+                event.preventDefault()
+            }
+        }
+    });
+
+    DataControl.load()
 </script>
 
 <template>

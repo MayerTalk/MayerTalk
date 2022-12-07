@@ -240,6 +240,7 @@
     transition: right ease 0.5s;
     z-index: 404;
     padding: 5px;
+    user-select: none;
 }
 
 .drawer.show {
@@ -249,7 +250,7 @@
 .drawer .bar {
     height: 50px;
     border-bottom: grey solid 1px;
-    margin-bottom: 5px;
+    margin: 2px 0;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -275,7 +275,8 @@
                     delete chars.value[currChar.value];
                     for (let i = chats.value.length - 1; i > -1; i--) {
                         if (chats.value[i].char === currChar.value) {
-                            chats.value.splice(i, 1)
+                            chats.value.splice(i, 1);
+                            DataControl.update('chats')
                         }
                     }
                     message.notify('删除成功', message.success);
@@ -582,6 +583,18 @@
                             <Delete/>
                         </el-icon>
                         清空
+                    </div>
+                    <div class="bar" @click="DataControl.withdraw">
+                        <el-icon color="lightgrey" :size="35">
+                            <Back/>
+                        </el-icon>
+                        撤回
+                    </div>
+                    <div class="bar" @click="DataControl.redo">
+                        <el-icon color="lightgrey" :size="35">
+                            <Right/>
+                        </el-icon>
+                        重做
                     </div>
                     <div class="bar" @click="downloadData">
                         <el-icon color="lightgrey" :size="35">
