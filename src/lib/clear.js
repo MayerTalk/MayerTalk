@@ -1,3 +1,3 @@
 // 清理一些旧数据
 
-localStorage.removeItem('data');
+// localStorage.removeItem('data');

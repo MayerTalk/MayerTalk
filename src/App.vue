@@ -266,7 +266,16 @@
         }
     });
 
-    DataControl.load()
+    DataControl.load();
+
+    if (localStorage.getItem('data')) {
+        try {
+            DataControl.set(JSON.parse(localStorage.getItem('data')));
+            DataControl.save();
+            localStorage.removeItem('data');
+        } catch (e) {
+        }
+    }
 </script>
 
 <template>
