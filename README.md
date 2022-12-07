@@ -34,6 +34,7 @@
  | 发送方式 | 点击 / ctrl + enter | 点击 / enter | 
  | 撤回 | ctrl + z | ctrl + z |
  | 重做 | ctrl + y | ctrl + y |
+ | 多次撤回 | ✅ | ❌ |
  
  ### 角色
  
