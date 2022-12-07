@@ -32,8 +32,8 @@
  | 一键清空 | ✅ | ✅ |
  | 换行方式 | enter | shift + enter |
  | 发送方式 | 点击 / ctrl + enter | 点击 / enter | 
- | 撤回 | 不支持 | ctrl + z |
- | 重做 | 不支持 | ctrl + y |
+ | 撤回 | ctrl + z | ctrl + z |
+ | 重做 | ctrl + y | ctrl + y |
  
  ### 角色
  
