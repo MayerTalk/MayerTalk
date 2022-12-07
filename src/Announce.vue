@@ -20,7 +20,6 @@
     <el-dialog v-model="modelValue" :title="'公告 '+version" :width="dialogWidth"
                @close="$emit('update:modelValue',false)">
         <div style="position:relative;">
-
             <h2 style="display: inline">明日方舟对话编辑器(beta)</h2>
             <p>开发阶段，功能尚不完善，还请谅解</p>
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
@@ -33,7 +32,7 @@
             - 调整截图渲染<br/>
             - 现在上传的头像会自动剪裁成正方形<br/>
             <h3>关于截图失败</h3>
-            <b>iOS：目前不支持，计划修复</b><br/>
+            <b>iOS：待支持</b><br/>
             <b>安卓：请使用Edge/Chrome，不支持夸克/UC</b><br/>
             <el-link href="https://wj.qq.com/s2/11287516/2689/" type="primary">其他浏览器无法截图/导出反馈</el-link>
             <p>

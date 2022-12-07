@@ -1,10 +1,11 @@
 <script setup>
-    import {ref, inject, computed, watch, onMounted, nextTick} from 'vue';
+    import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
+    import message from "../../lib/message";
 
     const chars = inject('chars');
     const images = inject('images');
-    const settings = inject('settings');
+    const renderSettings = inject('renderSettings');
     const width = inject('width');
     const charDirection = inject('charDirection');
     const preScreenshot = inject('preScreenshot');
@@ -38,11 +39,11 @@
     watch(charDirection, () => {
         // 头像列改变时调整图片大小
         resizeImage()
-    })
+    });
 </script>
 
 <template>
-    <div :class="settings.style">
+    <div :class="renderSettings.style">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)">
                 <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">

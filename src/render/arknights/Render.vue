@@ -17,12 +17,11 @@
     const chars = inject('chars');
     const chats = inject('chats');
     const images = inject('images');
-    const save = inject('save');
-    const setData = inject('setData');
-    const settings = ref({});
+    const DataControl = inject('DataControl');
+    const renderSettings = ref({});
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);
-    provide('settings', settings);
+    provide('renderSettings', renderSettings);
     provide('width', width);
 
     const charDirection = computed(() => {
@@ -43,10 +42,10 @@
     provide('charDirection', charDirection);
 
     function resizeWindow() {
-        const max = settings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60);
+        const max = renderSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60);
         if (preScreenshot.value) {
             width.value.window = max;
-            width.value.image = settings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px';
+            width.value.image = renderSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px';
             width.value.avatar = '60px';
             width.value.fontsize = '16px'
         } else {
@@ -174,7 +173,7 @@
                 id: uuid()
             });
             textarea.value = '';
-            save();
+            DataControl.save('chats');
             nextTick(() => {
                 resizeScroll();
                 scroll.value.setScrollTop(10000)
@@ -196,7 +195,7 @@
                     type: 'image',
                     id: uuid(),
                 });
-                save();
+                DataControl.save(['chats', 'images']);
                 nextTick(() => {
                     scroll.value.setScrollTop(10000)
                 })
@@ -232,6 +231,7 @@
     function uploadAvatar(uploadFile) {
         const url = blob2url(uploadFile);
         if (url) {
+            DataControl.update('images');
             const image = new Image();
             image.onload = () => {
                 const imageId = uuid();
@@ -268,7 +268,8 @@
                 () => {
                     const avatar = chars.value[currChar.value].avatar;
                     if (images.value.hasOwnProperty(avatar)) {
-                        delete images.value[avatar]
+                        delete images.value[avatar];
+                        DataControl.update('images')
                     }
 
                     delete chars.value[currChar.value];
@@ -309,6 +310,7 @@
                 let chat = chats.value.splice(currDialogue.value, 1)[0];
                 if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
                     delete images.value[chat.content];
+                    DataControl.update('images')
                 }
                 message.notify('删除成功', message.success);
                 ifShowEditDialogue.value = false;
@@ -337,7 +339,7 @@
             setTimeout(() => {
                 downloadImage(node, {
                     windowWidth: width.value.window + 20,
-                    scale: settings.value.scale
+                    scale: renderSettings.value.scale
                 }, () => {
                     preScreenshot.value = false;
                     node.style.height = null;
@@ -356,7 +358,7 @@
                 chats.value = [];
                 images.value = {};
                 message.notify('清空成功', message.success);
-                save()
+                DataControl.save(['chars', 'chats', 'images'])
             }
         )
     }
@@ -376,10 +378,10 @@
         reader.onloadend = () => {
             try {
                 const data = JSON.parse(reader.result);
-                setData(data);
+                DataControl.set(data);
                 message.notify('导入成功', message.success);
                 resizeScroll();
-                save()
+                DataControl.save()
             } catch (e) {
                 message.notify('导入失败，请确认文件名为 arktalk-data-xxx.json', message.error)
             }
@@ -398,9 +400,9 @@
 
 <template>
     <Settings/>
-    <div :class="settings.style">
+    <div :class="renderSettings.style">
         <div class="render">
-            <div id="body" :style="{background: settings.background}">
+            <div id="body" :style="{background: renderSettings.background}">
                 <el-dialog v-model="ifShowGuide" title="指南" :width="dialogWidth">
                     <h2>编辑栏</h2>
                     <div style="display: flex; align-items: center; margin-bottom: 5px">
@@ -446,7 +448,7 @@
                     </ol>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
-                           @closed="save">
+                           @closed="() => DataControl.save('chars')">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
                             <el-upload
@@ -503,7 +505,7 @@
                     </div>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
-                           @closed="save">
+                           @closed="() => DataControl.save('chats')">
                     <el-input
                             v-model="currDialogueData.content"
                             :autosize="{minRows: 1, maxRows: 5}"
@@ -610,7 +612,7 @@
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
                         <div class="window" id="window"
-                             :style="{width: width.window+'px', background: settings.background}"
+                             :style="{width: width.window+'px', background: renderSettings.background}"
                         >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id"></Dialogue>
