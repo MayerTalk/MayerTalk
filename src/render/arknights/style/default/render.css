@@ -257,6 +257,10 @@
     color: lightgrey;
 }
 
+.drawer .bar:hover {
+    color: lightblue;
+}
+
 .drawer .bar svg {
     margin-right: 5px;
 }
