@@ -216,9 +216,6 @@
                         }
                     }
                 }
-                message.notify('撤回成功', message.success)
-            } else {
-                message.notify('没有数据可以撤回')
             }
         },
         redo() {
@@ -234,10 +231,6 @@
                         }
                     }
                 }
-                message.notify('重做成功', message.success)
-
-            } else {
-                message.notify('没有数据可以重做')
             }
         }
     };
