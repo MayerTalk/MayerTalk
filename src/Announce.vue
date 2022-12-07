@@ -1,9 +1,18 @@
 <script setup>
-    import {onMounted} from 'vue'
+    import {onMounted, computed} from 'vue'
     import {saveData, getData} from './lib/tool';
 
-    const {modelValue} = defineProps(['modelValue']);
+    const props = defineProps(['modelValue']);
     const emit = defineEmits(['update:modelValue', 'showGuide']);
+
+    const ifShowAnnouncement = computed({
+        get() {
+            return props.modelValue
+        },
+        set(value) {
+            emit('update:modelValue', value);
+        }
+    });
 
     const version = 'v0.0.4';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
@@ -17,8 +26,7 @@
 </script>
 
 <template>
-    <el-dialog v-model="modelValue" :title="'公告 '+version" :width="dialogWidth"
-               @close="$emit('update:modelValue',false)">
+    <el-dialog v-model="ifShowAnnouncement" :title="'公告 '+version" :width="dialogWidth">
         <div style="position:relative;">
             <h2 style="display: inline">明日方舟对话编辑器(beta)</h2>
             <p>开发阶段，功能尚不完善，还请谅解</p>
