@@ -33,9 +33,11 @@ function getData(name) {
 
 function download(url, filename) {
     const el = document.createElement('a');
+    document.body.appendChild(el);
     el.download = filename;
     el.href = url;
     el.click();
+    el.remove()
 }
 
 function downloadImage(node, options, callback) {
