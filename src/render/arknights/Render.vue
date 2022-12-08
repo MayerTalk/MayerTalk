@@ -104,6 +104,26 @@
 
     const showToolBar = ref(false);
     const toolBarMask = ref(true);
+
+    // @列表处理
+    const ifAt = ref(false);
+    const atWho = ref({});
+    watch(atWho, () => {
+        // 刷入文本框
+        if (!atWho.value) { return }
+        textarea.value += atWho.value.name + " ";
+        ifAt.value = false;
+    })
+    function processKeyDown(e) {
+        // 处理单个key按下事件
+        if (e.code === "Digit2" && e.shiftKey) { // 输入法适配
+            atWho.value = "";
+            textarea.value += "@";
+            ifAt.value = true;
+        } else {
+            ifAt.value = false;
+        }
+    }
     if (window.innerWidth - 520 > 250) {
         showToolBar.value = true;
         toolBarMask.value = false
@@ -589,6 +609,28 @@
                     </div>
 
                 </el-dialog>
+                <el-dialog v-model="ifAt" :width="dialogWidth"
+                    title="想用@提到哪个角色?"
+                    modal="false"
+                    draggable
+                    @closed="() => { ifAt = false; }"
+                    @close-auto-focus="() => { ifAt = false; }">
+                    <el-select
+                        v-model="atWho"
+                        style="width:100%"
+                        placeholder="搜索角色..."
+                        clearable
+                        filterable
+                        default-first-option >
+                        <el-option v-for="char in chars"
+                            :key="char"
+                            :label="char.name"
+                            :value="char">
+                            <span style="float:left">{{char.name}}</span>
+                            <img style="float:right;display:inline-block" :src="char.avatar"/>
+                        </el-option>
+                    </el-select>
+                </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
                         <el-icon color="lightgrey" :size="35">
@@ -682,7 +724,8 @@
                             </div>
                             <textarea class="textarea" id="textarea" v-model="textarea"
                                       :placeholder="tipControl.tip.value"
-                                      @keydown.ctrl.enter="createDialogue(false)"></textarea>
+                                      @keydown.ctrl.enter="createDialogue(false)"
+                                      @keydown="processKeyDown"></textarea>
                             <div class="button-bar">
 
                                 <el-icon @click="createDialogue(false)" color="#808080" :size="35">
