@@ -329,6 +329,34 @@
         ifShowEditDialogue.value = false;
     }
 
+    function withdrawDialogue() {
+        message.confirm(
+            '撤回这条消息？',
+            '提示',
+            () => {
+                let chat = chats.value.splice(currDialogue.value, 1)[0];
+                if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
+                    delete images.value[chat.content];
+                    DataControl.update('images')
+                }
+                message.notify('撤回成功', message.success);
+                ifShowEditDialogue.value = false;
+
+                if (!chat.char) return;
+                chats.value.push({
+                    char: "",
+                    content: `“${chars.value[chat.char].name}” 撤回了一条消息`,
+                    type: 'monologue',
+                    id: uuid()
+                });
+                DataControl.save('chats');
+                nextTick(() => {
+                    resizeScroll();
+                    scroll.value.setScrollTop(10000)
+                });
+            }
+        );
+    }
 
     function screenshot() {
         preScreenshot.value = true;
@@ -546,10 +574,12 @@
                             </el-select>
                         </div>
                         <div style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
-                        <div v-if="editDialogue" style="width: 100%; margin-top: 5px">
-                            <el-button style="width: 50%" @click="delDialogue">删除</el-button>
-                            <el-button style="width: calc(50% - 5px); margin-left: 5px" @click="switchEdit(false)">向上插入
+                        <div v-if="editDialogue" style="width: 100%; margin-top: 5px; column-count: 3; column-gap: 5px;">
+                            <!-- TODO 应当把column-count+gap的这个写法应用到所有有并列的el-button的容器上-->
+                            <el-button style="width: 100%" @click="delDialogue">删除</el-button>
+                            <el-button style="width: 100%; margin-left: 0px" @click="switchEdit(false)">向上插入
                             </el-button>
+                            <el-button style="width: 100%; margin-left: 0px" @click="withdrawDialogue">撤回</el-button>
                         </div>
                         <div v-else style="width: 100%; margin-top: 5px">
                             <el-button style="width: 50%" @click="insertDialogue">插入</el-button>

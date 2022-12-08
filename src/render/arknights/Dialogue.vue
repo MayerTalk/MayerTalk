@@ -64,7 +64,7 @@
                 </div>
                 <template v-if="data.type==='chat'">
                     <div v-if="data.char" :class="[right? 'right':'left', 'avatar-id']">
-                        {{chars[data.char].name}}
+                        {{chars[data.char].name || ""}}
                     </div>
                     <div v-if="data.char" class="dialogue-box">
                         <div :class="[right? 'right':'left']">
