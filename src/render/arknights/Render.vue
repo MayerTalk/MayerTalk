@@ -109,11 +109,16 @@
     const ifAt = ref(false);
     const atWho = ref({});
     watch(atWho, () => {
-        // 刷入文本框
+        // 被@角色刷入文本框
         if (!atWho.value) { return }
         textarea.value += atWho.value.name + " ";
         ifAt.value = false;
-    })
+    });
+    watch(ifAt, () => {
+        if (!ifAt.value) {
+            document.querySelector("#textarea").focus();
+        }
+    });
     function processKeyDown(e) {
         // 处理单个key按下事件
         if (e.code === "Digit2" && e.shiftKey) { // 输入法适配
@@ -124,6 +129,12 @@
             ifAt.value = false;
         }
     }
+    function focusOnSelect() {
+        // @提示框显示后聚焦输入
+        // FIXME:(20221209) 没看懂文档里怎么调el-select的focus 这里先hack了= =
+        document.querySelector("#atWhoSelect").focus();
+    }
+
     if (window.innerWidth - 520 > 250) {
         showToolBar.value = true;
         toolBarMask.value = false
@@ -613,10 +624,10 @@
                     title="想用@提到哪个角色?"
                     modal="false"
                     draggable
-                    @closed="() => { ifAt = false; }"
-                    @close-auto-focus="() => { ifAt = false; }">
+                    @opened="focusOnSelect">
                     <el-select
                         v-model="atWho"
+                        id="atWhoSelect"
                         style="width:100%"
                         placeholder="搜索角色..."
                         clearable
