@@ -32,6 +32,12 @@
         }
     }
 
+    function nameOf(id) {
+        // 由char id对象获取name
+        let defaultName = /\/([^/]*?)\.(png|jpg|jpeg|webp)/.exec(chars.value[id].avatar); // 从图片名拿ID,尽量不出现“？？？”
+        return chars.value[id].name
+            || (defaultName ? defaultName : "？？？");
+    }
     watch(() => width.value.window, () => {
         // window改变时调整图片大小
         resizeImage()
@@ -63,6 +69,9 @@
                     >
                 </div>
                 <template v-if="data.type==='chat'">
+                    <div v-if="data.char" :class="[right? 'right':'left', 'avatar-id']">
+                        {{nameOf(data.char)}}
+                    </div>
                     <div v-if="data.char" class="dialogue-box">
                         <div :class="[right? 'right':'left']">
                             <div class="tail">
