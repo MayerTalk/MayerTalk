@@ -20,8 +20,14 @@ pre {
 .avatar-id {
     position: absolute;
     color: var(--dialogue-color);
-    left: 78px;
     font-size: small;
+}
+.avatar-id.left {
+    left: 78px;
+}
+
+.avatar-id.right {
+    right: 78px;
 }
 
 .monologue-box {

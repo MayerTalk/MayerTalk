@@ -11,7 +11,9 @@ import {
     ChatDotSquare,
     Delete,
     Upload,
-    Download
+    Download,
+    Back,
+    Right
 } from "@element-plus/icons";
 
 const app = createApp(App);
@@ -26,5 +28,7 @@ app.component('ChatDotSquare', ChatDotSquare);
 app.component('Delete', Delete);
 app.component('Upload', Upload);
 app.component('Download', Download);
+app.component('Back', Back);
+app.component('Right', Right);
 
 app.mount('#app');
