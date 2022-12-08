@@ -320,8 +320,12 @@
     }
 
     function insertDialogue() {
-        if (!currDialogueData.value.char) {
+        if (currDialogueData.value.char === undefined) {
             message.notify('请选择角色', message.warning);
+            return
+        }
+        if (!currDialogueData.value.type) {
+            message.notify('请选择类型', message.warning);
             return
         }
         chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value));
