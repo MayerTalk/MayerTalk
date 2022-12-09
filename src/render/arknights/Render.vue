@@ -648,7 +648,7 @@
                 </el-dialog>
                 <el-dialog v-model="ifAt" :width="dialogWidth"
                     title="想用@提到哪个角色?"
-                    modal="false"
+                    :modal="false"
                     draggable
                     @opened="focusOnSelect">
                     <el-select
