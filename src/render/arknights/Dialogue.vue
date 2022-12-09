@@ -5,6 +5,7 @@
 
     const chars = inject('chars');
     const images = inject('images');
+    const staticUrl = inject('staticUrl');
     const renderSettings = inject('renderSettings');
     const width = inject('width');
     const charDirection = inject('charDirection');
@@ -49,7 +50,7 @@
                 <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                     <div v-if="right === false">
                         <img src="/avatar-bg.png">
-                        <img :src="images[char.avatar] || char.avatar">
+                        <img :src="images[char.avatar] || staticUrl + char.avatar">
                     </div>
                 </div>
                 <div v-if="data.type==='image'" class="image-box">
@@ -86,7 +87,7 @@
                 <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                     <div v-if="right === true">
                         <img src="/avatar-bg.png">
-                        <img :src="images[char.avatar] || char.avatar">
+                        <img :src="images[char.avatar] || staticUrl + char.avatar">
                     </div>
                 </div>
             </div>

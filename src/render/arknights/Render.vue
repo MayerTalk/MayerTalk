@@ -17,6 +17,7 @@
     const chars = inject('chars');
     const chats = inject('chats');
     const images = inject('images');
+    const staticUrl = inject('staticUrl');
     const DataControl = inject('DataControl');
     const renderSettings = ref({});
     const width = ref({});
@@ -82,17 +83,17 @@
             const search = searchChar.value;
             const list = [];
             for (let i = 0; i < avatars.length; i++) {
-                if (avatars[i].indexOf(search) !== -1) {
+                if (avatars[i][0].indexOf(search) !== -1) {
                     list.push(avatars[i])
                 }
             }
             return list.length ? list : false
         } else {
             return [
-                '博士',
-                'PRTS',
-                'mon3tr',
-                '凯尔希'
+                ['博士', 'avatar/arknights/博士.png'],
+                ['PRTS', 'avatar/arknights/PRTS.png'],
+                ['mon3tr', 'avatar/arknights/mon3tr.png'],
+                ['凯尔希', 'avatar/arknights/凯尔希.png']
             ]
         }
     });
@@ -246,8 +247,8 @@
         return false
     }
 
-    function selectAvatar(src) {
-        newChar.value.avatar = '/avatar/' + src + '.png';
+    function selectAvatar(avatar) {
+        newChar.value.avatar = avatar[1];
         ifShowSelectAvatar.value = false
     }
 
@@ -344,7 +345,8 @@
             setTimeout(() => {
                 downloadImage(node, {
                     windowWidth: width.value.window + 20,
-                    scale: renderSettings.value.scale
+                    scale: renderSettings.value.scale,
+                    useCORS: true
                 }, () => {
                     preScreenshot.value = false;
                     node.style.height = null;
@@ -465,7 +467,7 @@
                                     :before-upload="uploadAvatar"
                             >
                                 <div class="container"><img v-if="newChar.avatar"
-                                                            :src="images[newChar.avatar] || newChar.avatar"/>
+                                                            :src="images[newChar.avatar] || staticUrl + newChar.avatar"/>
                                     <el-icon v-else class="avatar-uploader-icon">
                                         <Plus/>
                                     </el-icon>
@@ -498,9 +500,10 @@
                     <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
                     <div v-if="searchResult" class="avatar-bar">
                         <el-scrollbar max-height="50vh" style="width: 100%">
-                            <img v-for="src in searchResult" :key="src" :src="'/avatar/' + src + '.png'" loading="lazy"
-                                 :title="src"
-                                 @click="selectAvatar(src)">
+                            <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
+                                 loading="lazy"
+                                 :title="avatar[0]"
+                                 @click="selectAvatar(avatar)">
                         </el-scrollbar>
                     </div>
                     <div v-else
@@ -670,7 +673,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <img :src="images[char.avatar] || char.avatar">
+                                            <img :src="images[char.avatar] || staticUrl + char.avatar">
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">

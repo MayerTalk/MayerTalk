@@ -245,6 +245,7 @@
         }
     }
 
+    provide('staticUrl','https://static.mayertalk.top/');
     provide('ifShowAnnouncement', ifShowAnnouncement);
     provide('ifShowGuide', ifShowGuide);
     provide('config', config);
