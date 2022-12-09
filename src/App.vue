@@ -135,8 +135,8 @@
             const tmp = copy(data);
             for (let imageId in tmp) {
                 if (tmp.hasOwnProperty(imageId)) {
-                    if (tmp[imageId].indexOf('/avatar/') !== 0 && tmp[imageId].indexOf('data:image') !== 0) {
-                        // 非/avatar/(内置)和data:image(b64)视为不安全数据
+                    if (tmp[imageId].indexOf('avatar/') !== 0 && tmp[imageId].indexOf('data:image') !== 0) {
+                        // 非avatar/(内置)和data:image(b64)视为不安全数据
                         message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告');
                         delete tmp[imageId];
                         throw TypeError
@@ -245,7 +245,7 @@
         }
     }
 
-    provide('staticUrl','https://static.mayertalk.top/');
+    provide('staticUrl', 'https://static.mayertalk.top/');
     provide('ifShowAnnouncement', ifShowAnnouncement);
     provide('ifShowGuide', ifShowGuide);
     provide('config', config);
@@ -275,6 +275,15 @@
             DataControl.save();
             localStorage.removeItem('data');
         } catch (e) {
+        }
+    }
+
+    for (let key in chars.value) {
+        if (chars.value.hasOwnProperty(key)) {
+            const char = chars.value[key];
+            if (char.avatar.indexOf('/avatar/') === 0) {
+                chars.value[key].avatar = 'avatar/arknights/' + char.avatar.substring(8)
+            }
         }
     }
 </script>
