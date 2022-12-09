@@ -3,7 +3,7 @@
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square} from "@/lib/tool";
+    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square, ensureClose} from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
@@ -384,8 +384,12 @@
     }
 
     function insertDialogue() {
-        if (!currDialogueData.value.char) {
+        if (currDialogueData.value.char === undefined) {
             message.notify('请选择角色', message.warning);
+            return
+        }
+        if (!currDialogueData.value.type) {
+            message.notify('请选择类型', message.warning);
             return
         }
         chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value));
@@ -588,7 +592,7 @@
                     </div>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
-                           @closed="() => DataControl.save('chats')">
+                           @closed="() => DataControl.save('chats')" :before-close="editDialogue?null:ensureClose">
                     <el-input
                             v-model="currDialogueData.content"
                             :autosize="{minRows: 1, maxRows: 5}"

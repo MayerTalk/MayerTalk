@@ -33,9 +33,11 @@ function getData(name) {
 
 function download(url, filename) {
     const el = document.createElement('a');
+    document.body.appendChild(el);
     el.download = filename;
     el.href = url;
     el.click();
+    el.remove()
 }
 
 function downloadImage(node, options, callback) {
@@ -88,6 +90,12 @@ function image2square(image) {
     return canvas.toDataURL()
 }
 
+function ensureClose(done) {
+    message.confirm('是否退出编辑', '提示', () => {
+        done()
+    })
+}
+
 export {
     copy,
     uuid,
@@ -97,5 +105,6 @@ export {
     downloadImage,
     blob2url,
     blob2base64,
-    image2square
+    image2square,
+    ensureClose
 }

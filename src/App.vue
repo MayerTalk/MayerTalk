@@ -28,7 +28,7 @@
         constructor(key, obj) {
             this.key = key;
             this.obj = obj;
-            this.lastSave = '';
+            this.lastSave = JSON.stringify(obj.value);
             this.update = false;
             // TODO doesn't work
             // watch(this.obj, () => {
@@ -78,7 +78,7 @@
         constructor(key, obj) {
             this.key = key;
             this.obj = obj;
-            this.lastSave = '';
+            this.lastSave = JSON.stringify(obj.value);
             this.update = false;
             // TODO doesn't work
             // watch(this.obj, () => {
