@@ -497,20 +497,22 @@
                 </el-dialog>
                 <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
                     <!--        素材库选择头像-->
-                    <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
-                    <div v-if="searchResult" class="avatar-bar">
-                        <el-scrollbar max-height="50vh" style="width: 100%">
-                            <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
-                                 loading="lazy"
-                                 :title="avatar[0]"
-                                 @click="selectAvatar(avatar)">
-                        </el-scrollbar>
-                    </div>
-                    <div v-else
-                         style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
-                        <p>No Result</p>
-                        <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
-                    </div>
+                    <template v-if="ifShowSelectAvatar">
+                        <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
+                        <div v-if="searchResult" class="avatar-bar">
+                            <el-scrollbar max-height="50vh" style="width: 100%">
+                                <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
+                                     loading="lazy"
+                                     :title="avatar[0]"
+                                     @click="selectAvatar(avatar)">
+                            </el-scrollbar>
+                        </div>
+                        <div v-else
+                             style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
+                            <p>No Result</p>
+                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
+                        </div>
+                    </template>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                            @closed="() => DataControl.save('chats')" :before-close="editDialogue?null:ensureClose">
