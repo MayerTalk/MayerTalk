@@ -6,6 +6,10 @@ pre {
     white-space: pre-wrap;
 }
 
+.dialogue-container {
+    position: relative;
+}
+
 .avatar {
     position: relative;
     flex-shrink: 0;
@@ -64,6 +68,7 @@ pre {
     align-self: flex-end;
     flex-grow: 1;
     padding: 8px;
+    margin-top: 1.5em;
     /*font-size: var(--font-size);*/
     position: relative;
     background: var(--dialogue-background);

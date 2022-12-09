@@ -9,6 +9,7 @@
     const width = inject('width');
     const charDirection = inject('charDirection');
     const preScreenshot = inject('preScreenshot');
+    const plus1 = inject('plus1');
     const {data, index} = defineProps(['data', 'index']);
     defineEmits(['edit']);
     const char = computed(() => {
@@ -30,6 +31,11 @@
         if (data.type === 'image') {
             id.value = uuid();
         }
+    }
+
+    function requestPlus1() {
+        // Dialogue内触发+1请求交Render处理
+        plus1.value = -1;
     }
 
     watch(() => width.value.window, () => {
@@ -94,6 +100,18 @@
                 </div>
             </div>
         </div>
+        <div v-if="plus1 === index" class="plus1" @click="requestPlus1" style="
+            color: rgb(13,121,240);
+            position: absolute;
+            top: 50%;
+            right: -3em;
+            border: 2px solid rgb(13,121,240);
+            background: white;
+            border-radius: 1.8em;
+            width: 1.6em;
+            height: 1.6em;
+            cursor: pointer;"
+        >+1</div>
     </div>
 </template>
 
