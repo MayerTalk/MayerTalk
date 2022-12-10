@@ -96,6 +96,10 @@ function ensureClose(done) {
     })
 }
 
+function clickBySelector(selector) {
+    document.querySelector(selector).click()
+}
+
 export {
     copy,
     uuid,
@@ -106,5 +110,6 @@ export {
     blob2url,
     blob2base64,
     image2square,
-    ensureClose
+    ensureClose,
+    clickBySelector
 }

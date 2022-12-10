@@ -3,7 +3,7 @@
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square, ensureClose} from "@/lib/tool";
+    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square, ensureClose, clickBySelector} from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
@@ -67,7 +67,28 @@
     const textarea = ref('');
     const scroll = ref();
     const preScreenshot = ref(false);
+    const ifShowMoreType = ref(false);
+    const arrowStyle = ref({});
     provide('preScreenshot', preScreenshot);
+
+    function roll360() {
+        if (ifShowMoreType.value) {
+            arrowStyle.value = {
+                transform: 'rotate(180deg)',
+                transition: 'transform ease 0.4s'
+            };
+            resizeScroll(-100)
+        } else {
+            arrowStyle.value = {
+                transform: 'rotate(360deg)',
+                transition: 'transform ease 0.4s'
+            };
+            setTimeout(() => {
+                arrowStyle.value = {}
+            }, 500);
+            resizeScroll(100)
+        }
+    }
 
     const currChar = ref('');
     const ifShowEditChar = ref(false);
@@ -113,12 +134,13 @@
         toolBarMask.value = true
     }
 
-    function resizeScroll() {
+    function resizeScroll(offset = 0) {
         const el = document.getElementById('textarea');
         el.style.height = '20px';
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
         el.style.height = height + 'px';
-        scrollHeight.value = window.innerHeight - height - 70 + 'px'
+        const bar = document.getElementById('operateBar');
+        scrollHeight.value = window.innerHeight - bar.scrollHeight + offset + 'px'
     }
 
     watch(textarea, resizeScroll);
@@ -639,21 +661,12 @@
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id"></Dialogue>
                         </div>
-                        <div class="operateBar" :style="{width: windowWidth + 'px'}">
+                        <div id="operateBar" class="operateBar" :style="{width: windowWidth + 'px'}">
                             <div class="button-bar">
-                                <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">
-                                    <Picture/>
-                                    <el-upload
-                                            action="#"
-                                            :show-file-list="false"
-                                            class="avatar-uploader"
-                                            accept="image/png, image/jpeg, image/gif"
-                                            :before-upload="createImageDialogue"
-                                            style="position: absolute; width: 35px; height: 35px"
-                                    >
-                                        <div style="height: 35px; width: 35px; user-select: none">
-                                        </div>
-                                    </el-upload>
+                                <el-icon color="#707070" :size="35"
+                                         style="margin-right: 5px; position: relative" :style="arrowStyle"
+                                         @click="() => {ifShowMoreType = !ifShowMoreType; roll360()}">
+                                    <ArrowUp/>
                                 </el-icon>
                                 <el-icon @click="createDialogue(true)" color="#707070" :size="35">
                                     <ChatDotSquare/>
@@ -663,12 +676,26 @@
                                       :placeholder="tipControl.tip.value"
                                       @keydown.ctrl.enter="createDialogue(false)"></textarea>
                             <div class="button-bar">
-
                                 <el-icon @click="createDialogue(false)" color="#808080" :size="35">
                                     <Promotion/>
                                 </el-icon>
                             </div>
-
+                            <div class="moretype-bar" :class="{show: ifShowMoreType}">
+                                <div class="block" @click="clickBySelector('#uploadImage > div > input')">
+                                    <el-upload id="uploadImage"
+                                               action="#"
+                                               :show-file-list="false"
+                                               class="avatar-uploader"
+                                               accept="image/png, image/jpeg, image/gif"
+                                               :before-upload="createImageDialogue"
+                                               style="position: absolute; width: 0; height: 0"
+                                    ></el-upload>
+                                    <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">
+                                        <Picture/>
+                                    </el-icon>
+                                    图片
+                                </div>
+                            </div>
                             <div class="char-bar">
                                 <el-scrollbar>
                                     <div class="container">
