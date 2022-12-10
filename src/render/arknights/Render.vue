@@ -110,6 +110,7 @@
     // @列表处理
     const ifAt = ref(false);
     const atWho = ref({});
+    const atWhoSelRef = ref(null);
     watch(atWho, () => {
         // 被@角色刷入文本框
         if (!atWho.value) { return }
@@ -133,8 +134,11 @@
     }
     function focusOnSelect() {
         // @提示框显示后聚焦输入
-        // FIXME:(20221209) 没看懂文档里怎么调el-select的focus 这里先hack了= =
-        document.querySelector("#atWhoSelect").focus();
+        if (atWhoSelRef.value) {
+            atWhoSelRef.value.focus();
+        } else {
+            setTimeout(focusOnSelect, 1000);
+        }
     }
 
     // +1功能
@@ -397,17 +401,32 @@
         ifShowEditDialogue.value = false;
     }
 
+    function modelDialogue(content, replace, type, char) {
+        // 发送模板消息
+        // content(str): 消息内容
+        // replace(str): 格式化消息内容时使用的映射表
+        const startSeq = "#", endSeq = "#"; // 暂定的escape sequence
+        for (let key in replace) {
+            content = content.replace(startSeq + key.toString() + endSeq, replace[key].toString());
+        }
+        type = type || "chat";
+        char = char || "";
+        chats.value.push({
+            type: type,
+            char: char,
+            content: content,
+            id: uuid()
+        });
+    }
     function withdrawDialogue() {
+        // 撤回消息
         if (!currChar.value) {
             messsage.notify('需要先选中一个角色！', message.warning);
             return;
         }
-        chats.value.push({
-            char: "",
-            content: `“${chars.value[currChar.value].name}” 撤回了一条消息`,
-            type: 'chat',
-            id: uuid()
-        });
+        modelDialogue("“#name#” 撤回了一条消息", {
+            name: chars.value[currChar.value].name
+        })
         DataControl.save('chats');
         message.notify('撤回成功', message.success);
         nextTick(() => {
@@ -632,8 +651,8 @@
                             </el-select>
                         </div>
                         <div style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
-                        <div v-if="editDialogue" style="width: 100%; margin-top: 5px; column-count: 2; column-gap: 5px;">
-                            <!-- TODO 应当把column-count+gap的这个写法应用到所有有并列的el-button的容器上-->
+                        <div v-if="editDialogue" style="display: flex; width: 100%; margin-top: 5px; column-gap: 5px;">
+                            <!-- TODO 应当把column-gap的这个写法应用到所有有并列的el-button的容器上-->
                             <el-button style="width: 100%" @click="delDialogue">删除</el-button>
                             <el-button style="width: 100%; margin-left: 0px" @click="switchEdit(false)">向上插入
                             </el-button>
@@ -652,6 +671,7 @@
                     draggable
                     @opened="focusOnSelect">
                     <el-select
+                        ref="atWhoSelRef"
                         v-model="atWho"
                         id="atWhoSelect"
                         style="width:100%"

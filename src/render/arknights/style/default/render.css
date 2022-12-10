@@ -157,7 +157,8 @@
 }
 
 .flip:hover {
-    transform: rotateX(360deg);
+    /* rotateY() 性能太烂！ */
+    transform: scaleY(-1);
 }
 
 .scale {
