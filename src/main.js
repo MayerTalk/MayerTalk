@@ -14,7 +14,10 @@ import {
     Download,
     Back,
     Right,
-    ArrowUp
+    ArrowUp,
+    Operation,
+    Edit,
+    Close,
 } from "@element-plus/icons";
 
 const app = createApp(App);
@@ -32,5 +35,8 @@ app.component('Download', Download);
 app.component('Back', Back);
 app.component('Right', Right);
 app.component('ArrowUp', ArrowUp);
+app.component('Operation', Operation);
+app.component('Edit', Edit);
+app.component('Close', Close);
 
 app.mount('#app');

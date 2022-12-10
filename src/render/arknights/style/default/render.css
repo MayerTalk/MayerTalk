@@ -1,7 +1,7 @@
 /*class: render*/
 
 #body {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 }
 
@@ -69,6 +69,7 @@
 
 .operateBar {
     width: var(--witdh);
+    z-index: 5;
     position: fixed;
     display: flex;
     bottom: 0;

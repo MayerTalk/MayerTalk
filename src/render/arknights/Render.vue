@@ -2,14 +2,36 @@
     import {ref, computed, watch, inject, provide, nextTick, onMounted} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
+    import Option from './type/Option.vue'
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square, ensureClose, clickBySelector} from "@/lib/tool";
+    import {
+        copy,
+        uuid,
+        downloadImage,
+        download,
+        blob2url,
+        blob2base64,
+        image2square,
+        ensureClose,
+        clickBySelector
+    } from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
         monologue: '独白',
-        image: '图片'
+        image: '图片',
+        option: '选项',
+        select: '选择',
+        title: '标题'
     };
+
+    const editor = computed(() => {
+        if (['char', 'monologue', 'image'].indexOf(currDialogueData.value.type) !== -1) {
+            return false
+        } else if (currDialogueData.value.type === 'option') {
+            return Option
+        }
+    });
 
     const ifShowAnnouncement = inject('ifShowAnnouncement');
     const ifShowGuide = inject('ifShowGuide');
@@ -69,6 +91,8 @@
     const preScreenshot = ref(false);
     const ifShowMoreType = ref(false);
     const arrowStyle = ref({});
+    const options = ref({});
+    const ifShowCreateOption = ref(false);
     provide('preScreenshot', preScreenshot);
 
     function roll360() {
@@ -140,10 +164,12 @@
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
         el.style.height = height + 'px';
         const bar = document.getElementById('operateBar');
-        scrollHeight.value = window.innerHeight - bar.scrollHeight + offset + 'px'
+        scrollHeight.value = window.innerHeight - bar.scrollHeight + offset - 1 + 'px'
     }
 
-    watch(textarea, resizeScroll);
+    watch(textarea, () => {
+        resizeScroll()
+    });
     window.onresize = () => {
         resizeScroll()
     };
@@ -187,12 +213,12 @@
         tipControl.loop();
     });
 
-    function createDialogue(monologue) {
+    function createTextDialogue(type) {
         if (textarea.value) {
             chats.value.push({
                 char: currChar.value,
                 content: textarea.value,
-                type: monologue ? 'monologue' : 'chat',
+                type: type,
                 id: uuid()
             });
             textarea.value = '';
@@ -424,6 +450,28 @@
             avatars = module.default
         })
     }
+
+    function showCreateOption() {
+        const id = uuid();
+        options.value = {};
+        options.value[id] = '';
+        ifShowCreateOption.value = true
+    }
+
+    function createOptionDialogue() {
+        ifShowCreateOption.value = false;
+        chats.value.push({
+            char: currChar.value,
+            content: copy(options.value),
+            id: uuid(),
+            type: 'option'
+        });
+        DataControl.save('chats');
+        nextTick(() => {
+            resizeScroll();
+            scroll.value.setScrollTop(10000)
+        });
+    }
 </script>
 
 
@@ -538,15 +586,15 @@
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                            @closed="() => DataControl.save('chats')" :before-close="editDialogue?null:ensureClose">
-                    <el-input
-                            v-model="currDialogueData.content"
-                            :autosize="{minRows: 1, maxRows: 5}"
-                            resize="none"
-                            type="textarea"
-                            style="margin-bottom: 5px"
-                            :disabled="currDialogueData.type==='image'"
+                    <component v-if="editor" :is="editor" v-model="currDialogueData.content"/>
+                    <el-input v-else
+                              v-model="currDialogueData.content"
+                              :autosize="{minRows: 1, maxRows: 5}"
+                              resize="none"
+                              type="textarea"
+                              :disabled="currDialogueData.type==='image'"
                     ></el-input>
-                    <div class="edit-bar">
+                    <div class="edit-bar" style="margin-top: 5px">
                         <div style="width: 50%; display: flex">
                             <el-select v-model="currDialogueData.char" style="flex-grow: 1" placeholder="角色">
                                 <el-option
@@ -564,7 +612,7 @@
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
-                                       :disabled="currDialogueData.type==='image'"
+                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1"
                                        placeholder="类型"
                             >
                                 <el-option
@@ -572,7 +620,7 @@
                                         :key="type"
                                         :label="text"
                                         :value="type"
-                                        :disabled="type==='image'"
+                                        :disabled="['image','option'].indexOf(type) !== -1"
                                 />
                             </el-select>
                         </div>
@@ -589,6 +637,10 @@
                         </div>
                     </div>
 
+                </el-dialog>
+                <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
+                           :show-close="false">
+                    <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
                 </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
@@ -668,15 +720,15 @@
                                          @click="() => {ifShowMoreType = !ifShowMoreType; roll360()}">
                                     <ArrowUp/>
                                 </el-icon>
-                                <el-icon @click="createDialogue(true)" color="#707070" :size="35">
+                                <el-icon @click="createTextDialogue('monologue')" color="#707070" :size="35">
                                     <ChatDotSquare/>
                                 </el-icon>
                             </div>
                             <textarea class="textarea" id="textarea" v-model="textarea"
                                       :placeholder="tipControl.tip.value"
-                                      @keydown.ctrl.enter="createDialogue(false)"></textarea>
+                                      @keydown.ctrl.enter="createTextDialogue('chat')"></textarea>
                             <div class="button-bar">
-                                <el-icon @click="createDialogue(false)" color="#808080" :size="35">
+                                <el-icon @click="createTextDialogue('chat')" color="#808080" :size="35">
                                     <Promotion/>
                                 </el-icon>
                             </div>
@@ -690,10 +742,30 @@
                                                :before-upload="createImageDialogue"
                                                style="position: absolute; width: 0; height: 0"
                                     ></el-upload>
-                                    <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">
+                                    <el-icon color="#707070" :size="35">
                                         <Picture/>
                                     </el-icon>
                                     图片
+                                </div>
+                                <div class="block" @click="showCreateOption">
+                                    <el-icon color="#707070" :size="35">
+                                        <Operation/>
+                                    </el-icon>
+                                    选项
+                                </div>
+                                <div class="block" @click="createTextDialogue('select')">
+                                    <el-icon color="#707070" :size="35">
+                                        <Edit/>
+                                    </el-icon>
+                                    选择
+                                </div>
+                                <div class="block" @click="createTextDialogue('title')">
+                                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                                         data-v-029747aa="" style="width: 35px; height: 35px">
+                                        <path d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
+                                              fill="#707070"></path>
+                                    </svg>
+                                    标题
                                 </div>
                             </div>
                             <div class="char-bar">
