@@ -86,6 +86,10 @@
         resizeWindow()
     });
 
+    onMounted(() => {
+        document.getElementById('body').style.height = window.innerHeight + 'px'
+    })
+
     const textarea = ref('');
     const scroll = ref();
     const preScreenshot = ref(false);
