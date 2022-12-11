@@ -16,13 +16,14 @@
 
     const version = 'v0.0.5';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
+    const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
 
     onMounted(() => {
         if (getData('a_version') !== version) {
             emit('update:modelValue', true);
             saveData('a_version', version)
         }
-    })
+    });
 </script>
 
 <template>
@@ -38,7 +39,10 @@
             - 新增对话类型 选项/选择/标题<br/>
             - 新增渲染设置<br/>
             - 修复移动端元素溢出<br/>
-            - <el-link href="https://www.mayertalk.top/" type="primary">站点迁移</el-link>
+            -
+            <el-link href="https://www.mayertalk.top/" type="primary">
+                {{isNewSite?'站点迁移 (您已在新站点)':'站点迁移 前往[https://www.mayertalk.top/]'}}
+            </el-link>
             <h3>关于截图失败</h3>
             <b>iOS：待支持</b><br/>
             <b>安卓：请使用Edge/Chrome，不支持夸克/UC</b><br/>
