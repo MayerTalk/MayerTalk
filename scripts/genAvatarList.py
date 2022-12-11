@@ -16,7 +16,7 @@ def list_avatar(path, dirs=None) -> list:
         if os.path.isdir(os.path.join(path, file)):
             res.extend(list_avatar(os.path.join(path, file), dirs + [file]))
         else:
-            res.append(['.'.join(file.split('.')[:-1]), '/'.join(dirs + [file])])
+            res.append(['.'.join(file.split('.')[:-1]), '/' + '/'.join(dirs + [file])])
     return res
 
 
