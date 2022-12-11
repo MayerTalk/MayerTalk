@@ -7,6 +7,7 @@
     import Announce from './Announce.vue'
 
     const ifShowAnnouncement = ref(false);
+    const ifShowSettings = ref(false);
     const ifShowGuide = ref(false);
     const config = ref({render: 'Arknights'});
     const settings = ref({});
@@ -247,6 +248,7 @@
 
     provide('staticUrl', 'https://static.mayertalk.top/');
     provide('ifShowAnnouncement', ifShowAnnouncement);
+    provide('ifShowSettings', ifShowSettings);
     provide('ifShowGuide', ifShowGuide);
     provide('config', config);
     provide('settings', settings);

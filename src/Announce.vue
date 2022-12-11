@@ -14,7 +14,7 @@
         }
     });
 
-    const version = 'v0.0.4';
+    const version = 'v0.0.5';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
 
     onMounted(() => {
@@ -32,13 +32,11 @@
             <p>开发阶段，功能尚不完善，还请谅解</p>
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <h3>
-                v0.0.4
+                v0.0.5
             </h3>
-            - 新增指南<br/>
-            - 修复手机Chrome无法截图的问题<br/>
-            - 选中角色的提示更加明显了<br/>
-            - 调整截图渲染<br/>
-            - 现在上传的头像会自动剪裁成正方形<br/>
+            - 新增对话类型 选项/选择/标题<br/>
+            - 新增渲染设置<br/>
+            - 修复移动端元素溢出<br/>
             <h3>关于截图失败</h3>
             <b>iOS：待支持</b><br/>
             <b>安卓：请使用Edge/Chrome，不支持夸克/UC</b><br/>
