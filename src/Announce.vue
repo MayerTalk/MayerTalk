@@ -34,9 +34,11 @@
             <h3>
                 v0.0.5
             </h3>
+            - 支持 撤销/重做<br/>
             - 新增对话类型 选项/选择/标题<br/>
             - 新增渲染设置<br/>
             - 修复移动端元素溢出<br/>
+            - <el-link href="https://www.mayertalk.top/" type="primary">站点迁移</el-link>
             <h3>关于截图失败</h3>
             <b>iOS：待支持</b><br/>
             <b>安卓：请使用Edge/Chrome，不支持夸克/UC</b><br/>
