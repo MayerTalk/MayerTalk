@@ -2,7 +2,6 @@
     import {ref, provide, onMounted} from 'vue'
     import message from './lib/message';
     import {copy} from './lib/tool';
-    import './lib/clear';
     import Renders from './render'
     import Announce from './Announce.vue'
 
@@ -269,25 +268,7 @@
         }
     });
 
-    DataControl.load();
-
-    if (localStorage.getItem('data')) {
-        try {
-            DataControl.set(JSON.parse(localStorage.getItem('data')));
-            DataControl.save();
-            localStorage.removeItem('data');
-        } catch (e) {
-        }
-    }
-
-    for (let key in chars.value) {
-        if (chars.value.hasOwnProperty(key)) {
-            const char = chars.value[key];
-            if (char.avatar.indexOf('/avatar/') === 0) {
-                chars.value[key].avatar = 'avatar/arknights/' + char.avatar.substring(8)
-            }
-        }
-    }
+    DataControl.load()
 </script>
 
 <template>
