@@ -34,6 +34,7 @@
     });
 
     const ifShowAnnouncement = inject('ifShowAnnouncement');
+    const ifShowSettings = inject('ifShowSettings');
     const ifShowGuide = inject('ifShowGuide');
     const config = inject('config');
     const chars = inject('chars');
@@ -44,8 +45,10 @@
     const renderSettings = ref({});
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);
+    const dialogWidth = Math.ceil(windowWidth * 0.9);
     provide('renderSettings', renderSettings);
     provide('width', width);
+    provide('dialogWidth', dialogWidth);
 
     const charDirection = computed(() => {
         const dict = chars.value;
@@ -85,10 +88,17 @@
     watch(charDirection, () => {
         resizeWindow()
     });
+    watch(() => {
+        return renderSettings.value.width
+    }, () => {
+        resizeWindow()
+    });
 
     onMounted(() => {
-        document.getElementById('body').style.height = window.innerHeight + 'px'
-    })
+        const el = document.getElementById('body');
+        el.style.height = window.innerHeight + 'px';
+        el.style.cssText += 'transition: background-color ease 1s;';
+    });
 
     const textarea = ref('');
     const scroll = ref();
@@ -122,7 +132,6 @@
     const ifShowEditChar = ref(false);
     const ifShowSelectAvatar = ref(false);
     const createChar = ref(true);
-    const dialogWidth = Math.ceil(windowWidth * 0.9);
     const newChar = ref({name: ''});
     const searchChar = ref('');
     let avatars = [];
@@ -480,17 +489,17 @@
 
 
 <template>
-    <Settings/>
     <div :class="renderSettings.style">
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
+                <Settings/>
                 <el-dialog v-model="ifShowGuide" title="指南" :width="dialogWidth">
                     <h2>编辑栏</h2>
                     <div style="display: flex; align-items: center; margin-bottom: 5px">
                         <el-icon :size="35" style="margin: 0 5px">
-                            <Picture/>
+                            <ArrowUp/>
                         </el-icon>
-                        图片
+                        更多类型
                         <el-icon :size="35" style="margin: 0 5px">
                             <ChatDotSquare/>
                         </el-icon>
@@ -705,7 +714,12 @@
                             <div style=" width: 80px; height: 50px; user-select: none">
                             </div>
                         </el-upload>
-
+                    </div>
+                    <div class="bar" @click="ifShowSettings=true">
+                        <el-icon color="lightgrey" :size="35">
+                            <Setting/>
+                        </el-icon>
+                        设置
                     </div>
                 </div>
                 <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>

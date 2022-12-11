@@ -18,6 +18,7 @@ import {
     Operation,
     Edit,
     Close,
+    Setting
 } from "@element-plus/icons";
 
 const app = createApp(App);
@@ -38,5 +39,6 @@ app.component('ArrowUp', ArrowUp);
 app.component('Operation', Operation);
 app.component('Edit', Edit);
 app.component('Close', Close);
+app.component('Setting', Setting);
 
 app.mount('#app');
