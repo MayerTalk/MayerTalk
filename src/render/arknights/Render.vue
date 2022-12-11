@@ -438,7 +438,7 @@
             chats: chats.value,
             images: images.value
         })], {type: 'application/json'}));
-        download(url, 'arktalk-data-' + Date.now() + '.json')
+        download(url, 'mayertalk-data-' + Date.now() + '.json')
     }
 
     function uploadData(uploadFile) {
@@ -451,7 +451,7 @@
                 resizeScroll();
                 DataControl.save()
             } catch (e) {
-                message.notify('导入失败，请确认文件名为 arktalk-data-xxx.json', message.error)
+                message.notify('导入失败，请确认文件名为 mayertalk-data-xxx.json', message.error)
             }
         };
         reader.readAsText(uploadFile);
