@@ -48,7 +48,7 @@
             <b>安卓：请使用Edge/Chrome，不支持夸克/UC</b><br/>
             <el-link href="https://wj.qq.com/s2/11287516/2689/" type="primary">其他浏览器无法截图/导出反馈</el-link>
             <p>
-                <el-link @click="$emit('showGuide', false)" href="" type="primary">查看指南</el-link>
+                <el-link @click="$emit('showGuide', false)" href="javascript:void(0)" type="primary">查看指南</el-link>
             </p>
             <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary">交流群：560295639</el-link>
             <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
