@@ -2,6 +2,9 @@
 
 明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段  
 
+ [开发计划]( [https://github.com/Arkfans/Arktalk/wiki/%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92]()
+)
+
 *Warning: 低质量代码，简直依托答辩*
 
  ## 参考
