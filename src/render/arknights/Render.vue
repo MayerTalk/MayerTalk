@@ -309,6 +309,9 @@
     }
 
     function selectAvatar(avatar) {
+        if (images.value.hasOwnProperty(newChar.value.avatar)) {
+            delete images.value[newChar.value.avatar]
+        }
         newChar.value.avatar = avatar[1];
         ifShowSelectAvatar.value = false
     }
@@ -348,6 +351,12 @@
         }
     }
 
+    function clearNewChar() {
+        if (newChar.value && images.value.hasOwnProperty(newChar.value.avatar)) {
+            delete images.value[newChar.value.avatar]
+        }
+        newChar.value = {name: ''}
+    }
 
     function showEditDialogue(index) {
         editDialogue.value = true;
@@ -538,7 +547,7 @@
                     </ol>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
-                           @closed="() => DataControl.save('chars')">
+                           @closed="() => {DataControl.save('chars'); clearNewChar()}">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
                             <el-upload
