@@ -229,8 +229,7 @@
             '博士，剿灭打了吗？',
             '点击对话框可以编辑/插入对话',
             '不选中任何角色时，将以旁白视角发送对话',
-            'Ctrl+Enter可以快捷发送',
-            'Ctrl+1~9'
+            'Ctrl+Enter可以快捷发送'
         ],
         until: 0,
         index: -1,
@@ -297,6 +296,30 @@
             }
         });
         return false
+    }
+
+    function uploadImage(fileUpload) {
+        DataControl.update('images');
+        blob2base64(fileUpload, (b64) => {
+            if (b64) {
+                if (currDialogueData.value.type === 'image'
+                    && images.value.hasOwnProperty(currDialogueData.value.content)) {
+                    delete images.value[currDialogueData.value.content]
+                }
+                const imageId = uuid();
+                images.value[imageId] = b64;
+                currDialogueData.value.content = imageId
+            }
+        });
+        return false
+    }
+
+    function clearDialogueData() {
+        if (!editDialogue.value && currDialogueData.value.type === 'image'
+            && images.value.hasOwnProperty(currDialogueData.value.content)) {
+            delete images.value[currDialogueData.value.content]
+        }
+        currDialogueData.value = {}
     }
 
     function setCurr(id) {
@@ -434,6 +457,7 @@
         }
         chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value));
         message.notify('插入成功', message.success);
+        currDialogueData.value = {};
         ifShowEditDialogue.value = false;
     }
 
@@ -640,8 +664,27 @@
                     </template>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
-                           @closed="() => DataControl.save('chats')" :before-close="editDialogue?null:ensureClose">
+                           @closed="() => {clearDialogueData();DataControl.save('chats')}"
+                           :before-close="editDialogue?null:ensureClose">
                     <component v-if="editor" :is="editor" v-model="currDialogueData.content"/>
+                    <el-upload v-else-if="currDialogueData.type==='image'"
+                               action="#"
+                               drag
+                               :show-file-list="false"
+                               class="image-uploader"
+                               accept="image/png, image/jpeg, image/gif"
+                               :before-upload="uploadImage"
+                    >
+                        <div class="container">
+                            <el-scrollbar v-if="images[currDialogueData.content]">
+                                <img :src="images[currDialogueData.content]" style="width:100%"/>
+                            </el-scrollbar>
+
+                            <el-icon v-else class="avatar-uploader-icon">
+                                <Plus/>
+                            </el-icon>
+                        </div>
+                    </el-upload>
                     <el-input v-else
                               v-model="currDialogueData.content"
                               :autosize="{minRows: 1, maxRows: 5}"
@@ -669,7 +712,7 @@
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
                                        :disabled="['image','option'].indexOf(currDialogueData.type) !== -1 && editDialogue"
                                        placeholder="类型"
-                                       @change="currDialogueData.content=TypeDefault[currDialogueData.type]"
+                                       @change="() => {if(!editDialogue) {currDialogueData.content=TypeDefault[currDialogueData.type]}}"
                             >
                                 <el-option
                                         v-for="(text, type) in TypeDict"
@@ -688,7 +731,8 @@
                         </div>
                         <div v-else style="width: 100%; margin-top: 5px">
                             <el-button style="width: 50%" @click="insertDialogue">插入</el-button>
-                            <el-button style="width: calc(50% - 5px); margin-left: 5px" @click="switchEdit(true)">返回
+                            <el-button style="width: calc(50% - 5px); margin-left: 5px"
+                                       @click="() => {clearDialogueData();switchEdit(true)}">返回
                             </el-button>
                         </div>
                     </div>
