@@ -1,5 +1,5 @@
 <script setup>
-    import {ref, computed, watch, inject, provide, nextTick, onMounted} from 'vue'
+    import {ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import Option from './type/Option.vue'
@@ -15,6 +15,29 @@
         ensureClose,
         clickBySelector
     } from "@/lib/tool";
+
+    const controller = new AbortController();
+    document.addEventListener('keydown', event => {
+        console.log(event);
+        if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
+            if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
+                const index = (+event.key || 10) - 1;
+                const list = Object.entries(chars.value);
+                console.log(list);
+                if (index < list.length) {
+                    if (list[index][0] === currChar.value) {
+                        currChar.value = ''
+                    } else {
+                        currChar.value = list[index][0];
+                    }
+                    event.preventDefault()
+                }
+            }
+        }
+    }, {signal: controller.signal});
+    onUnmounted(() => {
+        controller.abort()
+    });
 
     const TypeDict = {
         chat: '对话',
