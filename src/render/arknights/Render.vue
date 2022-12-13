@@ -223,7 +223,7 @@
 
     const tipControl = {
         tip: ref(''),
-        texts: [
+        pool: [
             '素材库里除了有干员头像，还有召唤物/敌人/装置的',
             '上传的头像会自动剪裁成正方形',
             '博士，剿灭打了吗？',
@@ -233,15 +233,16 @@
             'Ctrl+Z/ctrl+Y可以撤回/重做',
             'Ctrl+1~9可以快捷切换角色'
         ],
+        cache: [],
         until: 0,
-        index: -1,
         cd: 5000,
         loop() {
             if (Date.now() > this.until) {
-                if (++this.index >= this.texts.length) {
-                    this.index = 0
+                if (this.cache.length < 1) {
+                    this.cache = copy(this.pool)
                 }
-                this.tip.value = this.texts[this.index];
+                const p = Math.ceil(Math.random() * this.cache.length) -1;
+                this.tip.value = this.cache.splice(p, 1);
                 nextTick(() => {
                     resizeScroll()
                 })
@@ -255,7 +256,6 @@
             this.until = Date.now() + timeout
         }
     };
-    tipControl.index = Math.ceil(Math.random() * tipControl.texts.length) - 1;
     onMounted(() => {
         tipControl.loop();
     });
