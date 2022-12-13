@@ -47,6 +47,15 @@
         select: '选择',
         title: '标题'
     };
+    const TypeDefault = {
+        chat: '',
+        monologue: '',
+        image: '',
+        option: {},
+        select: '',
+        title: ''
+    };
+    TypeDefault.option[uuid()] = '';
 
     const editor = computed(() => {
         if (['char', 'monologue', 'image'].indexOf(currDialogueData.value.type) !== -1) {
@@ -658,15 +667,16 @@
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
-                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1"
+                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1 && editDialogue"
                                        placeholder="类型"
+                                       @change="currDialogueData.content=TypeDefault[currDialogueData.type]"
                             >
                                 <el-option
                                         v-for="(text, type) in TypeDict"
                                         :key="type"
                                         :label="text"
                                         :value="type"
-                                        :disabled="['image','option'].indexOf(type) !== -1"
+                                        :disabled="['image','option'].indexOf(type) !== -1 && editDialogue"
                                 />
                             </el-select>
                         </div>
