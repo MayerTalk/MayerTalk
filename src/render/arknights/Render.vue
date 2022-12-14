@@ -458,6 +458,7 @@
             message.notify('请选择类型', message.warning);
             return
         }
+        currDialogueData.value.id = uuid();
         chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value));
         message.notify('插入成功', message.success);
         currDialogueData.value = {};
