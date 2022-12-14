@@ -1,4 +1,5 @@
 <script setup>
+
     import {ref, computed, watch, inject, provide, nextTick, onMounted} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
@@ -106,6 +107,16 @@
 
     const showToolBar = ref(false);
     const toolBarMask = ref(true);
+
+    // 模板消息
+    const ifShowModelMsg = ref(false);
+    const modelMsg = ref("");
+    const eli = ref(null);
+    watch(ifShowModelMsg, () => {
+        // TODO
+        if (eli.value)
+            console.log(`${eli.value.selectionStart}~${eli.value.selectionEnd}\nifShowModelMsg=${ifShowModelMsg.value}`);
+    });
 
     // @列表处理
     const ifAt = ref(false);
@@ -316,6 +327,13 @@
 
     function selectAvatar(src) {
         newChar.value.avatar = '/avatar/' + src + '.png';
+        let defaultName = /^(.*?)_(.*?)$/.exec(src);
+        if (defaultName) {
+            defaultName = defaultName[1] !== "敌人" ? defaultName[1] : defaultName[2];
+        } else {
+            defaultName = src;
+        }
+        newChar.value.name = newChar.value.name.trim() || defaultName;
         ifShowSelectAvatar.value = false
     }
 
@@ -401,38 +419,11 @@
         ifShowEditDialogue.value = false;
     }
 
-    function modelDialogue(content, replace, type, char) {
+    function sendModelMsg() {
         // 发送模板消息
         // content(str): 消息内容
         // replace(str): 格式化消息内容时使用的映射表
-        const startSeq = "#", endSeq = "#"; // 暂定的escape sequence
-        for (let key in replace) {
-            content = content.replace(startSeq + key.toString() + endSeq, replace[key].toString());
-        }
-        type = type || "chat";
-        char = char || "";
-        chats.value.push({
-            type: type,
-            char: char,
-            content: content,
-            id: uuid()
-        });
-    }
-    function withdrawDialogue() {
-        // 撤回消息
-        if (!currChar.value) {
-            messsage.notify('需要先选中一个角色！', message.warning);
-            return;
-        }
-        modelDialogue("“#name#” 撤回了一条消息", {
-            name: chars.value[currChar.value].name
-        })
-        DataControl.save('chats');
-        message.notify('撤回成功', message.success);
-        nextTick(() => {
-            resizeScroll();
-            scroll.value.setScrollTop(MAX_SCROLL_TOP)
-        });
+
     }
 
     function screenshot() {
@@ -575,7 +566,7 @@
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
                                 <el-input v-model="newChar.name" style="margin-top: 10px"
-                                          @keypress.enter="createChar && editChar()"></el-input>
+                                          @keypress.enter="createChar && editChar()" clearable></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
                                     <el-switch
@@ -688,6 +679,10 @@
                         </el-option>
                     </el-select>
                 </el-dialog>
+                <el-dialog v-model="ifShowModelMsg" :title="'创建模板消息'" :width="dialogWidth">
+                    <el-input v-model="modelMsg" style="margin-top: 10px" ref="eli" type="textarea" />
+                    <!-- TODO -->
+                </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
                         <el-icon color="lightgrey" :size="35">
@@ -796,7 +791,9 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <img :src="images[char.avatar] || char.avatar">
+                                            <el-tooltip :content="char.name" placement="top">
+                                                <img :src="images[char.avatar] || char.avatar">
+                                            </el-tooltip>
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">
@@ -813,10 +810,11 @@
                                 </el-scrollbar>
                                 <div v-if="currChar" class="option edit">
                                     <div  style="width: 40px; height: 40px"
-                                        @click="withdrawDialogue">
+                                        @click="ifShowModelMsg=!ifShowModelMsg">
                                         <svg class="flip" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill="#606060" d="M614.4 261.12H179.2l122.88-122.88c20.48-20.48 20.48-51.2 0-71.68-20.48-20.48-51.2-20.48-71.68 0L15.36 281.6c-10.24 10.24-15.36 25.6-15.36 35.84 0 15.36 5.12 25.6 15.36 35.84l215.04 215.04c20.48 20.48 51.2 20.48 71.68 0 20.48-20.48 20.48-51.2 0-71.68L153.6 348.16h460.8c174.08 0 317.44 117.76 317.44 261.12S788.48 870.4 614.4 870.4H250.88c-25.6 5.12-46.08 25.6-46.08 51.2s20.48 46.08 46.08 46.08H614.4c225.28 0 409.6-158.72 409.6-353.28 0-194.56-184.32-353.28-409.6-353.28z" p-id="5204">
-                                            </path>
+                                            <path fill="#606060" d="M868.119273 190.836364H344.482909V128h516.654546a69.818182 69.818182 0 0 1 69.818181 69.818182v474.763636h-62.836363V190.836364z"></path>
+                                            <path fill="#606060" d="M155.927273 316.509091h586.472727v460.8h-247.435636l-62.836364 62.836364h310.272a62.836364 62.836364 0 0 0 62.836364-62.836364V316.509091a62.836364 62.836364 0 0 0-62.836364-62.836364H155.927273A62.836364 62.836364 0 0 0 93.090909 316.509091v460.8c0 34.676364 28.113455 62.836364 62.836364 62.836364h157.742545l62.836364-62.836364H155.927273V316.509091z"></path>
+                                            <path fill="#606060" d="M343.505455 923.927273H442.181818l94.487273-94.487273-49.384727-49.338182-143.825455 143.825455z"></path>
                                         </svg>
                                     </div>
                                 </div>
