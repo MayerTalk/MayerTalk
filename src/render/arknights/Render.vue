@@ -3,6 +3,8 @@
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import Option from './type/Option.vue'
+    import CharSelector from './CharSelector.vue'
+
     import message from '@/lib/message'
     import {
         copy,
@@ -18,7 +20,6 @@
 
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
-        console.log(event);
         if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
             if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
                 const index = (+event.key || 10) - 1;
@@ -696,19 +697,7 @@
                     ></el-input>
                     <div class="edit-bar" style="margin-top: 5px">
                         <div style="width: 50%; display: flex">
-                            <el-select v-model="currDialogueData.char" style="flex-grow: 1" placeholder="角色">
-                                <el-option
-                                        v-for="(char, id) in chars"
-                                        :key="id"
-                                        :label="char.name"
-                                        :value="id"
-                                />
-                                <el-option
-                                        key=""
-                                        label="旁白"
-                                        value=""
-                                />
-                            </el-select>
+                            <CharSelector v-model="currDialogueData.char" :narration="true"/>
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
