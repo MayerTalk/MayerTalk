@@ -10,15 +10,18 @@
     const width = inject('width');
     const charDirection = inject('charDirection');
     const preScreenshot = inject('preScreenshot');
-    const {data, index} = defineProps(['data', 'index']);
+    const props = defineProps(['data', 'index']);
     defineEmits(['edit']);
+
+    const data = computed(() => props.data);
+    const index = computed(() => props.index);
+
     const char = computed(() => {
-        return chars.value[data.char] || {};
+        return chars.value[data.value.char] || {};
     });
     const id = ref(uuid());
-
     const right = computed(() => {
-        if (data.char) {
+        if (data.value.char) {
             // opposite is deprecated
             // return data.opposite ? !char.value.right : !!char.value.right
             return !!char.value.right
@@ -28,7 +31,7 @@
     });
 
     function resizeImage() {
-        if (data.type === 'image') {
+        if (data.value.type === 'image') {
             id.value = uuid();
         }
     }
