@@ -21,7 +21,7 @@
     transition: var(--el-transition-duration-fast);
 }
 
-.avatar-uploader, .image-uploader .el-upload:hover {
+.avatar-uploader .el-upload:hover, .image-uploader .el-upload:hover {
     border-color: var(--el-color-primary);
 }
 
