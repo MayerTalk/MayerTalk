@@ -24,15 +24,14 @@
             if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
                 const index = (+event.key || 10) - 1;
                 const list = Object.entries(chars.value);
-                console.log(list);
                 if (index < list.length) {
                     if (list[index][0] === currChar.value) {
                         currChar.value = ''
                     } else {
                         currChar.value = list[index][0];
                     }
-                    event.preventDefault()
                 }
+                event.preventDefault()
             }
         }
     }, {signal: controller.signal});
@@ -242,7 +241,7 @@
                 if (this.cache.length < 1) {
                     this.cache = copy(this.pool)
                 }
-                const p = Math.ceil(Math.random() * this.cache.length) -1;
+                const p = Math.ceil(Math.random() * this.cache.length) - 1;
                 this.tip.value = this.cache.splice(p, 1);
                 nextTick(() => {
                     resizeScroll()
