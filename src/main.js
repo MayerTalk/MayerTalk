@@ -41,4 +41,6 @@ app.component('Edit', Edit);
 app.component('Close', Close);
 app.component('Setting', Setting);
 
+app.provide('avatarsJs','avatar.js?v=69bdadf6');
+
 app.mount('#app');

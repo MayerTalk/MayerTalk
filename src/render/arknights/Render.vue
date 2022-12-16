@@ -526,8 +526,10 @@
         return false
     }
 
+    const avatarsJs = inject('avatarsJs');
+
     function loadAvatar() {
-        import("@/avatars").then(module => {
+        import(staticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
             avatars = module.default
         })
     }
