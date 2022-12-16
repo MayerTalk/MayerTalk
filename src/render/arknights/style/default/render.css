@@ -161,6 +161,10 @@
     transform: scaleY(-1);
 }
 
+.model-msg-list {
+    width: auto;
+}
+
 .scale {
     width: 40px;
     height: 40px;

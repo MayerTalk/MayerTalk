@@ -109,14 +109,35 @@
     const toolBarMask = ref(true);
 
     // 模板消息
-    const ifShowModelMsg = ref(false);
-    const modelMsg = ref("");
-    const eli = ref(null);
-    watch(ifShowModelMsg, () => {
-        // TODO
-        if (eli.value)
-            console.log(`${eli.value.selectionStart}~${eli.value.selectionEnd}\nifShowModelMsg=${ifShowModelMsg.value}`);
-    });
+    class ModelMsg extends String {
+        constructor(s) {
+            // 需要用new ModelMsg("${...}***")的方式新建对象
+            super(s);
+            if (!s && s !== "") {
+                throw `模板消息不能为空(${s})`
+            }
+            this.raw_string = s;
+        }
+        render() {
+            let name = currChar.value.name;
+            // 在此增加局部可见的参数
+            return eval(this.raw_string);
+        }
+        description() {
+            let dispMap = {
+                name: "<角色名>"
+            }
+            let desc = this.raw_string;
+            console.log(this.raw_string);
+            for (let kw in dispMap) {
+                desc = desc.replace(new RegExp("\\$\\{"+kw+"\\}"), dispMap[kw]);
+            }
+            return desc;
+        }
+    }
+    const modelMsgList = ref([
+        new ModelMsg("“${name}”撤回了一条消息"),
+    ]);
 
     // @列表处理
     const ifAt = ref(false);
@@ -679,10 +700,6 @@
                         </el-option>
                     </el-select>
                 </el-dialog>
-                <el-dialog v-model="ifShowModelMsg" :title="'创建模板消息'" :width="dialogWidth">
-                    <el-input v-model="modelMsg" style="margin-top: 10px" ref="eli" type="textarea" />
-                    <!-- TODO -->
-                </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
                         <el-icon color="lightgrey" :size="35">
@@ -809,14 +826,23 @@
                                     </div>
                                 </el-scrollbar>
                                 <div v-if="currChar" class="option edit">
-                                    <div  style="width: 40px; height: 40px"
-                                        @click="ifShowModelMsg=!ifShowModelMsg">
-                                        <svg class="flip" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill="#606060" d="M868.119273 190.836364H344.482909V128h516.654546a69.818182 69.818182 0 0 1 69.818181 69.818182v474.763636h-62.836363V190.836364z"></path>
-                                            <path fill="#606060" d="M155.927273 316.509091h586.472727v460.8h-247.435636l-62.836364 62.836364h310.272a62.836364 62.836364 0 0 0 62.836364-62.836364V316.509091a62.836364 62.836364 0 0 0-62.836364-62.836364H155.927273A62.836364 62.836364 0 0 0 93.090909 316.509091v460.8c0 34.676364 28.113455 62.836364 62.836364 62.836364h157.742545l62.836364-62.836364H155.927273V316.509091z"></path>
-                                            <path fill="#606060" d="M343.505455 923.927273H442.181818l94.487273-94.487273-49.384727-49.338182-143.825455 143.825455z"></path>
-                                        </svg>
-                                    </div>
+                                    <el-popover placement="top-start" title="选择模板信息" trigger="click" :style="'width:auto'">
+                                        <template #reference>
+                                            <div style="width: 40px; height: 40px">
+                                                <svg class="flip" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill="#606060" d="M868.119273 190.836364H344.482909V128h516.654546a69.818182 69.818182 0 0 1 69.818181 69.818182v474.763636h-62.836363V190.836364z"></path>
+                                                    <path fill="#606060" d="M155.927273 316.509091h586.472727v460.8h-247.435636l-62.836364 62.836364h310.272a62.836364 62.836364 0 0 0 62.836364-62.836364V316.509091a62.836364 62.836364 0 0 0-62.836364-62.836364H155.927273A62.836364 62.836364 0 0 0 93.090909 316.509091v460.8c0 34.676364 28.113455 62.836364 62.836364 62.836364h157.742545l62.836364-62.836364H155.927273V316.509091z"></path>
+                                                    <path fill="#606060" d="M343.505455 923.927273H442.181818l94.487273-94.487273-49.384727-49.338182-143.825455 143.825455z"></path>
+                                                </svg>
+                                            </div>
+                                        </template>
+                                        <el-card class="model-msg-list">
+                                            <span v-for="modelMsg in modelMsgList">
+                                                {{ modelMsg.description() }}
+                                            </span>
+                                        </el-card>
+                                    </el-popover>
+
                                 </div>
                                 <div class="option edit">
                                     <div v-if="currChar" style="width: 40px; height: 40px"
