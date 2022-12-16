@@ -411,14 +411,12 @@
     }
 
     function selectAvatar(src) {
-        newChar.value.avatar = '/avatar/' + src + '.png';
-        let defaultName = /^(.*?)_(.*?)$/.exec(src);
-        if (defaultName) {
-            defaultName = defaultName[1] !== "敌人" ? defaultName[1] : defaultName[2];
-        } else {
-            defaultName = src;
+        newChar.value.avatar = src[1];
+        let segments = /^(.*?)_(.*?)$/.exec(src[0]), name = src[0];
+        if (!!segments) {
+            name = segments[1] === "敌人" ? segments[2] : segments[1];
         }
-        newChar.value.name = newChar.value.name.trim() || defaultName;
+        newChar.value.name = newChar.value.name.trim() || name;
         ifShowSelectAvatar.value = false
     }
 
