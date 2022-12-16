@@ -2,29 +2,54 @@
     import {ref, computed, watch, inject, provide, nextTick, onMounted} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
+    import Option from './type/Option.vue'
     import message from '@/lib/message'
-    import {copy, uuid, downloadImage, download, blob2url, blob2base64, image2square, ensureClose} from "@/lib/tool";
+    import {
+        copy,
+        uuid,
+        downloadImage,
+        download,
+        blob2url,
+        blob2base64,
+        image2square,
+        ensureClose,
+        clickBySelector
+    } from "@/lib/tool";
 
     const TypeDict = {
         chat: '对话',
         monologue: '独白',
-        image: '图片'
+        image: '图片',
+        option: '选项',
+        select: '选择',
+        title: '标题'
     };
 
     const MAX_SCROLL_TOP = 10000;
+    const editor = computed(() => {
+        if (['char', 'monologue', 'image'].indexOf(currDialogueData.value.type) !== -1) {
+            return false
+        } else if (currDialogueData.value.type === 'option') {
+            return Option
+        }
+    });
 
     const ifShowAnnouncement = inject('ifShowAnnouncement');
+    const ifShowSettings = inject('ifShowSettings');
     const ifShowGuide = inject('ifShowGuide');
     const config = inject('config');
     const chars = inject('chars');
     const chats = inject('chats');
     const images = inject('images');
+    const staticUrl = inject('staticUrl');
     const DataControl = inject('DataControl');
     const renderSettings = ref({});
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);
+    const dialogWidth = Math.ceil(windowWidth * 0.9);
     provide('renderSettings', renderSettings);
     provide('width', width);
+    provide('dialogWidth', dialogWidth);
 
     const charDirection = computed(() => {
         const dict = chars.value;
@@ -64,17 +89,50 @@
     watch(charDirection, () => {
         resizeWindow()
     });
+    watch(() => {
+        return renderSettings.value.width
+    }, () => {
+        resizeWindow()
+    });
+
+    onMounted(() => {
+        const el = document.getElementById('body');
+        el.style.height = window.innerHeight + 'px';
+        el.style.cssText += 'transition: background-color ease 1s;';
+    });
 
     const textarea = ref('');
     const scroll = ref();
     const preScreenshot = ref(false);
+    const ifShowMoreType = ref(false);
+    const arrowStyle = ref({});
+    const options = ref({});
+    const ifShowCreateOption = ref(false);
     provide('preScreenshot', preScreenshot);
+
+    function roll360() {
+        if (ifShowMoreType.value) {
+            arrowStyle.value = {
+                transform: 'rotate(180deg)',
+                transition: 'transform ease 0.4s'
+            };
+            resizeScroll(-100)
+        } else {
+            arrowStyle.value = {
+                transform: 'rotate(360deg)',
+                transition: 'transform ease 0.4s'
+            };
+            setTimeout(() => {
+                arrowStyle.value = {}
+            }, 500);
+            resizeScroll(100)
+        }
+    }
 
     const currChar = ref('');
     const ifShowEditChar = ref(false);
     const ifShowSelectAvatar = ref(false);
     const createChar = ref(true);
-    const dialogWidth = Math.ceil(windowWidth * 0.9);
     const newChar = ref({name: ''});
     const searchChar = ref('');
     let avatars = [];
@@ -84,17 +142,17 @@
             const search = searchChar.value;
             const list = [];
             for (let i = 0; i < avatars.length; i++) {
-                if (avatars[i].indexOf(search) !== -1) {
+                if (avatars[i][0].indexOf(search) !== -1) {
                     list.push(avatars[i])
                 }
             }
             return list.length ? list : false
         } else {
             return [
-                '博士',
-                'PRTS',
-                'mon3tr',
-                '凯尔希'
+                ['博士', 'avatar/arknights/博士.png'],
+                ['PRTS', 'avatar/arknights/PRTS.png'],
+                ['mon3tr', 'avatar/arknights/mon3tr.png'],
+                ['凯尔希', 'avatar/arknights/凯尔希.png']
             ]
         }
     });
@@ -176,15 +234,18 @@
         toolBarMask.value = true
     }
 
-    function resizeScroll() {
+    function resizeScroll(offset = 0) {
         const el = document.getElementById('textarea');
         el.style.height = '20px';
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
         el.style.height = height + 'px';
-        scrollHeight.value = window.innerHeight - height - 70 + 'px'
+        const bar = document.getElementById('operateBar');
+        scrollHeight.value = window.innerHeight - bar.scrollHeight + offset - 1 + 'px'
     }
 
-    watch(textarea, resizeScroll);
+    watch(textarea, () => {
+        resizeScroll()
+    });
     window.onresize = () => {
         resizeScroll()
     };
@@ -228,12 +289,12 @@
         tipControl.loop();
     });
 
-    function createDialogue(monologue) {
+    function createTextDialogue(type) {
         if (textarea.value) {
             chats.value.push({
                 char: currChar.value,
                 content: textarea.value,
-                type: monologue ? 'monologue' : 'chat',
+                type: type,
                 id: uuid()
             });
             textarea.value = '';
@@ -310,8 +371,8 @@
         return false
     }
 
-    function selectAvatar(src) {
-        newChar.value.avatar = '/avatar/' + src + '.png';
+    function selectAvatar(avatar) {
+        newChar.value.avatar = avatar[1];
         ifShowSelectAvatar.value = false
     }
 
@@ -426,7 +487,8 @@
             setTimeout(() => {
                 downloadImage(node, {
                     windowWidth: width.value.window + 20,
-                    scale: renderSettings.value.scale
+                    scale: renderSettings.value.scale,
+                    useCORS: true
                 }, () => {
                     preScreenshot.value = false;
                     node.style.height = null;
@@ -457,7 +519,7 @@
             chats: chats.value,
             images: images.value
         })], {type: 'application/json'}));
-        download(url, 'arktalk-data-' + Date.now() + '.json')
+        download(url, 'mayertalk-data-' + Date.now() + '.json')
     }
 
     function uploadData(uploadFile) {
@@ -470,7 +532,7 @@
                 resizeScroll();
                 DataControl.save()
             } catch (e) {
-                message.notify('导入失败，请确认文件名为 arktalk-data-xxx.json', message.error)
+                message.notify('导入失败，请确认文件名为 mayertalk-data-xxx.json', message.error)
             }
         };
         reader.readAsText(uploadFile);
@@ -482,21 +544,43 @@
             avatars = module.default
         })
     }
+
+    function showCreateOption() {
+        const id = uuid();
+        options.value = {};
+        options.value[id] = '';
+        ifShowCreateOption.value = true
+    }
+
+    function createOptionDialogue() {
+        ifShowCreateOption.value = false;
+        chats.value.push({
+            char: currChar.value,
+            content: copy(options.value),
+            id: uuid(),
+            type: 'option'
+        });
+        DataControl.save('chats');
+        nextTick(() => {
+            resizeScroll();
+            scroll.value.setScrollTop(MAX_SCROLL_TOP);
+        });
+    }
 </script>
 
 
 <template>
-    <Settings/>
     <div :class="renderSettings.style">
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
+                <Settings/>
                 <el-dialog v-model="ifShowGuide" title="指南" :width="dialogWidth">
                     <h2>编辑栏</h2>
                     <div style="display: flex; align-items: center; margin-bottom: 5px">
                         <el-icon :size="35" style="margin: 0 5px">
-                            <Picture/>
+                            <ArrowUp/>
                         </el-icon>
-                        图片
+                        更多类型
                         <el-icon :size="35" style="margin: 0 5px">
                             <ChatDotSquare/>
                         </el-icon>
@@ -547,7 +631,7 @@
                                     :before-upload="uploadAvatar"
                             >
                                 <div class="container"><img v-if="newChar.avatar"
-                                                            :src="images[newChar.avatar] || newChar.avatar"/>
+                                                            :src="images[newChar.avatar] || staticUrl + newChar.avatar"/>
                                     <el-icon v-else class="avatar-uploader-icon">
                                         <Plus/>
                                     </el-icon>
@@ -577,31 +661,34 @@
                 </el-dialog>
                 <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
                     <!--        素材库选择头像-->
-                    <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
-                    <div v-if="searchResult" class="avatar-bar">
-                        <el-scrollbar max-height="50vh" style="width: 100%">
-                            <img v-for="src in searchResult" :key="src" :src="'/avatar/' + src + '.png'" loading="lazy"
-                                 :title="src"
-                                 @click="selectAvatar(src)">
-                        </el-scrollbar>
-                    </div>
-                    <div v-else
-                         style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
-                        <p>No Result</p>
-                        <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
-                    </div>
+                    <template v-if="ifShowSelectAvatar">
+                        <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
+                        <div v-if="searchResult" class="avatar-bar">
+                            <el-scrollbar max-height="50vh" style="width: 100%">
+                                <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
+                                     loading="lazy"
+                                     :title="avatar[0]"
+                                     @click="selectAvatar(avatar)">
+                            </el-scrollbar>
+                        </div>
+                        <div v-else
+                             style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
+                            <p>No Result</p>
+                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
+                        </div>
+                    </template>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                            @closed="() => DataControl.save('chats')" :before-close="editDialogue?null:ensureClose">
-                    <el-input
-                            v-model="currDialogueData.content"
-                            :autosize="{minRows: 1, maxRows: 5}"
-                            resize="none"
-                            type="textarea"
-                            style="margin-bottom: 5px"
-                            :disabled="currDialogueData.type==='image'"
+                    <component v-if="editor" :is="editor" v-model="currDialogueData.content"/>
+                    <el-input v-else
+                              v-model="currDialogueData.content"
+                              :autosize="{minRows: 1, maxRows: 5}"
+                              resize="none"
+                              type="textarea"
+                              :disabled="currDialogueData.type==='image'"
                     ></el-input>
-                    <div class="edit-bar">
+                    <div class="edit-bar" style="margin-top: 5px">
                         <div style="width: 50%; display: flex">
                             <el-select v-model="currDialogueData.char" style="flex-grow: 1" placeholder="角色">
                                 <el-option
@@ -619,7 +706,7 @@
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
-                                       :disabled="currDialogueData.type==='image'"
+                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1"
                                        placeholder="类型"
                             >
                                 <el-option
@@ -627,7 +714,7 @@
                                         :key="type"
                                         :label="text"
                                         :value="type"
-                                        :disabled="type==='image'"
+                                        :disabled="['image','option'].indexOf(type) !== -1"
                                 />
                             </el-select>
                         </div>
@@ -667,6 +754,10 @@
                             <img style="float:right;display:inline-block" :src="char.avatar"/>
                         </el-option>
                     </el-select>
+                </el-dialog>
+                <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
+                           :show-close="false">
+                    <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
                 </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
@@ -727,7 +818,12 @@
                             <div style=" width: 80px; height: 50px; user-select: none">
                             </div>
                         </el-upload>
-
+                    </div>
+                    <div class="bar" @click="ifShowSettings=true">
+                        <el-icon color="lightgrey" :size="35">
+                            <Setting/>
+                        </el-icon>
+                        设置
                     </div>
                 </div>
                 <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
@@ -739,44 +835,69 @@
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id" style="position:relative"></Dialogue>
                         </div>
-                        <div class="operateBar" :style="{width: windowWidth + 'px'}">
+                        <div id="operateBar" class="operateBar" :style="{width: windowWidth + 'px'}">
                             <div class="button-bar">
-                                <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative">
-                                    <Picture/>
-                                    <el-upload
-                                            action="#"
-                                            :show-file-list="false"
-                                            class="avatar-uploader"
-                                            accept="image/png, image/jpeg, image/gif"
-                                            :before-upload="createImageDialogue"
-                                            style="position: absolute; width: 35px; height: 35px"
-                                    >
-                                        <div style="height: 35px; width: 35px; user-select: none">
-                                        </div>
-                                    </el-upload>
+                                <el-icon color="#707070" :size="35"
+                                         style="margin-right: 5px; position: relative" :style="arrowStyle"
+                                         @click="() => {ifShowMoreType = !ifShowMoreType; roll360()}">
+                                    <ArrowUp/>
                                 </el-icon>
-                                <el-icon @click="createDialogue(true)" color="#707070" :size="35">
+                                <el-icon @click="createTextDialogue('monologue')" color="#707070" :size="35">
                                     <ChatDotSquare/>
                                 </el-icon>
                             </div>
                             <textarea class="textarea" id="textarea" v-model="textarea"
                                       :placeholder="tipControl.tip.value"
-                                      @keydown.ctrl.enter="createDialogue(false)"
+                                      @keydown.ctrl.enter="createTextDialogue('chat')"
                                       @keydown="processKeyDown"></textarea>
                             <div class="button-bar">
-
-                                <el-icon @click="createDialogue(false)" color="#808080" :size="35">
+                                <el-icon @click="createTextDialogue('chat')" color="#808080" :size="35">
                                     <Promotion/>
                                 </el-icon>
                             </div>
-
+                            <div class="moretype-bar" :class="{show: ifShowMoreType}">
+                                <div class="block" @click="clickBySelector('#uploadImage > div > input')">
+                                    <el-upload id="uploadImage"
+                                               action="#"
+                                               :show-file-list="false"
+                                               class="avatar-uploader"
+                                               accept="image/png, image/jpeg, image/gif"
+                                               :before-upload="createImageDialogue"
+                                               style="position: absolute; width: 0; height: 0"
+                                    ></el-upload>
+                                    <el-icon color="#707070" :size="35">
+                                        <Picture/>
+                                    </el-icon>
+                                    图片
+                                </div>
+                                <div class="block" @click="showCreateOption">
+                                    <el-icon color="#707070" :size="35">
+                                        <Operation/>
+                                    </el-icon>
+                                    选项
+                                </div>
+                                <div class="block" @click="createTextDialogue('select')">
+                                    <el-icon color="#707070" :size="35">
+                                        <Edit/>
+                                    </el-icon>
+                                    选择
+                                </div>
+                                <div class="block" @click="createTextDialogue('title')">
+                                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                                         data-v-029747aa="" style="width: 35px; height: 35px">
+                                        <path d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
+                                              fill="#707070"></path>
+                                    </svg>
+                                    标题
+                                </div>
+                            </div>
                             <div class="char-bar">
                                 <el-scrollbar>
                                     <div class="container">
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <img :src="images[char.avatar] || char.avatar">
+                                            <img :src="images[char.avatar] || staticUrl + char.avatar">
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">
