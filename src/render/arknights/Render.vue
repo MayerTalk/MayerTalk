@@ -25,11 +25,10 @@
                 const index = (+event.key || 10) - 1;
                 const list = Object.entries(chars.value);
                 if (index < list.length) {
-                    if (list[index][0] === currChar.value) {
-                        currChar.value = ''
-                    } else {
-                        currChar.value = list[index][0];
-                    }
+                    setCurr(list[index][0])
+                } else {
+                    createChar.value = true;
+                    ifShowEditChar.value = true;
                 }
                 event.preventDefault()
             }
