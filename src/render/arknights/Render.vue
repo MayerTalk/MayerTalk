@@ -84,6 +84,27 @@
         }
     }
 
+    function _addDialogue(content, char, type, id) {
+        // 通用的增加对话方法
+        // content(String): 对话内容，默认为空
+        // char(String): 发言角色id，默认为当前角色id
+        // type(String): 发言类型，默认为对话
+        // id(uuid): 发言id
+        // REFA: 应都重构至用这个方法
+
+        chats.value.push({
+                char: (typeof char === "string") ? char : currChar.value,
+                content: content || "",
+                type: type || "chat",
+                id: id || uuid()
+            });
+        nextTick(() => {
+            resizeScroll();
+            scroll.value.setScrollTop(MAX_SCROLL_TOP)
+        });
+        DataControl.save("chats");
+    }
+
     onMounted(() => {
         resizeWindow()
     });
@@ -167,34 +188,14 @@
     const toolBarMask = ref(true);
 
     // 模板消息
-    class ModelMsg extends String {
-        constructor(s) {
-            // 需要用new ModelMsg("${...}***")的方式新建对象
-            super(s);
-            if (!s && s !== "") {
-                throw `模板消息不能为空(${s})`
-            }
-            this.raw_string = s;
-        }
-        render() {
-            let name = currChar.value.name;
-            // 在此增加局部可见的参数
-            return eval(this.raw_string);
-        }
-        description() {
-            let dispMap = {
-                name: "<角色名>"
-            }
-            let desc = this.raw_string;
-            console.log(this.raw_string);
-            for (let kw in dispMap) {
-                desc = desc.replace(new RegExp("\\$\\{"+kw+"\\}"), dispMap[kw]);
-            }
-            return desc;
-        }
+    function renderModelMsg(modelMsg) {
+        let name = currChar.value?chars.value[currChar.value].name:"<角色名>";
+        // 在此增加局部可见的参数
+
+        return eval("`"+modelMsg+"`");
     }
     const modelMsgList = ref([
-        new ModelMsg("“${name}”撤回了一条消息"),
+        "“${name}”撤回了一条消息",
     ]);
     const modelMsgGateway = ref(null);
 
@@ -257,6 +258,7 @@
                     resizeScroll();
                     scroll.value.setScrollTop(MAX_SCROLL_TOP)
                 });
+                DataControl.save("chats");
             } else {
                 message.notify("必须选择一个角色才能复读", message.warning);
                 plus1.value = chats.value.length - 1;
@@ -538,8 +540,11 @@
                 chars.value = {};
                 chats.value = [];
                 images.value = {};
+                currChar.value = "";
+                currDialogue.value = 0;
+                currDialogueData.value = {};
                 message.notify('清空成功', message.success);
-                DataControl.save(['chars', 'chats', 'images'])
+                DataControl.save(['chars', 'chats', 'images']);
             }
         )
     }
@@ -562,7 +567,7 @@
                 DataControl.set(data);
                 message.notify('导入成功', message.success);
                 resizeScroll();
-                DataControl.save()
+                DataControl.save();
             } catch (e) {
                 message.notify('导入失败，请确认文件名为 mayertalk-data-xxx.json', message.error)
             }
@@ -931,10 +936,10 @@
                                     </svg>
                                     模板消息
                                 </div>
-                                <el-popover :virtual-ref="modelMsgGateway" placement="top-start" title="选择模板信息" trigger="click">
+                                <el-popover :virtual-ref="modelMsgGateway" popper-style="width:auto" placement="top-start" title="选择模板信息" trigger="click">
                                     <el-card class="model-msg-list">
-                                        <span v-for="modelMsg in modelMsgList">
-                                            {{ modelMsg.description() }}
+                                        <span v-for="modelMsg in modelMsgList" @click="_addDialogue(renderModelMsg(modelMsg), '')">
+                                            {{ renderModelMsg(modelMsg) }}
                                         </span>
                                     </el-card>
                                 </el-popover>
@@ -991,3 +996,12 @@
 
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
+<style>
+/* 设置模板消息弹窗部分的样式 */
+.el-card {
+    --el-card-padding: 10px;
+}
+.model-msg-list span {
+    cursor: pointer;
+}
+</style>
