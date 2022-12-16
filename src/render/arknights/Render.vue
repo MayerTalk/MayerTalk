@@ -162,6 +162,7 @@
     const currChar = ref('');
     const ifShowEditChar = ref(false);
     const ifShowSelectAvatar = ref(false);
+    const defaultName = ref('');
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
@@ -179,10 +180,10 @@
             return list.length ? list : false
         } else {
             return [
-                ['博士', 'avatar/arknights/博士.png'],
-                ['PRTS', 'avatar/arknights/PRTS.png'],
-                ['mon3tr', 'avatar/arknights/mon3tr.png'],
-                ['凯尔希', 'avatar/arknights/凯尔希.png']
+                ['博士', 'avatar/arknights/博士.png', '博士'],
+                ['PRTS', 'avatar/arknights/PRTS.png', 'PRTS'],
+                ['mon3tr', 'avatar/arknights/mon3tr.png', 'mon3tr'],
+                ['凯尔希', 'avatar/arknights/凯尔希.png', '凯尔希']
             ]
         }
     });
@@ -375,9 +376,12 @@
 
     function editChar() {
         if (createChar.value) {
-            if (newChar.value.name === '') {
+            if (newChar.value.name === '' && !defaultName.value) {
                 message.notify('名字是必须的', message.error);
                 return
+            }
+            if (newChar.value.name === '') {
+                newChar.value.name = defaultName.value
             }
             ifShowEditChar.value = false;
             chars.value[uuid()] = copy(newChar.value);
@@ -412,7 +416,8 @@
         if (newChar.value && images.value.hasOwnProperty(newChar.value.avatar)) {
             delete images.value[newChar.value.avatar]
         }
-        newChar.value = {name: ''}
+        newChar.value = {name: ''};
+        defaultName.value = ''
     }
 
     function showEditDialogue(index) {
@@ -617,7 +622,7 @@
                                     :show-file-list="false"
                                     class="avatar-uploader"
                                     accept="image/png, image/jpeg, image/gif"
-                                    :before-upload="uploadAvatar"
+                                    :before-upload="(file) => {defaultName='';return uploadAvatar(file)}"
                             >
                                 <div class="container"><img v-if="newChar.avatar"
                                                             :src="images[newChar.avatar] || staticUrl + newChar.avatar"/>
@@ -628,7 +633,7 @@
                             </el-upload>
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px"
+                                <el-input v-model="newChar.name" style="margin-top: 10px" :placeholder="defaultName"
                                           @keypress.enter="createChar && editChar()"></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
@@ -642,7 +647,9 @@
                             </div>
                         </div>
                         <div style="width: 100%; margin-top: 10px">
-                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">从素材库中选择头像</el-button>
+                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">
+                                从素材库中选择头像
+                            </el-button>
                             <el-button style="width: calc(40% - 12px)" @click="editChar">{{createChar?'创建':'删除'}}
                             </el-button>
                         </div>
@@ -657,7 +664,7 @@
                                 <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
                                      loading="lazy"
                                      :title="avatar[0]"
-                                     @click="selectAvatar(avatar)">
+                                     @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
                             </el-scrollbar>
                         </div>
                         <div v-else
