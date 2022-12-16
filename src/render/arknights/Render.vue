@@ -203,10 +203,15 @@
     const ifAt = ref(false);
     const atWho = ref({});
     const atWhoSelRef = ref(null);
+    let prevTextareaVal = "", insertAt = 0;
     watch(atWho, () => {
         // 被@角色刷入文本框
+        let textareaDom = document.querySelector("#textarea");
         if (!atWho.value) { return }
-        textarea.value += atWho.value.name + " ";
+        textarea.value = textareaDom.value.substring(0, insertAt)
+            + atWho.value.name
+            + " "
+            + textareaDom.value.substring(insertAt);
         ifAt.value = false;
     });
     watch(ifAt, () => {
@@ -214,15 +219,17 @@
             document.querySelector("#textarea").focus();
         }
     });
-    function processKeyDown(e) {
-        // 处理单个key按下事件
-        if (e.code === "Digit2" && e.shiftKey) { // 输入法适配
+    function processInput(e) {
+        // 处理键入@事件
+        let textareaDom = document.querySelector("#textarea");
+        if (textareaDom.value[textareaDom.selectionStart - 1] === "@" && e.inputType === "insertText") {
+            insertAt = textareaDom.selectionStart;
             atWho.value = "";
-            textarea.value += "@";
             ifAt.value = true;
         } else {
             ifAt.value = false;
         }
+        prevTextareaVal = textarea.value;
     }
     function focusOnSelect() {
         // @提示框显示后聚焦输入
@@ -787,7 +794,7 @@
                             :label="char.name"
                             :value="char">
                             <span style="float:left">{{char.name}}</span>
-                            <img style="float:right;display:inline-block" :src="char.avatar"/>
+                            <img style="float:right;display:inline-block;width:30px;height:30px;padding:2px" :src="staticUrl + char.avatar"/>
                         </el-option>
                     </el-select>
                 </el-dialog>
@@ -885,7 +892,7 @@
                             <textarea class="textarea" id="textarea" v-model="textarea"
                                       :placeholder="tipControl.tip.value"
                                       @keydown.ctrl.enter="createTextDialogue('chat')"
-                                      @keydown="processKeyDown"></textarea>
+                                      @input="processInput"></textarea>
                             <div class="button-bar">
                                 <el-icon @click="createTextDialogue('chat')" color="#808080" :size="35">
                                     <Promotion/>
