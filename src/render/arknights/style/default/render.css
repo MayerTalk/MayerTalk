@@ -153,15 +153,6 @@
     transform: rotate(180deg);
 }
 
-.flip {
-    transition: transform ease 1.5s;
-}
-
-.flip:hover {
-    /* rotateY() 性能太烂！ */
-    transform: scaleY(-1);
-}
-
 .model-msg-list {
     width: auto;
 }
@@ -235,6 +226,7 @@
     flex-flow: column;
     color: #707070;
     transition: color cubic-bezier(0.3, 0, 0.5, 1) 0.2s;
+    cursor: pointer;
 }
 
 .moretype-bar .block:hover {
