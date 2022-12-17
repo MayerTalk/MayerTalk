@@ -2,11 +2,11 @@
     import {ref, provide, onMounted} from 'vue'
     import message from './lib/message';
     import {copy} from './lib/tool';
-    import './lib/clear';
     import Renders from './render'
     import Announce from './Announce.vue'
 
     const ifShowAnnouncement = ref(false);
+    const ifShowSettings = ref(false);
     const ifShowGuide = ref(false);
     const config = ref({render: 'Arknights'});
     const settings = ref({});
@@ -136,7 +136,7 @@
             for (let imageId in tmp) {
                 if (tmp.hasOwnProperty(imageId)) {
                     if (tmp[imageId].indexOf('/avatar/') !== 0 && tmp[imageId].indexOf('data:image') !== 0) {
-                        // 非/avatar/(内置)和data:image(b64)视为不安全数据
+                        // 非avatar/(内置)和data:image(b64)视为不安全数据
                         message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告');
                         delete tmp[imageId];
                         throw TypeError
@@ -245,7 +245,9 @@
         }
     }
 
+    provide('staticUrl', 'https://static.mayertalk.top/');
     provide('ifShowAnnouncement', ifShowAnnouncement);
+    provide('ifShowSettings', ifShowSettings);
     provide('ifShowGuide', ifShowGuide);
     provide('config', config);
     provide('settings', settings);
@@ -266,16 +268,7 @@
         }
     });
 
-    DataControl.load();
-
-    if (localStorage.getItem('data')) {
-        try {
-            DataControl.set(JSON.parse(localStorage.getItem('data')));
-            DataControl.save();
-            localStorage.removeItem('data');
-        } catch (e) {
-        }
-    }
+    DataControl.load()
 </script>
 
 <template>

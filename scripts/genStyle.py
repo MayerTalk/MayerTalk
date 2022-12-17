@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
             try:
                 render.run()
-            except RuntimeError:
+            except (RuntimeError, FileNotFoundError):
                 pass
 
         for path in os.listdir(render_path):

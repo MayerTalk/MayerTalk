@@ -13,7 +13,12 @@ import {
     Upload,
     Download,
     Back,
-    Right
+    Right,
+    ArrowUp,
+    Operation,
+    Edit,
+    Close,
+    Setting
 } from "@element-plus/icons";
 
 const app = createApp(App);
@@ -30,5 +35,12 @@ app.component('Upload', Upload);
 app.component('Download', Download);
 app.component('Back', Back);
 app.component('Right', Right);
+app.component('ArrowUp', ArrowUp);
+app.component('Operation', Operation);
+app.component('Edit', Edit);
+app.component('Close', Close);
+app.component('Setting', Setting);
+
+app.provide('avatarsJs','avatar.js?v=ba5ae0ed');
 
 app.mount('#app');
