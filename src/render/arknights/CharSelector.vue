@@ -10,7 +10,7 @@
         narration: Boolean,
         placeholder: {
             type: String,
-            required: false
+            default: '角色'
         }
     });
     const emit = defineEmits(['update:modelValue', 'onMounted']);
@@ -36,7 +36,7 @@
             v-model="modelValue"
             ref="select"
             style="flex-grow: 1"
-            :placeholder="props.placeholder || '角色'"
+            :placeholder="props.placeholder"
             filterable>
         <el-option
                 v-for="(char, id) in chars"
