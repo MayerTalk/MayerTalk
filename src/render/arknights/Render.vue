@@ -572,13 +572,6 @@
         ifShowEditDialogue.value = false;
     }
 
-    function sendModelMsg() {
-        // 发送模板消息
-        // content(str): 消息内容
-        // replace(str): 格式化消息内容时使用的映射表
-
-    }
-
     function screenshot() {
         preScreenshot.value = true;
         resizeWindow();
