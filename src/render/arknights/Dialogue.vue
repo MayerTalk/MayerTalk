@@ -1,7 +1,6 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
-    import message from "../../lib/message";
 
     const chars = inject('chars');
     const images = inject('images');
@@ -10,15 +9,18 @@
     const width = inject('width');
     const charDirection = inject('charDirection');
     const preScreenshot = inject('preScreenshot');
-    const {data, index} = defineProps(['data', 'index']);
+    const props = defineProps(['data', 'index']);
     defineEmits(['edit']);
+
+    const data = computed(() => props.data);
+    const index = computed(() => props.index);
+
     const char = computed(() => {
-        return chars.value[data.char] || {};
+        return chars.value[data.value.char] || {};
     });
     const id = ref(uuid());
-
     const right = computed(() => {
-        if (data.char) {
+        if (data.value.char) {
             // opposite is deprecated
             // return data.opposite ? !char.value.right : !!char.value.right
             return !!char.value.right
@@ -28,7 +30,7 @@
     });
 
     function resizeImage() {
-        if (data.type === 'image') {
+        if (data.value.type === 'image') {
             id.value = uuid();
         }
     }
@@ -62,7 +64,6 @@
                     </div>
                 </template>
                 <template v-else>
-
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
                             <img src="/avatar-bg.png">
@@ -102,14 +103,14 @@
                     </template>
                     <template v-else-if="data.type==='option'">
                         <div class="option-box">
-                            <div v-for="text in data.content" class="block">
+                            <div v-for="value in data.content" class="block">
                                 <div class="bg">
                                     <div class="triangle" style="margin-left: 14px"></div>
                                     <div class="triangle"></div>
                                     <div class="triangle"></div>
                                 </div>
                                 <div class="text">
-                                    <pre>{{text}}</pre>
+                                    <pre>{{value[1]}}</pre>
                                 </div>
                             </div>
                         </div>

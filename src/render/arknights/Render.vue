@@ -1,8 +1,10 @@
 <script setup>
-    import {ref, computed, watch, inject, provide, nextTick, onMounted} from 'vue'
+    import {ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted} from 'vue'
     import Dialogue from './Dialogue.vue'
     import Settings from './Setting.vue'
     import Option from './type/Option.vue'
+    import CharSelector from './CharSelector.vue'
+
     import message from '@/lib/message'
     import {
         copy,
@@ -16,6 +18,26 @@
         clickBySelector
     } from "@/lib/tool";
 
+    const controller = new AbortController();
+    document.addEventListener('keydown', event => {
+        if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
+            if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
+                const index = (+event.key || 10) - 1;
+                const list = Object.entries(chars.value);
+                if (index < list.length) {
+                    setCurr(list[index][0])
+                } else {
+                    createChar.value = true;
+                    ifShowEditChar.value = true;
+                }
+                event.preventDefault()
+            }
+        }
+    }, {signal: controller.signal});
+    onUnmounted(() => {
+        controller.abort()
+    });
+
     const TypeDict = {
         chat: '对话',
         monologue: '独白',
@@ -23,6 +45,14 @@
         option: '选项',
         select: '选择',
         title: '标题'
+    };
+    const TypeDefault = {
+        chat: '',
+        monologue: '',
+        image: '',
+        option: [[uuid(), '']],
+        select: '',
+        title: ''
     };
 
     const editor = computed(() => {
@@ -131,6 +161,7 @@
     const currChar = ref('');
     const ifShowEditChar = ref(false);
     const ifShowSelectAvatar = ref(false);
+    const defaultName = ref('');
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
@@ -148,10 +179,10 @@
             return list.length ? list : false
         } else {
             return [
-                ['博士', 'avatar/arknights/博士.png'],
-                ['PRTS', 'avatar/arknights/PRTS.png'],
-                ['mon3tr', 'avatar/arknights/mon3tr.png'],
-                ['凯尔希', 'avatar/arknights/凯尔希.png']
+                ['博士', 'avatar/arknights/博士.png', '博士'],
+                ['PRTS', 'avatar/arknights/PRTS.png', 'PRTS'],
+                ['mon3tr', 'avatar/arknights/mon3tr.png', 'mon3tr'],
+                ['凯尔希', 'avatar/arknights/凯尔希.png', '凯尔希']
             ]
         }
     });
@@ -191,23 +222,26 @@
 
     const tipControl = {
         tip: ref(''),
-        texts: [
+        pool: [
             '素材库里除了有干员头像，还有召唤物/敌人/装置的',
             '上传的头像会自动剪裁成正方形',
             '博士，剿灭打了吗？',
             '点击对话框可以编辑/插入对话',
             '不选中任何角色时，将以旁白视角发送对话',
-            'Ctrl+Enter可以快捷发送'
+            'Ctrl+Enter可以快捷发送',
+            'Ctrl+Z/ctrl+Y可以撤回/重做',
+            'Ctrl+1~9可以快捷切换角色'
         ],
+        cache: [],
         until: 0,
-        index: -1,
         cd: 5000,
         loop() {
             if (Date.now() > this.until) {
-                if (++this.index >= this.texts.length) {
-                    this.index = 0
+                if (this.cache.length < 1) {
+                    this.cache = copy(this.pool)
                 }
-                this.tip.value = this.texts[this.index];
+                const p = Math.ceil(Math.random() * this.cache.length) - 1;
+                this.tip.value = this.cache.splice(p, 1);
                 nextTick(() => {
                     resizeScroll()
                 })
@@ -221,7 +255,6 @@
             this.until = Date.now() + timeout
         }
     };
-    tipControl.index = Math.ceil(Math.random() * tipControl.texts.length) - 1;
     onMounted(() => {
         tipControl.loop();
     });
@@ -264,6 +297,30 @@
             }
         });
         return false
+    }
+
+    function uploadImage(fileUpload) {
+        DataControl.update('images');
+        blob2base64(fileUpload, (b64) => {
+            if (b64) {
+                if (currDialogueData.value.type === 'image'
+                    && images.value.hasOwnProperty(currDialogueData.value.content)) {
+                    delete images.value[currDialogueData.value.content]
+                }
+                const imageId = uuid();
+                images.value[imageId] = b64;
+                currDialogueData.value.content = imageId
+            }
+        });
+        return false
+    }
+
+    function clearDialogueData() {
+        if (!editDialogue.value && currDialogueData.value.type === 'image'
+            && images.value.hasOwnProperty(currDialogueData.value.content)) {
+            delete images.value[currDialogueData.value.content]
+        }
+        currDialogueData.value = {}
     }
 
     function setCurr(id) {
@@ -309,15 +366,21 @@
     }
 
     function selectAvatar(avatar) {
+        if (images.value.hasOwnProperty(newChar.value.avatar)) {
+            delete images.value[newChar.value.avatar]
+        }
         newChar.value.avatar = avatar[1];
         ifShowSelectAvatar.value = false
     }
 
     function editChar() {
         if (createChar.value) {
-            if (newChar.value.name === '') {
+            if (newChar.value.name === '' && !defaultName.value) {
                 message.notify('名字是必须的', message.error);
                 return
+            }
+            if (newChar.value.name === '') {
+                newChar.value.name = defaultName.value
             }
             ifShowEditChar.value = false;
             chars.value[uuid()] = copy(newChar.value);
@@ -348,6 +411,13 @@
         }
     }
 
+    function clearNewChar() {
+        if (newChar.value && images.value.hasOwnProperty(newChar.value.avatar)) {
+            delete images.value[newChar.value.avatar]
+        }
+        newChar.value = {name: ''};
+        defaultName.value = ''
+    }
 
     function showEditDialogue(index) {
         editDialogue.value = true;
@@ -390,8 +460,10 @@
             message.notify('请选择类型', message.warning);
             return
         }
+        currDialogueData.value.id = uuid();
         chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value));
         message.notify('插入成功', message.success);
+        currDialogueData.value = {};
         ifShowEditDialogue.value = false;
     }
 
@@ -458,16 +530,16 @@
         return false
     }
 
+    const avatarsJs = inject('avatarsJs');
+
     function loadAvatar() {
-        import("@/avatars").then(module => {
+        import(staticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
             avatars = module.default
         })
     }
 
     function showCreateOption() {
-        const id = uuid();
-        options.value = {};
-        options.value[id] = '';
+        options.value = [[uuid(), '']];
         ifShowCreateOption.value = true
     }
 
@@ -538,7 +610,7 @@
                     </ol>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
-                           @closed="() => DataControl.save('chars')">
+                           @closed="() => {DataControl.save('chars'); clearNewChar()}">
                     <div style="display: flex; flex-wrap: wrap">
                         <div style="width: 100%; display: flex;">
                             <el-upload
@@ -547,7 +619,7 @@
                                     :show-file-list="false"
                                     class="avatar-uploader"
                                     accept="image/png, image/jpeg, image/gif"
-                                    :before-upload="uploadAvatar"
+                                    :before-upload="(file) => {defaultName='';return uploadAvatar(file)}"
                             >
                                 <div class="container"><img v-if="newChar.avatar"
                                                             :src="images[newChar.avatar] || staticUrl + newChar.avatar"/>
@@ -558,7 +630,7 @@
                             </el-upload>
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px"
+                                <el-input v-model="newChar.name" style="margin-top: 10px" :placeholder="defaultName"
                                           @keypress.enter="createChar && editChar()"></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
@@ -572,7 +644,9 @@
                             </div>
                         </div>
                         <div style="width: 100%; margin-top: 10px">
-                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">从素材库中选择头像</el-button>
+                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">
+                                从素材库中选择头像
+                            </el-button>
                             <el-button style="width: calc(40% - 12px)" @click="editChar">{{createChar?'创建':'删除'}}
                             </el-button>
                         </div>
@@ -587,7 +661,7 @@
                                 <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
                                      loading="lazy"
                                      :title="avatar[0]"
-                                     @click="selectAvatar(avatar)">
+                                     @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
                             </el-scrollbar>
                         </div>
                         <div v-else
@@ -598,8 +672,27 @@
                     </template>
                 </el-dialog>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
-                           @closed="() => DataControl.save('chats')" :before-close="editDialogue?null:ensureClose">
+                           @closed="() => {clearDialogueData();DataControl.save('chats')}"
+                           :before-close="editDialogue?null:ensureClose">
                     <component v-if="editor" :is="editor" v-model="currDialogueData.content"/>
+                    <el-upload v-else-if="currDialogueData.type==='image'"
+                               action="#"
+                               drag
+                               :show-file-list="false"
+                               class="image-uploader"
+                               accept="image/png, image/jpeg, image/gif"
+                               :before-upload="uploadImage"
+                    >
+                        <div class="container">
+                            <el-scrollbar v-if="images[currDialogueData.content]">
+                                <img :src="images[currDialogueData.content]" style="width:100%"/>
+                            </el-scrollbar>
+
+                            <el-icon v-else class="avatar-uploader-icon">
+                                <Plus/>
+                            </el-icon>
+                        </div>
+                    </el-upload>
                     <el-input v-else
                               v-model="currDialogueData.content"
                               :autosize="{minRows: 1, maxRows: 5}"
@@ -609,31 +702,20 @@
                     ></el-input>
                     <div class="edit-bar" style="margin-top: 5px">
                         <div style="width: 50%; display: flex">
-                            <el-select v-model="currDialogueData.char" style="flex-grow: 1" placeholder="角色">
-                                <el-option
-                                        v-for="(char, id) in chars"
-                                        :key="id"
-                                        :label="char.name"
-                                        :value="id"
-                                />
-                                <el-option
-                                        key=""
-                                        label="旁白"
-                                        value=""
-                                />
-                            </el-select>
+                            <CharSelector v-model="currDialogueData.char" :narration="true"/>
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
-                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1"
+                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1 && editDialogue"
                                        placeholder="类型"
+                                       @change="() => {if(!editDialogue) {currDialogueData.content=TypeDefault[currDialogueData.type]}}"
                             >
                                 <el-option
                                         v-for="(text, type) in TypeDict"
                                         :key="type"
                                         :label="text"
                                         :value="type"
-                                        :disabled="['image','option'].indexOf(type) !== -1"
+                                        :disabled="['image','option'].indexOf(type) !== -1 && editDialogue"
                                 />
                             </el-select>
                         </div>
@@ -645,7 +727,8 @@
                         </div>
                         <div v-else style="width: 100%; margin-top: 5px">
                             <el-button style="width: 50%" @click="insertDialogue">插入</el-button>
-                            <el-button style="width: calc(50% - 5px); margin-left: 5px" @click="switchEdit(true)">返回
+                            <el-button style="width: calc(50% - 5px); margin-left: 5px"
+                                       @click="() => {clearDialogueData();switchEdit(true)}">返回
                             </el-button>
                         </div>
                     </div>
