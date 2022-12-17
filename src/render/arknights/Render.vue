@@ -50,11 +50,10 @@
         chat: '',
         monologue: '',
         image: '',
-        option: {},
+        option: [[uuid(), '']],
         select: '',
         title: ''
     };
-    TypeDefault.option[uuid()] = '';
 
     const editor = computed(() => {
         if (['char', 'monologue', 'image'].indexOf(currDialogueData.value.type) !== -1) {
@@ -540,9 +539,7 @@
     }
 
     function showCreateOption() {
-        const id = uuid();
-        options.value = {};
-        options.value[id] = '';
+        options.value = [[uuid(), '']];
         ifShowCreateOption.value = true
     }
 

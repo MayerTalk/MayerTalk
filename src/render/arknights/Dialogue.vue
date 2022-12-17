@@ -1,7 +1,6 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
-    import message from "../../lib/message";
 
     const chars = inject('chars');
     const images = inject('images');
@@ -65,7 +64,6 @@
                     </div>
                 </template>
                 <template v-else>
-
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
                             <img src="/avatar-bg.png">
@@ -105,14 +103,14 @@
                     </template>
                     <template v-else-if="data.type==='option'">
                         <div class="option-box">
-                            <div v-for="text in data.content" class="block">
+                            <div v-for="value in data.content" class="block">
                                 <div class="bg">
                                     <div class="triangle" style="margin-left: 14px"></div>
                                     <div class="triangle"></div>
                                     <div class="triangle"></div>
                                 </div>
                                 <div class="text">
-                                    <pre>{{text}}</pre>
+                                    <pre>{{value[1]}}</pre>
                                 </div>
                             </div>
                         </div>
