@@ -702,7 +702,7 @@
                     ></el-input>
                     <div class="edit-bar" style="margin-top: 5px">
                         <div style="width: 50%; display: flex">
-                            <CharSelector v-model="currDialogueData.char" :narration="true"/>
+                            <CharSelector v-model="currDialogueData.char" narration/>
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"

@@ -1,12 +1,21 @@
 <script setup>
-    import {inject, computed} from 'vue'
+    import {ref, inject, computed, onMounted} from 'vue'
 
     const chars = inject('chars');
     const images = inject('images');
     const staticUrl = inject('staticUrl');
 
-    const props = defineProps(['modelValue', 'narration']);
-    const emit = defineEmits(['update:modelValue', 'showGuide']);
+    const props = defineProps({
+        modelValue: Object,
+        narration: Boolean,
+        placeholder: {
+            type: String,
+            required: false
+        }
+    });
+    const emit = defineEmits(['update:modelValue', 'onMounted']);
+
+    const select = ref(null);
 
     const modelValue = computed({
         get() {
@@ -16,10 +25,19 @@
             emit('update:modelValue', value);
         }
     });
+
+    onMounted(() => {
+        emit('onMounted', select.value)
+    });
 </script>
 
 <template>
-    <el-select v-model="modelValue" style="flex-grow: 1" placeholder="角色" filterable>
+    <el-select
+            v-model="modelValue"
+            ref="select"
+            style="flex-grow: 1"
+            :placeholder="props.placeholder || '角色'"
+            filterable>
         <el-option
                 v-for="(char, id) in chars"
                 :key="id"
