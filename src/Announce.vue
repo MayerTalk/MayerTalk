@@ -16,10 +16,21 @@
 
     const version = 'v0.0.5';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
+
     const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
+    const isDevSite = location.href.indexOf('https://dev.mayertalk.top/') === 0;
+
+    let title = '';
+    if (isDevSite) {
+        title = '公告 Dev'
+    } else {
+        title = '公告 ' + version
+    }
 
     onMounted(() => {
-        if (getData('a_version') !== version) {
+        if (isDevSite) {
+            emit('update:modelValue', true);
+        } else if (getData('a_version') !== version) {
             emit('update:modelValue', true);
             saveData('a_version', version)
         }
@@ -27,8 +38,18 @@
 </script>
 
 <template>
-    <el-dialog v-model="ifShowAnnouncement" :title="'公告 '+version" :width="dialogWidth">
-        <div style="position:relative;">
+    <el-dialog v-model="ifShowAnnouncement" :title="title" :width="dialogWidth">
+        <div v-if="isDevSite">
+            <h2 style="display: inline">明日方舟对话编辑器(beta)</h2>
+            <h2>您正处于开发站点，如有bug请加入交流群反馈</h2>
+            <p>
+                <el-link href="https://www.mayertalk.top" type="primary" style="margin-right: 15px">主站点</el-link>
+                <el-link @click="$emit('showGuide', false)" href="javascript:void(0)" type="primary">查看指南</el-link>
+            </p>
+            <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary">交流群：560295639</el-link>
+            <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
+        </div>
+        <div v-else style="position:relative;">
             <h2 style="display: inline">明日方舟对话编辑器(beta)</h2>
             <p>开发阶段，功能尚不完善，还请谅解</p>
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
