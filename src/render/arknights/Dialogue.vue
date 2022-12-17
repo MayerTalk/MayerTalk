@@ -1,7 +1,6 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
-    import message from "../../lib/message";
 
     const chars = inject('chars');
     const images = inject('images');
@@ -11,15 +10,18 @@
     const charDirection = inject('charDirection');
     const preScreenshot = inject('preScreenshot');
     const plus1 = inject('plus1');
-    const {data, index} = defineProps(['data', 'index']);
+    const props = defineProps(['data', 'index']);
     defineEmits(['edit']);
+
+    const data = computed(() => props.data);
+    const index = computed(() => props.index);
+
     const char = computed(() => {
-        return chars.value[data.char] || {};
+        return chars.value[data.value.char] || {};
     });
     const id = ref(uuid());
-
     const right = computed(() => {
-        if (data.char) {
+        if (data.value.char) {
             // opposite is deprecated
             // return data.opposite ? !char.value.right : !!char.value.right
             return !!char.value.right
@@ -29,7 +31,7 @@
     });
 
     function resizeImage() {
-        if (data.type === 'image') {
+        if (data.value.type === 'image') {
             id.value = uuid();
         }
     }
@@ -71,14 +73,15 @@
                         <div class="line"></div>
                     </div>
                 </template>
-                <template v-else-if="data.type==='chat'">
-                    <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
-                        <div v-if="right === false">
-                            <img src="/avatar-bg.png">
-                            <img :src="images[char.avatar] || staticUrl + char.avatar">
-                        </div>
+                <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
+                    <div v-if="right === false">
+                        <img src="/avatar-bg.png">
+                        <img :src="images[char.avatar] || staticUrl + char.avatar">
                     </div>
-
+                </div>
+                <img :id="data.id" :key="id" :src="images[data.content]"
+                        :style="{width: preScreenshot?width.image:'100%'}">
+                <template v-if="data.type==='chat'">
                     <div :class="['avatar-name', right? 'right':'left']">
                         {{fetchName()}}
                     </div>
@@ -92,14 +95,43 @@
                              :style="{width: preScreenshot?width.image:'100%'}"
                         >
                     </div>
-                    <div v-if="data.char" class="box dialogue-box">
-                        <div :class="[right? 'right':'left']">
-                            <div class="tail">
-                                <div class="tail2"></div>
+                    <template v-else-if="data.type==='chat'">
+                        <div v-if="data.char" class="box dialogue-box">
+                            <div :class="[right? 'right':'left']">
+                                <div class="tail">
+                                    <div class="tail2"></div>
+                                </div>
+                            </div>
+                            <pre style="font-family: Harmony">{{data.content}}</pre>
+                        </div>
+                        <div v-else style="color: #CCCCCC" class="box">
+                            <pre>{{data.content}}</pre>
+                        </div>
+                    </template>
+                    <template v-else-if="data.type==='monologue'">
+                        <div v-if="data.char" class="box monologue-box">
+                            <pre>{{data.content}}</pre>
+                        </div>
+                        <div v-else style="color: #909090" class="box">
+                            <pre>{{data.content}}</pre>
+                        </div>
+                    </template>
+                    <template v-else-if="data.type==='option'">
+                        <div class="option-box">
+                            <div v-for="value in data.content" class="block">
+                                <div class="bg">
+                                    <div class="triangle" style="margin-left: 14px"></div>
+                                    <div class="triangle"></div>
+                                    <div class="triangle"></div>
+                                </div>
+                                <div class="text">
+                                    <pre>{{value[1]}}</pre>
+                                </div>
                             </div>
                         </div>
                         <pre style="font-family: Harmony">{{data.content}}</pre>
-                    </div>
+
+                    </template>
                     <div v-else style="color: #CCCCCC" class="box">
                         <pre>{{data.content}}</pre>
                     </div>
