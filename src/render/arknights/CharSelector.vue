@@ -6,7 +6,7 @@
     const staticUrl = inject('staticUrl');
 
     const props = defineProps({
-        modelValue: Object,
+        modelValue: null,
         narration: Boolean,
         placeholder: {
             type: String,
@@ -27,6 +27,8 @@
     });
 
     onMounted(() => {
+        // const input = ref(null)
+        // @onMounted="(r) => {input = r}"
         emit('onMounted', select.value)
     });
 </script>
