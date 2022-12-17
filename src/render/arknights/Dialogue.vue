@@ -42,7 +42,7 @@
     }
 
     function fetchName() {
-        return (chars.value[data.char] || { name: "" }).name;
+        return (chars.value[data.value.char] || { name: "" }).name;
     }
 
     watch(() => width.value.window, () => {
@@ -79,12 +79,10 @@
                         <img :src="images[char.avatar] || staticUrl + char.avatar">
                     </div>
                 </div>
-                <img :id="data.id" :key="id" :src="images[data.content]"
-                        :style="{width: preScreenshot?width.image:'100%'}">
                 <template v-if="data.type==='chat'">
-                    <div :class="['avatar-name', right? 'right':'left']">
+                    <span :class="['avatar-name', right? 'right':'left']">
                         {{fetchName()}}
-                    </div>
+                    </span>
                     <div v-if="data.type==='image'" class="box image-box" style="justify-self: flex-start">
                         <div v-if="data.char" :class="[right? 'right':'left']">
                             <div class="tail">
@@ -153,7 +151,7 @@
                                 <div class="triangle"></div>
                             </div>
                             <div class="text">
-                                <pre>{{text}}</pre>
+                                <pre>{{text[1]}}</pre>
                             </div>
                         </div>
                     </div>

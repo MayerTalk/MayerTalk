@@ -25,6 +25,10 @@ pre {
     position: absolute;
     color: var(--dialogue-color);
     font-size: small;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    white-space: nowrap;
 }
 .avatar-name.left {
     left: 78px;

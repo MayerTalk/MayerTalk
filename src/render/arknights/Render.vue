@@ -233,7 +233,7 @@
     const ifAt = ref(false);
     const atWho = ref({});
     const atWhoSelRef = ref(null);
-    let prevTextareaVal = "", insertAt = 0;
+    let insertAt = 0;
     watch(atWho, () => {
         // 被@角色刷入文本框
         let textareaDom = document.querySelector("#textarea");
@@ -259,7 +259,6 @@
         } else {
             ifAt.value = false;
         }
-        prevTextareaVal = textarea.value;
     }
     function focusOnSelect() {
         // @提示框显示后聚焦输入
