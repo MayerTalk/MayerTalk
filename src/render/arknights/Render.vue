@@ -248,7 +248,7 @@
         let textareaDom = document.querySelector("#textarea");
         if (!atWho.value) { return }
         textarea.value = textareaDom.value.substring(0, insertAt)
-            + atWho.value.name
+            + chars.value[atWho.value].name
             + " "
             + textareaDom.value.substring(insertAt);
         ifAt.value = false;
@@ -819,7 +819,7 @@
                     ></el-input>
                     <div class="edit-bar" style="margin-top: 5px">
                         <div style="width: 50%; display: flex">
-                            <CharSelector v-model="currDialogueData.char" :narration="true"/>
+                            <CharSelector v-model="currDialogueData.char" narration/>
                         </div>
                         <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
@@ -855,8 +855,9 @@
                 <el-dialog v-model="ifAt" :width="dialogWidth"
                     title="想用@提到哪个角色?"
                     :modal="false"
+                    destroy-on-close
                     draggable>
-                        <CharSelector v-model:elCharSelector="atWhoSelRef"
+                        <CharSelector v-model:select="atWhoSelRef"
                         @update:modelValue="(value) => {atWho = value;}"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"

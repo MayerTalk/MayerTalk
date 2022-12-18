@@ -4,18 +4,25 @@
     const chars = inject('chars');
     const images = inject('images');
     const staticUrl = inject('staticUrl');
-    const props = defineProps([
-        'modelValue',
-        'elCharSelector',
-        'narration',
-    ]);
+
+
+    const props = defineProps({
+        modelValue: null,
+        narration: Boolean,
+        select: null,
+        placeholder: {
+            type: String,
+            default: '角色'
+        }
+    });
     const emit = defineEmits([
         'update:modelValue',
-        'update:elCharSelector',
+        'update:select',
+        'onMounted',
         'showGuide',
     ]);
 
-    const elCharSelector = ref(null);
+    const select = ref(null);
 
     const modelValue = computed({
         get() {
@@ -27,13 +34,18 @@
     });
 
     onMounted(() => {
-        emit("update:elCharSelector", elCharSelector.value);
+        emit("update:select", select.value);
     });
 
 </script>
 
 <template>
-    <el-select ref="elCharSelector" v-model="modelValue" style="flex-grow: 1;width:100%" placeholder="角色" filterable>
+    <el-select
+            v-model="modelValue"
+            ref="select"
+            style="flex-grow: 1;width: 100%"
+            :placeholder="props.placeholder"
+            filterable>
         <el-option
                 v-for="(char, id) in chars"
                 :key="id"
