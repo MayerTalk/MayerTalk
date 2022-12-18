@@ -217,9 +217,18 @@
     const showToolBar = ref(false);
     const toolBarMask = ref(true);
 
+    // 显示角色名片
+    const showAvatarName = ref(true);
+    provide('showAvatarName', showAvatarName);
+    watch(showAvatarName, () => {
+        document.documentElement.style.setProperty('--show-avatar-name',
+            showAvatarName.value ? "1.5em" : "0"
+        );
+    });
+
     // 模板消息
     function renderModelMsg(modelMsg) {
-        let name = currChar.value?chars.value[currChar.value].name:"<角色名>";
+        let name = (chars.value[currChar.value] || {name:"<角色名>"}).name;
         // 在此增加局部可见的参数
 
         return eval("`"+modelMsg+"`");
@@ -244,28 +253,29 @@
             + textareaDom.value.substring(insertAt);
         ifAt.value = false;
     });
-    watch(ifAt, () => {
-        if (!ifAt.value) {
-            document.querySelector("#textarea").focus();
-        }
-    });
-    function processInput(e) {
-        // 处理键入@事件
-        let textareaDom = document.querySelector("#textarea");
-        if (textareaDom.value[textareaDom.selectionStart - 1] === "@" && e.inputType === "insertText") {
-            insertAt = textareaDom.selectionStart;
-            atWho.value = "";
-            ifAt.value = true;
-        } else {
-            ifAt.value = false;
-        }
-    }
+
     function focusOnSelect() {
         // @提示框显示后聚焦输入
         if (atWhoSelRef.value) {
-            atWhoSelRef.value.focus();
+            // FIX: 必须等到窗体完全展示后才能focus?
+            setTimeout(atWhoSelRef.value.focus, 200);
         } else {
-            setTimeout(focusOnSelect, 1000);
+            nextTick(focusOnSelect);
+        }
+    }
+    function processInput(e) {
+        // 处理键入@事件
+        let textareaDom = document.querySelector("#textarea");
+        if (textareaDom.value[textareaDom.selectionStart - 1] === "@" && (
+            e.inputType === "insertText"
+            || e.inputType === "insertCompositionText")
+        ) {
+            insertAt = textareaDom.selectionStart;
+            atWho.value = "";
+            ifAt.value = true;
+            focusOnSelect();
+        } else {
+            ifAt.value = false;
         }
     }
 
@@ -845,25 +855,9 @@
                 <el-dialog v-model="ifAt" :width="dialogWidth"
                     title="想用@提到哪个角色?"
                     :modal="false"
-                    draggable
-                    @opened="focusOnSelect">
-                    <el-select
-                        ref="atWhoSelRef"
-                        v-model="atWho"
-                        id="atWhoSelect"
-                        style="width:100%"
-                        placeholder="搜索角色..."
-                        clearable
-                        filterable
-                        default-first-option >
-                        <el-option v-for="char in chars"
-                            :key="char"
-                            :label="char.name"
-                            :value="char">
-                            <span style="float:left">{{char.name}}</span>
-                            <img style="float:right;display:inline-block;width:30px;height:30px;padding:2px" :src="staticUrl + char.avatar"/>
-                        </el-option>
-                    </el-select>
+                    draggable>
+                        <CharSelector v-model:elCharSelector="atWhoSelRef"
+                        @update:modelValue="(value) => {atWho = value;}"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
                            :show-close="false">
@@ -1008,7 +1002,11 @@
                                     </svg>
                                     模板消息
                                 </div>
-                                <el-popover :virtual-ref="modelMsgGateway" popper-style="width:auto" placement="top-start" title="选择模板信息" trigger="click">
+                                <el-popover v-if="modelMsgGateway" :virtual-ref="modelMsgGateway" popper-style="width:auto" placement="top-start" title="选择模板信息" trigger="click">
+                                    <!-- FIX:即使是virtual-ref的el-popover #reference内也要有节点 否则warning-->
+                                    <template #reference>
+                                        <span></span>
+                                    </template>
                                     <el-card class="model-msg-list">
                                         <span v-for="modelMsg in modelMsgList" @click="_addDialogue(renderModelMsg(modelMsg), '')">
                                             {{ renderModelMsg(modelMsg) }}
@@ -1022,7 +1020,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <el-tooltip :content="char.name" placement="top">
+                                            <el-tooltip :content="char.name || ''" placement="top">
                                                 <img :src="images[char.avatar] || staticUrl + char.avatar">
                                             </el-tooltip>
                                         </div>

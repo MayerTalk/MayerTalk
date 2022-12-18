@@ -53,6 +53,7 @@ pre {
 
 .image-box {
     position: relative;
+    margin-top: var(--show-avatar-name);
     padding: 7px;
     background: var(--dialogue-background);
     border: var(--dialogue-border-color) solid 1px;
@@ -64,10 +65,9 @@ pre {
 }
 
 .dialogue-box {
-    align-self: flex-end;
     flex-grow: 1;
     padding: 8px;
-    margin-top: 1.5em;
+    margin-top: var(--show-avatar-name);
     /*font-size: var(--font-size);*/
     position: relative;
     background: var(--dialogue-background);
