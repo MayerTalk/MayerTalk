@@ -417,7 +417,7 @@
     }
 
     function clearNewChar() {
-        if (newChar.value && images.value.hasOwnProperty(newChar.value.avatar)) {
+        if (createChar.value && newChar.value && images.value.hasOwnProperty(newChar.value.avatar)) {
             delete images.value[newChar.value.avatar]
         }
         newChar.value = {name: ''};
