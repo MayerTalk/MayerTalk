@@ -63,6 +63,12 @@
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)"
                  :style="{justifyContent:(right?'flex-end':'flex-start')}">
+                <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
+                    <div v-if="right === false">
+                        <img src="/avatar-bg.png">
+                        <img :src="images[char.avatar] || staticUrl + char.avatar">
+                    </div>
+                </div>
                 <template v-if="data.type==='title'">
                     <div class="title-box">
                         <div style="background: darkgrey; padding: 0 7px; font-size: 10px">DIALOGUE</div>
@@ -76,12 +82,6 @@
                         <div class="line"></div>
                     </div>
                 </template>
-                <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
-                    <div v-if="right === false">
-                        <img src="/avatar-bg.png">
-                        <img :src="images[char.avatar] || staticUrl + char.avatar">
-                    </div>
-                </div>
                 <span v-if="showAvatarName" :class="['avatar-name', right? 'right':'left']">
                     {{fetchName()}}
                 </span>
@@ -126,11 +126,11 @@
                                 <div class="triangle"></div>
                             </div>
                             <div class="text">
-                                <pre>{{value[1]}}</pre>
+                                <pre >{{value[1]}}</pre>
                             </div>
                         </div>
                     </div>
-                    <pre style="font-family: Harmony">{{data.content}}</pre>
+                    <!-- <pre style="font-family: Harmony">{{data.content}}</pre> -->
 
                 </template>
                 <template v-else-if="data.type==='monologue'">
