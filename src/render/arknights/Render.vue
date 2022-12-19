@@ -124,10 +124,14 @@
         resizeWindow()
     });
 
-    onMounted(() => {
+    function resizeBody() {
         const el = document.getElementById('body');
         el.style.height = window.innerHeight + 'px';
         el.style.cssText += 'transition: background-color ease 1s;';
+    }
+
+    onMounted(() => {
+        resizeBody()
     });
 
     const textarea = ref('');
@@ -215,7 +219,8 @@
         resizeScroll()
     });
     window.onresize = () => {
-        resizeScroll()
+        resizeScroll();
+        resizeBody()
     };
 
     const scrollHeight = ref(window.innerHeight - 90 + 'px');
