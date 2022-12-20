@@ -12,6 +12,8 @@ def get_files(path: str) -> str:
     files = os.listdir(path)
     res = ''
     for file in files:
+        if '.dev.' in file:
+            continue
         fpath = os.path.join(path, file)
         if os.path.isdir(fpath):
             res += get_files(fpath)
