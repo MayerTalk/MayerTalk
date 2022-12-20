@@ -7,12 +7,6 @@ import hashlib
 
 from common import join
 
-os.system('')
-os.system('npm run build')
-
-shutil.rmtree(join('dist', 'avatar'))
-os.remove(join('dist', 'avatar.js'))
-
 
 def get_files(path: str) -> str:
     files = os.listdir(path)
@@ -22,21 +16,22 @@ def get_files(path: str) -> str:
         if os.path.isdir(fpath):
             res += get_files(fpath)
         else:
-            res += file
+            with open(fpath, mode='rb') as f:
+                res += hashlib.sha256(f.read()).hexdigest()
     return res
 
 
 if '-t' in sys.argv:
-    expire = int(sys.argv(sys.argv.index('-t') + 1))
+    expire = int(sys.argv[sys.argv.index('-t') + 1])
 elif '-d' in sys.argv:
-    expire = int(sys.argv(sys.argv.index('-d') + 1)) * 86400
+    expire = int(sys.argv[sys.argv.index('-d') + 1]) * 86400
 else:
     expire = 7 * 86400
 
-version = hashlib.sha256(get_files(join('dist')).encode('utf-8')).hexdigest()[:8]
+version = hashlib.sha256(get_files(join('src')).encode('utf-8')).hexdigest()[:8]
 
 if '-m' in sys.argv:
-    message = sys.argv(sys.argv.index('-m') + 1)
+    message = sys.argv[sys.argv.index('-m') + 1]
 else:
     message = ''
 
@@ -45,6 +40,12 @@ info = {
     'message': message,
     'version': version
 }
+
+os.system('')
+os.system(f'npm run build -- --base=/{version}/')
+
+shutil.rmtree(join('dist', 'avatar'))
+os.remove(join('dist', 'avatar.js'))
 
 with open(join('dist', 'info.json'), mode='wt', encoding='utf-8') as f:
     json.dump(info, f)
