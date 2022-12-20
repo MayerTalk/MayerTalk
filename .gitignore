@@ -16,6 +16,7 @@ public
 coverage
 *.local
 __pycache__
+*.dev*
 
 /cypress/videos/
 /cypress/screenshots/
