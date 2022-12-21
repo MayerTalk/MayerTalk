@@ -21,7 +21,7 @@
     provide('dialogWidth',dialogWidth);
 
     const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
-    const isDevSite = location.href.indexOf('https://dev.mayertalk.top/') === 0 || true;
+    const isDevSite = location.href.indexOf('https://dev.mayertalk.top/') === 0;
 
     if (!isDevSite) {
         onMounted(() => {
