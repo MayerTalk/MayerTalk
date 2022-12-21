@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import time
 import json
@@ -43,8 +44,16 @@ info = {
     'version': version
 }
 
+with open(join('src', 'App.vue'), mode='rt', encoding='utf-8') as f:
+    app = f.read()
+with open(join('src', 'App.vue'), mode='wt', encoding='utf-8') as f:
+    f.write(re.sub(r"(import Announce from '\./Announce\.)vue'", r"\1dev.vue'", app))
+
 os.system('')
 os.system(f'npm run build -- --base=/{version}/')
+
+with open(join('src', 'App.vue'), mode='wt', encoding='utf-8') as f:
+    f.write(app)
 
 shutil.rmtree(join('dist', 'avatar'))
 os.remove(join('dist', 'avatar.js'))
