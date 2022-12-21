@@ -15,7 +15,7 @@
     });
 
     const version = 'v0.0.5';
-    const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
+    const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
 
     const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
 
