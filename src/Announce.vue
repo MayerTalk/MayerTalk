@@ -1,8 +1,6 @@
 <script setup>
-    import {provide, computed, onMounted, defineAsyncComponent} from 'vue'
+    import {computed, onMounted} from 'vue'
     import {saveData, getData} from './lib/tool';
-
-    const DevAnnounce = defineAsyncComponent(() => import('./Announce.dev.vue'));
 
     const props = defineProps(['modelValue']);
     const emit = defineEmits(['update:modelValue', 'showGuide']);
@@ -18,26 +16,19 @@
 
     const version = 'v0.0.5';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 1000) * 0.9);
-    provide('dialogWidth',dialogWidth);
 
     const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
-    const isDevSite = location.href.indexOf('https://dev.mayertalk.top/') === 0;
 
-    if (!isDevSite) {
-        onMounted(() => {
-            if (getData('a_version') !== version) {
-                emit('update:modelValue', true);
-                saveData('a_version', version)
-            }
-        });
-    }
+    onMounted(() => {
+        if (getData('a_version') !== version) {
+            emit('update:modelValue', true);
+            saveData('a_version', version)
+        }
+    });
 </script>
 
 <template>
-    <template v-if="isDevSite">
-        <DevAnnounce v-model="ifShowAnnouncement"/>
-    </template>
-    <el-dialog v-else v-model="ifShowAnnouncement" :title="'公告 ' + version" :width="dialogWidth">
+    <el-dialog v-model="ifShowAnnouncement" :title="'公告 ' + version" :width="dialogWidth">
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <p>开发阶段，功能尚不完善，还请谅解</p>
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
