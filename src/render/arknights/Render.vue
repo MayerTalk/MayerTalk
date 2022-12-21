@@ -124,10 +124,15 @@
         resizeWindow()
     });
 
-    function resizeBody() {
+    function resizeBody(offset = 0) {
         const el = document.getElementById('body');
-        el.style.height = window.innerHeight + 'px';
+        el.style.height = window.innerHeight - offset + 'px';
         el.style.cssText += 'transition: background-color ease 1s;';
+        nextTick(() => {
+            if (el.scrollWidth < window.innerWidth && offset < 5) {
+                resizeBody(offset + 1)
+            }
+        })
     }
 
     onMounted(() => {
