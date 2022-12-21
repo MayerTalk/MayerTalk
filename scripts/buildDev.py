@@ -1,3 +1,8 @@
+"""
+生成dev版本
+(https://dev.mayertalk.top/)
+"""
+
 import os
 import re
 import sys
@@ -24,12 +29,17 @@ def get_files(path: str) -> str:
     return res
 
 
+now = int(time.time())
+now4 = now - (now + 8 * 3600) % 86400 + 4 * 3600
+
 if '-t' in sys.argv:
     expire = int(sys.argv[sys.argv.index('-t') + 1])
 elif '-d' in sys.argv:
     expire = int(sys.argv[sys.argv.index('-d') + 1]) * 86400
 else:
     expire = 7 * 86400
+
+expire += now if '-n' in sys.argv else now4
 
 version = hashlib.sha256(get_files(join('src')).encode('utf-8')).hexdigest()[:8]
 
@@ -39,7 +49,8 @@ else:
     message = ''
 
 info = {
-    'expire': int(time.time()) + expire,
+    'expire': expire,
+    'expireString': time.strftime('%Y-%m-%d %H:%M', time.localtime(expire)),
     'message': message,
     'version': version
 }
