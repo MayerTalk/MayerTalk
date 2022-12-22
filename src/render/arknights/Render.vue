@@ -1005,9 +1005,6 @@
                                 </div>
                                 <el-popover v-if="modelMsgGateway" :virtual-ref="modelMsgGateway" popper-style="width:auto" placement="top-start" title="选择模板信息" trigger="click">
                                     <!-- FIX:即使是virtual-ref的el-popover #reference内也要有节点 否则warning-->
-                                    <template #reference>
-                                        <span></span>
-                                    </template>
                                     <el-card class="model-msg-list">
                                         <span v-for="modelMsg in modelMsgList" @click="_addDialogue(renderModelMsg(modelMsg), '')">
                                             {{ renderModelMsg(modelMsg) }}
