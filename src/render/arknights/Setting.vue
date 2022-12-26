@@ -16,6 +16,9 @@
     const config = inject('config');
     const dialogWidth = inject('dialogWidth');
 
+    // 显示角色名片
+    const showAvatarName = inject('showAvatarName');
+
     function sync() {
         for (let key in defaultSettings) {
             if (defaultSettings.hasOwnProperty(key)) {
@@ -69,6 +72,17 @@
                         <el-select v-model="language" style="">
                             <el-option key="zh-cn" value="zh-cn"/>
                         </el-select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>显示角色名片</th>
+                    <td>
+                        <el-switch
+                                v-model="showAvatarName"
+                                active-text="是"
+                                inactive-text="否"
+                                style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff">
+                        </el-switch>
                     </td>
                 </tr>
             </table>
@@ -131,5 +145,9 @@
         flex-grow: 1;
         height: 0;
         border-top: lightgrey solid 1px;
+    }
+
+    th {
+        text-align: right;
     }
 </style>

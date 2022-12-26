@@ -172,8 +172,12 @@
     height: 35px;
 }
 
+.char-bar .el-scrollbar {
+    flex-grow: 1;
+}
+
 .edit {
-    position: absolute;
+    /*position: absolute;*/
     margin: 0;
     right: 0;
     align-self: center;
@@ -226,6 +230,7 @@
     flex-flow: column;
     color: #707070;
     transition: color cubic-bezier(0.3, 0, 0.5, 1) 0.2s;
+    cursor: pointer;
 }
 
 .moretype-bar .block:hover {

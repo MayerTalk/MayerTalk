@@ -6,6 +6,10 @@ pre {
     white-space: pre-wrap;
 }
 
+.dialogue-container {
+    position: relative;
+}
+
 .avatar {
     position: relative;
     flex-shrink: 0;
@@ -17,11 +21,29 @@ pre {
     height: 100%;
 }
 
+.avatar-name {
+    position: absolute;
+    color: var(--dialogue-color);
+    font-size: small;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: auto;
+    white-space: nowrap;
+}
+.avatar-name.left {
+    left: 78px;
+}
+
+.avatar-name.right {
+    right: 78px;
+}
+
 .box {
     flex-grow: 1;
     padding: 8px;
     position: relative;
     align-self: flex-start;
+    margin-top: var(--show-avatar-name);
 }
 
 .monologue-box {
@@ -32,6 +54,7 @@ pre {
 
 .image-box {
     position: relative;
+    margin-top: var(--show-avatar-name);
     padding: 7px;
     background: var(--dialogue-background);
     border: var(--dialogue-border-color) solid 1px;
@@ -43,6 +66,10 @@ pre {
 }
 
 .dialogue-box {
+    flex-grow: 1;
+    padding: 8px;
+    /*font-size: var(--font-size);*/
+    position: relative;
     background: var(--dialogue-background);
     border: var(--dialogue-border-color) solid 1px;
     color: var(--dialogue-color);

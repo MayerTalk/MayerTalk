@@ -5,15 +5,22 @@
     const images = inject('images');
     const staticUrl = inject('staticUrl');
 
+
     const props = defineProps({
         modelValue: null,
         narration: Boolean,
+        select: null,
         placeholder: {
             type: String,
             default: '角色'
         }
     });
-    const emit = defineEmits(['update:modelValue', 'onMounted']);
+    const emit = defineEmits([
+        'update:modelValue',
+        'update:select',
+        'onMounted',
+        'showGuide',
+    ]);
 
     const select = ref(null);
 
@@ -27,17 +34,16 @@
     });
 
     onMounted(() => {
-        // const input = ref(null)
-        // @onMounted="(r) => {input = r}"
-        emit('onMounted', select.value)
+        emit("update:select", select.value);
     });
+
 </script>
 
 <template>
     <el-select
             v-model="modelValue"
             ref="select"
-            style="flex-grow: 1"
+            style="flex-grow: 1;width: 100%"
             :placeholder="props.placeholder"
             filterable>
         <el-option
