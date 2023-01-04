@@ -146,8 +146,4 @@
         height: 0;
         border-top: lightgrey solid 1px;
     }
-
-    th {
-        text-align: right;
-    }
 </style>
