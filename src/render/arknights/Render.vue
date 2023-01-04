@@ -122,11 +122,11 @@
         // REFA: 应都重构至用这个方法
 
         chats.value.push({
-                char: (typeof char === "string") ? char : currChar.value,
-                content: content || "",
-                type: type || "chat",
-                id: id || uuid()
-            });
+            char: (typeof char === "string") ? char : currChar.value,
+            content: content || "",
+            type: type || "chat",
+            id: id || uuid()
+        });
         nextTick(() => {
             resizeScroll();
             scroll.value.setScrollTop(MAX_SCROLL_TOP)
@@ -243,7 +243,9 @@
     watch(atWho, () => {
         // 被@角色刷入文本框
         let textareaDom = document.querySelector("#textarea");
-        if (!atWho.value) { return }
+        if (!atWho.value) {
+            return
+        }
         textarea.value = textareaDom.value.substring(0, insertAt)
             + chars.value[atWho.value].name
             + " "
@@ -260,6 +262,7 @@
             nextTick(focusOnSelect);
         }
     }
+
     function processInput(e) {
         // 处理键入@事件
         let textareaDom = document.querySelector("#textarea");
@@ -286,7 +289,7 @@
             chats.value[chats.value.length - 2].char &&
             chats.value[chats.value.length - 2].content === chats.value[chats.value.length - 1].content
         ) plus1.value = chats.value.length - 1;
-    }, { deep: true });
+    }, {deep: true});
     watch(plus1, () => {
         // 因为输入在Dialogue外，Dialogue内拿不到chats所以传回这里添加信息
         if (plus1.value == -1)
@@ -851,12 +854,12 @@
 
                 </el-dialog>
                 <el-dialog v-model="ifAt" :width="dialogWidth"
-                    title="想用@提到哪个角色?"
-                    :modal="false"
-                    destroy-on-close
-                    draggable>
-                        <CharSelector v-model:select="atWhoSelRef"
-                        @update:modelValue="(value) => {atWho = value;}"/>
+                           title="想用@提到哪个角色?"
+                           :modal="false"
+                           destroy-on-close
+                           draggable>
+                    <CharSelector v-model:select="atWhoSelRef"
+                                  @update:modelValue="(value) => {atWho = value;}"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
                            :show-close="false">
@@ -936,7 +939,8 @@
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
-                                      :data="chats[index]" :index="index" :key="dialogue.id" style="position:relative"></Dialogue>
+                                      :data="chats[index]" :index="index" :key="dialogue.id"
+                                      style="position:relative"></Dialogue>
                         </div>
                         <div id="operateBar" class="operateBar" :style="{width: windowWidth + 'px'}">
                             <div class="button-bar">
@@ -1000,6 +1004,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
+                                            <img :src="images[char.avatar] || staticUrl + char.avatar">
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">
