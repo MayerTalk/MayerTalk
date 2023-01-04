@@ -74,17 +74,6 @@
                         </el-select>
                     </td>
                 </tr>
-                <tr>
-                    <th>显示角色名片</th>
-                    <td>
-                        <el-switch
-                                v-model="showAvatarName"
-                                active-text="是"
-                                inactive-text="否"
-                                style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff">
-                        </el-switch>
-                    </td>
-                </tr>
             </table>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
@@ -113,6 +102,15 @@
                         <el-input v-model="fake.scale" :clearable="true"
                                   :placeholder="'' + defaultSettings.scale"
                                   @input="settings.scale=+fake.scale"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>显示角色名</th>
+                    <td>
+                        <el-switch
+                                v-model="showAvatarName"
+                                style="--el-switch-on-color: #79bbffZ;">
+                        </el-switch>
                     </td>
                 </tr>
             </table>
