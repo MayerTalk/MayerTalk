@@ -109,7 +109,7 @@
                     <td>
                         <el-switch
                                 v-model="showAvatarName"
-                                style="--el-switch-on-color: #79bbffZ;">
+                                style="--el-switch-on-color: #79bbff;">
                         </el-switch>
                     </td>
                 </tr>
