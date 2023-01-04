@@ -235,18 +235,6 @@
         );
     });
 
-    // 模板消息
-    function renderModelMsg(modelMsg) {
-        let name = (chars.value[currChar.value] || {name:"<角色名>"}).name;
-        // 在此增加局部可见的参数
-
-        return eval("`"+modelMsg+"`");
-    }
-    const modelMsgList = ref([
-        "“${name}”撤回了一条消息",
-    ]);
-    const modelMsgGateway = ref(null);
-
     // @列表处理
     const ifAt = ref(false);
     const atWho = ref({});
@@ -1005,22 +993,6 @@
                                     </svg>
                                     标题
                                 </div>
-                                <div v-if="currChar" ref="modelMsgGateway" class="block">
-                                    <svg style="width:35px;height:35px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill="#606060" d="M868.119273 190.836364H344.482909V128h516.654546a69.818182 69.818182 0 0 1 69.818181 69.818182v474.763636h-62.836363V190.836364z"></path>
-                                        <path fill="#606060" d="M155.927273 316.509091h586.472727v460.8h-247.435636l-62.836364 62.836364h310.272a62.836364 62.836364 0 0 0 62.836364-62.836364V316.509091a62.836364 62.836364 0 0 0-62.836364-62.836364H155.927273A62.836364 62.836364 0 0 0 93.090909 316.509091v460.8c0 34.676364 28.113455 62.836364 62.836364 62.836364h157.742545l62.836364-62.836364H155.927273V316.509091z"></path>
-                                        <path fill="#606060" d="M343.505455 923.927273H442.181818l94.487273-94.487273-49.384727-49.338182-143.825455 143.825455z"></path>
-                                    </svg>
-                                    模板消息
-                                </div>
-                                <el-popover v-if="modelMsgGateway" :virtual-ref="modelMsgGateway" popper-style="width:auto" placement="top-start" title="选择模板信息" trigger="click">
-                                    <!-- FIX:即使是virtual-ref的el-popover #reference内也要有节点 否则warning-->
-                                    <el-card class="model-msg-list">
-                                        <span v-for="modelMsg in modelMsgList" @click="_addDialogue(renderModelMsg(modelMsg), '')">
-                                            {{ renderModelMsg(modelMsg) }}
-                                        </span>
-                                    </el-card>
-                                </el-popover>
                             </div>
                             <div class="char-bar">
                                 <el-scrollbar>
@@ -1028,9 +1000,6 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <el-tooltip :content="char.name || ''" placement="top">
-                                                <img :src="images[char.avatar] || staticUrl + char.avatar">
-                                            </el-tooltip>
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">
@@ -1074,12 +1043,3 @@
 
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
-<style>
-/* 设置模板消息弹窗部分的样式 */
-.el-card {
-    --el-card-padding: 10px;
-}
-.model-msg-list span {
-    cursor: pointer;
-}
-</style>
