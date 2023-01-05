@@ -30,9 +30,6 @@
         }
     });
 
-    // 显示角色名片
-    const showAvatarName = inject("showAvatarName");
-
     function resizeImage() {
         if (data.value.type === 'image') {
             id.value = uuid();
@@ -82,7 +79,7 @@
                         <div class="line"></div>
                     </div>
                 </template>
-                <span v-if="showAvatarName" :class="['avatar-name', right? 'right':'left']">
+                <span v-if="renderSettings.showCharName" :class="['avatar-name', right? 'right':'left']">
                     {{fetchName()}}
                 </span>
 

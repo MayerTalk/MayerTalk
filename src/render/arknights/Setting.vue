@@ -6,7 +6,8 @@
         background: '#303030',
         width: 400,
         style: 'default',
-        scale: 1.5
+        scale: 1.5,
+        showCharName: false
     };
 
     const DataControl = inject('DataControl');
@@ -15,9 +16,6 @@
     const renderSettings = inject('renderSettings');
     const config = inject('config');
     const dialogWidth = inject('dialogWidth');
-
-    // 显示角色名片
-    const showAvatarName = inject('showAvatarName');
 
     function sync() {
         for (let key in defaultSettings) {
@@ -108,7 +106,7 @@
                     <th>显示角色名</th>
                     <td>
                         <el-switch
-                                v-model="showAvatarName"
+                                v-model="settings.showCharName"
                                 style="--el-switch-on-color: #79bbff;">
                         </el-switch>
                     </td>
