@@ -172,11 +172,8 @@
     height: 35px;
 }
 
-.char-bar .el-scrollbar {
-    flex-grow: 1;
-}
-
 .edit {
+    position: absolute;
     margin: 0;
     right: 0;
     align-self: center;
