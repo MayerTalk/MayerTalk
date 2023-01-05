@@ -852,6 +852,7 @@
                            destroy-on-close
                            draggable>
                     <CharSelector v-model:select="atWhoSelRef"
+                                  style="width: 100%"
                                   @update:modelValue="(value) => {atWho = value;}"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
