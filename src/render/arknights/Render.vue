@@ -226,13 +226,6 @@
     const showToolBar = ref(false);
     const toolBarMask = ref(true);
 
-    // 显示角色名片
-    watch(() => {return renderSettings.value.showCharName}, () => {
-        document.documentElement.style.setProperty('--show-avatar-name',
-            renderSettings.value.showCharName ? "1.5em" : "0"
-        );
-    });
-
     // @列表处理
     const ifAt = ref(false);
     const atWho = ref({});

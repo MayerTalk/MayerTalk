@@ -10,7 +10,3 @@
 #body > div.el-scrollbar > div.el-scrollbar__wrap.el-scrollbar__wrap--hidden-default {
     transition: height ease 0.3s;
 }
-
-:root {
-    --show-avatar-name: 1.5em;
-}
