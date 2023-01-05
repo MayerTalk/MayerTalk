@@ -77,7 +77,7 @@
                         </div>
                     </div>
                     <div v-if="data.type==='image'" style="flex-grow: 1">
-                        <div class="charName">{{char.name}}</div>
+                        <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>
                         <div class="box image-box" style="justify-self: flex-start">
                             <div v-if="data.char" :class="[right? 'right':'left']">
                                 <div class="tail">
@@ -90,7 +90,7 @@
                     </div>
                     <template v-else-if="data.type==='chat'">
                         <div v-if="data.char" style="flex-grow: 1">
-                            <div class="charName">{{char.name}}</div>
+                            <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>
                             <div class="box dialogue-box">
                                 <div :class="[right? 'right':'left']">
                                     <div class="tail">
@@ -107,7 +107,7 @@
                     </template>
                     <template v-else-if="data.type==='monologue'">
                         <div v-if="data.char" style="flex-grow: 1">
-                            <div class="charName">{{char.name}}</div>
+                            <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>
                             <div class="box monologue-box">
                                 <pre>{{data.content}}</pre>
                             </div>
