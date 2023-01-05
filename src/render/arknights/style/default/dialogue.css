@@ -62,10 +62,6 @@ pre {
 }
 
 .dialogue-box {
-    flex-grow: 1;
-    padding: 8px;
-    /*font-size: var(--font-size);*/
-    position: relative;
     background: var(--dialogue-background);
     border: var(--dialogue-border-color) solid 1px;
     color: var(--dialogue-color);
