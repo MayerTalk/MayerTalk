@@ -154,8 +154,10 @@
                     </div>
                 </template>
             </div>
+            <div v-if="plus1 === index" class="plus1" @click="requestPlus1">
+                <p>+1</p>
+            </div>
         </div>
-        <div v-if="plus1 === index" class="plus1" @click="requestPlus1">+1</div>
     </div>
 </template>
 
@@ -177,14 +179,23 @@
 
     .plus1 {
         color: rgb(13, 121, 240);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: absolute;
-        top: 50%;
-        right: -3em;
+        top: 20px;
+        right: -40px;
         border: 2px solid rgb(13, 121, 240);
+        border-radius: 50%;
         background: white;
-        border-radius: 1.8em;
-        width: 1.6em;
-        height: 1.6em;
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
         cursor: pointer;
+    }
+
+    .plus1 p {
+        display: inline;
+        padding-bottom: 1px;
     }
 </style>
