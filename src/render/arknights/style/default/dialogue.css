@@ -6,10 +6,6 @@ pre {
     white-space: pre-wrap;
 }
 
-.dialogue-container {
-    position: relative;
-}
-
 .avatar {
     position: relative;
     flex-shrink: 0;
