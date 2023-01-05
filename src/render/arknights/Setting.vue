@@ -116,19 +116,11 @@
     </el-dialog>
 </template>
 
-<style>
-    #settings .select-trigger {
-        display: flex;
-        justify-self: flex-end;
-    }
-</style>
-
 <style scoped>
     table {
         padding-left: 10px;
         border-spacing: 5px;
     }
-
 
     .line-left {
         margin-right: 10px;

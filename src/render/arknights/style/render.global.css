@@ -3,7 +3,7 @@
     padding-bottom: 20px;
 }
 
-.avatar-uploader .el-upload-dragger,.image-uploader .el-upload-dragger {
+.avatar-uploader .el-upload-dragger, .image-uploader .el-upload-dragger {
     padding: 0;
 }
 

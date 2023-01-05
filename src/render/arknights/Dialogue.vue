@@ -100,7 +100,6 @@
                                 <pre>{{data.content}}</pre>
                             </div>
                         </div>
-
                         <div v-else style="color: #CCCCCC" class="box">
                             <pre>{{data.content}}</pre>
                         </div>
