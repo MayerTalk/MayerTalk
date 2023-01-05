@@ -481,10 +481,12 @@
         return false
     }
 
-    function selectAvatar(src) {
-        newChar.value.avatar = src[1];
-        newChar.value.name = src[2];
-        ifShowSelectAvatar.value = false;
+    function selectAvatar(avatar) {
+        if (images.value.hasOwnProperty(newChar.value.avatar)) {
+            delete images.value[newChar.value.avatar]
+        }
+        newChar.value.avatar = avatar[1];
+        ifShowSelectAvatar.value = false
     }
 
     function editChar() {
@@ -746,8 +748,8 @@
                             </el-upload>
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px"
-                                          @keypress.enter="createChar && editChar()" clearable></el-input>
+                                <el-input v-model="newChar.name" style="margin-top: 10px" :placeholder="defaultName"
+                                          @keypress.enter="createChar && editChar()"></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
                                     <el-switch
