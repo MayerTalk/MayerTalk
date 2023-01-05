@@ -6,7 +6,8 @@
         background: '#303030',
         width: 400,
         style: 'default',
-        scale: 1.5
+        scale: 1.5,
+        showCharName: false
     };
 
     const DataControl = inject('DataControl');
@@ -15,9 +16,6 @@
     const renderSettings = inject('renderSettings');
     const config = inject('config');
     const dialogWidth = inject('dialogWidth');
-
-    // 显示角色名片
-    const showAvatarName = inject('showAvatarName');
 
     function sync() {
         for (let key in defaultSettings) {
@@ -74,17 +72,6 @@
                         </el-select>
                     </td>
                 </tr>
-                <tr>
-                    <th>显示角色名片</th>
-                    <td>
-                        <el-switch
-                                v-model="showAvatarName"
-                                active-text="是"
-                                inactive-text="否"
-                                style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff">
-                        </el-switch>
-                    </td>
-                </tr>
             </table>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
@@ -115,24 +102,25 @@
                                   @input="settings.scale=+fake.scale"/>
                     </td>
                 </tr>
+                <tr>
+                    <th>显示角色名</th>
+                    <td>
+                        <el-switch
+                                v-model="settings.showCharName"
+                                style="--el-switch-on-color: #79bbff;">
+                        </el-switch>
+                    </td>
+                </tr>
             </table>
         </div>
     </el-dialog>
 </template>
-
-<style>
-    #settings .select-trigger {
-        display: flex;
-        justify-self: flex-end;
-    }
-</style>
 
 <style scoped>
     table {
         padding-left: 10px;
         border-spacing: 5px;
     }
-
 
     .line-left {
         margin-right: 10px;
@@ -145,9 +133,5 @@
         flex-grow: 1;
         height: 0;
         border-top: lightgrey solid 1px;
-    }
-
-    th {
-        text-align: right;
     }
 </style>

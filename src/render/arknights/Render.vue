@@ -122,11 +122,11 @@
         // REFA: 应都重构至用这个方法
 
         chats.value.push({
-                char: (typeof char === "string") ? char : currChar.value,
-                content: content || "",
-                type: type || "chat",
-                id: id || uuid()
-            });
+            char: (typeof char === "string") ? char : currChar.value,
+            content: content || "",
+            type: type || "chat",
+            id: id || uuid()
+        });
         nextTick(() => {
             resizeScroll();
             scroll.value.setScrollTop(MAX_SCROLL_TOP)
@@ -226,27 +226,6 @@
     const showToolBar = ref(false);
     const toolBarMask = ref(true);
 
-    // 显示角色名片
-    const showAvatarName = ref(true);
-    provide('showAvatarName', showAvatarName);
-    watch(showAvatarName, () => {
-        document.documentElement.style.setProperty('--show-avatar-name',
-            showAvatarName.value ? "1.5em" : "0"
-        );
-    });
-
-    // 模板消息
-    function renderModelMsg(modelMsg) {
-        let name = (chars.value[currChar.value] || {name:"<角色名>"}).name;
-        // 在此增加局部可见的参数
-
-        return eval("`"+modelMsg+"`");
-    }
-    const modelMsgList = ref([
-        "“${name}”撤回了一条消息",
-    ]);
-    const modelMsgGateway = ref(null);
-
     // @列表处理
     const ifAt = ref(false);
     const atWho = ref({});
@@ -255,7 +234,9 @@
     watch(atWho, () => {
         // 被@角色刷入文本框
         let textareaDom = document.querySelector("#textarea");
-        if (!atWho.value) { return }
+        if (!atWho.value) {
+            return
+        }
         textarea.value = textareaDom.value.substring(0, insertAt)
             + chars.value[atWho.value].name
             + " "
@@ -272,6 +253,7 @@
             nextTick(focusOnSelect);
         }
     }
+
     function processInput(e) {
         // 处理键入@事件
         let textareaDom = document.querySelector("#textarea");
@@ -298,7 +280,7 @@
             chats.value[chats.value.length - 2].char &&
             chats.value[chats.value.length - 2].content === chats.value[chats.value.length - 1].content
         ) plus1.value = chats.value.length - 1;
-    }, { deep: true });
+    }, {deep: true});
     watch(plus1, () => {
         // 因为输入在Dialogue外，Dialogue内拿不到chats所以传回这里添加信息
         if (plus1.value == -1)
@@ -492,10 +474,12 @@
         return false
     }
 
-    function selectAvatar(src) {
-        newChar.value.avatar = src[1];
-        newChar.value.name = src[2];
-        ifShowSelectAvatar.value = false;
+    function selectAvatar(avatar) {
+        if (images.value.hasOwnProperty(newChar.value.avatar)) {
+            delete images.value[newChar.value.avatar]
+        }
+        newChar.value.avatar = avatar[1];
+        ifShowSelectAvatar.value = false
     }
 
     function editChar() {
@@ -757,8 +741,8 @@
                             </el-upload>
                             <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                                 名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px"
-                                          @keypress.enter="createChar && editChar()" clearable></el-input>
+                                <el-input v-model="newChar.name" style="margin-top: 10px" :placeholder="defaultName"
+                                          @keypress.enter="createChar && editChar()"></el-input>
                                 <div style="margin-top: 5px">
                                     头像位置
                                     <el-switch
@@ -863,12 +847,12 @@
 
                 </el-dialog>
                 <el-dialog v-model="ifAt" :width="dialogWidth"
-                    title="想用@提到哪个角色?"
-                    :modal="false"
-                    destroy-on-close
-                    draggable>
-                        <CharSelector v-model:select="atWhoSelRef"
-                        @update:modelValue="(value) => {atWho = value;}"/>
+                           title="想用@提到哪个角色?"
+                           :modal="false"
+                           destroy-on-close
+                           draggable>
+                    <CharSelector v-model:select="atWhoSelRef"
+                                  @update:modelValue="(value) => {atWho = value;}"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
                            :show-close="false">
@@ -948,7 +932,8 @@
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
-                                      :data="chats[index]" :index="index" :key="dialogue.id" style="position:relative"></Dialogue>
+                                      :data="chats[index]" :index="index" :key="dialogue.id"
+                                      style="position:relative"></Dialogue>
                         </div>
                         <div id="operateBar" class="operateBar" :style="{width: windowWidth + 'px'}">
                             <div class="button-bar">
@@ -1005,22 +990,6 @@
                                     </svg>
                                     标题
                                 </div>
-                                <div v-if="currChar" ref="modelMsgGateway" class="block">
-                                    <svg style="width:35px;height:35px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill="#606060" d="M868.119273 190.836364H344.482909V128h516.654546a69.818182 69.818182 0 0 1 69.818181 69.818182v474.763636h-62.836363V190.836364z"></path>
-                                        <path fill="#606060" d="M155.927273 316.509091h586.472727v460.8h-247.435636l-62.836364 62.836364h310.272a62.836364 62.836364 0 0 0 62.836364-62.836364V316.509091a62.836364 62.836364 0 0 0-62.836364-62.836364H155.927273A62.836364 62.836364 0 0 0 93.090909 316.509091v460.8c0 34.676364 28.113455 62.836364 62.836364 62.836364h157.742545l62.836364-62.836364H155.927273V316.509091z"></path>
-                                        <path fill="#606060" d="M343.505455 923.927273H442.181818l94.487273-94.487273-49.384727-49.338182-143.825455 143.825455z"></path>
-                                    </svg>
-                                    模板消息
-                                </div>
-                                <el-popover v-if="modelMsgGateway" :virtual-ref="modelMsgGateway" popper-style="width:auto" placement="top-start" title="选择模板信息" trigger="click">
-                                    <!-- FIX:即使是virtual-ref的el-popover #reference内也要有节点 否则warning-->
-                                    <el-card class="model-msg-list">
-                                        <span v-for="modelMsg in modelMsgList" @click="_addDialogue(renderModelMsg(modelMsg), '')">
-                                            {{ renderModelMsg(modelMsg) }}
-                                        </span>
-                                    </el-card>
-                                </el-popover>
                             </div>
                             <div class="char-bar">
                                 <el-scrollbar>
@@ -1028,9 +997,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <el-tooltip :content="char.name || ''" placement="top">
-                                                <img :src="images[char.avatar] || staticUrl + char.avatar">
-                                            </el-tooltip>
+                                            <img :src="images[char.avatar] || staticUrl + char.avatar">
                                         </div>
                                         <div class="option" style="background: #686868; position:relative;"
                                              @click="showEditChar(true)">
@@ -1048,7 +1015,7 @@
                                 <div class="option edit">
                                     <div v-if="currChar" style="width: 40px; height: 40px"
                                          @click="showEditChar(false)">
-                                        <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3. org/2000/svg"
+                                        <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                              data-v-029747aa="">
                                             <path fill="#606060"
                                                   d="M600.704 64a32 32 0 0 1 30.464 22.208l35.2 109.376c14.784 7.232 28.928 15.36 42.432 24.512l112.384-24.192a32 32 0 0 1 34.432 15.36L944.32 364.8a32 32 0 0 1-4.032 37.504l-77.12 85.12a357.12 357.12 0 0 1 0 49.024l77.12 85.248a32 32 0 0 1 4.032 37.504l-88.704 153.6a32 32 0 0 1-34.432 15.296L708.8 803.904c-13.44 9.088-27.648 17.28-42.368 24.512l-35.264 109.376A32 32 0 0 1 600.704 960H423.296a32 32 0 0 1-30.464-22.208L357.696 828.48a351.616 351.616 0 0 1-42.56-24.64l-112.32 24.256a32 32 0 0 1-34.432-15.36L79.68 659.2a32 32 0 0 1 4.032-37.504l77.12-85.248a357.12 357.12 0 0 1 0-48.896l-77.12-85.248A32 32 0 0 1 79.68 364.8l88.704-153.6a32 32 0 0 1 34.432-15.296l112.32 24.256c13.568-9.152 27.776-17.408 42.56-24.64l35.2-109.312A32 32 0 0 1 423.232 64H600.64zm-23.424 64H446.72l-36.352 113.088-24.512 11.968a294.113 294.113 0 0 0-34.816 20.096l-22.656 15.36-116.224-25.088-65.28 113.152 79.68 88.192-1.92 27.136a293.12 293.12 0 0 0 0 40.192l1.92 27.136-79.808 88.192 65.344 113.152 116.224-25.024 22.656 15.296a294.113 294.113 0 0 0 34.816 20.096l24.512 11.968L446.72 896h130.688l36.48-113.152 24.448-11.904a288.282 288.282 0 0 0 34.752-20.096l22.592-15.296 116.288 25.024 65.28-113.152-79.744-88.192 1.92-27.136a293.12 293.12 0 0 0 0-40.256l-1.92-27.136 79.808-88.128-65.344-113.152-116.288 24.96-22.592-15.232a287.616 287.616 0 0 0-34.752-20.096l-24.448-11.904L577.344 128zM512 320a192 192 0 1 1 0 384 192 192 0 0 1 0-384zm0 64a128 128 0 1 0 0 256 128 128 0 0 0 0-256z"></path>
@@ -1074,12 +1041,3 @@
 
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
-<style>
-/* 设置模板消息弹窗部分的样式 */
-.el-card {
-    --el-card-padding: 10px;
-}
-.model-msg-list span {
-    cursor: pointer;
-}
-</style>
