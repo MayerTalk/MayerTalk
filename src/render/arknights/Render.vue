@@ -355,20 +355,30 @@
         tipControl.loop();
     });
 
+    function createDialogue(data, locate = true) {
+        chats.value.push({
+            content: data.content,
+            type: data.type,
+            char: data.char || currChar.value,
+            id: data.id || uuid()
+        });
+        DataControl.save('chats');
+        nextTick(() => {
+            resizeScroll();
+            if (locate) {
+                scroll.value.setScrollTop(MAX_SCROLL_TOP)
+            }
+        });
+
+    }
+
     function createTextDialogue(type) {
         if (textarea.value) {
-            chats.value.push({
-                char: currChar.value,
+            createDialogue({
                 content: textarea.value,
                 type: type,
-                id: uuid()
             });
             textarea.value = '';
-            DataControl.save('chats');
-            nextTick(() => {
-                resizeScroll();
-                scroll.value.setScrollTop(MAX_SCROLL_TOP)
-            });
         } else {
             message.notify('请在输入框内输入文本', message.info);
             tipControl.setTmpTip('请在此输入文本')
@@ -380,16 +390,11 @@
             if (b64) {
                 const imageId = uuid();
                 images.value[imageId] = b64;
-                chats.value.push({
-                    char: currChar.value,
+                DataControl.update('image');
+                createDialogue({
                     content: imageId,
                     type: 'image',
-                    id: uuid(),
                 });
-                DataControl.save(['chats', 'images']);
-                nextTick(() => {
-                    scroll.value.setScrollTop(MAX_SCROLL_TOP)
-                })
             }
         });
         return false
@@ -643,17 +648,10 @@
 
     function createOptionDialogue() {
         ifShowCreateOption.value = false;
-        chats.value.push({
-            char: currChar.value,
+        createDialogue({
             content: copy(options.value),
-            id: uuid(),
             type: 'option'
-        });
-        DataControl.save('chats');
-        nextTick(() => {
-            resizeScroll();
-            scroll.value.setScrollTop(MAX_SCROLL_TOP);
-        });
+        })
     }
 </script>
 

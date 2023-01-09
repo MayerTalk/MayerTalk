@@ -56,7 +56,8 @@
     <div :class="renderSettings.style">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)"
-                 :style="{justifyContent:(right?'flex-end':'flex-start')}">
+                 :style="{justifyContent:(right?'flex-end':'flex-start')}"
+                 :id="data.id">
                 <div v-if="data.type==='title'" style="flex-grow: 1">
                     <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
                          class="charName">{{char.name}}
