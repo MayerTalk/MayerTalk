@@ -1,6 +1,8 @@
 <script setup>
     import {ref, inject, watch, computed} from 'vue'
     import Renders from '@/render'
+    import message from '@/lib/message'
+    import {ensure} from '@/lib/tool';
 
     import {TypeDict} from "@/constance";
 
@@ -69,10 +71,31 @@
         settings.value.showCharNameSettings[type] = value
     }
 
+    const size = ref(0);
+    for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+            size.value += localStorage.getItem(key).length
+        }
+    }
+    const SizeUnit = ['B', 'KB', 'MB'];
+    let unit = SizeUnit[0];
+    for (let i = 1; size.value > 1024; i++) {
+        size.value /= 1024;
+        unit = SizeUnit[1]
+    }
+    size.value = size.value.toFixed(2) + unit;
+
+    function clearStorage() {
+        localStorage.clear();
+        message.notify('清空成功，正在重载', message.success);
+        setTimeout(() => {
+            location.reload()
+        }, 500)
+    }
+
     // 同步，否则加载延迟+++
     sync();
     watch(settings, () => sync(), {deep: true});
-    ;
 </script>
 
 <template>
@@ -143,6 +166,20 @@
                                 <Operation/>
                             </el-icon>
                         </div>
+                    </td>
+                </tr>
+            </table>
+            <div style="display: flex; align-items: center">
+                <div class="line-left" style="width: 20px;"></div>
+                <h2 style="margin: 10px 0">储存</h2>
+                <div class="line-right"></div>
+            </div>
+            <table>
+                <tr>
+                    <th>本地</th>
+                    <td>{{size}}</td>
+                    <td>
+                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、设置）')">清空</el-button>
                     </td>
                 </tr>
             </table>

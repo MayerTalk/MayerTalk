@@ -90,10 +90,14 @@ function image2square(image) {
     return canvas.toDataURL()
 }
 
-function ensureClose(done) {
-    message.confirm('是否退出编辑', '提示', () => {
+function ensure(done, text) {
+    message.confirm(text, '提示', () => {
         done()
     })
+}
+
+function ensureClose(done) {
+    ensure(done, '是否退出编辑')
 }
 
 function clickBySelector(selector) {
@@ -110,6 +114,7 @@ export {
     blob2url,
     blob2base64,
     image2square,
+    ensure,
     ensureClose,
     clickBySelector
 }
