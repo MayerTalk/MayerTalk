@@ -71,19 +71,22 @@
         settings.value.showCharNameSettings[type] = value
     }
 
-    const size = ref(0);
-    for (let key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
-            size.value += localStorage.getItem(key).length
-        }
-    }
     const SizeUnit = ['B', 'KB', 'MB'];
-    let unit = SizeUnit[0];
-    for (let i = 1; size.value > 1024; i++) {
-        size.value /= 1024;
-        unit = SizeUnit[1]
+    
+    function getStorageSize() {
+        let size = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                size += localStorage.getItem(key).length
+            }
+        }
+        let unit = SizeUnit[0];
+        for (let i = 1; size > 1024; i++) {
+            size /= 1024;
+            unit = SizeUnit[1]
+        }
+        return size.toFixed(2) + unit;
     }
-    size.value = size.value.toFixed(2) + unit;
 
     function clearStorage() {
         localStorage.clear();
@@ -177,7 +180,7 @@
             <table>
                 <tr>
                     <th>本地</th>
-                    <td>{{size}}</td>
+                    <td>{{getStorageSize()}}</td>
                     <td>
                         <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、设置）')">清空</el-button>
                     </td>
