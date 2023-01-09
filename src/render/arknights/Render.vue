@@ -25,17 +25,23 @@
 
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
-        if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
-            if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
-                const index = (+event.key || 10) - 1;
-                const list = Object.entries(chars.value);
-                if (index < list.length) {
-                    setCurr(list[index][0])
-                } else {
+        if (event.ctrlKey) {
+            if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
+                if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
+                    const index = (+event.key || 10) - 1;
+                    const list = Object.entries(chars.value);
+                    if (index < list.length) {
+                        setCurr(list[index][0])
+                    } else {
+                        createChar.value = true;
+                        ifShowEditChar.value = true;
+                    }
+                    event.preventDefault()
+                } else if (event.code === 'KeyC') {
                     createChar.value = true;
                     ifShowEditChar.value = true;
+                    event.preventDefault()
                 }
-                event.preventDefault()
             }
         }
     }, {signal: controller.signal});
