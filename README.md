@@ -9,7 +9,7 @@
  ## 参考
  
  - [yuzutalk](https://www.yuzutalk.net/) 对话形式二创的启发
- - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现(2022.5.9)，不过在本项目启动时(2022.11.5)并不知晓，不可避免地撞车了（
+ - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现
  
  ## 与ClosureTalk的区别
  
@@ -36,8 +36,8 @@
  | 发送方式 | 点击 / ctrl + enter | 点击 / enter | 
  | 撤回 | ctrl + z | ctrl + z |
  | 重做 | ctrl + y | ctrl + y |
+ | 渲染设置 | ✅ | ✅ |
  | 多次撤回 | ✅ | ❌ |
- | 渲染设置 | ✅ | ❌ |
  
  ### 角色
  
