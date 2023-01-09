@@ -104,6 +104,16 @@ function clickBySelector(selector) {
     document.querySelector(selector).click()
 }
 
+function getDialogue(id) {
+    let selector = null;
+    if (id.search(/^\d/) === 0) {
+        selector = '#\\3' + id.slice(0, 1) + ' ' + id.slice(1);
+    } else {
+        selector = '#' + id
+    }
+    return document.querySelector(selector);
+}
+
 export {
     copy,
     uuid,
@@ -116,5 +126,6 @@ export {
     image2square,
     ensure,
     ensureClose,
-    clickBySelector
+    clickBySelector,
+    getDialogue
 }

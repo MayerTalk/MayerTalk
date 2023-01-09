@@ -52,12 +52,10 @@
 </script>
 
 <template>
-    <!--    <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>-->
-    <div :class="renderSettings.style">
+    <div :class="renderSettings.style" :id="data.id">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)"
-                 :style="{justifyContent:(right?'flex-end':'flex-start')}"
-                 :id="data.id">
+                 :style="{justifyContent:(right?'flex-end':'flex-start')}">
                 <div v-if="data.type==='title'" style="flex-grow: 1">
                     <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
                          class="charName">{{char.name}}

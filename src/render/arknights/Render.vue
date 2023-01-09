@@ -15,7 +15,8 @@
         blob2base64,
         image2square,
         ensureClose,
-        clickBySelector
+        clickBySelector,
+        getDialogue
     } from "@/lib/tool";
     import {
         TypeDict,
@@ -42,7 +43,6 @@
         controller.abort()
     });
 
-    const MAX_SCROLL_TOP = 10000;
     const editor = computed(() => {
         if (['char', 'monologue', 'image'].indexOf(currDialogueData.value.type) !== -1) {
             return false
@@ -98,27 +98,6 @@
             width.value.avatar = Math.ceil(w / max * 60) + 'px';
             width.value.fontsize = Math.ceil(w / max * 16) + 'px';
         }
-    }
-
-    function _addDialogue(content, char, type, id) {
-        // 通用的增加对话方法
-        // content(String): 对话内容，默认为空
-        // char(String): 发言角色id，默认为当前角色id
-        // type(String): 发言类型，默认为对话
-        // id(uuid): 发言id
-        // REFA: 应都重构至用这个方法
-
-        chats.value.push({
-            char: (typeof char === "string") ? char : currChar.value,
-            content: content || "",
-            type: type || "chat",
-            id: id || uuid()
-        });
-        nextTick(() => {
-            resizeScroll();
-            scroll.value.setScrollTop(MAX_SCROLL_TOP)
-        });
-        DataControl.save("chats");
     }
 
     onMounted(() => {
@@ -272,17 +251,10 @@
         // 因为输入在Dialogue外，Dialogue内拿不到chats所以传回这里添加信息
         if (plus1.value == -1)
             if (currChar.value) {
-                chats.value.push({
-                    char: currChar.value,
+                createDialogue({
                     content: chats.value[chats.value.length - 1].content,
                     type: 'chat',
-                    id: uuid()
                 });
-                nextTick(() => {
-                    resizeScroll();
-                    scroll.value.setScrollTop(MAX_SCROLL_TOP)
-                });
-                DataControl.save("chats");
             } else {
                 message.notify("必须选择一个角色才能复读", message.warning);
                 plus1.value = chats.value.length - 1;
@@ -355,21 +327,23 @@
         tipControl.loop();
     });
 
+
     function createDialogue(data, locate = true) {
-        chats.value.push({
+        data = {
             content: data.content,
             type: data.type,
             char: data.char || currChar.value,
             id: data.id || uuid()
-        });
+        };
+        chats.value.push(data);
         DataControl.save('chats');
         nextTick(() => {
             resizeScroll();
             if (locate) {
-                scroll.value.setScrollTop(MAX_SCROLL_TOP)
+                const el = getDialogue(data.id);
+                scroll.value.setScrollTop(el.offsetTop)
             }
         });
-
     }
 
     function createTextDialogue(type) {
