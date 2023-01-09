@@ -2,12 +2,19 @@
     import {ref, inject, watch, computed} from 'vue'
     import Renders from '@/render'
 
+    import {TypeDict} from "@/constance";
+
     const defaultSettings = {
         background: '#303030',
         width: 400,
         style: 'default',
         scale: 1.5,
-        showCharName: false
+        showCharName: false,
+        showCharNameSettings: {
+            chat: true,
+            monologue: true,
+            image: true
+        }
     };
 
     const DataControl = inject('DataControl');
@@ -17,34 +24,55 @@
     const config = inject('config');
     const dialogWidth = inject('dialogWidth');
 
-    function sync() {
-        for (let key in defaultSettings) {
-            if (defaultSettings.hasOwnProperty(key)) {
-                renderSettings.value[key] = settings.value[key] || defaultSettings[key]
+    function _sync(dst, src1, src2, k) {
+        for (let key in src1) {
+            if (src1.hasOwnProperty(key)) {
+                if (typeof src1[key] === 'object') {
+                    dst[key] = {};
+                    _sync(dst[key], src1[key], src2[key] || {}, key)
+                } else {
+                    dst[key] = src1[key]
+                }
+            }
+        }
+        for (let key in src2) {
+            if (src2.hasOwnProperty(key)) {
+                if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === "boolean")) {
+                    dst[key] = src2[key]
+                }
             }
         }
     }
 
-    function numProxy(obj) {
-        const r = ref(obj);
-        watch(r, () => {
-            obj.value = +r
-        });
-        return r
+    function sync() {
+        _sync(renderSettings.value, defaultSettings, settings.value);
     }
 
-    const width = numProxy(settings.value.width);
 
     const fake = ref({
         width: settings.value.width || null,
         scale: settings.value.scale || null
     });
 
+
     const language = ref('zh-cn');
+
+    const ifShowEditShowCharName = ref(false);
+    const showCharNameSettings = computed(() => {
+        return renderSettings.value.showCharNameSettings || {}
+    });
+
+    function setShowCharNameSettings(type, value) {
+        if (!settings.value.hasOwnProperty('showCharNameSettings')) {
+            settings.value.showCharNameSettings = {}
+        }
+        settings.value.showCharNameSettings[type] = value
+    }
 
     // 同步，否则加载延迟+++
     sync();
     watch(settings, () => sync(), {deep: true});
+    ;
 </script>
 
 <template>
@@ -105,15 +133,39 @@
                 <tr>
                     <th>显示角色名</th>
                     <td>
-                        <el-switch
-                                v-model="settings.showCharName"
-                                style="--el-switch-on-color: #79bbff;">
-                        </el-switch>
+                        <div style="display: flex; align-items: center">
+                            <el-switch
+                                    v-model="settings.showCharName"
+                                    style="--el-switch-on-color: #79bbff;">
+                            </el-switch>
+                            <el-icon :size="35" color="#707070" style="margin-left: 10px; cursor: pointer"
+                                     @click="ifShowEditShowCharName=true">
+                                <Operation/>
+                            </el-icon>
+                        </div>
                     </td>
                 </tr>
             </table>
         </div>
     </el-dialog>
+    <el-dialog v-model="ifShowEditShowCharName" title="请选择要显示角色名的类型" :width="dialogWidth"
+               @closed="DataControl.save('settings')">
+        <table>
+            <tr v-for="(text, type) in TypeDict">
+                <th>{{text}}</th>
+                <td>
+                    <el-switch
+                            v-model="showCharNameSettings[type]"
+                            style="--el-switch-on-color: #79bbff; margin-left: 10px"
+                            @change="(value) => {setShowCharNameSettings(type,value)}"
+                    >
+                    </el-switch>
+                </td>
+            </tr>
+        </table>
+
+    </el-dialog>
+
 </template>
 
 <style scoped>

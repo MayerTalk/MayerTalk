@@ -52,11 +52,15 @@
 </script>
 
 <template>
+    <!--    <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>-->
     <div :class="renderSettings.style">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)"
                  :style="{justifyContent:(right?'flex-end':'flex-start')}">
-                <template v-if="data.type==='title'">
+                <div v-if="data.type==='title'" style="flex-grow: 1">
+                    <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
+                         class="charName">{{char.name}}
+                    </div>
                     <div class="title-box">
                         <div style="background: darkgrey; padding: 0 7px; font-size: 10px">DIALOGUE</div>
                         <div style="color: var(--dialogue-color); padding: 0 10px; position:relative;">
@@ -68,7 +72,7 @@
                         </div>
                         <div class="line"></div>
                     </div>
-                </template>
+                </div>
                 <template v-else>
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
@@ -76,9 +80,12 @@
                             <img :src="images[char.avatar] || staticUrl + char.avatar">
                         </div>
                     </div>
-                    <div v-if="data.type==='image'" style="flex-grow: 1">
-                        <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>
-                        <div class="box image-box" style="justify-self: flex-start">
+                    <!--Content Start-->
+                    <div style="flex-grow: 1">
+                        <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
+                             class="charName">{{char.name}}
+                        </div>
+                        <div v-if="data.type==='image'" class="box image-box" style="justify-self: flex-start">
                             <div v-if="data.char" :class="[right? 'right':'left']">
                                 <div class="tail">
                                     <div class="tail2"></div>
@@ -86,66 +93,62 @@
                             </div>
                             <img :id="data.id" :key="id" :src="images[data.content]"
                                  :style="{width: preScreenshot?width.image:'100%'}"
-                            ></div>
-                    </div>
-                    <template v-else-if="data.type==='chat'">
-                        <div v-if="data.char" style="flex-grow: 1">
-                            <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>
-                            <div class="box dialogue-box">
+                            >
+                        </div>
+                        <template v-else-if="data.type==='chat'">
+                            <div v-if="data.char" class="box dialogue-box">
                                 <div :class="[right? 'right':'left']">
                                     <div class="tail">
                                         <div class="tail2"></div>
                                     </div>
+                                    <pre>{{data.content}}</pre>
                                 </div>
+                            </div>
+                            <div v-else style="color: #CCCCCC" class="box">
                                 <pre>{{data.content}}</pre>
                             </div>
-                        </div>
-                        <div v-else style="color: #CCCCCC" class="box">
-                            <pre>{{data.content}}</pre>
-                        </div>
-                    </template>
-                    <template v-else-if="data.type==='monologue'">
-                        <div v-if="data.char" style="flex-grow: 1">
-                            <div v-if="renderSettings.showCharName" class="charName">{{char.name}}</div>
-                            <div class="box monologue-box">
+                        </template>
+                        <template v-else-if="data.type==='monologue'">
+                            <div v-if="data.char" class="box monologue-box">
                                 <pre>{{data.content}}</pre>
                             </div>
-                        </div>
-                        <div v-else style="color: #909090" class="box">
-                            <pre>{{data.content}}</pre>
-                        </div>
-                    </template>
-                    <template v-else-if="data.type==='option'">
-                        <div class="option-box">
-                            <div v-for="value in data.content" class="block">
-                                <div class="bg">
+                            <div v-else style="color: #909090" class="box">
+                                <pre>{{data.content}}</pre>
+                            </div>
+                        </template>
+                        <template v-else-if="data.type==='option'">
+                            <div class="option-box">
+                                <div v-for="value in data.content" class="block">
+                                    <div class="bg">
+                                        <div class="triangle" style="margin-left: 14px"></div>
+                                        <div class="triangle"></div>
+                                        <div class="triangle"></div>
+                                    </div>
+                                    <div class="text">
+                                        <pre>{{value[1]}}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else-if="data.type==='select'">
+                            <div class="box select-box">
+                                <div class="triangle-box">
                                     <div class="triangle" style="margin-left: 14px"></div>
                                     <div class="triangle"></div>
                                     <div class="triangle"></div>
                                 </div>
                                 <div class="text">
-                                    <pre>{{value[1]}}</pre>
+                                    <pre>{{data.content}}</pre>
+                                </div>
+                                <div class="triangle-box" style="transform: rotate(180deg)">
+                                    <div class="triangle" style="margin-left: 14px"></div>
+                                    <div class="triangle"></div>
+                                    <div class="triangle"></div>
                                 </div>
                             </div>
-                        </div>
-                    </template>
-                    <template v-else-if="data.type==='select'">
-                        <div class="box select-box">
-                            <div class="triangle-box">
-                                <div class="triangle" style="margin-left: 14px"></div>
-                                <div class="triangle"></div>
-                                <div class="triangle"></div>
-                            </div>
-                            <div class="text">
-                                <pre>{{data.content}}</pre>
-                            </div>
-                            <div class="triangle-box" style="transform: rotate(180deg)">
-                                <div class="triangle" style="margin-left: 14px"></div>
-                                <div class="triangle"></div>
-                                <div class="triangle"></div>
-                            </div>
-                        </div>
-                    </template>
+                        </template>
+                    </div>
+                    <!--Content End-->
                     <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                         <div v-if="right === true">
                             <img src="/avatar-bg.png">
