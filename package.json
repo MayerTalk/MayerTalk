@@ -1,6 +1,6 @@
 {
-  "name": "workshop",
-  "version": "0.0.0",
+  "name": "Mayertalk",
+  "version": "0.0.5",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
