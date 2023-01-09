@@ -95,24 +95,23 @@
     position: relative;
     display: flex;
     width: 100%;
-    height: 55px;
     background: #A0A0A0;
     border-top: 1px solid lightgrey;
 }
 
 .char-bar .container {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    width: calc(100% - 55px);
-    height: 55px;
+    width: 100%;
     flex-shrink: 0;
 }
 
 .char {
     flex-shrink: 0;
-    margin: 0 2px;
-    width: 50px;
-    height: 50px;
+    margin: 2px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: #808080;
     overflow: hidden;
@@ -120,9 +119,9 @@
 
 .char-curr {
     flex-shrink: 0;
-    margin: 0 2px;
-    width: 46px;
-    height: 46px;
+    margin: 2px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: #505050;
     overflow: hidden;
@@ -134,17 +133,17 @@
 }
 
 .char img {
-    width: 50px;
-    height: 50px;
+    width: 52px;
+    height: 52px;
 }
 
 .char-curr img {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
 }
 
 .option {
-    margin: 0 2px;
+    margin: 2px;
     width: 50px;
     height: 50px;
     border-radius: 50%;

@@ -10,3 +10,7 @@
 #body > div.el-scrollbar > div.el-scrollbar__wrap.el-scrollbar__wrap--hidden-default {
     transition: height ease 0.3s;
 }
+
+#operateBar > div.char-bar > div.el-scrollbar > div.el-scrollbar__bar.is-vertical > div {
+    background-color: lightgrey;
+}
