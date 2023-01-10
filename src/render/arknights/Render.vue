@@ -370,7 +370,7 @@
             if (b64) {
                 const imageId = uuid();
                 images.value[imageId] = b64;
-                DataControl.update('image');
+                DataControl.update('images');
                 createDialogue({
                     content: imageId,
                     type: 'image',
