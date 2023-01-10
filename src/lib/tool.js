@@ -114,6 +114,16 @@ function getDialogue(id) {
     return document.querySelector(selector);
 }
 
+function doAfterMounted(ref, callback) {
+    if (ref.value) {
+        callback(ref)
+    } else {
+        setTimeout(() => {
+            doAfterMounted(ref, callback)
+        }, 0)
+    }
+}
+
 export {
     copy,
     uuid,
@@ -127,5 +137,6 @@ export {
     ensure,
     ensureClose,
     clickBySelector,
-    getDialogue
+    getDialogue,
+    doAfterMounted
 }
