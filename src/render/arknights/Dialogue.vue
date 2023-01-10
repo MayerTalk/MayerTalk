@@ -75,7 +75,7 @@
                 <template v-else>
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
-                            <img :src="staticUrl + 'avatar-bg.png'">
+                            <img :src="staticUrl + 'avatar-bg.webp'">
                             <img :src="images[char.avatar] || staticUrl + char.avatar">
                         </div>
                     </div>
@@ -150,7 +150,7 @@
                     <!--Content End-->
                     <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                         <div v-if="right === true">
-                            <img :src="staticUrl + '/avatar-bg.png'">
+                            <img :src="staticUrl + '/avatar-bg.webp'">
                             <img :src="images[char.avatar] || staticUrl + char.avatar">
                         </div>
                     </div>
