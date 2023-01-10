@@ -216,6 +216,12 @@
         }
         atWho.value = '';
         ifShowAt.value = false;
+        setTimeout(() => {
+            const el = document.querySelector('#textarea');
+            const range = insertAt + chars.value[id].name.length + 1;
+            el.focus();
+            el.setSelectionRange(range, range);
+        }, 100)
     }
 
     function atWhoOpen() {
@@ -839,7 +845,7 @@
                     <CharSelector v-model="atWho"
                                   v-model:select="atWhoSelRef"
                                   style="width: 100%"
-                                  @change="handleAt"/>
+                                  @change="handleAt" @visible-change="(visible) => {if (!visible) {ifShowAt=false}}"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
                            :show-close="false">
