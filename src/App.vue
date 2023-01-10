@@ -155,12 +155,15 @@
             if (typeof update === "string") {
                 if (this.storage.hasOwnProperty(update)) {
                     this.storage[update].update = true
+                } else {
+                    console.warn('[DataControl] not exist storage \'' + update + '\'')
                 }
             } else {
-
                 for (let i = 0; i < update.length; i++) {
                     if (this.storage.hasOwnProperty(update[i])) {
                         this.storage[update[i]].update = true
+                    } else {
+                        console.warn('[DataControl] not exist storage \'' + update[i] + '\'')
                     }
                 }
             }
