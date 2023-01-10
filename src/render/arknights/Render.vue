@@ -182,10 +182,10 @@
             return list.length ? list : false
         } else {
             return [
-                ['博士', 'avatar/arknights/博士.png', '博士'],
-                ['PRTS', 'avatar/arknights/PRTS.png', 'PRTS'],
-                ['mon3tr', 'avatar/arknights/mon3tr.png', 'mon3tr'],
-                ['凯尔希', 'avatar/arknights/凯尔希.png', '凯尔希']
+                ['博士', 'avatar/arknights/博士.webp', '博士'],
+                ['PRTS', 'avatar/arknights/PRTS.webp', 'PRTS'],
+                ['mon3tr', 'avatar/arknights/mon3tr.webp', 'mon3tr'],
+                ['凯尔希', 'avatar/arknights/凯尔希.webp', '凯尔希']
             ]
         }
     });
