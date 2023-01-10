@@ -238,7 +238,7 @@
         // 处理键入@事件
         if (e.data === '@' && (e.inputType === "insertText" || e.inputType === 'insertCompositionText')) {
             if (ifShowAt.value) {
-                textarea.value = e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart)
+                textarea.value = e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart);
                 insertAt = e.target.selectionStart - 1;
             } else {
                 insertAt = e.target.selectionStart;
@@ -287,7 +287,7 @@
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20;
         el.style.height = height + 'px';
         const bar = document.getElementById('operateBar');
-        scrollHeight.value = window.innerHeight - bar.scrollHeight + offset - 1 + 'px'
+        scrollHeight.value = bar.offsetTop + offset + 'px'
     }
 
     watch(textarea, () => {
