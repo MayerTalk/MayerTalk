@@ -16,7 +16,8 @@
         image2square,
         ensureClose,
         clickBySelector,
-        getDialogue
+        getDialogue,
+        doAfterMounted
     } from "@/lib/tool";
     import {
         TypeDict,
@@ -199,31 +200,33 @@
     const toolBarMask = ref(true);
 
     // @列表处理
-    const ifAt = ref(false);
-    const atWho = ref({});
+    const ifShowAt = ref(false);
+    const atWho = ref('');
     const atWhoSelRef = ref(null);
     let insertAt = 0;
-    watch(atWho, () => {
+
+    function handleAt(id) {
         // 被@角色刷入文本框
         let textareaDom = document.querySelector("#textarea");
-        if (!atWho.value) {
-            return
-        }
         textarea.value = textareaDom.value.substring(0, insertAt)
-            + chars.value[atWho.value].name
+            + chars.value[id].name
             + " "
             + textareaDom.value.substring(insertAt);
-        ifAt.value = false;
-    });
-
-    function focusOnSelect() {
-        // @提示框显示后聚焦输入
         if (atWhoSelRef.value) {
-            // FIX: 必须等到窗体完全展示后才能focus?
-            setTimeout(atWhoSelRef.value.focus, 200);
-        } else {
-            nextTick(focusOnSelect);
+            atWhoSelRef.value.blur();
         }
+        atWho.value = '';
+        ifShowAt.value = false;
+    }
+
+    function atWhoOpen() {
+        // @提示框显示后聚焦输入
+        doAfterMounted(atWhoSelRef, (ref) => {
+            // 等待动画结束
+            setTimeout(() => {
+                ref.value.focus()
+            }, 150);
+        })
     }
 
     function processInput(e) {
@@ -234,11 +237,10 @@
             || e.inputType === "insertCompositionText")
         ) {
             insertAt = textareaDom.selectionStart;
-            atWho.value = "";
-            ifAt.value = true;
-            focusOnSelect();
+            ifShowAt.value = true;
+            atWhoOpen();
         } else {
-            ifAt.value = false;
+            ifShowAt.value = false;
         }
     }
 
@@ -655,6 +657,10 @@
             type: 'option'
         })
     }
+
+    function loga(value) {
+        console.log(value)
+    }
 </script>
 
 
@@ -833,14 +839,13 @@
                     </div>
 
                 </el-dialog>
-                <el-dialog v-model="ifAt" :width="dialogWidth"
-                           title="想用@提到哪个角色?"
-                           :modal="false"
-                           destroy-on-close
-                           draggable>
-                    <CharSelector v-model:select="atWhoSelRef"
+                <el-dialog v-model="ifShowAt" :width="dialogWidth"
+                           title="想@哪个角色?"
+                           :modal="false">
+                    <CharSelector v-model="atWho"
+                                  v-model:select="atWhoSelRef"
                                   style="width: 100%"
-                                  @update:modelValue="(value) => {atWho = value;}"/>
+                                  @change="handleAt"/>
                 </el-dialog>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
                            :show-close="false">
