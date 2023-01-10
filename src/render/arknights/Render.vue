@@ -207,21 +207,16 @@
 
     function handleAt(id) {
         // 被@角色刷入文本框
-        textarea.value = textareaDom.value.substring(0, insertAt)
+        textarea.value = textarea.value.slice(0, insertAt)
             + chars.value[id].name
             + " "
-            + textareaDom.value.substring(insertAt);
+            + textarea.value.slice(insertAt);
         if (atWhoSelRef.value) {
             atWhoSelRef.value.blur();
         }
         atWho.value = '';
         ifShowAt.value = false;
     }
-
-    let textareaDom = null;
-    onMounted(() => {
-        textareaDom = document.querySelector("#textarea")
-    });
 
     function atWhoOpen() {
         // @提示框显示后聚焦输入
@@ -237,7 +232,6 @@
         // 处理键入@事件
         if (e.data === '@' && (e.inputType === "insertText" || e.inputType === 'insertCompositionText')) {
             if (ifShowAt.value) {
-                console.log(e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart));
                 textarea.value = e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart)
                 insertAt = e.target.selectionStart - 1;
             } else {
@@ -660,10 +654,6 @@
             content: copy(options.value),
             type: 'option'
         })
-    }
-
-    function loga(value) {
-        console.log(value)
     }
 </script>
 
