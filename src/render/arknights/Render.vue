@@ -207,7 +207,6 @@
 
     function handleAt(id) {
         // 被@角色刷入文本框
-        let textareaDom = document.querySelector("#textarea");
         textarea.value = textareaDom.value.substring(0, insertAt)
             + chars.value[id].name
             + " "
@@ -218,6 +217,11 @@
         atWho.value = '';
         ifShowAt.value = false;
     }
+
+    let textareaDom = null;
+    onMounted(() => {
+        textareaDom = document.querySelector("#textarea")
+    });
 
     function atWhoOpen() {
         // @提示框显示后聚焦输入
@@ -231,16 +235,16 @@
 
     function processInput(e) {
         // 处理键入@事件
-        let textareaDom = document.querySelector("#textarea");
-        if (textareaDom.value[textareaDom.selectionStart - 1] === "@" && (
-            e.inputType === "insertText"
-            || e.inputType === "insertCompositionText")
-        ) {
-            insertAt = textareaDom.selectionStart;
-            ifShowAt.value = true;
-            atWhoOpen();
-        } else {
-            ifShowAt.value = false;
+        if (e.data === '@' && (e.inputType === "insertText" || e.inputType === 'insertCompositionText')) {
+            if (ifShowAt.value) {
+                console.log(e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart));
+                textarea.value = e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart)
+                insertAt = e.target.selectionStart - 1;
+            } else {
+                insertAt = e.target.selectionStart;
+                ifShowAt.value = true;
+                atWhoOpen();
+            }
         }
     }
 
