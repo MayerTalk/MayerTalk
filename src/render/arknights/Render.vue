@@ -569,7 +569,29 @@
         })
     }
 
-    function clear() {
+    const ifShowClear = ref(false);
+
+    function clearChats() {
+        message.confirm(
+            '即将清空所有对话',
+            '提示',
+            () => {
+                for (let i = 0; i < chats.value.length; i++) {
+                    const chat = chats.value[i];
+                    if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
+                        delete images.value[chat.content]
+                    }
+                }
+                chats.value = [];
+                currDialogue.value = 0;
+                currDialogueData.value = {};
+                message.notify('清空成功', message.success);
+                DataControl.save(['chats', 'images']);
+            }
+        )
+    }
+
+    function clearAll() {
         message.confirm(
             '即将清空所有角色、对话',
             '提示',
@@ -843,12 +865,18 @@
                         </el-icon>
                         指南
                     </div>
-                    <div class="bar" @click="clear">
+                    <div class="bar" @click="ifShowClear=true">
                         <el-icon color="lightgrey" :size="35">
                             <Delete/>
                         </el-icon>
                         清空
                     </div>
+                    <el-dialog v-model="ifShowClear" title="请选择要清空的类型" :width="dialogWidth">
+                        <div style="display: flex; column-gap: 5px">
+                            <el-button size="large" style="width: 100%;" @click="clearChats">对话</el-button>
+                            <el-button size="large" style="width:100%; margin: 0" @click="clearAll">全部</el-button>
+                        </div>
+                    </el-dialog>
                     <div class="bar" @click="DataControl.withdraw">
                         <el-icon color="lightgrey" :size="35">
                             <Back/>
@@ -965,7 +993,8 @@
                                              @click="setCurr(id)">
                                             <img :src="images[char.avatar] || staticUrl + char.avatar">
                                         </div>
-                                        <div class="option" style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"
+                                        <div class="option"
+                                             style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"
                                              @click="showEditChar(true)">
                                             <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                                  data-v-029747aa="" style="background: #707070">
