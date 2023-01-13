@@ -8,6 +8,16 @@ const TypeDict = {
     select: '选择',
     title: '标题'
 };
+
+const TypeHint = {
+    chat: 'text',
+    monologue: 'text',
+    image: 'bytes',
+    option: 'list',
+    select: 'text',
+    title: 'text'
+};
+
 const TypeDefault = {
     chat: '',
     monologue: '',
@@ -17,7 +27,9 @@ const TypeDefault = {
     title: ''
 };
 
+
 export {
     TypeDict,
-    TypeDefault
+    TypeDefault,
+    TypeHint
 }
