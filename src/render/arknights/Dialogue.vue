@@ -9,9 +9,8 @@
     const width = inject('width');
     const charDirection = inject('charDirection');
     const preScreenshot = inject('preScreenshot');
-    const plus1 = inject('plus1');
-    const props = defineProps(['data', 'index']);
-    defineEmits(['edit']);
+    const props = defineProps(['data', 'index', 'plus1']);
+    defineEmits(['edit', 'plus1']);
 
     const data = computed(() => props.data);
     const index = computed(() => props.index);
@@ -156,7 +155,7 @@
                     </div>
                 </template>
             </div>
-            <div v-if="plus1 === index && !preScreenshot" class="plus1" @click="requestPlus1">
+            <div v-if="props.plus1 && !preScreenshot" class="plus1" @click="$emit('plus1',index)">
                 <p>+1</p>
             </div>
         </div>

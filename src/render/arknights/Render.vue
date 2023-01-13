@@ -21,6 +21,7 @@
     } from "@/lib/tool";
     import {
         TypeDict,
+        TypeHint,
         TypeDefault
     } from "@/constance";
 
@@ -250,28 +251,20 @@
 
     // +1功能
     const plus1 = ref(-1);
-    provide('plus1', plus1);
-    watch(chats, () => {
-        if (
-            chats.value.length > 1 &&
-            chats.value[chats.value.length - 1].char &&
-            chats.value[chats.value.length - 2].char &&
-            chats.value[chats.value.length - 2].content === chats.value[chats.value.length - 1].content
-        ) plus1.value = chats.value.length - 1;
-    }, {deep: true});
-    watch(plus1, () => {
-        // 因为输入在Dialogue外，Dialogue内拿不到chats所以传回这里添加信息
-        if (plus1.value == -1)
-            if (currChar.value) {
-                createDialogue({
-                    content: chats.value[chats.value.length - 1].content,
-                    type: 'chat',
-                });
+
+    function plus1Hook(index) {
+        if (index > 0) {
+            const c1 = chats.value[index];
+            const c2 = chats.value[index - 1];
+            if (c1.content === c2.content && c1.type === c2.type) {
+                plus1.value = index;
             } else {
-                message.notify("必须选择一个角色才能复读", message.warning);
-                plus1.value = chats.value.length - 1;
+                plus1.value = -1
             }
-    });
+        } else {
+            plus1.value = -1
+        }
+    }
 
     if (window.innerWidth - 520 > 250) {
         showToolBar.value = true;
@@ -349,6 +342,26 @@
         };
         chats.value.push(data);
         DataControl.save('chats');
+        plus1Hook(chats.value.length - 1);
+        nextTick(() => {
+            resizeScroll();
+            if (locate) {
+                const el = getDialogue(data.id);
+                scroll.value.setScrollTop(el.offsetTop)
+            }
+        });
+    }
+
+    function copyDialogue(index, data = {}, locate = true) {
+        data = {
+            content: data.content || chats.value[index].content,
+            type: data.type || chats.value[index].type,
+            char: data.char || currChar.value,
+            id: data.id || uuid()
+        };
+        chats.value.push(data);
+        DataControl.save('chats');
+        plus1Hook(chats.value.length - 1);
         nextTick(() => {
             resizeScroll();
             if (locate) {
@@ -930,8 +943,8 @@
                         <div class="window" id="window"
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
-                            <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue"
-                                      :data="chats[index]" :index="index" :key="dialogue.id"
+                            <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue" @plus1="copyDialogue"
+                                      :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
                                       style="position:relative"></Dialogue>
                         </div>
                         <div id="operateBar" class="operateBar" :style="{width: windowWidth + 'px'}">
