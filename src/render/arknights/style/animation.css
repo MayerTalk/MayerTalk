@@ -1,0 +1,18 @@
+.roll {
+    transition: transform ease 1s;
+}
+
+.roll:hover {
+    transform: rotate(180deg);
+}
+
+.scale {
+    width: 40px;
+    height: 40px;
+    transition: all ease 5ms;
+}
+
+.scale:hover {
+    width: 35px;
+    height: 35px;
+}
