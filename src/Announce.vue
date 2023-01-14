@@ -1,5 +1,5 @@
 <script setup>
-    import {computed, onMounted} from 'vue'
+    import {ref, computed, onMounted} from 'vue'
     import {saveData, getData} from './lib/tool';
 
     const props = defineProps(['modelValue']);
@@ -13,6 +13,7 @@
             emit('update:modelValue', value);
         }
     });
+    const ifShowUnsupportBrowser = ref(false);
 
     const version = 'v0.0.5';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
@@ -45,12 +46,22 @@
         </el-link>
         <h3>关于截图失败</h3>
         <b>iOS：待支持</b><br/>
-        <b>安卓：推荐使用Edge/Chrome，不支持夸克/UC</b><br/>
+        <b>安卓：推荐使用via</b><br/>
+        <el-link @click="ifShowUnsupportBrowser=true" href="javascript:void(0)">查看不支持的浏览器</el-link>
+        <br/>
         <el-link href="https://wj.qq.com/s2/11287516/2689/" type="primary">其他浏览器无法截图/导出反馈</el-link>
         <p>
-            <el-link @click="$emit('showGuide', false)" href="javascript:void(0)" type="primary">查看指南</el-link>
+            <el-link @click="$emit('showGuide', false)" href="javascript:void(0)">查看指南</el-link>
         </p>
         <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary">交流群：560295639</el-link>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
+    </el-dialog>
+    <el-dialog v-model="ifShowUnsupportBrowser" title="不支持的浏览器" :width="dialogWidth">
+        <ul>
+            <li>夸克</li>
+            <li>UC</li>
+            <li>QQ浏览器</li>
+            <li>百度浏览器</li>
+        </ul>
     </el-dialog>
 </template>
