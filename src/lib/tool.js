@@ -1,4 +1,5 @@
 import {v4 as uuid} from 'uuid'
+import md5 from 'blueimp-md5';
 import html2canvas from 'html2canvas';
 import message from "./message";
 
@@ -87,7 +88,7 @@ function image2square(image) {
     } else {
         ctx.drawImage(image, 0, crop, m, m, 0, 0, size, size);
     }
-    return canvas.toDataURL()
+    return canvas
 }
 
 function ensure(done, text) {
@@ -125,6 +126,7 @@ function doAfterMounted(ref, callback) {
 }
 
 export {
+    md5,
     copy,
     uuid,
     saveData,

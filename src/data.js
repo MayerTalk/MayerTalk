@@ -1,5 +1,6 @@
-import {ref} from 'vue'
-import {copy} from '@/lib/tool'
+import {ref, computed} from 'vue'
+import {StaticUrl} from '@/constance';
+import {copy, blob2base64, md5, uuid} from '@/lib/tool'
 
 const config = ref({render: 'Arknights'});
 const settings = ref({});
@@ -225,6 +226,49 @@ const DataControl = {
                         storage.save(true)
                     }
                 }
+            }
+        }
+    },
+    char: {
+        new(data) {
+            data = copy(data);
+            const id = uuid();
+            chars.value[id] = data;
+            data.src = computed(() => {
+                const avatar = chars.value[id].avatar;
+                return images.value.hasOwnProperty(avatar) ? images.value[avatar].src : StaticUrl + avatar
+            })
+        }
+    },
+    image: {
+        new(blob, callback) {
+            blob2base64(blob, (b64) => {
+                if (b64) {
+                    const id = md5(b64);
+                    if (images.value.hasOwnProperty(id)) {
+                        images.value[id].count++;
+                    } else {
+                        images.value[id] = {count: 1, src: b64};
+                    }
+                    DataControl.update('images');
+                    callback && callback(id);
+                } else {
+                    callback && callback(null)
+                }
+            });
+        },
+        delete(id) {
+            if (images.value.hasOwnProperty(id)) {
+                images.value[id].count--;
+                if (images.value[id].count < 1) {
+                    delete images.value[id]
+                }
+                DataControl.update('images')
+            }
+        },
+        count(id) {
+            if (images.value.hasOwnProperty(id)) {
+                images.value[id].count++
             }
         }
     }

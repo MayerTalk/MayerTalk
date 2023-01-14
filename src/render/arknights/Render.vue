@@ -19,6 +19,7 @@
         doAfterMounted
     } from "@/lib/tool";
     import {
+        StaticUrl,
         TypeDict,
         TypeHint,
         TypeDefault
@@ -72,7 +73,6 @@
     const ifShowAnnouncement = inject('ifShowAnnouncement');
     const ifShowSettings = inject('ifShowSettings');
     const ifShowGuide = inject('ifShowGuide');
-    const staticUrl = inject('staticUrl');
     const renderSettings = ref({});
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);
@@ -407,40 +407,28 @@
     }
 
     function createImageDialogue(fileUpload) {
-        blob2base64(fileUpload, (b64) => {
-            if (b64) {
-                const imageId = uuid();
-                images.value[imageId] = b64;
-                DataControl.update('images');
-                createDialogue({
-                    content: imageId,
-                    type: 'image',
-                });
-            }
+        DataControl.image.new(fileUpload, (id) => {
+            createDialogue({
+                content: id,
+                type: 'image',
+            });
         });
         return false
     }
 
     function uploadImage(fileUpload) {
-        DataControl.update('images');
-        blob2base64(fileUpload, (b64) => {
-            if (b64) {
-                if (currDialogueData.value.type === 'image'
-                    && images.value.hasOwnProperty(currDialogueData.value.content)) {
-                    delete images.value[currDialogueData.value.content]
-                }
-                const imageId = uuid();
-                images.value[imageId] = b64;
-                currDialogueData.value.content = imageId
+        DataControl.image.new(fileUpload, (id) => {
+            if (currDialogueData.value.type === 'image') {
+                DataControl.image.delete(currDialogueData.value.content)
             }
+            currDialogueData.value.content = id
         });
         return false
     }
 
     function clearDialogueData() {
-        if (!editDialogue.value && currDialogueData.value.type === 'image'
-            && images.value.hasOwnProperty(currDialogueData.value.content)) {
-            delete images.value[currDialogueData.value.content]
+        if (!editDialogue.value && currDialogueData.value.type === 'image') {
+            DataControl.image.delete(currDialogueData.value.content)
         }
         currDialogueData.value = {}
     }
@@ -472,15 +460,14 @@
     function uploadAvatar(uploadFile) {
         const url = blob2url(uploadFile);
         if (url) {
-            DataControl.update('images');
             const image = new Image();
             image.onload = () => {
-                const imageId = uuid();
-                images.value[imageId] = image2square(image);
-                if (images.value.hasOwnProperty(newChar.value.avatar)) {
-                    delete images.value[newChar.value.avatar]
-                }
-                newChar.value.avatar = imageId
+                image2square(image).toBlob((blob) => {
+                    DataControl.image.new(blob, (id) => {
+                        DataControl.image.delete(newChar.value.avatar);
+                        newChar.value.avatar = id
+                    });
+                })
             };
             image.src = url;
         }
@@ -488,9 +475,7 @@
     }
 
     function selectAvatar(avatar) {
-        if (images.value.hasOwnProperty(newChar.value.avatar)) {
-            delete images.value[newChar.value.avatar]
-        }
+        DataControl.image.delete(newChar.value.avatar);
         newChar.value.avatar = avatar[1];
         ifShowSelectAvatar.value = false
     }
@@ -504,8 +489,8 @@
             if (newChar.value.name === '') {
                 newChar.value.name = defaultName.value
             }
+            DataControl.char.new(newChar.value);
             ifShowEditChar.value = false;
-            chars.value[uuid()] = copy(newChar.value);
             newChar.value = {name: ''};
             message.notify('创建成功', message.success);
         } else {
@@ -513,12 +498,7 @@
                 '即将删除该角色',
                 '提示',
                 () => {
-                    const avatar = chars.value[currChar.value].avatar;
-                    if (images.value.hasOwnProperty(avatar)) {
-                        delete images.value[avatar];
-                        DataControl.update('images')
-                    }
-
+                    DataControl.image.delete(chars.value[currChar.value].avatar);
                     delete chars.value[currChar.value];
                     for (let i = chats.value.length - 1; i > -1; i--) {
                         if (chats.value[i].char === currChar.value) {
@@ -534,8 +514,8 @@
     }
 
     function clearNewChar() {
-        if (createChar.value && newChar.value && images.value.hasOwnProperty(newChar.value.avatar)) {
-            delete images.value[newChar.value.avatar]
+        if (createChar.value && newChar.value) {
+            DataControl.image.delete(newChar.value.avatar)
         }
         newChar.value = {name: ''};
         defaultName.value = ''
@@ -563,9 +543,8 @@
             '提示',
             () => {
                 let chat = chats.value.splice(currDialogue.value, 1)[0];
-                if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
-                    delete images.value[chat.content];
-                    DataControl.update('images')
+                if (chat.type === 'image') {
+                    DataControl.image.delete(chat.content);
                 }
                 message.notify('删除成功', message.success);
                 ifShowEditDialogue.value = false;
@@ -619,8 +598,8 @@
             () => {
                 for (let i = 0; i < chats.value.length; i++) {
                     const chat = chats.value[i];
-                    if (chat.type === 'image' && images.value.hasOwnProperty(chat.content)) {
-                        delete images.value[chat.content]
+                    if (chat.type === 'image') {
+                        DataControl.image.delete(chat.content);
                     }
                 }
                 chats.value = [];
@@ -652,7 +631,7 @@
     const avatarsJs = inject('avatarsJs');
 
     function loadAvatar() {
-        import(staticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
+        import(StaticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
             avatars = module.default
         })
     }
@@ -734,7 +713,7 @@
                                     :before-upload="(file) => {defaultName='';return uploadAvatar(file)}"
                             >
                                 <div class="container"><img v-if="newChar.avatar"
-                                                            :src="images[newChar.avatar] || staticUrl + newChar.avatar"/>
+                                                            :src="images.hasOwnProperty(newChar.avatar) ? images[newChar.avatar].src : StaticUrl + newChar.avatar"/>
                                     <el-icon v-else class="avatar-uploader-icon">
                                         <Plus/>
                                     </el-icon>
@@ -770,7 +749,7 @@
                         <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
                         <div v-if="searchResult" class="avatar-bar">
                             <el-scrollbar max-height="50vh" style="width: 100%">
-                                <img v-for="avatar in searchResult" :key="avatar[0]" :src="staticUrl + avatar[1]"
+                                <img v-for="avatar in searchResult" :key="avatar[0]" :src="StaticUrl + avatar[1]"
                                      loading="lazy"
                                      :title="avatar[0]"
                                      @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
@@ -797,7 +776,7 @@
                     >
                         <div class="container">
                             <el-scrollbar v-if="images[currDialogueData.content]">
-                                <img :src="images[currDialogueData.content]" style="width:100%"/>
+                                <img :src="images[currDialogueData.content].src" style="width:100%"/>
                             </el-scrollbar>
 
                             <el-icon v-else class="avatar-uploader-icon">
@@ -1004,7 +983,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <img :src="images[char.avatar] || staticUrl + char.avatar">
+                                            <img :src="char.src">
                                         </div>
                                         <div class="option"
                                              style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"

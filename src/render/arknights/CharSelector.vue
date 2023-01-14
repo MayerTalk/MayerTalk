@@ -2,8 +2,6 @@
     import {ref, inject, computed, onMounted} from 'vue'
     import {chars, images} from '@/data'
 
-    const staticUrl = inject('staticUrl');
-
     const props = defineProps({
         modelValue: null,
         narration: Boolean,
@@ -52,7 +50,7 @@
         >
             {{char.name}}
             <div style="display: flex; align-items: center; height: 100%; float: right">
-                <img :src="images[char.avatar] || staticUrl + char.avatar"
+                <img :src="char.src"
                      style="height: 80%; display: inline"/>
             </div>
         </el-option>

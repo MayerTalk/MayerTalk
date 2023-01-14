@@ -9,7 +9,6 @@
     const ifShowSettings = ref(false);
     const ifShowGuide = ref(false);
 
-    provide('staticUrl', 'https://static.mayertalk.top/');
     provide('ifShowAnnouncement', ifShowAnnouncement);
     provide('ifShowSettings', ifShowSettings);
     provide('ifShowGuide', ifShowGuide);

@@ -1,12 +1,12 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
+    import {StaticUrl} from '@/constance'
     import {
         chars,
         images,
     } from '@/data'
 
-    const staticUrl = inject('staticUrl');
     const renderSettings = inject('renderSettings');
     const width = inject('width');
     const charDirection = inject('charDirection');
@@ -71,8 +71,8 @@
                 <template v-else>
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
-                            <img :src="staticUrl + 'avatar-bg.webp'">
-                            <img :src="images[char.avatar] || staticUrl + char.avatar">
+                            <img :src="StaticUrl + 'avatar-bg.webp'">
+                            <img :src="char.src">
                         </div>
                     </div>
                     <!--Content Start-->
@@ -86,7 +86,7 @@
                                     <div class="tail2"></div>
                                 </div>
                             </div>
-                            <img :id="data.id" :key="id" :src="images[data.content]"
+                            <img :id="data.id" :key="id" :src="images[data.content].src"
                                  :style="{width: preScreenshot?width.image:'100%'}"
                             >
                         </div>
@@ -146,8 +146,8 @@
                     <!--Content End-->
                     <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                         <div v-if="right === true">
-                            <img :src="staticUrl + '/avatar-bg.webp'">
-                            <img :src="images[char.avatar] || staticUrl + char.avatar">
+                            <img :src="StaticUrl + '/avatar-bg.webp'">
+                            <img :src="char.src">
                         </div>
                     </div>
                 </template>

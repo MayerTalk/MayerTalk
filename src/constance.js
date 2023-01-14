@@ -1,5 +1,7 @@
 import {uuid} from './lib/tool'
 
+const StaticUrl = 'https://static.mayertalk.top/';
+
 const TypeDict = {
     chat: '对话',
     monologue: '独白',
@@ -29,6 +31,7 @@ const TypeDefault = {
 
 
 export {
+    StaticUrl,
     TypeDict,
     TypeDefault,
     TypeHint
