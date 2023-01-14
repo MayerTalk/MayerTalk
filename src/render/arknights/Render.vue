@@ -10,7 +10,6 @@
         copy,
         uuid,
         downloadImage,
-        download,
         blob2url,
         blob2base64,
         image2square,
@@ -31,6 +30,10 @@
         images,
         DataControl
     } from '@/data'
+    import {
+        uploadData,
+        downloadData
+    } from '@/lib/versionControl'
 
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
@@ -646,33 +649,6 @@
         )
     }
 
-    function downloadData() {
-        const url = blob2url(new Blob([JSON.stringify({
-            config: config.value,
-            chars: chars.value,
-            chats: chats.value,
-            images: images.value
-        })], {type: 'application/json'}));
-        download(url, 'mayertalk-data-' + Date.now() + '.json')
-    }
-
-    function uploadData(uploadFile) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            try {
-                const data = JSON.parse(reader.result);
-                DataControl.set(data);
-                message.notify('导入成功', message.success);
-                resizeScroll();
-                DataControl.save();
-            } catch (e) {
-                message.notify('导入失败，请确认文件名为 mayertalk-data-xxx.json', message.error)
-            }
-        };
-        reader.readAsText(uploadFile);
-        return false
-    }
-
     const avatarsJs = inject('avatarsJs');
 
     function loadAvatar() {
@@ -942,7 +918,7 @@
                                 :show-file-list="false"
                                 class="avatar-uploader"
                                 accept="application/json"
-                                :before-upload="uploadData"
+                                :before-upload="(file) => uploadData(file,resizeScroll)"
                                 style="position: absolute; width: 100%; height: 50px; overflow: hidden"
                         >
                             <div style=" width: 80px; height: 50px; user-select: none">

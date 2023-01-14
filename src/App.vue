@@ -1,4 +1,5 @@
 <script setup>
+    import '@/lib/versionControl'
     import {ref, provide} from 'vue'
     import Renders from './render'
     import Announce from './Announce.vue'
