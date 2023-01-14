@@ -125,24 +125,26 @@ const ImageStorage = class ImageStorage {
         return false
     }
 
-    set(data) {
+    set(data, internal = false) {
         const tmp = copy(data);
-        for (let imageId in tmp) {
-            if (tmp.hasOwnProperty(imageId)) {
-                if (tmp[imageId].hasOwnProperty('src')) {
-                    if (tmp[imageId].src.indexOf('data:image') !== 0) {
+        if (!internal) {
+            for (let imageId in tmp) {
+                if (tmp.hasOwnProperty(imageId)) {
+                    if (tmp[imageId].hasOwnProperty('src')) {
+                        if (tmp[imageId].src.indexOf('data:image') !== 0) {
+                            // 非avatar/(内置)和data:image(b64)视为不安全数据
+                            message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告');
+                            delete tmp[imageId];
+                            throw TypeError
+                        }
+                    } else if (
+                        tmp[imageId].indexOf('data:image') !== 0) {
+                        // 老数据适配
                         // 非avatar/(内置)和data:image(b64)视为不安全数据
                         message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告');
                         delete tmp[imageId];
                         throw TypeError
                     }
-                } else if (
-                    tmp[imageId].indexOf('data:image') !== 0) {
-                    // 老数据适配
-                    // 非avatar/(内置)和data:image(b64)视为不安全数据
-                    message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告');
-                    delete tmp[imageId];
-                    throw TypeError
                 }
             }
         }
@@ -217,7 +219,7 @@ const DataControl = {
                 if (this.storage.hasOwnProperty(operator.key)) {
                     if (operator.type === 'modify') {
                         const storage = this.storage[operator.key];
-                        storage.set(JSON.parse(operator.old));
+                        storage.set(JSON.parse(operator.old), true);
                         storage.save(true)
                     }
                 }
@@ -232,7 +234,7 @@ const DataControl = {
                 if (this.storage.hasOwnProperty(operator.key)) {
                     if (operator.type === 'modify') {
                         const storage = this.storage[operator.key];
-                        storage.set(JSON.parse(operator.new));
+                        storage.set(JSON.parse(operator.new), true);
                         storage.save(true)
                     }
                 }
