@@ -5,6 +5,11 @@
     import {ensure} from '@/lib/tool';
 
     import {TypeDict} from "@/constance";
+    import {
+        config,
+        settings,
+        DataControl
+    } from '@/data'
 
     const defaultSettings = {
         background: '#303030',
@@ -19,11 +24,8 @@
         }
     };
 
-    const DataControl = inject('DataControl');
     const ifShow = inject('ifShowSettings');
-    const settings = inject('settings');
     const renderSettings = inject('renderSettings');
-    const config = inject('config');
     const dialogWidth = inject('dialogWidth');
 
     function _sync(dst, src1, src2, k) {
@@ -72,7 +74,7 @@
     }
 
     const SizeUnit = ['B', 'KB', 'MB'];
-    
+
     function getStorageSize() {
         let size = 0;
         for (let key in localStorage) {

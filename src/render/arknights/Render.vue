@@ -24,6 +24,13 @@
         TypeHint,
         TypeDefault
     } from "@/constance";
+    import {
+        config,
+        chats,
+        chars,
+        images,
+        DataControl
+    } from '@/data'
 
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
@@ -62,12 +69,7 @@
     const ifShowAnnouncement = inject('ifShowAnnouncement');
     const ifShowSettings = inject('ifShowSettings');
     const ifShowGuide = inject('ifShowGuide');
-    const config = inject('config');
-    const chars = inject('chars');
-    const chats = inject('chats');
-    const images = inject('images');
     const staticUrl = inject('staticUrl');
-    const DataControl = inject('DataControl');
     const renderSettings = ref({});
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);

@@ -1,9 +1,11 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
+    import {
+        chars,
+        images,
+    } from '@/data'
 
-    const chars = inject('chars');
-    const images = inject('images');
     const staticUrl = inject('staticUrl');
     const renderSettings = inject('renderSettings');
     const width = inject('width');

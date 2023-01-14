@@ -1,10 +1,8 @@
 <script setup>
     import {ref, inject, computed, onMounted} from 'vue'
+    import {chars, images} from '@/data'
 
-    const chars = inject('chars');
-    const images = inject('images');
     const staticUrl = inject('staticUrl');
-
 
     const props = defineProps({
         modelValue: null,
@@ -57,8 +55,6 @@
                 <img :src="images[char.avatar] || staticUrl + char.avatar"
                      style="height: 80%; display: inline"/>
             </div>
-
-
         </el-option>
         <el-option v-if="props.narration"
                    key=""
