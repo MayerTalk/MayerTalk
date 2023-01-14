@@ -93,31 +93,48 @@
     });
     provide('charDirection', charDirection);
 
-    function resizeWindow() {
-        const max = renderSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60);
-        if (preScreenshot.value) {
-            width.value.window = max;
-            width.value.image = renderSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px';
-            width.value.avatar = '60px';
-            width.value.fontsize = '16px'
-        } else {
-            const w = Math.min(max, document.body.clientWidth);
-            width.value.window = w;
-            width.value.avatar = Math.ceil(w / max * 60) + 'px';
-            width.value.fontsize = Math.ceil(w / max * 16) + 'px';
+    const ResizeWindow = {
+        time: 0,
+        get(size) {
+            return (this.time === 1 ? size : Math.ceil(this.time * size)) + 'px'
+        },
+        size: {
+            avatar: 60,
+            fontsize: 16
+        },
+        resize() {
+            const max = renderSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60);
+            if (preScreenshot.value) {
+                width.value.window = max;
+                width.value.image = renderSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px';
+                this.time = 1;
+            } else {
+                const w = Math.min(max, document.body.clientWidth);
+                width.value.window = w;
+                if (w === max) {
+                    this.time = 1
+                } else {
+                    this.time = w / max
+                }
+            }
+            for (let key in this.size) {
+                if (this.size.hasOwnProperty(key)) {
+                    width.value[key] = this.get(this.size[key])
+                }
+            }
         }
-    }
+    };
 
     onMounted(() => {
-        resizeWindow()
+        ResizeWindow.resize()
     });
     watch(charDirection, () => {
-        resizeWindow()
+        ResizeWindow.resize()
     });
     watch(() => {
         return renderSettings.value.width
     }, () => {
-        resizeWindow()
+        ResizeWindow.resize()
     });
 
     function resizeBody(offset = 0) {
@@ -569,7 +586,7 @@
 
     function screenshot() {
         preScreenshot.value = true;
-        resizeWindow();
+        ResizeWindow.resize();
         const node = document.getElementById('window');
         nextTick(() => {
             // 将height定为整数，防止截图下方出现白条
@@ -582,7 +599,7 @@
                 }, () => {
                     preScreenshot.value = false;
                     node.style.height = null;
-                    setTimeout(resizeWindow, 50)
+                    setTimeout(ResizeWindow.resize, 50)
                 })
             }, 100)
         })
