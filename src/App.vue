@@ -1,7 +1,5 @@
 <script setup>
-    import {ref, provide, onMounted} from 'vue'
-    import message from './lib/message';
-    import {copy} from './lib/tool';
+    import {ref, provide} from 'vue'
     import Renders from './render'
     import Announce from './Announce.vue'
     import {config} from './data'

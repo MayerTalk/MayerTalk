@@ -37,11 +37,6 @@
         }
     }
 
-    function requestPlus1() {
-        // Dialogue内触发+1请求交Render处理
-        plus1.value = -1;
-    }
-
     watch(() => width.value.window, () => {
         // window改变时调整图片大小
         resizeImage()
