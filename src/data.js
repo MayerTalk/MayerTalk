@@ -1,4 +1,5 @@
 import {ref} from 'vue'
+import {copy} from '@/lib/tool'
 
 const config = ref({render: 'Arknights'});
 const settings = ref({});
@@ -87,12 +88,12 @@ const ImageStorage = class ImageStorage {
             }
             if (dataStr.length > 4 * 1024 * 1024) {
                 // 5mb limit
-                if (!notifyMaxStorage) {
+                if (!this.notifyMaxStorage) {
                     message.confirm('图片总体积超过4MB，将不会自动保存图片');
                     this.notifyMaxStorage = true
                 }
             } else {
-                if (notifyMaxStorage) {
+                if (this.notifyMaxStorage) {
                     message.notify('图片总体积小于4MB，自动保存已恢复', message.success);
                     this.notifyMaxStorage = false
                 }
