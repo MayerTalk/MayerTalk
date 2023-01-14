@@ -1,5 +1,6 @@
 import {ref, computed} from 'vue'
 import {StaticUrl} from '@/constance';
+import message from '@/lib/message'
 import {copy, blob2base64, md5, uuid} from '@/lib/tool'
 
 const config = ref({render: 'Arknights'});
