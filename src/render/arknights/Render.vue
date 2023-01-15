@@ -863,7 +863,7 @@
                 <el-dialog v-model="ifShowCopy" title="请选择要复读的角色" :width="dialogWidth">
                     <el-button style="width: 100%;" @click="handleCopy">复读</el-button>
                     <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true"
-                                  :multiple="true" :filterable="false"/>
+                                  :multiple="true" :filterable="false" @close="copyChars.value = []"/>
                 </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
