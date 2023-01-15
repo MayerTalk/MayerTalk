@@ -844,7 +844,7 @@
                            :show-close="false">
                     <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
                 </el-dialog>
-                <el-dialog v-model="ifShowCopy" title="请选择要复读的角色" :width="dialogWidth" @close="copyChars.value = []">
+                <el-dialog v-model="ifShowCopy" title="请选择要复读的角色" :width="dialogWidth" @closed="copyChars = []">
                     <el-button style="width: 100%;" @click="handleCopy">复读</el-button>
                     <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true"
                                   :multiple="true" :filterable="false"/>
