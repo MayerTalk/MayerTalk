@@ -583,7 +583,9 @@
                 }, () => {
                     preScreenshot.value = false;
                     node.style.height = null;
-                    setTimeout(ResizeWindow.resize, 50)
+                    setTimeout(() => {
+                        ResizeWindow.resize()
+                    }, 50)
                 })
             }, 100)
         })
