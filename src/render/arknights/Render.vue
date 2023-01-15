@@ -71,6 +71,7 @@
     });
 
     const ifShowAnnouncement = inject('ifShowAnnouncement');
+    const ifShowAbout = inject('ifShowAbout');
     const ifShowSettings = inject('ifShowSettings');
     const ifShowGuide = inject('ifShowGuide');
     const renderSettings = ref({});
@@ -935,6 +936,12 @@
                             <Setting/>
                         </el-icon>
                         设置
+                    </div>
+                    <div class="bar" @click="ifShowAbout=true">
+                        <el-icon color="lightgrey" :size="35">
+                            <Collection/>
+                        </el-icon>
+                        关于
                     </div>
                 </div>
                 <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
