@@ -26,8 +26,8 @@
         <h2 style="display: inline">MayerTalk(beta)</h2><br/>
         <p>明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段</p>
         <p style="display: flex; align-items: center">Github:
-            <el-link href="https://github.com/Arkfans/Arktalk" type="primary" style="margin-left: 5px" target="_blank">
-                Arkfans/Arktalk
+            <el-link href="https://github.com/Arkfans/MayerTalk" type="primary" style="margin-left: 5px" target="_blank">
+                Arkfans/MayerTalk
             </el-link>
         </p>
         <h3>贡献者</h3>

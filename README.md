@@ -1,8 +1,8 @@
-# Arktalk
+# MayerTalk
 
 明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段  
 
- [开发计划](https://github.com/Arkfans/Arktalk/wiki/%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92)
+ [开发计划](https://github.com/Arkfans/MayerTalk/wiki/%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92)
 
 *Warning: 低质量代码，简直依托答辩*
 
@@ -18,14 +18,14 @@
  
  ### 设备支持
  
- |         | Arktalk | ClosureTalk |
+ |         | MayerTalk | ClosureTalk |
  | ------- | ------- | ----------- |
  | 电脑 | ✅ | ✅ |
  | 手机 | ✅ | ❌ |
  
   ### 编辑
   
- |         | Arktalk | ClosureTalk |
+ |         | MayerTalk | ClosureTalk |
  | ------- | ------- | ----------- |
  | 导入导出 | ✅ | ✅ |
  | 编辑已发送文本 | ✅ | ✅ |
@@ -41,7 +41,7 @@
  
  ### 角色
  
- |         | Arktalk | ClosureTalk |
+ |         | MayerTalk | ClosureTalk |
  | ------- | ------- | ----------- |
  | 自定义 | ✅ | ✅ |
  | 编辑已创建角色 | ✅ | ❌ |
@@ -54,7 +54,7 @@
  
  ### 对话类型
  
- |         | Arktalk | ClosureTalk |
+ |         | MayerTalk | ClosureTalk |
  | ------- | ------- | ----------- |
  | 文本 | ✅ | ✅ |
  | 内心独白 | ✅ | ✅ |
@@ -67,7 +67,7 @@
  
  ### 主题
  
- | Arktalk | ClosureTalk |
+ | MayerTalk | ClosureTalk |
  | ------- | ----------- |
  | 叙拉古人 | 傀影肉鸽
  | | 碧蓝档案(momotalk) |
