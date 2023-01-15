@@ -194,15 +194,15 @@
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
-    let  charList = [];
+    let charList = [];
 
     const searchResult = computed(() => {
         if (searchChar.value) {
             const search = searchChar.value;
             const list = [];
-            for (let i = 0; i <  charList.length; i++) {
-                if ( charList[i][0].indexOf(search) !== -1) {
-                    list.push( charList[i])
+            for (let i = 0; i < charList.length; i++) {
+                if (charList[i][0].indexOf(search) !== -1) {
+                    list.push(charList[i])
                 }
             }
             return list.length ? list : false
@@ -505,14 +505,7 @@
                 '即将删除该角色',
                 '提示',
                 () => {
-                    DataControl.image.delete(chars.value[currChar.value].avatar);
-                    delete chars.value[currChar.value];
-                    for (let i = chats.value.length - 1; i > -1; i--) {
-                        if (chats.value[i].char === currChar.value) {
-                            chats.value.splice(i, 1);
-                            DataControl.update('chats')
-                        }
-                    }
+                    DataControl.char.delete(currChar.value);
                     message.notify('删除成功', message.success);
                     ifShowEditChar.value = false;
                 }
@@ -603,17 +596,10 @@
             '即将清空所有对话',
             '提示',
             () => {
-                for (let i = 0; i < chats.value.length; i++) {
-                    const chat = chats.value[i];
-                    if (chat.type === 'image') {
-                        DataControl.image.delete(chat.content);
-                    }
-                }
-                chats.value = [];
+                DataControl.clear(0);
                 currDialogue.value = 0;
                 currDialogueData.value = {};
-                message.notify('清空成功', message.success);
-                DataControl.save(['chats', 'images']);
+                ifShowClear.value = false;
             }
         )
     }
@@ -623,14 +609,11 @@
             '即将清空所有角色、对话',
             '提示',
             () => {
-                chars.value = {};
-                chats.value = [];
-                images.value = {};
+                DataControl.clear(1);
                 currChar.value = "";
                 currDialogue.value = 0;
                 currDialogueData.value = {};
-                message.notify('清空成功', message.success);
-                DataControl.save(['chars', 'chats', 'images']);
+                ifShowClear.value = false;
             }
         )
     }
@@ -639,7 +622,7 @@
 
     function loadAvatar() {
         import(StaticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
-             charList = module.default
+            charList = module.default
         })
     }
 

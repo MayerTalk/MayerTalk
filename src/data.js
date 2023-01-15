@@ -253,6 +253,25 @@ const DataControl = {
             }
         }
     },
+    clear(level) {
+        if (level === 0) {
+            for (let i = 0; i < chats.value.length; i++) {
+                const chat = chats.value[i];
+                if (chat.type === 'image') {
+                    this.image.delete(chat.content);
+                }
+            }
+            chats.value = [];
+            message.notify('清空成功', message.success);
+            this.save(['chats', 'images']);
+        } else if (level === 1) {
+            chars.value = {};
+            chats.value = [];
+            images.value = {};
+            message.notify('清空成功', message.success);
+            this.save(['chars', 'chats', 'images']);
+        }
+    },
     char: {
         new(data) {
             data = copy(data);
@@ -264,8 +283,13 @@ const DataControl = {
             })
         },
         delete(id) {
-            if (avatars.value.hasOwnProperty(id)) {
-                delete avatars.value[id]
+            DataControl.image.delete(chars.value[id].avatar);
+            delete chars.value[currChar.value];
+            for (let i = chats.value.length - 1; i > -1; i--) {
+                if (chats.value[i].char === currChar.value) {
+                    chats.value.splice(i, 1);
+                    DataControl.update('chats')
+                }
             }
         }
     },
