@@ -284,9 +284,9 @@ const DataControl = {
         },
         delete(id) {
             DataControl.image.delete(chars.value[id].avatar);
-            delete chars.value[currChar.value];
+            delete chars.value[id];
             for (let i = chats.value.length - 1; i > -1; i--) {
-                if (chats.value[i].char === currChar.value) {
+                if (chats.value[i].char === id) {
                     chats.value.splice(i, 1);
                     DataControl.update('chats')
                 }
