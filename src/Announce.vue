@@ -31,6 +31,7 @@
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <p>开发阶段，功能尚不完善，还请谅解</p>
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
+        <h2 style="color: orangered">祝各位博士新春快乐~</h2>
         <h3>
             v0.1.0
         </h3>
@@ -41,7 +42,7 @@
             <li>复读</li>
             <li>仅清空对话</li>
             <li>清空本地数据(设置)</li>
-            <li>Ctrl + C 快捷创建橘色</li>
+            <li>Ctrl + C 快捷创建角色</li>
         </ul>
         <b>修复</b>
         <ul>
