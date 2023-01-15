@@ -651,6 +651,9 @@
             type: 'option'
         })
     }
+
+    const s = ref(true);
+    const model = ref([])
 </script>
 
 
@@ -795,10 +798,10 @@
                               :disabled="currDialogueData.type==='image'"
                     ></el-input>
                     <div class="edit-bar" style="margin-top: 5px">
-                        <div style="width: 50%; display: flex">
+                        <div style="width: calc(50% - 2px); display: flex">
                             <CharSelector v-model="currDialogueData.char" narration/>
                         </div>
-                        <div style="width: calc(50% - 5px); margin-left: 5px; display: flex">
+                        <div style="width: calc(50% - 3px); margin-left: 5px; display: flex">
                             <el-select v-model="currDialogueData.type" style="flex-grow: 1"
                                        :disabled="['image','option'].indexOf(currDialogueData.type) !== -1 && editDialogue"
                                        placeholder="类型"
@@ -814,15 +817,14 @@
                             </el-select>
                         </div>
                         <div style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
-                        <div v-if="editDialogue" style="display: flex; width: 100%; margin-top: 5px; column-gap: 5px;">
-                            <!-- TODO 应当把column-gap的这个写法应用到所有有并列的el-button的容器上-->
+                        <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
                             <el-button style="width: 100%" @click="delDialogue">删除</el-button>
-                            <el-button style="width: 100%; margin-left: 0px" @click="switchEdit(false)">向上插入
+                            <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">向上插入
                             </el-button>
                         </div>
-                        <div v-else style="width: 100%; margin-top: 5px">
-                            <el-button style="width: 50%" @click="insertDialogue">插入</el-button>
-                            <el-button style="width: calc(50% - 5px); margin-left: 5px"
+                        <div v-else class="column-display" style="width: 100%; margin-top: 5px">
+                            <el-button style="width: 100%" @click="insertDialogue">插入</el-button>
+                            <el-button style="width: 100%; margin-left: 0"
                                        @click="() => {clearDialogueData();switchEdit(true)}">返回
                             </el-button>
                         </div>

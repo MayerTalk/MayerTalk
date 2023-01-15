@@ -19,6 +19,11 @@
     transition: background-color ease 1s;
 }
 
+.column-display {
+    display: flex;
+    column-gap: 5px;
+}
+
 .avatar-uploader {
     display: flex;
     width: 100px;
