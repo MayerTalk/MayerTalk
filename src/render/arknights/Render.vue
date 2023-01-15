@@ -381,6 +381,9 @@
             char: data.char || currChar.value,
             id: data.id || uuid()
         };
+        if (data.type === 'image') {
+            DataControl.image.count(data.content)
+        }
         chats.value.push(data);
         DataControl.save('chats');
         plus1Hook(chats.value.length - 1);
