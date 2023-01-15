@@ -37,8 +37,20 @@
         </h3>
         <b>新增</b>
         <ul>
-            <li>@提示</li>
-            <li>+1</li>
+            <li>
+                <p style="display: flex; align-items: center; margin: 0">@提示
+                    <el-link href="https://github.com/1MLightyears" target="_blank" style="margin-left: 5px">
+                        @Lightyears
+                    </el-link>
+                </p>
+            </li>
+            <li>
+                <p style="display: flex; align-items: center; margin: 0">+1
+                    <el-link href="https://github.com/1MLightyears" target="_blank" style="margin-left: 5px">
+                        @Lightyears
+                    </el-link>
+                </p>
+            </li>
             <li>复读</li>
             <li>仅清空对话</li>
             <li>清空本地数据(设置)</li>
