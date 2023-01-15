@@ -234,10 +234,10 @@
             + chars.value[id].name
             + " "
             + textarea.value.slice(insertAt);
-        if (atWhoSelRef.value) {
-            atWhoSelRef.value.blur();
-        }
         atWho.value = '';
+        if (atWhoSelRef.value) {
+            atWhoSelRef.value.blur()
+        }
         ifShowAt.value = false;
         setTimeout(() => {
             const el = document.querySelector('#textarea');
@@ -374,7 +374,7 @@
         });
     }
 
-    function copyDialogue(index, data = {}, locate = true) {
+    function copyDialogue(index, data = {}, config) {
         data = {
             content: data.content || chats.value[index].content,
             type: data.type || chats.value[index].type,
@@ -385,11 +385,13 @@
             DataControl.image.count(data.content)
         }
         chats.value.push(data);
-        DataControl.save('chats');
-        plus1Hook(chats.value.length - 1);
+        if (config.hasOwnProperty('save') ? config.save : true) {
+            DataControl.save('chats');
+            plus1Hook(chats.value.length - 1);
+        }
         nextTick(() => {
             resizeScroll();
-            if (locate) {
+            if (config.hasOwnProperty('locate') ? config.locate : true) {
                 const el = getDialogue(data.id);
                 scroll.value.setScrollTop(el.offsetTop)
             }
@@ -652,8 +654,22 @@
         })
     }
 
-    const s = ref(true);
-    const model = ref([])
+    const ifShowCopy = ref(false);
+    const copyChars = ref([]);
+
+    function handleCopy() {
+        if (copyChars.value.length === 0) {
+            message.notify('请选择至少一个角色', message.warning);
+            return
+        }
+        const last = copyChars.value.length - 1;
+        for (let i = 0; i < copyChars.value.length; i++) {
+            copyDialogue(currDialogue.value, {char: copyChars.value[i]}, {locate: i === last, save: i === last})
+        }
+        copyChars.value = [];
+        ifShowCopy.value = false;
+        ifShowEditDialogue.value = false
+    }
 </script>
 
 
@@ -819,8 +835,8 @@
                         <div style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
                         <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
                             <el-button style="width: 100%" @click="delDialogue">删除</el-button>
-                            <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">向上插入
-                            </el-button>
+                            <el-button style="width: 100%; margin-left: 0" @click="ifShowCopy=true">复读</el-button>
+                            <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">向上插入</el-button>
                         </div>
                         <div v-else class="column-display" style="width: 100%; margin-top: 5px">
                             <el-button style="width: 100%" @click="insertDialogue">插入</el-button>
@@ -842,6 +858,11 @@
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth" :before-close="ensureClose"
                            :show-close="false">
                     <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
+                </el-dialog>
+                <el-dialog v-model="ifShowCopy" title="请选择要复读的角色" :width="dialogWidth">
+                    <el-button style="width: 100%;" @click="handleCopy">复读</el-button>
+                    <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true"
+                                  :multiple="true" :filterable="false"/>
                 </el-dialog>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
