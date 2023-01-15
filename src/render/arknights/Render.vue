@@ -29,6 +29,7 @@
         chats,
         chars,
         images,
+        avatars,
         DataControl
     } from '@/data'
     import {
@@ -193,15 +194,15 @@
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
-    let avatars = [];
+    let  charList = [];
 
     const searchResult = computed(() => {
         if (searchChar.value) {
             const search = searchChar.value;
             const list = [];
-            for (let i = 0; i < avatars.length; i++) {
-                if (avatars[i][0].indexOf(search) !== -1) {
-                    list.push(avatars[i])
+            for (let i = 0; i <  charList.length; i++) {
+                if ( charList[i][0].indexOf(search) !== -1) {
+                    list.push( charList[i])
                 }
             }
             return list.length ? list : false
@@ -638,7 +639,7 @@
 
     function loadAvatar() {
         import(StaticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
-            avatars = module.default
+             charList = module.default
         })
     }
 
@@ -1016,7 +1017,7 @@
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currChar?'char-curr':'char']"
                                              @click="setCurr(id)">
-                                            <img :src="char.src">
+                                            <img :src="avatars[id]">
                                         </div>
                                         <div class="option"
                                              style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"

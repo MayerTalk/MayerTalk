@@ -1,6 +1,6 @@
 <script setup>
     import {ref, inject, computed, onMounted} from 'vue'
-    import {chars, images} from '@/data'
+    import {chars, avatars} from '@/data'
 
     const props = defineProps({
         modelValue: null,
@@ -50,7 +50,7 @@
         >
             {{char.name}}
             <div style="display: flex; align-items: center; height: 100%; float: right">
-                <img :src="char.src"
+                <img :src="avatars[id]"
                      style="height: 80%; display: inline"/>
             </div>
         </el-option>

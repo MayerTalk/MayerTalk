@@ -5,6 +5,7 @@
     import {
         chars,
         images,
+        avatars,
     } from '@/data'
 
     const renderSettings = inject('renderSettings');
@@ -72,7 +73,7 @@
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
                             <img :src="StaticUrl + 'avatar-bg.webp'">
-                            <img :src="char.src">
+                            <img :src="avatars[data.char]">
                         </div>
                     </div>
                     <!--Content Start-->
@@ -147,7 +148,7 @@
                     <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                         <div v-if="right === true">
                             <img :src="StaticUrl + '/avatar-bg.webp'">
-                            <img :src="char.src">
+                            <img :src="avatars[data.char]">
                         </div>
                     </div>
                 </template>

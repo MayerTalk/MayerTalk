@@ -6,6 +6,7 @@ import {
     chats,
     chars,
     images,
+    avatars,
     DataControl
 } from '@/data'
 import {StaticUrl} from '@/constance'
@@ -45,12 +46,8 @@ const versionSwitcher = {
                 if (change.hasOwnProperty(char.avatar)) {
                     char.avatar = change[char.avatar];
                 } else {
-                    char.avatar = char.avatar.replace('.png','.webp')
+                    char.avatar = char.avatar.replace('.png', '.webp')
                 }
-                char.src = computed(() => {
-                    const avatar = chars.value[key].avatar;
-                    return images.value.hasOwnProperty(avatar) ? images.value[avatar].src : StaticUrl + avatar
-                });
             }
         }
         images.value = tmp;
@@ -73,16 +70,10 @@ function switchVersion(version) {
 }
 
 function downloadData() {
-    const _chars = copy(chars.value);
-    for (let key in _chars) {
-        if (_chars.hasOwnProperty(key) && _chars[key].hasOwnProperty('src')) {
-            delete _chars[key].src
-        }
-    }
     const url = blob2url(new Blob([JSON.stringify({
         version: currVersion,
         config: config.value,
-        chars: _chars,
+        chars: chars.value,
         chats: chats.value,
         images: images.value
     })], {type: 'application/json'}));

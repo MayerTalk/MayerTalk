@@ -8,6 +8,7 @@ const settings = ref({});
 const chars = ref({});
 const chats = ref([]);
 const images = ref({});
+const avatars = ref({});
 
 const Data = {
     config,
@@ -194,14 +195,24 @@ const DataControl = {
         }
 
     },
+    genCharSrc() {
+        for (let key in chars.value) {
+            if (chars.value.hasOwnProperty(key)) {
+                avatars.value[key] = computed(() => {
+                    const avatar = chars.value[key].avatar;
+                    return images.value.hasOwnProperty(avatar) ? images.value[avatar].src : StaticUrl + avatar
+                });
+            }
+        }
+    },
     load() {
         for (let key in this.storage) {
             if (this.storage.hasOwnProperty(key)) {
                 this.storage[key].load();
                 this.storage[key].update = false
             }
-
         }
+        this.genCharSrc()
     },
     set(data) {
         for (let key in this.storage) {
@@ -210,6 +221,7 @@ const DataControl = {
                 this.storage[key].update = true
             }
         }
+        this.genCharSrc()
     },
     withdraw() {
         if (this.index + 1 < this.version.length) {
@@ -246,10 +258,15 @@ const DataControl = {
             data = copy(data);
             const id = uuid();
             chars.value[id] = data;
-            data.src = computed(() => {
+            avatars.value[id] = computed(() => {
                 const avatar = chars.value[id].avatar;
                 return images.value.hasOwnProperty(avatar) ? images.value[avatar].src : StaticUrl + avatar
             })
+        },
+        delete(id) {
+            if (avatars.value.hasOwnProperty(id)) {
+                delete avatars.value[id]
+            }
         }
     },
     image: {
@@ -283,7 +300,7 @@ const DataControl = {
                 images.value[id].count++
             }
         }
-    }
+    },
 };
 
 for (let key in Data) {
@@ -316,6 +333,7 @@ export {
     chats,
     chars,
     images,
+    avatars,
     Storage,
     ImageStorage,
     DataControl
