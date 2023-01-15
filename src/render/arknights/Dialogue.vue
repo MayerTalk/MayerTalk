@@ -76,7 +76,7 @@
                         </div>
                     </div>
                     <!--Content Start-->
-                    <div style="flex-grow: 1">
+                    <div :style="{'flex-grow':data.type==='image'?0:1}">
                         <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
                              class="charName">{{char.name}}
                         </div>

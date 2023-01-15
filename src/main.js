@@ -1,5 +1,3 @@
-// localStorage.clear()
-
 import {createApp} from 'vue'
 import App from './App.vue'
 
