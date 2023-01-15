@@ -1,19 +1,22 @@
 <script setup>
     import {ref, inject, computed, onMounted} from 'vue'
-
-    const chars = inject('chars');
-    const images = inject('images');
-    const staticUrl = inject('staticUrl');
+    import {chars, images} from '@/data'
 
     const props = defineProps({
         modelValue: null,
         narration: Boolean,
+        select: null,
         placeholder: {
             type: String,
             default: '角色'
         }
     });
-    const emit = defineEmits(['update:modelValue', 'onMounted']);
+    const emit = defineEmits([
+        'update:modelValue',
+        'update:select',
+        'onMounted',
+        'showGuide',
+    ]);
 
     const select = ref(null);
 
@@ -27,17 +30,16 @@
     });
 
     onMounted(() => {
-        // const input = ref(null)
-        // @onMounted="(r) => {input = r}"
-        emit('onMounted', select.value)
+        emit("update:select", select.value);
     });
+
 </script>
 
 <template>
     <el-select
             v-model="modelValue"
             ref="select"
-            style="flex-grow: 1"
+            style="flex-grow: 1;"
             :placeholder="props.placeholder"
             filterable>
         <el-option
@@ -48,11 +50,9 @@
         >
             {{char.name}}
             <div style="display: flex; align-items: center; height: 100%; float: right">
-                <img :src="images[char.avatar] || staticUrl + char.avatar"
+                <img :src="char.src"
                      style="height: 80%; display: inline"/>
             </div>
-
-
         </el-option>
         <el-option v-if="props.narration"
                    key=""

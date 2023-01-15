@@ -182,3 +182,9 @@ pre {
     color: grey;
     border-top: grey solid 1px;
 }
+
+.charName {
+    font-size: 13px;
+    color: var(--dialogue-color);
+    margin-bottom: 4px;
+}

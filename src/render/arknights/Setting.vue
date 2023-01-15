@@ -1,45 +1,102 @@
 <script setup>
     import {ref, inject, watch, computed} from 'vue'
     import Renders from '@/render'
+    import message from '@/lib/message'
+    import {ensure} from '@/lib/tool';
+
+    import {TypeDict} from "@/constance";
+    import {
+        config,
+        settings,
+        DataControl
+    } from '@/data'
 
     const defaultSettings = {
         background: '#303030',
         width: 400,
         style: 'default',
-        scale: 1.5
+        scale: 1.5,
+        showCharName: false,
+        showCharNameSettings: {
+            chat: true,
+            monologue: true,
+            image: true
+        }
     };
 
-    const DataControl = inject('DataControl');
     const ifShow = inject('ifShowSettings');
-    const settings = inject('settings');
     const renderSettings = inject('renderSettings');
-    const config = inject('config');
     const dialogWidth = inject('dialogWidth');
 
-    function sync() {
-        for (let key in defaultSettings) {
-            if (defaultSettings.hasOwnProperty(key)) {
-                renderSettings.value[key] = settings.value[key] || defaultSettings[key]
+    function _sync(dst, src1, src2, k) {
+        for (let key in src1) {
+            if (src1.hasOwnProperty(key)) {
+                if (typeof src1[key] === 'object') {
+                    dst[key] = {};
+                    _sync(dst[key], src1[key], src2[key] || {}, key)
+                } else {
+                    dst[key] = src1[key]
+                }
+            }
+        }
+        for (let key in src2) {
+            if (src2.hasOwnProperty(key)) {
+                if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === "boolean")) {
+                    dst[key] = src2[key]
+                }
             }
         }
     }
 
-    function numProxy(obj) {
-        const r = ref(obj);
-        watch(r, () => {
-            obj.value = +r
-        });
-        return r
+    function sync() {
+        _sync(renderSettings.value, defaultSettings, settings.value);
     }
 
-    const width = numProxy(settings.value.width);
 
     const fake = ref({
         width: settings.value.width || null,
         scale: settings.value.scale || null
     });
 
+
     const language = ref('zh-cn');
+
+    const ifShowEditShowCharName = ref(false);
+    const showCharNameSettings = computed(() => {
+        return renderSettings.value.showCharNameSettings || {}
+    });
+
+    function setShowCharNameSettings(type, value) {
+        if (!settings.value.hasOwnProperty('showCharNameSettings')) {
+            settings.value.showCharNameSettings = {}
+        }
+        settings.value.showCharNameSettings[type] = value
+    }
+
+    const SizeUnit = ['B', 'KB', 'MB'];
+
+    function getStorageSize() {
+        let size = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                size += localStorage.getItem(key).length
+            }
+        }
+        let unit = SizeUnit[0];
+        for (let i = 1; size > 1024; i++) {
+            size /= 1024;
+            unit = SizeUnit[1]
+        }
+        return size.toFixed(2) + unit;
+    }
+
+    function clearStorage() {
+        localStorage.clear();
+        message.notify('清空成功，正在重载', message.success);
+        setTimeout(() => {
+            location.reload()
+        }, 500)
+    }
 
     // 同步，否则加载延迟+++
     sync();
@@ -101,24 +158,63 @@
                                   @input="settings.scale=+fake.scale"/>
                     </td>
                 </tr>
+                <tr>
+                    <th>显示角色名</th>
+                    <td>
+                        <div style="display: flex; align-items: center">
+                            <el-switch
+                                    v-model="settings.showCharName"
+                                    style="--el-switch-on-color: #79bbff;">
+                            </el-switch>
+                            <el-icon :size="35" color="#707070" style="margin-left: 10px; cursor: pointer"
+                                     @click="ifShowEditShowCharName=true">
+                                <Operation/>
+                            </el-icon>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <div style="display: flex; align-items: center">
+                <div class="line-left" style="width: 20px;"></div>
+                <h2 style="margin: 10px 0">储存</h2>
+                <div class="line-right"></div>
+            </div>
+            <table>
+                <tr>
+                    <th>本地</th>
+                    <td>{{getStorageSize()}}</td>
+                    <td>
+                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、设置）')">清空</el-button>
+                    </td>
+                </tr>
             </table>
         </div>
     </el-dialog>
-</template>
+    <el-dialog v-model="ifShowEditShowCharName" title="请选择要显示角色名的类型" :width="dialogWidth"
+               @closed="DataControl.save('settings')">
+        <table>
+            <tr v-for="(text, type) in TypeDict">
+                <th>{{text}}</th>
+                <td>
+                    <el-switch
+                            v-model="showCharNameSettings[type]"
+                            style="--el-switch-on-color: #79bbff; margin-left: 10px"
+                            @change="(value) => {setShowCharNameSettings(type,value)}"
+                    >
+                    </el-switch>
+                </td>
+            </tr>
+        </table>
 
-<style>
-    #settings .select-trigger {
-        display: flex;
-        justify-self: flex-end;
-    }
-</style>
+    </el-dialog>
+
+</template>
 
 <style scoped>
     table {
         padding-left: 10px;
         border-spacing: 5px;
     }
-
 
     .line-left {
         margin-right: 10px;

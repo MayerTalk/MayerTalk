@@ -24,7 +24,7 @@ def list_avatar(path, dirs=None) -> list:
                 name = name[1]
             else:
                 name = name[0]
-            name = name.replace('.png', '')
+            name = name.replace('.webp', '')
 
             res.append(['.'.join(file.split('.')[:-1]), '/' + '/'.join(dirs + [file]), name])
     return res

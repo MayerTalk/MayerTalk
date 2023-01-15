@@ -1,4 +1,5 @@
 import {v4 as uuid} from 'uuid'
+import md5 from 'blueimp-md5';
 import html2canvas from 'html2canvas';
 import message from "./message";
 
@@ -87,20 +88,45 @@ function image2square(image) {
     } else {
         ctx.drawImage(image, 0, crop, m, m, 0, 0, size, size);
     }
-    return canvas.toDataURL()
+    return canvas
+}
+
+function ensure(done, text) {
+    message.confirm(text, '提示', () => {
+        done()
+    })
 }
 
 function ensureClose(done) {
-    message.confirm('是否退出编辑', '提示', () => {
-        done()
-    })
+    ensure(done, '是否退出编辑')
 }
 
 function clickBySelector(selector) {
     document.querySelector(selector).click()
 }
 
+function getDialogue(id) {
+    let selector = null;
+    if (id.search(/^\d/) === 0) {
+        selector = '#\\3' + id.slice(0, 1) + ' ' + id.slice(1);
+    } else {
+        selector = '#' + id
+    }
+    return document.querySelector(selector);
+}
+
+function doAfterMounted(ref, callback) {
+    if (ref.value) {
+        callback(ref)
+    } else {
+        setTimeout(() => {
+            doAfterMounted(ref, callback)
+        }, 0)
+    }
+}
+
 export {
+    md5,
     copy,
     uuid,
     saveData,
@@ -110,6 +136,9 @@ export {
     blob2url,
     blob2base64,
     image2square,
+    ensure,
     ensureClose,
-    clickBySelector
+    clickBySelector,
+    getDialogue,
+    doAfterMounted
 }

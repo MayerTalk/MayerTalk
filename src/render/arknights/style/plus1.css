@@ -1,0 +1,24 @@
+/*class: dialogue*/
+
+
+.plus1 {
+    color: rgb(13, 121, 240);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    right: -50px;
+    border: 2px solid rgb(13, 121, 240);
+    border-radius: 50%;
+    background: white;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.plus1 p {
+    display: inline;
+    padding-bottom: 1px;
+}
