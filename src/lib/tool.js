@@ -78,7 +78,7 @@ function image2square(image) {
     const ctx = canvas.getContext('2d');
     const w = image.width;
     const h = image.height;
-    const crop = Math.ceil(Math.abs(w - h) / 2);
+    const crop = Math.floor(Math.abs(w - h) / 2);
     const m = Math.min(w, h);
     const size = Math.min(m, 512);
     canvas.width = size;

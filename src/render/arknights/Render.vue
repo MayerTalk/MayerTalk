@@ -79,6 +79,7 @@
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);
     const dialogWidth = Math.ceil(windowWidth * 0.9);
+    const avatarBarFrameWidth = Math.floor((dialogWidth - 48) / 4) + 'px';
     provide('renderSettings', renderSettings);
     provide('width', width);
     provide('dialogWidth', dialogWidth);
@@ -337,7 +338,7 @@
                 if (this.cache.length < 1) {
                     this.cache = copy(this.pool)
                 }
-                const p = Math.ceil(Math.random() * this.cache.length) - 1;
+                const p = Math.floor(Math.random() * this.cache.length) - 1;
                 this.tip.value = this.cache.splice(p, 1);
                 nextTick(() => {
                     resizeScroll()
@@ -657,6 +658,7 @@
         ifShowCopy.value = false;
         ifShowEditDialogue.value = false
     }
+
 </script>
 
 
@@ -756,14 +758,16 @@
                     <!--        素材库选择头像-->
                     <template v-if="ifShowSelectAvatar">
                         <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
-                        <div v-if="searchResult" class="avatar-bar">
+                        <template v-if="searchResult">
                             <el-scrollbar max-height="50vh" style="width: 100%">
-                                <img v-for="avatar in searchResult" :key="avatar[0]" :src="StaticUrl + avatar[1]"
-                                     loading="lazy"
-                                     :title="avatar[0]"
-                                     @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
+                                <div class="avatar-bar">
+                                    <div class="frame" v-for="avatar in searchResult" :key="avatar[0]">
+                                        <img :src="StaticUrl + avatar[1]" loading="lazy" :title="avatar[0]"
+                                             @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
+                                    </div>
+                                </div>
                             </el-scrollbar>
-                        </div>
+                        </template>
                         <div v-else
                              style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
                             <p>No Result</p>
@@ -1046,3 +1050,9 @@
 
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
+<style>
+    .avatar-bar .frame {
+        width: v-bind('avatarBarFrameWidth');
+        height: v-bind('avatarBarFrameWidth')
+    }
+</style>
