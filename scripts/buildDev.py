@@ -14,7 +14,7 @@ import hashlib
 from common import join
 
 
-def get_files(path: str) -> str:
+def get_hashes(path: str) -> str:
     files = os.listdir(path)
     res = ''
     for file in files:
@@ -22,7 +22,7 @@ def get_files(path: str) -> str:
             continue
         fpath = os.path.join(path, file)
         if os.path.isdir(fpath):
-            res += get_files(fpath)
+            res += get_hashes(fpath)
         else:
             with open(fpath, mode='rb') as f:
                 res += hashlib.sha256(f.read()).hexdigest()
@@ -41,30 +41,41 @@ else:
 
 expire += now if '-n' in sys.argv else now4
 
-version = hashlib.sha256(get_files(join('src')).encode('utf-8')).hexdigest()[:8]
+version = hashlib.sha256(get_hashes(join('src')).encode('utf-8')).hexdigest()[:8]
 
 if '-m' in sys.argv:
     message = sys.argv[sys.argv.index('-m') + 1]
 else:
     message = ''
 
+if '-tag' in sys.argv:
+    tag = sys.argv[sys.argv.index('-tag') + 1]
+else:
+    tag = version
+
 info = {
     'expire': expire,
     'expireString': time.strftime('%Y-%m-%d %H:%M', time.localtime(expire)),
     'message': message,
-    'version': version
+    'version': version,
+    'tag': tag
 }
 
-with open(join('src', 'App.vue'), mode='rt', encoding='utf-8') as f:
-    app = f.read()
-with open(join('src', 'App.vue'), mode='wt', encoding='utf-8') as f:
-    f.write(re.sub(r"(import Announce from '\./Announce\.)vue'", r"\1dev.vue'", app))
+with open(join('src', 'Announce.dev.vue'), mode='rt', encoding='utf-8') as f:
+    announce_dev = f.read()
+with open(join('src', 'Announce.vue'), mode='rt', encoding='utf-8') as f:
+    announce = f.read()
+with open(join('src', 'Announce.vue'), mode='wt', encoding='utf-8') as f:
+    f.write(announce_dev)
+
+with open(join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:
+    f.write(f'export default {json.dumps(info)}')
 
 os.system('')
 os.system(f'npm run build -- --base=/{version}/')
 
-with open(join('src', 'App.vue'), mode='wt', encoding='utf-8') as f:
-    f.write(app)
+with open(join('src', 'Announce.vue'), mode='wt', encoding='utf-8') as f:
+    f.write(announce)
 
 shutil.rmtree(join('dist', 'avatar'))
 os.remove(join('dist', 'avatar.js'))
