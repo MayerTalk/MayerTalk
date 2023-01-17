@@ -33,7 +33,7 @@
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <p>开发阶段，功能尚不完善，还请谅解</p>
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
-        <h2 style="color: orangered">祝各位博士新春快乐~</h2>
+        <h2 style="color: orangered">祝各位博士新年快乐~</h2>
         <template v-if="isNewSite">
             <h3>
                 v0.1.0
