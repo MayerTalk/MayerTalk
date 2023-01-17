@@ -43,6 +43,6 @@ app.component('Close', Close);
 app.component('Setting', Setting);
 app.component('Collection', Collection);
 
-app.provide('avatarsJs','avatar.js?v=beed41ea');
+app.provide('avatarsJs','avatar.js?v=78319d24');
 
 app.mount('#app');
