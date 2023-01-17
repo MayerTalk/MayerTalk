@@ -362,7 +362,7 @@
         data = {
             content: data.content,
             type: data.type,
-            char: data.char || currChar.value,
+            char: data.hasOwnProperty('char') ? data.char : currChar.value,
             id: data.id || uuid()
         };
         chats.value.push(data);
@@ -381,7 +381,7 @@
         data = {
             content: data.content || chats.value[index].content,
             type: data.type || chats.value[index].type,
-            char: data.char || currChar.value,
+            char: data.hasOwnProperty('char') ? data.char : currChar.value,
             id: data.id || uuid()
         };
         if (data.type === 'image') {
