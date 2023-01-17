@@ -377,7 +377,7 @@
         });
     }
 
-    function copyDialogue(index, data = {}, config) {
+    function copyDialogue(index, data = {}, config = {}) {
         data = {
             content: data.content || chats.value[index].content,
             type: data.type || chats.value[index].type,
