@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          - dev
+          ref: dev
 
       - name: Use Node.js 16
         uses: actions/setup-node@v3
@@ -38,7 +38,7 @@ jobs:
 
       - name: Build Dev
         run: |
-            python build/dev.py
+          python build/dev.py
 
       - name: Publish
         env:
