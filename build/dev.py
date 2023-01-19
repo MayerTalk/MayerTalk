@@ -37,7 +37,7 @@ with open(os.path.join('.github', 'publish.txt'), mode='rt', encoding='utf-8') a
 info = {
     'expire': expire,
     'expireString': time.strftime('%Y-%m-%d %H:%M', time.localtime(expire)),
-    'message': 'git action auto build',
+    'message': 'Github Action 自动部署',
     'version': version,
     'tag': tag
 }
