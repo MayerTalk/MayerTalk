@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import sys
 import time
 import hashlib
 import asyncio
@@ -16,9 +17,9 @@ def sign(key: str) -> dict:
     return {'signature': signature, 'timestamp': ts}
 
 
-async def upload(server: str, key: str, path: str, file: bytes):
+async def upload(server: str, key: str, path: str, file: bytes, dev: str = 'false'):
     global client
-    async with client.put(server, headers=sign(key), params={'path': path},
+    async with client.put(server, headers=sign(key), params={'path': path, 'dev': dev},
                           data={'file': file}) as r:
         if r.status:
             res = await r.json()
@@ -49,19 +50,30 @@ async def run():
 
     server = os.environ.get('SERVER')
     key = os.environ.get('KEY')
+    dev = sys.argv.index('--dev')
 
     files = scan()
     y = len(files)
     x = 0
+
     for file in files:
         x += 1
         file[1] = file[1][1:]
+
         with open(file[0], mode='rb') as f:
-            res = await upload(server, key, file[1], f.read())
+            res = await upload(server, key, file[1], f.read(), dev='true' if dev else 'false')
         if res is True:
             print(f'[{x}/{y}] upload {file[1]} successfully')
         else:
             print(f'[{x}/{y}] upload {file[1]} failed \n{res}')
+
+    if dev:
+        async with client.post(f'{server}dev_reload') as r:
+            if r.ok:
+                print('dev reload')
+            else:
+                print('dev reload failed', r.status)
+
     await client.close()
 
 
