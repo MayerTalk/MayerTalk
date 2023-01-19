@@ -68,7 +68,7 @@ async def run():
             print(f'[{x}/{y}] upload {file[1]} failed \n{res}')
 
     if dev:
-        async with client.post(f'{server}dev_reload') as r:
+        async with client.post(f'{server}dev_reload', headers=sign(key)) as r:
             if r.ok:
                 print('dev reload')
             else:
