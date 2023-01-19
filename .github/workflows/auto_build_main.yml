@@ -25,6 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          npm install
           python -m pip install --upgrade pip
           python -m venv venv
           venv\Scripts\python -m pip install --upgrade pip wheel setuptools
@@ -36,7 +37,6 @@ jobs:
 
       - name: Build Web
         run: |
-          npm install
           npm run build
 
       - name: Publish
