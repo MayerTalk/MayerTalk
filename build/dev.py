@@ -1,7 +1,5 @@
-"""
-生成dev版本
-(https://dev.mayertalk.top/)
-"""
+# -*- coding: UTF-8 -*-
+
 
 import os
 import time
@@ -57,7 +55,7 @@ os.system(f'npm run build -- --base=/{version}/')
 with open(os.path.join('dist', 'info.json'), mode='wt', encoding='utf-8') as f:
     json.dump(info, f)
 
-print(f'''\033[1;32m√ build
+print(f'''\033[1;32m✓ build
 \033[0;36mexpire: {time.strftime("%Y-%m-%d %X", time.localtime(info["expire"]))}
 \033[0;33mversion: {version}\033[0m''')
 
