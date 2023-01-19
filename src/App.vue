@@ -2,7 +2,7 @@
     import '@/lib/versionControl'
     import {ref, provide} from 'vue'
     import Renders from './render'
-    import Announce from './Announce.vue'
+    import Announce from './Announce.git.vue'
     import About from './About.vue'
     import {config} from './data'
 

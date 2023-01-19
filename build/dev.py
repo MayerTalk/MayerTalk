@@ -9,6 +9,8 @@ import json
 import shutil
 import hashlib
 
+time.timezone = -28800
+
 
 def get_hashes(path: str) -> str:
     files = os.listdir(path)
@@ -42,8 +44,8 @@ info = {
     'tag': tag
 }
 
-with open(os.path.join('src', 'Announce.dev.vue'), mode='rt', encoding='utf-8') as f:
-    announce_dev = f.read()
+with open(os.path.join('src', 'Announce.git.vue'), mode='rt', encoding='utf-8') as f:
+    announce_git = f.read()
 with open(os.path.join('src', 'Announce.vue'), mode='rt', encoding='utf-8') as f:
     announce = f.read()
 
