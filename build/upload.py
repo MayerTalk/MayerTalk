@@ -50,7 +50,7 @@ async def run():
 
     server = os.environ.get('SERVER')
     key = os.environ.get('KEY')
-    dev = sys.argv.index('--dev')
+    dev = '--dev' in sys.argv
 
     files = scan()
     y = len(files)
