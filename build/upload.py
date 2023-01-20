@@ -17,9 +17,9 @@ def sign(key: str) -> dict:
     return {'signature': signature, 'timestamp': ts}
 
 
-async def upload(server: str, key: str, path: str, file: bytes, dev: str = 'false'):
+async def upload(server: str, key: str, path: str, file: bytes, dev: bool = False):
     global client
-    async with client.put(server, headers=sign(key), params={'path': path, 'dev': dev},
+    async with client.put(server, headers=sign(key), params={'path': path, 'site': 'dev' if dev else 'main'},
                           data={'file': file}) as r:
         if r.status:
             res = await r.json()
@@ -61,7 +61,7 @@ async def run():
         file[1] = file[1][1:]
 
         with open(file[0], mode='rb') as f:
-            res = await upload(server, key, file[1], f.read(), dev='true' if dev else 'false')
+            res = await upload(server, key, file[1], f.read(), dev=dev)
         if res is True:
             print(f'[{x}/{y}] upload {file[1]} successfully')
         else:
