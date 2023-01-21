@@ -3,11 +3,16 @@
 明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段  
 
  [开发计划](https://github.com/Arkfans/MayerTalk/wiki/%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92)
-
- ## 参考
  
- - [yuzutalk](https://www.yuzutalk.net/) 对话形式二创的启发
- - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现
+ ## 鸣谢
+ 
+ - 数据及资源
+   - [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
+   - [yuanyan3060/Arknights-Bot-Resource](https://github.com/yuanyan3060/Arknights-Bot-Resource)
+ - 参考
+   - [yuzutalk](https://www.yuzutalk.net/) 对话形式二创的启发
+   - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现
+
  
  ## 与ClosureTalk的区别
  
