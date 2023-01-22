@@ -212,6 +212,8 @@
     let searchResultFullShow = 0;
 
     function searchCharHandler(search) {
+        const t = Date.now();
+        searchResultFullShow = t;
         if (search) {
             const list = [];
             for (let charId in CharDict) {
@@ -243,16 +245,12 @@
                 // TODO use virtual list
                 if (res.length > 400) {
                     searchResult.value = res.slice(0, 40);
-                    const t = Date.now();
-                    searchResultFullShow = t;
                     setTimeout(() => {
                         if (searchResultFullShow === t)
                             searchResult.value = res
                     }, 1000)
                 } else if (res.length > 40) {
                     searchResult.value = res.slice(0, 40);
-                    const t = Date.now();
-                    searchResultFullShow = t;
                     setTimeout(() => {
                         if (searchResultFullShow === t)
                             searchResult.value = res
@@ -261,11 +259,9 @@
                     searchResult.value = res
                 }
             } else {
-                searchResultFullShow = Date.now();
                 searchResult.value = false
             }
         } else {
-            searchResultFullShow = Date.now();
             searchResult.value = [
                 ['博士', 'avatar/arknights/博士.webp', '博士'],
                 ['PRTS', 'avatar/arknights/PRTS.webp', 'PRTS'],
