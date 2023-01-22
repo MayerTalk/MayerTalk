@@ -36,6 +36,10 @@
         uploadData,
         downloadData
     } from '@/lib/versionControl'
+    import {
+        CharDict,
+        loadChar
+    } from '@/lib/character'
 
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
@@ -195,27 +199,80 @@
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
-    let charList = [];
+    const searchResult = ref(false);
 
-    const searchResult = computed(() => {
-        if (searchChar.value) {
-            const search = searchChar.value;
+    function initSearchChar() {
+        const el = document.querySelector('#searchCharInput');
+        el.addEventListener('input', (event) => {
+            searchCharHandler(el.value)
+        });
+        searchCharHandler('')
+    }
+
+    let searchResultFullShow = 0;
+
+    function searchCharHandler(search) {
+        if (search) {
             const list = [];
-            for (let i = 0; i < charList.length; i++) {
-                if (charList[i][0].indexOf(search) !== -1) {
-                    list.push(charList[i])
+            for (let charId in CharDict) {
+                if (CharDict.hasOwnProperty(charId)) {
+                    const char = CharDict[charId];
+                    for (let lang in char.names) {
+                        if (char.names.hasOwnProperty(lang)) {
+                            if (lang === 'en_US') {
+                                if (char.names[lang].toLowerCase().indexOf(search.toLowerCase()) !== -1) {
+                                    list.push(charId);
+                                    break
+                                }
+                            } else if (char.names[lang].indexOf(search) !== -1) {
+                                list.push(charId);
+                                break
+                            }
+                        }
+                    }
                 }
             }
-            return list.length ? list : false
+            const res = [];
+            for (let i = 0; i < list.length; i++) {
+                for (let j = 0; j < CharDict[list[i]].avatars.length; j++) {
+                    res.push([CharDict[list[i]].avatars[j], CharDict[list[i]].avatars[j], CharDict[list[i]].names['zh_CN']])
+                }
+            }
+            if (res) {
+                // 优化：延迟输出
+                // TODO use virtual list
+                if (res.length > 400) {
+                    searchResult.value = res.slice(0, 40);
+                    const t = Date.now();
+                    searchResultFullShow = t;
+                    setTimeout(() => {
+                        if (searchResultFullShow === t)
+                            searchResult.value = res
+                    }, 1000)
+                } else if (res.length > 40) {
+                    searchResult.value = res.slice(0, 40);
+                    const t = Date.now();
+                    searchResultFullShow = t;
+                    setTimeout(() => {
+                        if (searchResultFullShow === t)
+                            searchResult.value = res
+                    }, 200)
+                } else {
+                    searchResult.value = res
+                }
+            } else {
+                searchResultFullShow = Date.now();
+                searchResult.value = false
+            }
         } else {
-            return [
+            searchResult.value = [
                 ['博士', 'avatar/arknights/博士.webp', '博士'],
                 ['PRTS', 'avatar/arknights/PRTS.webp', 'PRTS'],
                 ['mon3tr', 'avatar/arknights/mon3tr.webp', 'mon3tr'],
                 ['凯尔希', 'avatar/arknights/凯尔希.webp', '凯尔希']
             ]
         }
-    });
+    }
 
     const ifShowEditDialogue = ref(false);
     const currDialogue = ref(-1);
@@ -623,12 +680,6 @@
 
     const avatarsJs = inject('avatarsJs');
 
-    function loadAvatar() {
-        import(StaticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
-            charList = module.default
-        })
-    }
-
     function showCreateOption() {
         options.value = [[uuid(), '']];
         ifShowCreateOption.value = true
@@ -754,15 +805,16 @@
                         </div>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
+                <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh"
+                           @open.once="loadChar('arknights');initSearchChar()">
                     <!--        素材库选择头像-->
                     <template v-if="ifShowSelectAvatar">
-                        <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
+                        <el-input placeholder="搜索更多角色" v-model="searchChar" id="searchCharInput"></el-input>
                         <template v-if="searchResult">
                             <el-scrollbar max-height="50vh" style="width: 100%">
                                 <div class="avatar-bar">
                                     <div class="frame" v-for="avatar in searchResult" :key="avatar[0]">
-                                        <img :src="StaticUrl + avatar[1]" loading="lazy" :title="avatar[0]"
+                                        <img :src="StaticUrl + avatar[1]" loading="lazy" :title="avatar[2]"
                                              @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
                                     </div>
                                 </div>

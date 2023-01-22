@@ -1,6 +1,9 @@
 {
   "name": "Mayertalk",
   "version": "0.1.0",
+  "description": "Arknights dialogue editor",
+  "author": "www.arkfans.top",
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -8,6 +11,7 @@
   },
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
+    "axios": "^1.2.3",
     "blueimp-md5": "^2.19.0",
     "element-plus": "^2.2.15",
     "html2canvas": "^1.4.1",
