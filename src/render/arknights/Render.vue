@@ -195,7 +195,7 @@
 
     const currChar = ref('');
     const ifShowEditChar = ref(false);
-    const ifShowSelectAvatar = ref(false);
+    const ifShowSelectChar = ref(false);
     const defaultName = ref('');
     const createChar = ref(true);
     const newChar = ref({name: ''});
@@ -538,10 +538,10 @@
         return false
     }
 
-    function selectAvatar(avatar) {
+    function selectChar(avatar) {
         DataControl.image.delete(newChar.value.avatar);
         newChar.value.avatar = avatar[1];
-        ifShowSelectAvatar.value = false
+        ifShowSelectChar.value = false
     }
 
     function editChar() {
@@ -796,26 +796,26 @@
                             </div>
                         </div>
                         <div style="width: 100%; margin-top: 10px">
-                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">
-                                从素材库中选择头像
+                            <el-button style="width: 60%" @click="ifShowSelectChar=true">
+                                从素材库中选择角色
                             </el-button>
                             <el-button style="width: calc(40% - 12px)" @click="editChar">{{createChar?'创建':'删除'}}
                             </el-button>
                         </div>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh"
+                <el-dialog v-model="ifShowSelectChar" title="选择角色" :width="dialogWidth" top="10vh"
                            @open="loadChar('arknights');initSearchChar()"
                            @closed="searchCharHandler('');searchChar=''">
-                    <!--        素材库选择头像-->
-                    <template v-if="ifShowSelectAvatar">
+                    <!--        素材库选择角色-->
+                    <template v-if="ifShowSelectChar">
                         <el-input placeholder="搜索更多角色" v-model="searchChar" id="searchCharInput"></el-input>
                         <template v-if="searchResult">
                             <el-scrollbar max-height="50vh" style="width: 100%">
                                 <div class="avatar-bar">
-                                    <div class="frame" v-for="avatar in searchResult" :key="avatar[0]">
-                                        <img :src="StaticUrl + avatar[1]" loading="lazy" :title="avatar[2]"
-                                             @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
+                                    <div class="frame" v-for="char in searchResult" :key="char[0]">
+                                        <img :src="StaticUrl + char[1]" loading="lazy" :title="char[2]"
+                                             @click="() => {selectChar(char);defaultName=char[2]}">
                                     </div>
                                 </div>
                             </el-scrollbar>
@@ -823,7 +823,7 @@
                         <div v-else
                              style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
                             <p>No Result</p>
-                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
+                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置</p>
                         </div>
                     </template>
                 </el-dialog>
