@@ -265,6 +265,7 @@
                 searchResult.value = false
             }
         } else {
+            searchResultFullShow = Date.now();
             searchResult.value = [
                 ['博士', 'avatar/arknights/博士.webp', '博士'],
                 ['PRTS', 'avatar/arknights/PRTS.webp', 'PRTS'],
@@ -518,7 +519,7 @@
                 return
             }
         }
-        searchChar.value = '';
+        searchResult.value = false;
         ifShowEditChar.value = true
     }
 
@@ -806,7 +807,8 @@
                     </div>
                 </el-dialog>
                 <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh"
-                           @open.once="loadChar('arknights');initSearchChar()">
+                           @open="loadChar('arknights');initSearchChar()"
+                           @closed="searchCharHandler('');searchChar=''">
                     <!--        素材库选择头像-->
                     <template v-if="ifShowSelectAvatar">
                         <el-input placeholder="搜索更多角色" v-model="searchChar" id="searchCharInput"></el-input>
