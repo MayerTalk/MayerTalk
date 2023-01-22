@@ -38,7 +38,8 @@
     } from '@/lib/versionControl'
     import {
         CharDict,
-        loadChar
+        loadChar,
+        sortChar
     } from '@/lib/character'
 
     const controller = new AbortController();
@@ -234,6 +235,7 @@
                     }
                 }
             }
+            sortChar(list, 'zh_CN');
             const res = [];
             for (let i = 0; i < list.length; i++) {
                 for (let j = 0; j < CharDict[list[i]].avatars.length; j++) {
