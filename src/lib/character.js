@@ -6,6 +6,15 @@ const request = new Request({host: StaticUrl});
 const CharDict = {};
 const loaded = [];
 
+function parseAvatarUrl(url, series, charId) {
+    if (url.indexOf('id:') === 0) {
+        url = 'avatar/' + series + '/' + url.slice(3) + '.webp'
+    } else {
+        url = 'avatar/' + series + '/' + charId + url + '.webp'
+    }
+    return url.replace('#', '%23')
+}
+
 function loadChar(series) {
     if (loaded.indexOf(series) !== -1) {
         return
@@ -18,9 +27,18 @@ function loadChar(series) {
                 success: (resp) => {
                     loaded.push(series);
                     for (let charId in resp.data) {
-                        if (resp.data.hasOwnProperty(charId)) {
-                            CharDict[charId] = resp.data[charId]
+                        if (!resp.data.hasOwnProperty(charId)) {
+                            continue
                         }
+                        const data = resp.data[charId];
+                        for (let avatarId in data.avatars) {
+                            if (!data.avatars.hasOwnProperty(avatarId)) {
+                                continue
+                            }
+                            data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId);
+                        }
+                        data.series = series;
+                        CharDict[charId] = data
                     }
                 }
             })
@@ -28,17 +46,23 @@ function loadChar(series) {
     })
 }
 
-const TagSort = {
+const seriesSort = {
     arknights: 1,
+};
+
+const TagSort = {
     operator: 1001,
     token: 1002,
     trap: 1003,
     enemy: 1004
 };
 
-function sortTag(a, b) {
+function firstSort(a, b) {
     const A = CharDict[a];
     const B = CharDict[b];
+    if (TagSort[A.series] !== TagSort[B.series]) {
+        return TagSort[A.series] - TagSort[B.series]
+    }
     for (let i = 0; i < A.tags.length && i < B.tags.length; i++) {
         if (A.tags[i] === B.tags[i]) {
             continue
@@ -64,8 +88,8 @@ const sortDict = {
 
 function sortChar(list, lang) {
     sortDict[lang] ? list.sort((a, b) => {
-        return sortTag(a, b) || sortDict[lang](a, b)
-    }) : list.sort(sortTag)
+        return firstSort(a, b) || sortDict[lang](a, b)
+    }) : list.sort(firstSort())
 }
 
 export {

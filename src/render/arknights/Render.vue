@@ -216,18 +216,14 @@
         const t = Date.now();
         searchResultFullShow = t;
         if (search) {
+            search = search.toLowerCase();
             const list = [];
             for (let charId in CharDict) {
                 if (CharDict.hasOwnProperty(charId)) {
                     const char = CharDict[charId];
                     for (let lang in char.names) {
                         if (char.names.hasOwnProperty(lang)) {
-                            if (lang === 'en_US') {
-                                if (char.names[lang].toLowerCase().indexOf(search.toLowerCase()) !== -1) {
-                                    list.push(charId);
-                                    break
-                                }
-                            } else if (char.names[lang].indexOf(search) !== -1) {
+                            if (char.names[lang].indexOf(search) !== -1) {
                                 list.push(charId);
                                 break
                             }
