@@ -151,7 +151,7 @@ const ImageStorage = class ImageStorage {
                     this.lastSave = dataStr;
                     return true
                 }
-            } else {
+            } else if (this.db.conn) {
                 const data = {};
                 this.db.transaction().openCursor().onsuccess = (event) => {
                     const cursor = event.target.result;
@@ -300,7 +300,7 @@ const DataControl = {
     },
     load() {
         for (let key in this.storage) {
-            if (this.storage.hasOwnProperty(key) && key !== 'images') {
+            if (this.storage.hasOwnProperty(key)) {
                 this.storage[key].load();
                 this.storage[key].update = false
             }
