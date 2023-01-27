@@ -8,7 +8,7 @@ import {
     DataControl
 } from '@/lib/data'
 
-const latestVersion = 'b';
+const latestVersion = 'c';
 let currVersion = getData('data.version') || 'a';
 const versionSwitcher = {
     a: () => {
@@ -48,8 +48,14 @@ const versionSwitcher = {
         }
         images.value = tmp;
         DataControl.update('chars', 'chats', 'images');
-        DataControl.image.sync();
         return 'b'
+    },
+    b: () => {
+        // v 0.1.0 -> v0.1.1 / b -> c
+        // indexDB
+        localStorage.removeItem('data.images');
+        DataControl.image.sync();
+        return 'c'
     }
 };
 
