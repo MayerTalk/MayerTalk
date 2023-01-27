@@ -82,16 +82,17 @@
                 size += localStorage.getItem(key).length
             }
         }
+        size += DataControl.image.lastSave.length;
         let unit = SizeUnit[0];
         for (let i = 1; size > 1024; i++) {
             size /= 1024;
-            unit = SizeUnit[1]
+            unit = SizeUnit[i]
         }
         return size.toFixed(2) + unit;
     }
 
     function clearStorage() {
-        localStorage.clear();
+        DataControl.clear(2);
         message.notify('清空成功，正在重载', message.success);
         setTimeout(() => {
             location.reload()

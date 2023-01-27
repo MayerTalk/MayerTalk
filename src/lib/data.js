@@ -68,17 +68,58 @@ const Storage = class Storage {
     }
 };
 
+const DataBase = class DataBase {
+    constructor(dbname, table) {
+        this.db = dbname;
+        this.table = table;
+        this.conn = null
+    }
+
+    open(onupgradeneeded, callback) {
+        const request = window.indexedDB.open(this.db);
+        request.onupgradeneeded = onupgradeneeded;
+        request.onsuccess = (event) => {
+            this.conn = request.result;
+            callback && callback()
+        }
+    }
+
+    transaction(mode = 'readonly') {
+        return this.conn.transaction(this.table, mode).objectStore(this.table)
+    }
+
+    add(data) {
+        return this.transaction('readwrite').add(data)
+    }
+
+    put(data) {
+        return this.transaction('readwrite').put(data)
+    }
+
+    delete(key) {
+        return this.transaction('readwrite').delete(key)
+    }
+
+    clear(success) {
+        this.transaction('readwrite').clear().onsuccess = success
+    }
+};
+
 const ImageStorage = class ImageStorage {
     constructor(key, obj) {
         this.key = key;
         this.obj = obj;
         this.lastSave = JSON.stringify(obj.value);
         this.update = false;
-        this.notifyMaxStorage = false
-        // TODO doesn't work
-        // watch(this.obj, () => {
-        //     this.update = true
-        // })
+        this.db = new DataBase('data', 'images');
+        this.db.open((event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('images')) {
+                db.createObjectStore('images', {keyPath: 'id'})
+            }
+        }, () => {
+            this.load()
+        })
     }
 
     save(force) {
@@ -88,19 +129,6 @@ const ImageStorage = class ImageStorage {
             const dataStr = JSON.stringify(this.obj.value);
             if (dataStr === lastSave) {
                 return false
-            }
-            if (dataStr.length > 4 * 1024 * 1024) {
-                // 5mb limit
-                if (!this.notifyMaxStorage) {
-                    message.confirm('图片总体积超过4MB，将不会自动保存图片');
-                    this.notifyMaxStorage = true
-                }
-            } else {
-                if (this.notifyMaxStorage) {
-                    message.notify('图片总体积小于4MB，自动保存已恢复', message.success);
-                    this.notifyMaxStorage = false
-                }
-                localStorage.setItem('data.' + this.key, dataStr);
             }
             this.lastSave = dataStr;
             return {
@@ -113,17 +141,18 @@ const ImageStorage = class ImageStorage {
     }
 
     load() {
-        try {
-            const dataStr = localStorage.getItem('data.' + this.key);
-            const data = JSON.parse(dataStr);
-            if (data) {
+        const data = {};
+        this.db.transaction().openCursor().onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
+                console.log(data);
+                cursor.continue()
+            } else {
+                this.lastSave = JSON.stringify(data);
                 this.obj.value = data;
-                this.lastSave = dataStr;
-                return true
             }
-        } catch (e) {
         }
-        return false
     }
 
     set(data, internal = false) {
@@ -149,7 +178,19 @@ const ImageStorage = class ImageStorage {
                 }
             }
         }
-        this.obj.value = tmp
+        this.obj.value = tmp;
+        this.sync()
+    }
+
+    sync() {
+        // 将内存数据同步到indexDB
+        this.db.clear(() => {
+            for (let key in this.obj.value) {
+                if (this.obj.value.hasOwnProperty(key)) {
+                    this.db.add({id: key, ...this.obj.value[key]})
+                }
+            }
+        });
     }
 
     new(blob, callback) {
@@ -157,9 +198,10 @@ const ImageStorage = class ImageStorage {
             if (b64) {
                 const id = md5(b64);
                 if (images.value.hasOwnProperty(id)) {
-                    images.value[id].count++;
+                    this.db.put({id: id, count: ++images.value[id].count, src: b64})
                 } else {
                     images.value[id] = {count: 1, src: b64};
+                    this.db.add({id: id, count: 1, src: b64});
                 }
                 DataControl.update('images');
                 callback && callback(id);
@@ -171,9 +213,11 @@ const ImageStorage = class ImageStorage {
 
     delete(id) {
         if (images.value.hasOwnProperty(id)) {
-            images.value[id].count--;
-            if (images.value[id].count < 1) {
-                delete images.value[id]
+            if (--images.value[id].count < 1) {
+                delete images.value[id];
+                this.db.delete(id)
+            } else {
+                this.db.put({id: id, ...images.value[id]})
             }
             DataControl.update('images')
         }
@@ -181,7 +225,8 @@ const ImageStorage = class ImageStorage {
 
     count(id) {
         if (images.value.hasOwnProperty(id)) {
-            images.value[id].count++
+            images.value[id].count++;
+            this.db.put({id: id, ...images.value[id]})
         }
     }
 };
@@ -240,7 +285,7 @@ const DataControl = {
     },
     load() {
         for (let key in this.storage) {
-            if (this.storage.hasOwnProperty(key)) {
+            if (this.storage.hasOwnProperty(key) && key !== 'images') {
                 this.storage[key].load();
                 this.storage[key].update = false
             }
@@ -288,6 +333,7 @@ const DataControl = {
     },
     clear(level) {
         if (level === 0) {
+            // 清空对话
             for (let i = 0; i < chats.value.length; i++) {
                 const chat = chats.value[i];
                 if (chat.type === 'image') {
@@ -298,11 +344,16 @@ const DataControl = {
             message.notify('清空成功', message.success);
             this.save(['chats', 'images']);
         } else if (level === 1) {
+            // 清空对话 + 角色
             chars.value = {};
             chats.value = [];
             images.value = {};
             message.notify('清空成功', message.success);
             this.save(['chars', 'chats', 'images']);
+        } else if (level === 2) {
+            // 清空本地数据
+            localStorage.clear();
+            indexedDB.deleteDatabase('data')
         }
     },
     char: {
