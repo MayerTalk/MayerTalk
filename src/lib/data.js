@@ -151,6 +151,39 @@ const ImageStorage = class ImageStorage {
         }
         this.obj.value = tmp
     }
+
+    new(blob, callback) {
+        blob2base64(blob, (b64) => {
+            if (b64) {
+                const id = md5(b64);
+                if (images.value.hasOwnProperty(id)) {
+                    images.value[id].count++;
+                } else {
+                    images.value[id] = {count: 1, src: b64};
+                }
+                DataControl.update('images');
+                callback && callback(id);
+            } else {
+                callback && callback(null)
+            }
+        });
+    }
+
+    delete(id) {
+        if (images.value.hasOwnProperty(id)) {
+            images.value[id].count--;
+            if (images.value[id].count < 1) {
+                delete images.value[id]
+            }
+            DataControl.update('images')
+        }
+    }
+
+    count(id) {
+        if (images.value.hasOwnProperty(id)) {
+            images.value[id].count++
+        }
+    }
 };
 
 const DataControl = {
@@ -293,44 +326,15 @@ const DataControl = {
             }
         }
     },
-    image: {
-        new(blob, callback) {
-            blob2base64(blob, (b64) => {
-                if (b64) {
-                    const id = md5(b64);
-                    if (images.value.hasOwnProperty(id)) {
-                        images.value[id].count++;
-                    } else {
-                        images.value[id] = {count: 1, src: b64};
-                    }
-                    DataControl.update('images');
-                    callback && callback(id);
-                } else {
-                    callback && callback(null)
-                }
-            });
-        },
-        delete(id) {
-            if (images.value.hasOwnProperty(id)) {
-                images.value[id].count--;
-                if (images.value[id].count < 1) {
-                    delete images.value[id]
-                }
-                DataControl.update('images')
-            }
-        },
-        count(id) {
-            if (images.value.hasOwnProperty(id)) {
-                images.value[id].count++
-            }
-        }
-    },
+    image: null
 };
 
 for (let key in Data) {
     if (Data.hasOwnProperty(key)) {
         if (key === 'images') {
-            DataControl.storage[key] = new ImageStorage(key, Data[key])
+            const storage = new ImageStorage(key, Data[key]);
+            DataControl.storage[key] = storage;
+            DataControl.image = storage
         } else {
             DataControl.storage[key] = new Storage(key, Data[key])
         }
