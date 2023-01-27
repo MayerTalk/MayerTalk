@@ -151,18 +151,21 @@ const ImageStorage = class ImageStorage {
                     this.lastSave = dataStr;
                     return true
                 }
-            } else if (this.db.conn && Object.entries(this.obj.value).length === 0) {
-                const data = {};
-                this.db.transaction().openCursor().onsuccess = (event) => {
-                    const cursor = event.target.result;
-                    if (cursor) {
-                        data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
-                        console.log(data);
-                        cursor.continue()
-                    } else {
-                        this.lastSave = JSON.stringify(data);
-                        this.obj.value = data;
+            } else if (this.db.conn) {
+                if (Object.entries(this.obj.value).length === 0) {
+                    const data = {};
+                    this.db.transaction().openCursor().onsuccess = (event) => {
+                        const cursor = event.target.result;
+                        if (cursor) {
+                            data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
+                            cursor.continue()
+                        } else {
+                            this.lastSave = JSON.stringify(data);
+                            this.obj.value = data;
+                        }
                     }
+                } else {
+                    this.sync()
                 }
             }
         } catch (e) {

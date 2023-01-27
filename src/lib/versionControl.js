@@ -55,7 +55,6 @@ const versionSwitcher = {
         // indexDB
         localStorage.removeItem('data.images');
         DataControl.update('images');
-        DataControl.image.sync();
         return 'c'
     }
 };
