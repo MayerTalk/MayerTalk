@@ -141,18 +141,33 @@ const ImageStorage = class ImageStorage {
     }
 
     load() {
-        const data = {};
-        this.db.transaction().openCursor().onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-                data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
-                console.log(data);
-                cursor.continue()
+        try {
+            const dataStr = localStorage.getItem('data.' + this.key);
+            if (dataStr) {
+                // 向前支持
+                const data = JSON.parse(dataStr);
+                if (data) {
+                    this.obj.value = data;
+                    this.lastSave = dataStr;
+                    return true
+                }
             } else {
-                this.lastSave = JSON.stringify(data);
-                this.obj.value = data;
+                const data = {};
+                this.db.transaction().openCursor().onsuccess = (event) => {
+                    const cursor = event.target.result;
+                    if (cursor) {
+                        data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
+                        console.log(data);
+                        cursor.continue()
+                    } else {
+                        this.lastSave = JSON.stringify(data);
+                        this.obj.value = data;
+                    }
+                }
             }
+        } catch (e) {
         }
+        return false
     }
 
     set(data, internal = false) {
