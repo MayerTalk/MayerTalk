@@ -5,7 +5,7 @@ const request = new Request({host: StaticUrl});
 
 const CharDict = {};
 const loaded = [];
-const Suffix = (navigator.userAgent.indexOf("Chrome") !== -1 && navigator.userAgent.indexOf("Safari") === -1)
+const Suffix = (navigator.userAgent.indexOf("Chrome") === -1 && navigator.userAgent.indexOf("Safari") !== -1)
     ? '.png' : '.webp';
 
 function parseAvatarUrl(url, series, charId) {
