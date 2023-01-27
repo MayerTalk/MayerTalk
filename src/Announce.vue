@@ -18,10 +18,8 @@
     const version = 'v0.1.1';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
 
-    const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
-
     onMounted(() => {
-        if (getData('a_version') !== version || !isNewSite) {
+        if (getData('a_version') !== version) {
             emit('update:modelValue', true);
             saveData('a_version', version)
         }
@@ -33,28 +31,20 @@
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <p>开发阶段，功能尚不完善，还请谅解</p>
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
-        <template v-if="!isNewSite">
-            <h3>
-                v0.1.1
-            </h3>
-            <b>新增</b>
-            <ul>
-                <li>
-                    拼音，拼音首字母，多语种搜索<br/>e.g. 斯卡蒂 / sikadi / skd / skadi
-                </li>
-            </ul>
-            <b>优化</b>
-            <ul>
-                <li>现在角色搜索结果会按拼音首字母排序</li>
-                <li>取消了图片大小4mb的限制</li>
-            </ul>
-        </template>
-        <template v-else>
-            <h2>此网站将于1.30停止支持，请在完成现有创作后前往
-                <el-link href="https://www.mayertalk.top/" type="primary" style="top: -2px; left: -4px"><h2
-                        style="display: inline; margin: 0">新网站</h2></el-link>
-            </h2>
-        </template>
+        <h3>
+            v0.1.1
+        </h3>
+        <b>新增</b>
+        <ul>
+            <li>
+                拼音，拼音首字母，多语种搜索<br/>e.g. 斯卡蒂 / sikadi / skd / skadi
+            </li>
+        </ul>
+        <b>优化</b>
+        <ul>
+            <li>现在角色搜索结果会按拼音首字母排序</li>
+            <li>取消了图片大小4mb的限制</li>
+        </ul>
         <h3>关于截图失败</h3>
         <b>iOS：待支持</b><br/>
         <b>安卓：推荐使用via</b><br/>
