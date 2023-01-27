@@ -15,7 +15,7 @@
     });
     const ifShowUnsupportBrowser = ref(false);
 
-    const version = 'v0.1.0';
+    const version = 'v0.1.1';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
 
     const isNewSite = location.href.indexOf('https://www.mayertalk.top/') === 0;
@@ -33,46 +33,20 @@
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <p>开发阶段，功能尚不完善，还请谅解</p>
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
-        <h2 style="color: orangered">祝各位博士新年快乐~</h2>
-        <template v-if="isNewSite">
+        <template v-if="!isNewSite">
             <h3>
-                v0.1.0
+                v0.1.1
             </h3>
             <b>新增</b>
             <ul>
                 <li>
-                    <p style="display: flex; align-items: center; margin: 0">@提示
-                        <el-link href="https://github.com/1MLightyears" target="_blank" style="margin-left: 5px">
-                            @Lightyears
-                        </el-link>
-                    </p>
+                    拼音，拼音首字母，多语种搜索<br/>e.g. 斯卡蒂 / sikadi / skd / skadi
                 </li>
-                <li>
-                    <p style="display: flex; align-items: center; margin: 0">+1
-                        <el-link href="https://github.com/1MLightyears" target="_blank" style="margin-left: 5px">
-                            @Lightyears
-                        </el-link>
-                    </p>
-                </li>
-                <li>
-                    <p style="display: flex; align-items: center; margin: 0">显示角色名
-                        <el-link href="https://github.com/1MLightyears" target="_blank" style="margin-left: 5px">
-                            @Lightyears
-                        </el-link>
-                    </p>
-                </li>
-                <li>复读</li>
-                <li>仅清空对话</li>
-                <li>清空本地数据(设置)</li>
-                <li>Ctrl + C 快捷创建角色</li>
-            </ul>
-            <b>修复</b>
-            <ul>
-                <li>长对话编辑时错误转跳</li>
             </ul>
             <b>优化</b>
             <ul>
-                <li>角色栏由横向滚动改为纵向</li>
+                <li>现在角色搜索结果会按拼音首字母排序</li>
+                <li>取消了图片大小4mb的限制</li>
             </ul>
         </template>
         <template v-else>
@@ -88,7 +62,7 @@
         <br/>
         <el-link href="https://wj.qq.com/s2/11287516/2689/" type="primary">其他浏览器无法截图/导出反馈</el-link>
         <p>
-            <el-link @click="$emit('showGuide', false)" href="javascript:void(0)">查看指南</el-link>
+            <el-link @click="$emit('showGuide', false)" href="javascript:void(0)" type="primary">查看指南</el-link>
         </p>
         <div style="display: flex">
             <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px">
