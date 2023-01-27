@@ -8,8 +8,8 @@ import {
     images,
     avatars,
     DataControl
-} from '@/data'
-import {StaticUrl} from '@/constance'
+} from '@/lib/data'
+import {StaticUrl} from '@/lib/constance'
 import {copy} from "./tool";
 
 const latestVersion = 'b';

@@ -1,6 +1,6 @@
 <script setup>
     import {ref, inject, computed, onMounted} from 'vue'
-    import {chars, avatars} from '@/data'
+    import {chars, avatars} from '@/lib/data'
 
     const props = defineProps({
         modelValue: null,

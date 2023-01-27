@@ -1,5 +1,5 @@
 import {ref, computed} from 'vue'
-import {StaticUrl} from '@/constance';
+import {StaticUrl} from '@/lib/constance';
 import message from '@/lib/message'
 import {copy, blob2base64, md5, uuid} from '@/lib/tool'
 

@@ -1,5 +1,5 @@
 import Request from '@/lib/request'
-import {StaticUrl} from "@/constance";
+import {StaticUrl} from "@/lib/constance";
 
 const request = new Request({host: StaticUrl});
 

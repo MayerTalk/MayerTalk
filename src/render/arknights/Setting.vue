@@ -4,12 +4,12 @@
     import message from '@/lib/message'
     import {ensure} from '@/lib/tool';
 
-    import {TypeDict} from "@/constance";
+    import {TypeDict} from "@/lib/constance";
     import {
         config,
         settings,
         DataControl
-    } from '@/data'
+    } from '@/lib/data'
 
     const defaultSettings = {
         background: '#303030',

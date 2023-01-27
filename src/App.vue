@@ -4,7 +4,7 @@
     import Renders from './render'
     import Announce from './Announce.vue'
     import About from './About.vue'
-    import {config} from './data'
+    import {config} from '@/lib/data'
 
     const ifShowAnnouncement = ref(false);
     const ifShowSettings = ref(false);

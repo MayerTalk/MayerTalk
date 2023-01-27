@@ -23,7 +23,7 @@
         TypeDict,
         TypeHint,
         TypeDefault
-    } from "@/constance";
+    } from "@/lib/constance";
     import {
         config,
         chats,
@@ -31,7 +31,7 @@
         images,
         avatars,
         DataControl
-    } from '@/data'
+    } from '@/lib/data'
     import {
         uploadData,
         downloadData

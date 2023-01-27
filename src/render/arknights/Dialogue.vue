@@ -1,12 +1,12 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
-    import {StaticUrl} from '@/constance'
+    import {StaticUrl} from '@/lib/constance'
     import {
         chars,
         images,
         avatars,
-    } from '@/data'
+    } from '@/lib/data'
 
     const renderSettings = inject('renderSettings');
     const width = inject('width');
