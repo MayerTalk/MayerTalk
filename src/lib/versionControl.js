@@ -54,6 +54,7 @@ const versionSwitcher = {
         // v 0.1.0 -> v0.1.1 / b -> c
         // indexDB
         localStorage.removeItem('data.images');
+        DataControl.update('images');
         DataControl.image.sync();
         return 'c'
     }
