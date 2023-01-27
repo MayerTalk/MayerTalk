@@ -1,4 +1,4 @@
-import {uuid} from './lib/tool'
+import {uuid} from '@/lib/tool'
 
 const StaticUrl = 'https://static.mayertalk.top/';
 

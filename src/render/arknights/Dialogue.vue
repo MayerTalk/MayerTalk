@@ -1,12 +1,12 @@
 <script setup>
     import {ref, inject, computed, watch} from 'vue';
     import {uuid} from '@/lib/tool'
-    import {StaticUrl} from '@/constance'
+    import {StaticUrl} from '@/lib/constance'
     import {
         chars,
         images,
         avatars,
-    } from '@/data'
+    } from '@/lib/data'
 
     const renderSettings = inject('renderSettings');
     const width = inject('width');
@@ -87,9 +87,11 @@
                                     <div class="tail2"></div>
                                 </div>
                             </div>
-                            <img :id="data.id" :key="id" :src="images[data.content].src"
+                            <img v-if="images[data.content]"
+                                 :id="data.id" :key="id" :src="images[data.content].src"
                                  :style="{width: preScreenshot?width.image:'100%'}"
                             >
+                            <span v-else>loading image...</span>
                         </div>
                         <template v-else-if="data.type==='chat'">
                             <div v-if="data.char" class="box dialogue-box">

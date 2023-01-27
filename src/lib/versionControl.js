@@ -1,4 +1,3 @@
-import {computed} from 'vue'
 import {getData, saveData, blob2url, download, md5} from '@/lib/tool'
 import message from '@/lib/message'
 import {
@@ -6,13 +5,10 @@ import {
     chats,
     chars,
     images,
-    avatars,
     DataControl
-} from '@/data'
-import {StaticUrl} from '@/constance'
-import {copy} from "./tool";
+} from '@/lib/data'
 
-const latestVersion = 'b';
+const latestVersion = 'c';
 let currVersion = getData('data.version') || 'a';
 const versionSwitcher = {
     a: () => {
@@ -53,6 +49,13 @@ const versionSwitcher = {
         images.value = tmp;
         DataControl.update('chars', 'chats', 'images');
         return 'b'
+    },
+    b: () => {
+        // v 0.1.0 -> v0.1.1 / b -> c
+        // indexDB
+        localStorage.removeItem('data.images');
+        DataControl.update('images');
+        return 'c'
     }
 };
 

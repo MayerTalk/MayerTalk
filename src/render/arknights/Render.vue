@@ -23,7 +23,7 @@
         TypeDict,
         TypeHint,
         TypeDefault
-    } from "@/constance";
+    } from "@/lib/constance";
     import {
         config,
         chats,
@@ -31,11 +31,17 @@
         images,
         avatars,
         DataControl
-    } from '@/data'
+    } from '@/lib/data'
     import {
         uploadData,
         downloadData
     } from '@/lib/versionControl'
+    import {
+        CharDict,
+        loadChar,
+        sortChar,
+        AvatarSuffix
+    } from '@/lib/character'
 
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
@@ -190,32 +196,79 @@
 
     const currChar = ref('');
     const ifShowEditChar = ref(false);
-    const ifShowSelectAvatar = ref(false);
+    const ifShowSelectChar = ref(false);
     const defaultName = ref('');
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
-    let charList = [];
+    const searchResult = ref(false);
 
-    const searchResult = computed(() => {
-        if (searchChar.value) {
-            const search = searchChar.value;
+    function initSearchChar() {
+        const el = document.querySelector('#searchCharInput');
+        el.addEventListener('input', (event) => {
+            searchCharHandler(el.value)
+        });
+        searchCharHandler('')
+    }
+
+    let searchResultFullShow = 0;
+
+    function searchCharHandler(search) {
+        const t = Date.now();
+        searchResultFullShow = t;
+        if (search) {
+            search = search.toLowerCase();
             const list = [];
-            for (let i = 0; i < charList.length; i++) {
-                if (charList[i][0].indexOf(search) !== -1) {
-                    list.push(charList[i])
+            for (let charId in CharDict) {
+                if (CharDict.hasOwnProperty(charId)) {
+                    const char = CharDict[charId];
+                    for (let lang in char.names) {
+                        if (char.names.hasOwnProperty(lang)) {
+                            if (char.names[lang].indexOf(search) !== -1) {
+                                list.push(charId);
+                                break
+                            }
+                        }
+                    }
                 }
             }
-            return list.length ? list : false
+            sortChar(list, 'zh_CN');
+            const res = [];
+            for (let i = 0; i < list.length; i++) {
+                for (let j = 0; j < CharDict[list[i]].avatars.length; j++) {
+                    res.push([CharDict[list[i]].avatars[j], CharDict[list[i]].avatars[j], CharDict[list[i]].names['zh_CN']])
+                }
+            }
+            if (res) {
+                // 优化：延迟输出
+                // TODO use virtual list
+                if (res.length > 400) {
+                    searchResult.value = res.slice(0, 40);
+                    setTimeout(() => {
+                        if (searchResultFullShow === t)
+                            searchResult.value = res
+                    }, 1000)
+                } else if (res.length > 40) {
+                    searchResult.value = res.slice(0, 40);
+                    setTimeout(() => {
+                        if (searchResultFullShow === t)
+                            searchResult.value = res
+                    }, 200)
+                } else {
+                    searchResult.value = res
+                }
+            } else {
+                searchResult.value = false
+            }
         } else {
-            return [
-                ['博士', 'avatar/arknights/博士.webp', '博士'],
-                ['PRTS', 'avatar/arknights/PRTS.webp', 'PRTS'],
-                ['mon3tr', 'avatar/arknights/mon3tr.webp', 'mon3tr'],
-                ['凯尔希', 'avatar/arknights/凯尔希.webp', '凯尔希']
+            searchResult.value = [
+                ['博士', 'avatar/arknights/doctor' + AvatarSuffix, '博士'],
+                ['PRTS', 'avatar/arknights/PRTS' + AvatarSuffix, 'PRTS'],
+                ['mon3tr', 'avatar/arknights/mon3tr' + AvatarSuffix, 'mon3tr'],
+                ['凯尔希', 'avatar/arknights/char_003_kalts' + AvatarSuffix, '凯尔希']
             ]
         }
-    });
+    }
 
     const ifShowEditDialogue = ref(false);
     const currDialogue = ref(-1);
@@ -461,7 +514,7 @@
                 return
             }
         }
-        searchChar.value = '';
+        searchResult.value = false;
         ifShowEditChar.value = true
     }
 
@@ -482,10 +535,10 @@
         return false
     }
 
-    function selectAvatar(avatar) {
+    function selectChar(avatar) {
         DataControl.image.delete(newChar.value.avatar);
         newChar.value.avatar = avatar[1];
-        ifShowSelectAvatar.value = false
+        ifShowSelectChar.value = false
     }
 
     function editChar() {
@@ -623,12 +676,6 @@
 
     const avatarsJs = inject('avatarsJs');
 
-    function loadAvatar() {
-        import(StaticUrl + avatarsJs  /* @vite-ignore */ ).then(module => {
-            charList = module.default
-        })
-    }
-
     function showCreateOption() {
         options.value = [[uuid(), '']];
         ifShowCreateOption.value = true
@@ -746,24 +793,26 @@
                             </div>
                         </div>
                         <div style="width: 100%; margin-top: 10px">
-                            <el-button style="width: 60%" @click="ifShowSelectAvatar=true">
-                                从素材库中选择头像
+                            <el-button style="width: 60%" @click="ifShowSelectChar=true">
+                                从素材库中选择角色
                             </el-button>
                             <el-button style="width: calc(40% - 12px)" @click="editChar">{{createChar?'创建':'删除'}}
                             </el-button>
                         </div>
                     </div>
                 </el-dialog>
-                <el-dialog v-model="ifShowSelectAvatar" title="选择头像" :width="dialogWidth" top="10vh" @open="loadAvatar">
-                    <!--        素材库选择头像-->
-                    <template v-if="ifShowSelectAvatar">
-                        <el-input placeholder="搜索更多角色" v-model="searchChar"></el-input>
+                <el-dialog v-model="ifShowSelectChar" title="选择角色" :width="dialogWidth" top="10vh"
+                           @open="loadChar('arknights');initSearchChar()"
+                           @closed="searchCharHandler('');searchChar=''">
+                    <!--        素材库选择角色-->
+                    <template v-if="ifShowSelectChar">
+                        <el-input placeholder="搜索更多角色" v-model="searchChar" id="searchCharInput"></el-input>
                         <template v-if="searchResult">
                             <el-scrollbar max-height="50vh" style="width: 100%">
                                 <div class="avatar-bar">
-                                    <div class="frame" v-for="avatar in searchResult" :key="avatar[0]">
-                                        <img :src="StaticUrl + avatar[1]" loading="lazy" :title="avatar[0]"
-                                             @click="() => {selectAvatar(avatar);defaultName=avatar[2]}">
+                                    <div class="frame" v-for="char in searchResult" :key="char[0]">
+                                        <img :src="StaticUrl + char[1]" loading="lazy" :title="char[2]"
+                                             @click="() => {selectChar(char);defaultName=char[2]}">
                                     </div>
                                 </div>
                             </el-scrollbar>
@@ -771,7 +820,7 @@
                         <div v-else
                              style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
                             <p>No Result</p>
-                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置头像</p>
+                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置</p>
                         </div>
                     </template>
                 </el-dialog>
