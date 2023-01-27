@@ -5,12 +5,14 @@ const request = new Request({host: StaticUrl});
 
 const CharDict = {};
 const loaded = [];
+const Suffix = (navigator.userAgent.indexOf("Chrome") !== -1 && navigator.userAgent.indexOf("Safari") === -1)
+    ? '.png' : '.webp';
 
 function parseAvatarUrl(url, series, charId) {
     if (url.indexOf('id:') === 0) {
-        url = 'avatar/' + series + '/' + url.slice(3) + '.webp'
+        url = 'avatar/' + series + '/' + url.slice(3) + Suffix
     } else {
-        url = 'avatar/' + series + '/' + charId + url + '.webp'
+        url = 'avatar/' + series + '/' + charId + url + Suffix
     }
     return url.replace('#', '%23')
 }
@@ -95,5 +97,6 @@ function sortChar(list, lang) {
 export {
     CharDict,
     loadChar,
-    sortChar
+    sortChar,
+    Suffix as AvatarSuffix
 }

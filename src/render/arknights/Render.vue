@@ -39,7 +39,8 @@
     import {
         CharDict,
         loadChar,
-        sortChar
+        sortChar,
+        AvatarSuffix
     } from '@/lib/character'
 
     const controller = new AbortController();
@@ -261,10 +262,10 @@
             }
         } else {
             searchResult.value = [
-                ['博士', 'avatar/arknights/博士.webp', '博士'],
-                ['PRTS', 'avatar/arknights/PRTS.webp', 'PRTS'],
-                ['mon3tr', 'avatar/arknights/mon3tr.webp', 'mon3tr'],
-                ['凯尔希', 'avatar/arknights/凯尔希.webp', '凯尔希']
+                ['博士', 'avatar/arknights/doctor' + AvatarSuffix, '博士'],
+                ['PRTS', 'avatar/arknights/PRTS' + AvatarSuffix, 'PRTS'],
+                ['mon3tr', 'avatar/arknights/mon3tr' + AvatarSuffix, 'mon3tr'],
+                ['凯尔希', 'avatar/arknights/char_003_kalts' + AvatarSuffix, '凯尔希']
             ]
         }
     }
