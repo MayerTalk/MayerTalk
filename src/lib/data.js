@@ -151,7 +151,7 @@ const ImageStorage = class ImageStorage {
                     this.lastSave = dataStr;
                     return true
                 }
-            } else if (this.db.conn) {
+            } else if (this.db.conn && Object.entries(this.obj.value).length === 0) {
                 const data = {};
                 this.db.transaction().openCursor().onsuccess = (event) => {
                     const cursor = event.target.result;
