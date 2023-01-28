@@ -983,7 +983,9 @@
                         关于
                     </div>
                 </div>
-                <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
+                <Transition name="fade">
+                    <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
+                </Transition>
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
                         <div class="window" id="window"
@@ -1094,7 +1096,6 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <style src=".global.css"></style>
@@ -1103,5 +1104,19 @@
     .avatar-bar .frame {
         width: v-bind('avatarBarFrameWidth');
         height: v-bind('avatarBarFrameWidth')
+    }
+
+    .drawer-mask {
+        opacity: 0.5;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.5s ease;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+        opacity: 0;
     }
 </style>
