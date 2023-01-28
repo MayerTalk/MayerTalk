@@ -2,12 +2,27 @@
 
 
 import os
+import sys
 import time
 import json
 import shutil
 import hashlib
 
 time.timezone = -28800
+
+
+def argv(name, formatter=str):
+    key = f'--{name}'
+    if key in sys.argv:
+        index = sys.argv.index(key) + 1
+
+        if index >= len(sys.argv):
+            return True
+
+        if sys.argv[index].startswith('--'):
+            return True
+        else:
+            return formatter(sys.argv[index])
 
 
 def get_hashes(path: str) -> str:
@@ -37,9 +52,9 @@ with open(os.path.join('.github', 'publish.txt'), mode='rt', encoding='utf-8') a
 info = {
     'expire': expire,
     'build': int(time.time()),
-    'message': 'Github Action 自动部署',
+    'message': argv('message') or 'Github Action 自动部署',
     'version': version,
-    'tag': tag
+    'tag': argv('tag') or tag
 }
 
 with open(os.path.join('src', 'Announce.git.vue'), mode='rt', encoding='utf-8') as f:
