@@ -560,6 +560,7 @@
                 '提示',
                 () => {
                     DataControl.char.delete(currChar.value);
+                    currChar.value = '';
                     message.notify('删除成功', message.success);
                     ifShowEditChar.value = false;
                 }
