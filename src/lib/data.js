@@ -253,6 +253,7 @@ const DataControl = {
     storage: {},
     version: [],
     index: -1,
+    switchHook: null,
     update(update) {
         if (typeof update === "string") {
             if (this.storage.hasOwnProperty(update)) {
@@ -332,6 +333,7 @@ const DataControl = {
                     }
                 }
             }
+            this.switchHook && this.switchHook(true, this.index)
         }
     },
     redo() {
@@ -347,6 +349,7 @@ const DataControl = {
                     }
                 }
             }
+            this.switchHook && this.switchHook(false, this.index)
         }
     },
     clear(level) {

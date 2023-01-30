@@ -535,6 +535,12 @@
         return false
     }
 
+    DataControl.switchHook = () => {
+        if (!chars.value.hasOwnProperty(currChar.value)) {
+            currChar.value = ''
+        }
+    };
+
     function selectChar(avatar) {
         DataControl.image.delete(newChar.value.avatar);
         newChar.value.avatar = avatar[1];
