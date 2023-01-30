@@ -550,7 +550,7 @@
             if (newChar.value.name === '') {
                 newChar.value.name = defaultName.value
             }
-            DataControl.char.new(newChar.value);
+            currChar.value = DataControl.char.new(newChar.value);
             ifShowEditChar.value = false;
             newChar.value = {name: ''};
             message.notify('创建成功', message.success);

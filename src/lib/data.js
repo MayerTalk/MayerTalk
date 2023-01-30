@@ -382,7 +382,8 @@ const DataControl = {
             avatars.value[id] = computed(() => {
                 const avatar = chars.value[id].avatar;
                 return images.value.hasOwnProperty(avatar) ? images.value[avatar].src : StaticUrl + avatar
-            })
+            });
+            return id
         },
         delete(id) {
             DataControl.image.delete(chars.value[id].avatar);
