@@ -415,7 +415,7 @@ for (let key in Data) {
 }
 
 document.addEventListener('keydown', event => {
-    if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
+    if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
         if (event.code === 'KeyZ') {
             if (event.shiftKey) {
                 DataControl.redo();

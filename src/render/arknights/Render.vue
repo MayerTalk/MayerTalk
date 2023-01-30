@@ -46,7 +46,7 @@
     const controller = new AbortController();
     document.addEventListener('keydown', event => {
         if (event.ctrlKey) {
-            if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
+            if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
                 if (event.code === 'KeyC') {
                     createChar.value = true;
                     ifShowEditChar.value = true;
