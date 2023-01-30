@@ -413,7 +413,11 @@ for (let key in Data) {
 document.addEventListener('keydown', event => {
     if (event.ctrlKey && ['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1) {
         if (event.code === 'KeyZ') {
-            DataControl.withdraw();
+            if (event.shiftKey) {
+                DataControl.redo();
+            } else {
+                DataControl.withdraw();
+            }
             event.preventDefault()
         } else if (event.code === 'KeyY') {
             DataControl.redo();
