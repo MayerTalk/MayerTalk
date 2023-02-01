@@ -185,7 +185,7 @@
                     <th>本地</th>
                     <td>{{getStorageSize()}}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、设置）')">清空</el-button>
+                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、设置），且无法恢复')">清空</el-button>
                     </td>
                 </tr>
             </table>
