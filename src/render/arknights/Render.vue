@@ -560,7 +560,9 @@
             ifShowEditChar.value = false;
             newChar.value = {name: ''};
             message.notify('创建成功', message.success);
-            document.getElementById('textarea').focus();
+            if (!toolBarMask.value) {
+                document.getElementById('textarea').focus();
+            }
         } else {
             message.confirm(
                 '即将删除该角色',
