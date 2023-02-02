@@ -15,7 +15,7 @@
     });
     const ifShowUnsupportBrowser = ref(false);
 
-    const version = 'v0.1.1';
+    const version = 'v0.1.2';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
 
     onMounted(() => {
@@ -31,19 +31,19 @@
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <p>开发阶段，功能尚不完善，还请谅解</p>
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
+        <el-link href="/docs/guide/start.html" type="primary">快速上手 (首次使用推荐阅读)</el-link>
         <h3>
-            v0.1.1
+            v0.1.2
         </h3>
         <b>新增</b>
         <ul>
             <li>
-                拼音，拼音首字母，多语种搜索<br/>e.g. 斯卡蒂 / sikadi / skd / skadi
+                <el-link href="/docs/" type="primary">更好的文档</el-link>
             </li>
         </ul>
         <b>优化</b>
         <ul>
-            <li>现在角色搜索结果会按拼音首字母排序</li>
-            <li>取消了图片大小4mb的限制</li>
+            <li>Ctrl+num快捷键不再检查是否正在输入</li>
         </ul>
         <h3>关于截图失败</h3>
         <b>iOS：待支持</b><br/>
@@ -51,10 +51,7 @@
         <el-link @click="ifShowUnsupportBrowser=true" href="javascript:void(0)">查看不支持的浏览器</el-link>
         <br/>
         <el-link href="https://wj.qq.com/s2/11287516/2689/" type="primary">其他浏览器无法截图/导出反馈</el-link>
-        <p>
-            <el-link @click="$emit('showGuide', false)" href="javascript:void(0)" type="primary">查看指南</el-link>
-        </p>
-        <div style="display: flex">
+        <div style="display: flex; margin-top: 10px">
             <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px">
                 交流群：560295639
             </el-link>
