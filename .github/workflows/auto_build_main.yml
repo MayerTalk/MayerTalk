@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,8 +28,9 @@ jobs:
           npm install
           python -m pip install --upgrade pip
           python -m venv venv
-          venv\Scripts\python -m pip install --upgrade pip wheel setuptools
-          venv\Scripts\python -m pip install aiohttp
+          source venv/bin/activate
+          pip install --upgrade pip wheel setuptools
+          pip install aiohttp
 
       - name: Build Style
         run: |
@@ -44,5 +45,5 @@ jobs:
           SERVER: ${{ secrets.SERVER }}
           KEY: ${{ secrets.KEY }}
         run: |
-          venv\Scripts\Activate.ps1
-          venv\Scripts\python build/upload.py
+          source venv/bin/activate
+          python build/upload.py
