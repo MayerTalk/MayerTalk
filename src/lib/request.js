@@ -5,6 +5,7 @@ axios.defaults.withCredentials = false;
 export default class Requests {
     constructor(config) {
         this.host = config.host;
+        this.cancelTokens = []
     }
 
     httpRequests(method, options) {
@@ -28,6 +29,9 @@ export default class Requests {
                 url: this.host + url,
                 method: method,
                 headers: headers,
+                cancelToken: new axios.CancelToken(cancel => {
+                    this.cancelTokens.push({cancel})
+                }),
                 [params]: payload
             };
 

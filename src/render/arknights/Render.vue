@@ -40,6 +40,8 @@
         CharDict,
         loadChar,
         sortChar,
+        searchResult,
+        searchCharHandler,
         AvatarSuffix
     } from '@/lib/character'
 
@@ -88,6 +90,7 @@
     provide('renderSettings', renderSettings);
     provide('width', width);
     provide('dialogWidth', dialogWidth);
+
     function toGuide() {
         location.href = '/docs/guide/start.html'
     }
@@ -203,7 +206,6 @@
     const createChar = ref(true);
     const newChar = ref({name: ''});
     const searchChar = ref('');
-    const searchResult = ref(false);
 
     function initSearchChar() {
         const el = document.querySelector('#searchCharInput');
@@ -211,65 +213,6 @@
             searchCharHandler(el.value)
         });
         searchCharHandler('')
-    }
-
-    let searchResultFullShow = 0;
-
-    function searchCharHandler(search) {
-        const t = Date.now();
-        searchResultFullShow = t;
-        if (search) {
-            search = search.toLowerCase();
-            const list = [];
-            for (let charId in CharDict) {
-                if (CharDict.hasOwnProperty(charId)) {
-                    const char = CharDict[charId];
-                    for (let lang in char.names) {
-                        if (char.names.hasOwnProperty(lang)) {
-                            if (char.names[lang].indexOf(search) !== -1) {
-                                list.push(charId);
-                                break
-                            }
-                        }
-                    }
-                }
-            }
-            sortChar(list, 'zh_CN');
-            const res = [];
-            for (let i = 0; i < list.length; i++) {
-                for (let j = 0; j < CharDict[list[i]].avatars.length; j++) {
-                    res.push([CharDict[list[i]].avatars[j], CharDict[list[i]].avatars[j], CharDict[list[i]].names['zh_CN']])
-                }
-            }
-            if (res) {
-                // 优化：延迟输出
-                // TODO use virtual list
-                if (res.length > 400) {
-                    searchResult.value = res.slice(0, 40);
-                    setTimeout(() => {
-                        if (searchResultFullShow === t)
-                            searchResult.value = res
-                    }, 1000)
-                } else if (res.length > 40) {
-                    searchResult.value = res.slice(0, 40);
-                    setTimeout(() => {
-                        if (searchResultFullShow === t)
-                            searchResult.value = res
-                    }, 200)
-                } else {
-                    searchResult.value = res
-                }
-            } else {
-                searchResult.value = false
-            }
-        } else {
-            searchResult.value = [
-                ['博士', 'avatar/arknights/doctor' + AvatarSuffix, '博士'],
-                ['PRTS', 'avatar/arknights/PRTS' + AvatarSuffix, 'PRTS'],
-                ['mon3tr', 'avatar/arknights/mon3tr' + AvatarSuffix, 'mon3tr'],
-                ['凯尔希', 'avatar/arknights/char_003_kalts' + AvatarSuffix, '凯尔希']
-            ]
-        }
     }
 
     const ifShowEditDialogue = ref(false);
