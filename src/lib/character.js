@@ -98,7 +98,7 @@ function sortChar(list, lang) {
 }
 
 const searchResult = ref(false);
-
+const AliasAddition = ref([]);
 
 let searchResultFullShow = 0;
 
@@ -107,6 +107,11 @@ const SearchManager = class SearchManager {
         this.search = search;
         this.t = t;
         this.list = list;
+        for (let charId of AliasAddition.value) {
+            if (this.list.indexOf(charId) === -1) {
+                this.list.push(charId);
+            }
+        }
         this.lang = lang;
         this.res = [];
         self.showed = false;
@@ -164,7 +169,7 @@ const SearchManager = class SearchManager {
             AliasApi.cancelTokens = []
         }
         AliasApi.get({
-            url: 'alias/search?lang=ALL&output=4&type=39&text=' + this.search,
+            url: 'alias/search?lang=ALL&output=4&type=39&mode=14&text=' + this.search,
             success(resp) {
                 callback && callback(resp.data)
             }
@@ -176,9 +181,13 @@ const SearchManager = class SearchManager {
         this.gen();
         this.show();
         this.searchAlias((data) => {
+            AliasAddition.value = [];
             for (let charId of data) {
-                if (CharDict.hasOwnProperty(charId) && this.list.indexOf(charId) === -1) {
-                    this.list.push(charId);
+                if (CharDict.hasOwnProperty(charId)) {
+                    if (this.list.indexOf(charId) === -1) {
+                        this.list.push(charId);
+                    }
+                    AliasAddition.value.push(charId)
                 }
             }
             this.sort();
