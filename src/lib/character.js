@@ -177,7 +177,7 @@ const SearchManager = class SearchManager {
         this.show();
         this.searchAlias((data) => {
             for (let charId of data) {
-                if (this.list.indexOf(charId) === -1) {
+                if (CharDict.hasOwnProperty(charId) && this.list.indexOf(charId) === -1) {
                     this.list.push(charId);
                 }
             }
