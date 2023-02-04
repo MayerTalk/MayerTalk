@@ -1,6 +1,7 @@
 import {ref} from 'vue'
 
 import Request from '@/lib/request'
+import {copy} from '@/lib/tool'
 import {StaticUrl} from "@/lib/constance";
 
 const request = new Request({host: StaticUrl});
@@ -106,6 +107,7 @@ const SearchManager = class SearchManager {
     constructor(search, t, list, lang = 'zh_CN') {
         this.search = search;
         this.t = t;
+        this.raw_list = copy(list);
         this.list = list;
         for (let charId of AliasAddition.value) {
             if (this.list.indexOf(charId) === -1) {
@@ -181,6 +183,7 @@ const SearchManager = class SearchManager {
         this.gen();
         this.show();
         this.searchAlias((data) => {
+            this.list = this.raw_list;
             AliasAddition.value = [];
             for (let charId of data) {
                 if (CharDict.hasOwnProperty(charId)) {
@@ -221,6 +224,7 @@ function searchCharHandler(search) {
         const manager = new SearchManager(search, t, list);
         manager.run()
     } else {
+        AliasAddition.value = [];
         searchResult.value = [
             ['博士', 'avatar/arknights/doctor' + Suffix, '博士'],
             ['PRTS', 'avatar/arknights/PRTS' + Suffix, 'PRTS'],
