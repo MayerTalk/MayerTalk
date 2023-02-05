@@ -163,7 +163,7 @@ const SearchManager = class SearchManager {
         }
     }
 
-    searchAlias(callback) {
+    searchAlias(success, error) {
         if (AliasApi.cancelTokens.length) {
             for (let item of AliasApi.cancelTokens) {
                 item.cancel()
@@ -172,20 +172,30 @@ const SearchManager = class SearchManager {
         }
         AliasApi.get({
             url: 'alias/search?lang=7&output=4&type=39&mode=14&text=' + this.search,
-            success(resp) {
-                callback && callback(resp.data)
-            }
+            success,
+            error
         })
+    }
+
+    aliasHandler(callback) {
+        return (response) => {
+            this.list = this.raw_list;
+            AliasAddition.value = [];
+            callback && callback(response);
+            this.sort();
+            this.gen();
+            if (this.showed && this.t === searchResultFullShow) {
+                searchResult.value = this.res
+            }
+        }
     }
 
     run() {
         this.sort();
         this.gen();
         this.show();
-        this.searchAlias((data) => {
-            this.list = this.raw_list;
-            AliasAddition.value = [];
-            for (let charId of data) {
+        this.searchAlias(this.aliasHandler((resp) => {
+            for (let charId of resp.data) {
                 if (CharDict.hasOwnProperty(charId)) {
                     if (this.list.indexOf(charId) === -1) {
                         this.list.push(charId);
@@ -193,12 +203,7 @@ const SearchManager = class SearchManager {
                     AliasAddition.value.push(charId)
                 }
             }
-            this.sort();
-            this.gen();
-            if (this.showed && this.t === searchResultFullShow) {
-                searchResult.value = this.res
-            }
-        })
+        }), this.aliasHandler())
     }
 };
 
