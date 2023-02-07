@@ -15,7 +15,7 @@
     });
     const ifShowUnsupportBrowser = ref(false);
 
-    const version = 'v0.1.2';
+    const version = 'v0.1.3';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
 
     onMounted(() => {
@@ -33,17 +33,19 @@
         <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
         <el-link href="/docs/guide/start.html" type="primary">快速上手 (首次使用推荐阅读)</el-link>
         <h3>
-            v0.1.2
+            v0.1.3
         </h3>
         <b>新增</b>
         <ul>
             <li>
-                <el-link href="/docs/" type="primary">更好的文档</el-link>
+                支持别名搜索<br/>
+                e.g. 现在可以用“刁民”搜索“乌萨斯平民”了<br/>
+                <p style="display: flex; margin: 0">没有想要的别名？
+                    <el-link href="https://alias.arkfans.top/docs/alias.html" type="primary" style="margin-left: 5px;" target="_blank">
+                        点我提交
+                    </el-link>
+                </p>
             </li>
-        </ul>
-        <b>优化</b>
-        <ul>
-            <li>Ctrl+num快捷键不再检查是否正在输入</li>
         </ul>
         <h3>关于截图失败</h3>
         <b>iOS：待支持</b><br/>
