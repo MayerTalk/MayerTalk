@@ -13,12 +13,10 @@ const Suffix = (navigator.userAgent.indexOf("Chrome") === -1 && navigator.userAg
     ? '.png' : '.webp';
 
 function parseAvatarUrl(url, series, charId) {
-    if (url.indexOf('id:') === 0) {
-        url = 'avatar/' + series + '/' + url.slice(3) + Suffix
-    } else {
-        url = 'avatar/' + series + '/' + charId + url + Suffix
-    }
-    return url.replace('#', '%23')
+    return 'avatar/'
+        + encodeURIComponent(series) + '/'
+        + encodeURIComponent(url.indexOf('id:') === 0 ? url.slice(3) : charId + url)
+        + Suffix
 }
 
 function loadChar(series) {
