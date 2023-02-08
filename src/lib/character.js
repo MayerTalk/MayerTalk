@@ -171,7 +171,7 @@ const SearchManager = class SearchManager {
             AliasApi.cancelTokens = []
         }
         AliasApi.get({
-            url: 'alias/search?lang=7&output=4&type=39&mode=14&text=' + this.search,
+            url: 'alias/search?lang=7&output=4&type=39&mode=14&text=' + encodeURI(this.search),
             success,
             error
         })
