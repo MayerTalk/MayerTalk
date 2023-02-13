@@ -61,24 +61,38 @@ const TagSort = {
     enemy: 1004
 };
 
-function firstSort(a, b) {
-    const A = CharDict[a];
-    const B = CharDict[b];
-    if (TagSort[A.series] !== TagSort[B.series]) {
-        return TagSort[A.series] - TagSort[B.series]
+function sortByLength(a, b, lang) {
+    const A = a.names[lang];
+    const B = b.names[lang];
+    if (!A) {
+        return 1
+    } else if (!B) {
+        return -1
     }
-    for (let i = 0; i < A.tags.length && i < B.tags.length; i++) {
-        if (A.tags[i] === B.tags[i]) {
+    return A.length - B.length
+}
+
+function sortBySeries(a, b) {
+    return (TagSort[a.series] || 100) - (TagSort[b.series] || 100)
+}
+
+function sortByTag(a, b) {
+    for (let i = 0; i < a.tags.length && i < b.tags.length; i++) {
+        if (a.tags[i] === b.tags[i]) {
             continue
         }
-        return TagSort[A.tags[i]] - TagSort[B.tags[i]]
+        return TagSort[a.tags[i]] - TagSort[b.tags[i]]
     }
     return 0
 }
 
+function firstSort(a, b, lang) {
+    return sortBySeries(a, b) || sortByTag(a, b) || sortByLength(a, b, lang)
+}
+
 function sort_zh_CN(a, b) {
-    const A = CharDict[a].names.fpy;
-    const B = CharDict[b].names.fpy;
+    const A = a.names.fpy;
+    const B = b.names.fpy;
     if (A === B) {
         return 0
     } else {
@@ -92,8 +106,14 @@ const sortDict = {
 
 function sortChar(list, lang) {
     sortDict[lang] ? list.sort((a, b) => {
-        return firstSort(a, b) || sortDict[lang](a, b)
-    }) : list.sort(firstSort())
+        const A = CharDict[a];
+        const B = CharDict[b];
+        return firstSort(A, B, lang) || sortDict[lang](A, B)
+    }) : list.sort((a, b) => {
+        const A = CharDict[a];
+        const B = CharDict[b];
+        firstSort(A, B, lang)
+    })
 }
 
 const searchResult = ref(false);
