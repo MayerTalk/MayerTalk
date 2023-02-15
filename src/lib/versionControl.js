@@ -12,7 +12,7 @@ const latestVersion = 'c';
 const initialVersion = 'a';
 let currVersion = getData('data.version') || initialVersion;
 const versionSwitcher = {
-    a: (data) => {
+    a: (data, opt) => {
         // v0.0.5 -> v0.1.0 / a -> b
         // png2webp / image ref / char.src (computed)
         const tmp = {};
@@ -48,18 +48,25 @@ const versionSwitcher = {
         data.images = tmp;
         return 'b'
     },
-    b: (data) => {
-        // v 0.1.0 -> v0.1.1 / b -> c
-        // indexDB
-        // localStorage.removeItem('data.images');
+    b: (data, opt) => {
+        if (opt.load) {
+            // v 0.1.0 -> v0.1.1 / b -> c
+            // indexDB
+            const dataStr = localStorage.getItem('data.images');
+            if (dataStr) {
+                data.imgaes = JSON.parse(dataStr);
+                DataControl.image.sync();
+                localStorage.removeItem('data.images')
+            }
+        }
         return 'c'
     }
 };
 
-function switchVersion(data, version) {
+function switchVersion(data, version, opt = {}) {
     while (version !== latestVersion) {
         try {
-            version = versionSwitcher[version](data)
+            version = versionSwitcher[version](data, opt)
         } catch (e) {
             break
         }
@@ -103,7 +110,9 @@ function loadData() {
         DataControl.load()
     } else {
         DataControl.load((data, next) => {
-            switchVersion(data, currVersion);
+            switchVersion(data, currVersion, {
+                load: true
+            });
             next.forEach((n) => {
                 n()
             })

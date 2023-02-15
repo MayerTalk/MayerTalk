@@ -146,26 +146,6 @@ const ImageStorage = class ImageStorage {
 
     load() {
         try {
-            const dataStr = localStorage.getItem('data.' + this.key);
-            if (dataStr) {
-                // 向前支持
-                const data = JSON.parse(dataStr);
-                if (this.loadedCallback) {
-                    this.loadedCallback(
-                        [data, () => {
-                            this.obj.value = data;
-                            this.lastSave = dataStr;
-                            this.update = false
-                        }]
-                    )
-                } else {
-                    this.obj.value = data;
-                    this.lastSave = dataStr;
-                    this.update = false
-                }
-                return
-            }
-
             const data = {};
             this.db.transaction().openCursor().onsuccess = (event) => {
                 const cursor = event.target.result;
