@@ -113,8 +113,8 @@ function loadData() {
             switchVersion(data, currVersion, {
                 load: true
             });
-            next.forEach((n) => {
-                n()
+            Object.entries(next).forEach((obj) => {
+                obj[1]()
             })
         })
     }
