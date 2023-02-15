@@ -53,11 +53,14 @@ const Storage = class Storage {
         try {
             const dataStr = localStorage.getItem('data.' + this.key);
             const data = JSON.parse(dataStr);
-            if (data) {
-                this.obj.value = data;
-                this.lastSave = dataStr;
-                return true
-            }
+            return [data, () => {
+                if (data) {
+                    this.obj.value = data;
+                    this.lastSave = dataStr;
+                    this.update = false;
+                    return true
+                }
+            }]
         } catch (e) {
         }
         return false
@@ -119,7 +122,8 @@ const ImageStorage = class ImageStorage {
             }
         }, () => {
             this.load()
-        })
+        });
+        this.loadedCallback = null
     }
 
     save(force) {
@@ -146,26 +150,42 @@ const ImageStorage = class ImageStorage {
             if (dataStr) {
                 // 向前支持
                 const data = JSON.parse(dataStr);
-                if (data) {
+                if (this.loadedCallback) {
+                    this.loadedCallback(
+                        [data, () => {
+                            this.obj.value = data;
+                            this.lastSave = dataStr;
+                            this.update = false
+                        }]
+                    )
+                } else {
                     this.obj.value = data;
                     this.lastSave = dataStr;
-                    return true
+                    this.update = false
                 }
-            } else if (this.db.conn) {
-                if (Object.entries(this.obj.value).length === 0) {
-                    const data = {};
-                    this.db.transaction().openCursor().onsuccess = (event) => {
-                        const cursor = event.target.result;
-                        if (cursor) {
-                            data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
-                            cursor.continue()
-                        } else {
-                            this.lastSave = JSON.stringify(data);
-                            this.obj.value = data;
-                        }
-                    }
+                return
+            }
+
+            const data = {};
+            this.db.transaction().openCursor().onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    data[cursor.value.id] = {count: cursor.value.count, src: cursor.value.src};
+                    cursor.continue()
                 } else {
-                    this.sync()
+                    if (this.loadedCallback) {
+                        this.loadedCallback(
+                            [data, () => {
+                                this.lastSave = JSON.stringify(data);
+                                this.obj.value = data;
+                                this.update = false
+                            }]
+                        )
+                    } else {
+                        this.lastSave = JSON.stringify(data);
+                        this.obj.value = data;
+                        this.update = false
+                    }
                 }
             }
         } catch (e) {
@@ -302,13 +322,26 @@ const DataControl = {
             }
         }
     },
-    load() {
+    load(callback) {
+        const data = {};
+        const next = {};
         for (let key in this.storage) {
             if (this.storage.hasOwnProperty(key)) {
-                this.storage[key].load();
-                this.storage[key].update = false
+                if (key !== 'images') {
+                    const [d, n] = this.storage[key].load();
+                    data[key] = d;
+                    next[key] = n;
+                    n();
+                }
             }
         }
+        this.storage.images.loadedCallback = (res) => {
+            const [d, n] = res;
+            data.images = d;
+            next.images = n;
+            n();
+            callback && callback(data, next)
+        };
         this.genCharSrc()
     },
     set(data) {
@@ -429,8 +462,6 @@ document.addEventListener('keydown', event => {
         }
     }
 });
-
-DataControl.load();
 
 export {
     config,
