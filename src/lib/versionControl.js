@@ -41,8 +41,6 @@ const versionSwitcher = {
                 const char = chars.value[key];
                 if (change.hasOwnProperty(char.avatar)) {
                     char.avatar = change[char.avatar];
-                } else {
-                    char.avatar = char.avatar.replace('.png', '.webp')
                 }
             }
         }
