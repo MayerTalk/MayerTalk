@@ -52,7 +52,7 @@ const Storage = class Storage {
     load() {
         try {
             const dataStr = localStorage.getItem('data.' + this.key);
-            const data = JSON.parse(dataStr);
+            const data = JSON.parse(dataStr) || copy(this.obj.value);
             return [data, () => {
                 if (data) {
                     this.obj.value = data;
