@@ -9,66 +9,69 @@ import {
 } from '@/lib/data'
 
 const latestVersion = 'c';
-let currVersion = getData('data.version') || 'a';
+const initialVersion = 'a';
+let currVersion = getData('data.version') || initialVersion;
 const versionSwitcher = {
-    a: () => {
+    a: (data, opt) => {
         // v0.0.5 -> v0.1.0 / a -> b
         // png2webp / image ref / char.src (computed)
         const tmp = {};
         const change = {};
-        for (let key in images.value) {
-            if (images.value.hasOwnProperty(key)) {
-                const id = md5(images.value[key]);
+        for (let key in data.images) {
+            if (data.images.hasOwnProperty(key)) {
+                const id = md5(data.images[key]);
                 change[key] = id;
                 if (tmp.hasOwnProperty(id)) {
                     tmp[id].count++
                 } else {
                     tmp[id] = {
                         count: 1,
-                        src: images.value[key]
+                        src: data.images[key]
                     }
                 }
             }
         }
-        for (let i = 0; i < chats.value.length; i++) {
-            const chat = chats.value[i];
+        for (let i = 0; i < data.chats.length; i++) {
+            const chat = data.chats[i];
             if (chat.type === 'image' && change.hasOwnProperty(chat.content)) {
                 chat.content = change[chat.content]
             }
         }
-        for (let key in chars.value) {
-            if (chars.value.hasOwnProperty(key)) {
-                const char = chars.value[key];
+        for (let key in data.chars) {
+            if (data.chars.hasOwnProperty(key)) {
+                const char = data.chars[key];
                 if (change.hasOwnProperty(char.avatar)) {
                     char.avatar = change[char.avatar];
-                } else {
-                    char.avatar = char.avatar.replace('.png', '.webp')
                 }
             }
         }
-        images.value = tmp;
-        DataControl.update('chars', 'chats', 'images');
+        data.images = tmp;
         return 'b'
     },
-    b: () => {
-        // v 0.1.0 -> v0.1.1 / b -> c
-        // indexDB
-        localStorage.removeItem('data.images');
-        DataControl.update('images');
+    b: (data, opt) => {
+        if (opt.load) {
+            // v 0.1.0 -> v0.1.1 / b -> c
+            // indexDB
+            const dataStr = localStorage.getItem('data.images');
+            if (dataStr) {
+                data.imgaes = JSON.parse(dataStr);
+                DataControl.image.sync();
+                localStorage.removeItem('data.images')
+            }
+        }
         return 'c'
     }
 };
 
-function switchVersion(version) {
+function switchVersion(data, version, opt = {}) {
     while (version !== latestVersion) {
         try {
-            version = versionSwitcher[version]()
+            version = versionSwitcher[version](data, opt)
         } catch (e) {
             break
         }
     }
     currVersion = version;
-    DataControl.save();
     saveData('data.version', version)
 }
 
@@ -88,8 +91,9 @@ function uploadData(uploadFile, callback) {
     reader.onloadend = () => {
         try {
             const data = JSON.parse(reader.result);
+            switchVersion(data, data.version || initialVersion);
             DataControl.set(data);
-            switchVersion(data.version || 'a');
+            DataControl.save();
             message.notify('导入成功', message.success);
             callback && callback()
         } catch (e) {
@@ -101,7 +105,22 @@ function uploadData(uploadFile, callback) {
     return false
 }
 
-switchVersion(currVersion);
+function loadData() {
+    if (latestVersion === currVersion) {
+        DataControl.load()
+    } else {
+        DataControl.load((data, next) => {
+            switchVersion(data, currVersion, {
+                load: true
+            });
+            Object.entries(next).forEach((obj) => {
+                obj[1]()
+            })
+        })
+    }
+}
+
+loadData();
 
 export {
     switchVersion,

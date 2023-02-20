@@ -28,9 +28,9 @@
     });
 
     const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1
-        || navigator.userAgent.indexOf('quark') !== -1
+        || navigator.userAgent.indexOf('Quark') !== -1
         || navigator.userAgent.indexOf('QQBrowser') !== -1
-        || navigator.userAgent.indexOf('baidubrowser') !== -1;
+        || navigator.userAgent.indexOf('baidu') !== -1;
 </script>
 
 <template>
