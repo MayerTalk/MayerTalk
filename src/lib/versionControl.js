@@ -5,6 +5,7 @@ import {
     chats,
     chars,
     images,
+    settings,
     DataControl
 } from '@/lib/data'
 
@@ -75,14 +76,23 @@ function switchVersion(data, version, opt = {}) {
     saveData('data.version', version)
 }
 
-function downloadData() {
-    const url = blob2url(new Blob([JSON.stringify({
+
+function getDataString(full = false) {
+    const data = {
         version: currVersion,
         config: config.value,
         chars: chars.value,
         chats: chats.value,
         images: images.value
-    })], {type: 'application/json'}));
+    };
+    if (full) {
+        data.settings = settings.value;
+    }
+    return JSON.stringify(data)
+}
+
+function downloadData() {
+    const url = blob2url(new Blob([getDataString()], {type: 'application/json'}));
     download(url, 'mayertalk-data-' + Date.now() + '.json')
 }
 
@@ -123,7 +133,9 @@ function loadData() {
 loadData();
 
 export {
+    initialVersion,
     switchVersion,
+    getDataString,
     uploadData,
     downloadData
 }
