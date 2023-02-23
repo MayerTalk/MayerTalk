@@ -14,7 +14,7 @@ const DataBase = class DataBase {
         }
     }
 
-    transaction(table, mode = 'readonly') {
+    transaction(table = this.table, mode = 'readonly') {
         return this.conn.transaction(table, mode).objectStore(table)
     }
 
