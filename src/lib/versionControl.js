@@ -133,7 +133,9 @@ function loadData() {
 loadData();
 
 export {
+    initialVersion,
     switchVersion,
+    getDataString,
     uploadData,
     downloadData
 }

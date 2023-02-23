@@ -2,6 +2,7 @@ import {ref, computed} from 'vue'
 import {StaticUrl} from '@/lib/constance';
 import message from '@/lib/message'
 import {copy, blob2base64, md5, uuid} from '@/lib/tool'
+import DataBase from './db';
 
 const config = ref({render: 'Arknights'});
 const settings = ref({});
@@ -68,43 +69,6 @@ const Storage = class Storage {
 
     set(data) {
         this.obj.value = data
-    }
-};
-
-const DataBase = class DataBase {
-    constructor(dbname, table) {
-        this.db = dbname;
-        this.table = table;
-        this.conn = null
-    }
-
-    open(onupgradeneeded, callback) {
-        const request = window.indexedDB.open(this.db);
-        request.onupgradeneeded = onupgradeneeded;
-        request.onsuccess = (event) => {
-            this.conn = request.result;
-            callback && callback()
-        }
-    }
-
-    transaction(mode = 'readonly') {
-        return this.conn.transaction(this.table, mode).objectStore(this.table)
-    }
-
-    add(data) {
-        return this.transaction('readwrite').add(data)
-    }
-
-    put(data) {
-        return this.transaction('readwrite').put(data)
-    }
-
-    delete(key) {
-        return this.transaction('readwrite').delete(key)
-    }
-
-    clear(success) {
-        this.transaction('readwrite').clear().onsuccess = success
     }
 };
 
