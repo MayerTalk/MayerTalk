@@ -2,7 +2,7 @@
     import {ref, inject, watch, computed} from 'vue'
     import Renders from '@/render'
     import message from '@/lib/message'
-    import {ensure} from '@/lib/tool';
+    import {ensure, formatSize} from '@/lib/tool';
 
     import {TypeDict} from "@/lib/constance";
     import {
@@ -73,8 +73,6 @@
         settings.value.showCharNameSettings[type] = value
     }
 
-    const SizeUnit = ['B', 'KB', 'MB'];
-
     function getStorageSize() {
         let size = 0;
         for (let key in localStorage) {
@@ -83,12 +81,7 @@
             }
         }
         size += DataControl.image.lastSave.length;
-        let unit = SizeUnit[0];
-        for (let i = 1; size > 1024; i++) {
-            size /= 1024;
-            unit = SizeUnit[i]
-        }
-        return size.toFixed(2) + unit;
+        return formatSize(size)
     }
 
     function clearStorage() {
