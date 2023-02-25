@@ -64,7 +64,8 @@ const versionSwitcher = {
     }
 };
 
-function switchVersion(data, version, opt = {}) {
+function switchVersion(data, opt = {}) {
+    let version = data.version || initialVersion;
     while (version !== latestVersion) {
         try {
             version = versionSwitcher[version](data, opt)
@@ -101,7 +102,7 @@ function uploadData(uploadFile, callback) {
     reader.onloadend = () => {
         try {
             const data = JSON.parse(reader.result);
-            switchVersion(data, data.version || initialVersion);
+            switchVersion(data);
             DataControl.set(data);
             DataControl.save();
             message.notify('导入成功', message.success);
@@ -120,7 +121,8 @@ function loadData() {
         DataControl.load()
     } else {
         DataControl.load((data, next) => {
-            switchVersion(data, currVersion, {
+            data.version = currVersion;
+            switchVersion(data, {
                 load: true
             });
             Object.entries(next).forEach((obj) => {
