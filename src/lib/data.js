@@ -351,7 +351,8 @@ const DataControl = {
         } else if (level === 2) {
             // 清空本地数据
             localStorage.clear();
-            indexedDB.deleteDatabase('data')
+            indexedDB.deleteDatabase('data');
+            indexedDB.deleteDatabase('savefile')
         }
     },
     char: {

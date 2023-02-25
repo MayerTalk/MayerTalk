@@ -19,7 +19,8 @@ import {
     Edit,
     Close,
     Setting,
-    Collection
+    Collection,
+    Refresh
 } from "@element-plus/icons";
 
 const app = createApp(App);
@@ -42,7 +43,8 @@ app.component('Edit', Edit);
 app.component('Close', Close);
 app.component('Setting', Setting);
 app.component('Collection', Collection);
+app.component('Refresh', Refresh);
 
-app.provide('avatarsJs','avatar.js?v=78319d24');
+app.provide('avatarsJs', 'avatar.js?v=78319d24');
 
 app.mount('#app');

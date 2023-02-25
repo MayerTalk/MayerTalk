@@ -4,6 +4,7 @@
     import Settings from './Setting.vue'
     import Option from './type/Option.vue'
     import CharSelector from './CharSelector.vue'
+    import Savefile from './components/Savefile.vue'
 
     import message from '@/lib/message'
     import {
@@ -82,6 +83,7 @@
     const ifShowAnnouncement = inject('ifShowAnnouncement');
     const ifShowAbout = inject('ifShowAbout');
     const ifShowSettings = inject('ifShowSettings');
+    const ifShowSavefile = ref(false);
     const renderSettings = ref({});
     const width = ref({});
     const windowWidth = Math.min(520, document.body.clientWidth);
@@ -669,6 +671,7 @@
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
                 <Settings/>
+                <Savefile v-model="ifShowSavefile"/>
                 <el-dialog v-model="ifShowEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
                            @closed="() => {DataControl.save('chars'); clearNewChar()}">
                     <div style="display: flex; flex-wrap: wrap">
@@ -892,6 +895,12 @@
                             <Collection/>
                         </el-icon>
                         关于
+                    </div>
+                    <div class="bar" @click="ifShowSavefile=true">
+                        <el-icon color="lightgrey" :size="35">
+                            <Collection/>
+                        </el-icon>
+                        存档
                     </div>
                 </div>
                 <Transition name="fade">
