@@ -26,6 +26,10 @@ const DataBase = class DataBase {
         return this.transaction(table, 'readwrite').put(data)
     }
 
+    get(key, table = this.table) {
+        return this.transaction(table).get(key)
+    }
+
     delete(key, table = this.table) {
         return this.transaction(table, 'readwrite').delete(key)
     }

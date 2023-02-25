@@ -218,7 +218,9 @@ const DataControl = {
     version: [],
     index: -1,
     switchHook: null,
+    updateHook: null,
     update(update) {
+        this.updateHook && this.updateHook();
         if (typeof update === "string") {
             if (this.storage.hasOwnProperty(update)) {
                 this.storage[update].update = true
@@ -288,13 +290,14 @@ const DataControl = {
         };
         this.genCharSrc()
     },
-    set(data) {
+    set(data, internal = false) {
         for (let key in this.storage) {
             if (this.storage.hasOwnProperty(key) && data.hasOwnProperty(key)) {
-                this.storage[key].set(data[key]);
+                this.storage[key].set(data[key], internal);
                 this.storage[key].update = true
             }
         }
+        this.updateHook && this.updateHook();
         this.genCharSrc()
     },
     withdraw() {
@@ -351,7 +354,8 @@ const DataControl = {
         } else if (level === 2) {
             // 清空本地数据
             localStorage.clear();
-            indexedDB.deleteDatabase('data')
+            indexedDB.deleteDatabase('data');
+            indexedDB.deleteDatabase('savefile')
         }
     },
     char: {

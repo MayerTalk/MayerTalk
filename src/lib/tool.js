@@ -125,6 +125,16 @@ function doAfterMounted(ref, callback) {
     }
 }
 
+const SizeUnit = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+function formatSize(size, unit = SizeUnit[0]) {
+    for (let i = 1; size > 1024; i++) {
+        size /= 1024;
+        unit = SizeUnit[i]
+    }
+    return size.toFixed(2) + unit;
+}
+
 export {
     md5,
     copy,
@@ -140,5 +150,6 @@ export {
     ensureClose,
     clickBySelector,
     getDialogue,
-    doAfterMounted
+    doAfterMounted,
+    formatSize
 }
