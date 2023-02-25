@@ -1,4 +1,4 @@
-import {getData, saveData, blob2url, download, md5} from '@/lib/tool'
+import {getData, saveData, blob2url, download, md5, copy} from '@/lib/tool'
 import message from '@/lib/message'
 import {
     config,
@@ -88,7 +88,7 @@ function getDataJson(full = false) {
     if (full) {
         data.settings = settings.value;
     }
-    return data
+    return copy(data)
 }
 
 function getDataString(full = false) {
