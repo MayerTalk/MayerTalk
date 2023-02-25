@@ -77,7 +77,7 @@ function switchVersion(data, opt = {}) {
     saveData('data.version', version)
 }
 
-function getData(full = false) {
+function getDataJson(full = false) {
     const data = {
         version: currVersion,
         config: config.value,
@@ -91,7 +91,7 @@ function getData(full = false) {
 }
 
 function getDataString(full = false) {
-    return JSON.stringify(getData(full))
+    return JSON.stringify(getDataJson(full))
 }
 
 function downloadData() {
@@ -139,7 +139,7 @@ loadData();
 export {
     initialVersion,
     switchVersion,
-    getData,
+    getDataJson,
     getDataString,
     uploadData,
     downloadData
