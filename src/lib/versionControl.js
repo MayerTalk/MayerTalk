@@ -88,6 +88,7 @@ function getDataJson(full = false) {
     if (full) {
         data.settings = settings.value;
     }
+    return data
 }
 
 function getDataString(full = false) {
