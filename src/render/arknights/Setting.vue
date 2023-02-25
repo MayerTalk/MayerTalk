@@ -2,7 +2,8 @@
     import {ref, inject, watch, computed} from 'vue'
     import Renders from '@/render'
     import message from '@/lib/message'
-    import {ensure} from '@/lib/tool';
+    import {ensure, formatSize} from '@/lib/tool';
+    import Save from '@/lib/savefile'
 
     import {TypeDict} from "@/lib/constance";
     import {
@@ -73,7 +74,7 @@
         settings.value.showCharNameSettings[type] = value
     }
 
-    const SizeUnit = ['B', 'KB', 'MB'];
+    const storageSize = ref('计算中...');
 
     function getStorageSize() {
         let size = 0;
@@ -83,12 +84,14 @@
             }
         }
         size += DataControl.image.lastSave.length;
-        let unit = SizeUnit[0];
-        for (let i = 1; size > 1024; i++) {
-            size /= 1024;
-            unit = SizeUnit[i]
-        }
-        return size.toFixed(2) + unit;
+        Save.getInfo((data) => {
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    size += data[key].size
+                }
+            }
+            storageSize.value = formatSize(size)
+        });
     }
 
     function clearStorage() {
@@ -105,7 +108,8 @@
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" title="设置" :width="dialogWidth" @closed="DataControl.save(['config','settings'])">
+    <el-dialog v-model="ifShow" title="设置" :width="dialogWidth"
+               @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
         <div id="settings">
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
@@ -183,9 +187,9 @@
             <table>
                 <tr>
                     <th>本地</th>
-                    <td>{{getStorageSize()}}</td>
+                    <td>{{storageSize}}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、设置），且无法恢复')">清空</el-button>
+                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、存档），且无法恢复')">清空</el-button>
                     </td>
                 </tr>
             </table>

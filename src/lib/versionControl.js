@@ -1,4 +1,4 @@
-import {getData, saveData, blob2url, download, md5} from '@/lib/tool'
+import {getData, saveData, blob2url, download, md5, copy} from '@/lib/tool'
 import message from '@/lib/message'
 import {
     config,
@@ -64,7 +64,8 @@ const versionSwitcher = {
     }
 };
 
-function switchVersion(data, version, opt = {}) {
+function switchVersion(data, opt = {}) {
+    let version = data.version || initialVersion;
     while (version !== latestVersion) {
         try {
             version = versionSwitcher[version](data, opt)
@@ -76,8 +77,7 @@ function switchVersion(data, version, opt = {}) {
     saveData('data.version', version)
 }
 
-
-function getDataString(full = false) {
+function getDataJson(full = false) {
     const data = {
         version: currVersion,
         config: config.value,
@@ -88,7 +88,11 @@ function getDataString(full = false) {
     if (full) {
         data.settings = settings.value;
     }
-    return JSON.stringify(data)
+    return copy(data)
+}
+
+function getDataString(full = false) {
+    return JSON.stringify(getDataJson(full))
 }
 
 function downloadData() {
@@ -101,8 +105,8 @@ function uploadData(uploadFile, callback) {
     reader.onloadend = () => {
         try {
             const data = JSON.parse(reader.result);
-            switchVersion(data, data.version || initialVersion);
-            DataControl.set(data);
+            switchVersion(data);
+            DataControl.set(data, false);
             DataControl.save();
             message.notify('导入成功', message.success);
             callback && callback()
@@ -120,7 +124,8 @@ function loadData() {
         DataControl.load()
     } else {
         DataControl.load((data, next) => {
-            switchVersion(data, currVersion, {
+            data.version = currVersion;
+            switchVersion(data, {
                 load: true
             });
             Object.entries(next).forEach((obj) => {
@@ -135,6 +140,7 @@ loadData();
 export {
     initialVersion,
     switchVersion,
+    getDataJson,
     getDataString,
     uploadData,
     downloadData
