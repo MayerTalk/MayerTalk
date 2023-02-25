@@ -218,7 +218,9 @@ const DataControl = {
     version: [],
     index: -1,
     switchHook: null,
+    updateHook: null,
     update(update) {
+        this.updateHook && this.updateHook();
         if (typeof update === "string") {
             if (this.storage.hasOwnProperty(update)) {
                 this.storage[update].update = true
@@ -295,6 +297,7 @@ const DataControl = {
                 this.storage[key].update = true
             }
         }
+        this.updateHook && this.updateHook();
         this.genCharSrc()
     },
     withdraw() {

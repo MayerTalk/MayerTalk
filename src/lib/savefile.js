@@ -17,15 +17,20 @@ const Save = class Save {
             if (!db.objectStoreNames.contains('data')) {
                 db.createObjectStore('data', {keyPath: 'id'})
             }
-        })
+        });
+        this.saved = false;
+        DataControl.updateHook = () => {
+            this.saved = false
+        }
     }
 
     new(name, callback) {
         const data = getDataJson();
         const id = uuid();
         const time = Date.now();
-        this.db.add({id, size: JSON.stringify(data).length, time, name}, 'info').onsuccess = (evt) => {
-            callback && callback(evt)
+        this.db.add({id, size: JSON.stringify(data).length, time, name}, 'info').onsuccess = (evemt) => {
+            callback && callback(event);
+            this.saved = true
         };
         this.db.add({id, data}, 'data');
         return id
@@ -36,8 +41,9 @@ const Save = class Save {
         const time = Date.now();
         this.db.get(id, 'info').onsuccess = (evt) => {
             const name = evt.target.result.name;
-            this.db.put({id, size: JSON.stringify(data).length, time, name}, 'info').onsuccess = (evt) => {
-                callback && callback(evt)
+            this.db.put({id, size: JSON.stringify(data).length, time, name}, 'info').onsuccess = (event) => {
+                callback && callback(event)
+                this.saved = true
             }
         };
         this.db.put({id, data}, 'data');
@@ -49,14 +55,15 @@ const Save = class Save {
             switchVersion(data);
             DataControl.set(data, true);
             DataControl.save();
+            this.saved = true;
             callback && (callback(event))
         }
     }
 
     delete(id, callback) {
         this.db.delete(id, 'data');
-        this.db.delete(id, 'info').onsuccess = (evt) => {
-            callback && callback(evt)
+        this.db.delete(id, 'info').onsuccess = (event) => {
+            callback && callback(event)
         }
     }
 

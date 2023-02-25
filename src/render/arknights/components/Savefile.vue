@@ -21,6 +21,7 @@
     const tableData = ref([]);
 
     const savefileName = ref('');
+    const ifSave = ref(false);
 
     function loadData() {
         if (!Save.db.conn) {
@@ -29,9 +30,7 @@
             }, 100)
         } else {
             Save.getInfo((res) => {
-                console.log(res);
                 tableData.value = [];
-
                 for (let key in res) {
                     if (res.hasOwnProperty(key)) {
                         const time = new Date(res[key].time);
@@ -49,8 +48,6 @@
         }
     }
 
-    loadData();
-
     function newSave() {
         if (savefileName.value.length === 0) {
             message.notify('请输入存档名', message.warning);
@@ -64,15 +61,6 @@
         });
     }
 
-    function deleteSave(row) {
-        ensure(() => {
-            Save.delete(row.id, () => {
-                loadData();
-                message.notify('删除成功', message.success);
-            });
-        }, '是否删除存档 「' + row.name + '」')
-    }
-
     function syncSave(row) {
         ensure(() => {
             Save.save(row.id, () => {
@@ -83,15 +71,31 @@
     }
 
     function loadSave(row) {
-        ensure(() => {
+        if (Save.saved) {
             Save.load(row.id, () => {
                 message.notify('导入成功', message.success);
                 loadData()
             });
-        }, '是否导入存档 「' + row.name + '」')
+        } else {
+            ensure(() => {
+                Save.load(row.id, () => {
+                    message.notify('导入成功', message.success);
+                    loadData()
+                });
+            }, '是否导入存档 「' + row.name + '」')
+        }
     }
 
-    const ifSave = ref(false)
+    function deleteSave(row) {
+        ensure(() => {
+            Save.delete(row.id, () => {
+                loadData();
+                message.notify('删除成功', message.success);
+            });
+        }, '是否删除存档 「' + row.name + '」')
+    }
+
+    loadData();
 </script>
 
 <template>
