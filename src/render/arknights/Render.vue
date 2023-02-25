@@ -849,6 +849,12 @@
                             <el-button size="large" style="width:100%; margin: 0" @click="clearAll">全部</el-button>
                         </div>
                     </el-dialog>
+                    <div class="bar" @click="ifShowSavefile=true">
+                        <el-icon color="lightgrey" :size="35">
+                            <Collection/>
+                        </el-icon>
+                        存档
+                    </div>
                     <div class="bar" @click="DataControl.withdraw">
                         <el-icon color="lightgrey" :size="35">
                             <Back/>
@@ -892,15 +898,9 @@
                     </div>
                     <div class="bar" @click="ifShowAbout=true">
                         <el-icon color="lightgrey" :size="35">
-                            <Collection/>
+                            <CoffeeCup/>
                         </el-icon>
                         关于
-                    </div>
-                    <div class="bar" @click="ifShowSavefile=true">
-                        <el-icon color="lightgrey" :size="35">
-                            <Collection/>
-                        </el-icon>
-                        存档
                     </div>
                 </div>
                 <Transition name="fade">

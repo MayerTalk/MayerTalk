@@ -20,7 +20,8 @@ import {
     Close,
     Setting,
     Collection,
-    Refresh
+    Refresh,
+    CoffeeCup
 } from "@element-plus/icons";
 
 const app = createApp(App);
@@ -44,6 +45,7 @@ app.component('Close', Close);
 app.component('Setting', Setting);
 app.component('Collection', Collection);
 app.component('Refresh', Refresh);
+app.component('CoffeeCup', CoffeeCup);
 
 app.provide('avatarsJs', 'avatar.js?v=78319d24');
 
