@@ -15,7 +15,7 @@
     });
     const ifShowUnsupportBrowser = ref(false);
 
-    const version = 'v0.1.3';
+    const version = 'v0.1.4';
     const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
 
     onMounted(() => {
