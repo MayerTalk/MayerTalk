@@ -77,8 +77,7 @@ function switchVersion(data, opt = {}) {
     saveData('data.version', version)
 }
 
-
-function getDataString(full = false) {
+function getData(full = false) {
     const data = {
         version: currVersion,
         config: config.value,
@@ -89,7 +88,10 @@ function getDataString(full = false) {
     if (full) {
         data.settings = settings.value;
     }
-    return JSON.stringify(data)
+}
+
+function getDataString(full = false) {
+    return JSON.stringify(getData(full))
 }
 
 function downloadData() {
@@ -103,7 +105,7 @@ function uploadData(uploadFile, callback) {
         try {
             const data = JSON.parse(reader.result);
             switchVersion(data);
-            DataControl.set(data);
+            DataControl.set(data, false);
             DataControl.save();
             message.notify('导入成功', message.success);
             callback && callback()
@@ -137,6 +139,7 @@ loadData();
 export {
     initialVersion,
     switchVersion,
+    getData,
     getDataString,
     uploadData,
     downloadData

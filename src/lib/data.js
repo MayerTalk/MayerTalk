@@ -288,10 +288,10 @@ const DataControl = {
         };
         this.genCharSrc()
     },
-    set(data) {
+    set(data, internal = false) {
         for (let key in this.storage) {
             if (this.storage.hasOwnProperty(key) && data.hasOwnProperty(key)) {
-                this.storage[key].set(data[key]);
+                this.storage[key].set(data[key], internal);
                 this.storage[key].update = true
             }
         }
