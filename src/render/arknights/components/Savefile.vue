@@ -112,7 +112,7 @@
         <el-table :data="tableData">
             <el-table-column prop="name" label="名称"/>
             <el-table-column prop="timeString" label="最后编辑"/>
-            <el-table-column prop="sizeString" label="体积" :width="70"/>
+            <el-table-column prop="sizeString" label="体积" :width="80"/>
             <el-table-column label="操作" :width="90">
                 <template #default="scope">
                     <div style="display: flex; justify-content: right; align-items: center; column-gap: 5px">
