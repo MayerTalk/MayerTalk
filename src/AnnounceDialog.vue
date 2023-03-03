@@ -1,36 +1,36 @@
 <script setup>
-    import {ref, computed, onMounted} from 'vue'
-    import {saveData, getData} from './lib/tool';
+import { ref, computed, onMounted } from 'vue'
+import { saveData, getData } from './lib/tool'
 
-    const props = defineProps(['modelValue']);
-    const emit = defineEmits(['update:modelValue', 'showGuide']);
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue', 'showGuide'])
 
-    const ifShowAnnouncement = computed({
-        get() {
-            return props.modelValue
-        },
-        set(value) {
-            emit('update:modelValue', value);
-        }
-    });
-    const ifShowUnsupportBrowser = ref(false);
+const ifShowAnnouncement = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
+    }
+})
+const ifShowNotSupportBrowser = ref(false)
 
-    const version = 'v0.1.4';
-    const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
+const version = 'v0.1.4'
+const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9)
 
-    onMounted(() => {
-        if (getData('a_version') !== version) {
-            emit('update:modelValue', true);
-            saveData('a_version', version)
-        } else if (invalidBrowser) {
-            emit('update:modelValue', true);
-        }
-    });
+onMounted(() => {
+    if (getData('a_version') !== version) {
+        emit('update:modelValue', true)
+        saveData('a_version', version)
+    } else if (invalidBrowser) {
+        emit('update:modelValue', true)
+    }
+})
 
-    const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1
-        || navigator.userAgent.indexOf('Quark') !== -1
-        || navigator.userAgent.indexOf('QQBrowser') !== -1
-        || navigator.userAgent.indexOf('baidu') !== -1;
+const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
+        navigator.userAgent.indexOf('Quark') !== -1 ||
+        navigator.userAgent.indexOf('QQBrowser') !== -1 ||
+        navigator.userAgent.indexOf('baidu') !== -1
 </script>
 
 <template>
@@ -77,7 +77,7 @@
         </div>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
     </el-dialog>
-    <el-dialog v-model="ifShowUnsupportBrowser" title="不支持的浏览器" :width="dialogWidth">
+    <el-dialog v-model="ifShowNotSupportBrowser" title="不支持的浏览器" :width="dialogWidth">
         <ul>
             <li>夸克</li>
             <li>UC</li>

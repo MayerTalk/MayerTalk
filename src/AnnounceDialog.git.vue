@@ -1,24 +1,24 @@
 <script setup>
-    import {computed, onMounted} from 'vue'
-    import info from './info.dev'
+import { computed, onMounted } from 'vue'
+import info from './info.dev'
 
-    const props = defineProps(['modelValue']);
-    const emit = defineEmits(['update:modelValue', 'showGuide']);
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue', 'showGuide'])
 
-    const ifShowAnnouncement = computed({
-        get() {
-            return props.modelValue
-        },
-        set(value) {
-            emit('update:modelValue', value);
-        }
-    });
+const ifShowAnnouncement = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
+    }
+})
 
-    const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
+const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9)
 
-    onMounted(() => {
-        ifShowAnnouncement.value = true;
-    })
+onMounted(() => {
+    ifShowAnnouncement.value = true
+})
 </script>
 
 <template>

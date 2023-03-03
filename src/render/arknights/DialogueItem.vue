@@ -1,51 +1,51 @@
 <script setup>
-    import {ref, inject, computed, watch} from 'vue';
-    import {uuid} from '@/lib/tool'
-    import {StaticUrl} from '@/lib/constance'
-    import {
-        chars,
-        images,
-        avatars,
-    } from '@/lib/data'
+import { ref, inject, computed, watch } from 'vue'
+import { uuid } from '@/lib/tool'
+import { StaticUrl } from '@/lib/constance'
+import {
+    chars,
+    images,
+    avatars
+} from '@/lib/data'
 
-    const renderSettings = inject('renderSettings');
-    const width = inject('width');
-    const charDirection = inject('charDirection');
-    const preScreenshot = inject('preScreenshot');
-    const props = defineProps(['data', 'index', 'plus1']);
-    defineEmits(['edit', 'plus1']);
+const renderSettings = inject('renderSettings')
+const width = inject('width')
+const charDirection = inject('charDirection')
+const preScreenshot = inject('preScreenshot')
+const props = defineProps(['data', 'index', 'plus1'])
+defineEmits(['edit', 'plus1'])
 
-    const data = computed(() => props.data);
-    const index = computed(() => props.index);
+const data = computed(() => props.data)
+const index = computed(() => props.index)
 
-    const char = computed(() => {
-        return chars.value[data.value.char] || {};
-    });
-    const id = ref(uuid());
-    const right = computed(() => {
-        if (data.value.char) {
-            // opposite is deprecated
-            // return data.opposite ? !char.value.right : !!char.value.right
-            return !!char.value.right
-        } else {
-            return null
-        }
-    });
-
-    function resizeImage() {
-        if (data.value.type === 'image') {
-            id.value = uuid();
-        }
+const char = computed(() => {
+    return chars.value[data.value.char] || {}
+})
+const id = ref(uuid())
+const right = computed(() => {
+    if (data.value.char) {
+        // opposite is deprecated
+        // return data.opposite ? !char.value.right : !!char.value.right
+        return !!char.value.right
+    } else {
+        return null
     }
+})
 
-    watch(() => width.value.window, () => {
-        // window改变时调整图片大小
-        resizeImage()
-    });
-    watch(charDirection, () => {
-        // 头像列改变时调整图片大小
-        resizeImage()
-    });
+function resizeImage () {
+    if (data.value.type === 'image') {
+        id.value = uuid()
+    }
+}
+
+watch(() => width.value.window, () => {
+    // window改变时调整图片大小
+    resizeImage()
+})
+watch(charDirection, () => {
+    // 头像列改变时调整图片大小
+    resizeImage()
+})
 </script>
 
 <template>
@@ -116,7 +116,7 @@
                         </template>
                         <template v-else-if="data.type==='option'">
                             <div class="option-box">
-                                <div v-for="value in data.content" class="block">
+                                <div v-for="value in data.content" class="block" :key="value[0]">
                                     <div class="bg">
                                         <div class="triangle" style="margin-left: 14px"></div>
                                         <div class="triangle"></div>

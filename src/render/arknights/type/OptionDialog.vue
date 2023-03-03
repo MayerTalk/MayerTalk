@@ -1,28 +1,27 @@
 <script setup>
-    import {computed} from 'vue'
-    import message from '@/lib/message'
-    import {uuid} from '@/lib/tool';
+import { computed } from 'vue'
+import message from '@/lib/message'
+import { uuid } from '@/lib/tool'
 
-    const props = defineProps(['modelValue', 'extraButton']);
-    const emit = defineEmits(['update:modelValue', 'done']);
+const props = defineProps(['modelValue', 'extraButton'])
+const emit = defineEmits(['update:modelValue', 'done'])
 
-    const modelValue = computed({
-        get() {
-            return props.modelValue
-        },
-        set(value) {
-            emit('update:modelValue', value);
-        }
-    });
-
-    function deleteOption(index) {
-        if (modelValue.value.length === 1) {
-            message.notify('你不能删除最后一个选项', message.warning)
-        } else {
-            modelValue.value.splice(index, 1)
-        }
+const modelValue = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
     }
+})
 
+function deleteOption (index) {
+    if (modelValue.value.length === 1) {
+        message.notify('你不能删除最后一个选项', message.warning)
+    } else {
+        modelValue.value.splice(index, 1)
+    }
+}
 
 </script>
 
@@ -31,7 +30,7 @@
               style="margin-bottom: 5px">
         <template #append>
             <el-icon @click="deleteOption(index)">
-                <Close/>
+                <IconClose/>
             </el-icon>
         </template>
     </el-input>

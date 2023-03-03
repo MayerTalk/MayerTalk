@@ -1,24 +1,24 @@
 <script setup>
-    import {computed} from 'vue'
+import { computed } from 'vue'
 
-    const props = defineProps(['modelValue']);
-    const emit = defineEmits(['update:modelValue']);
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue'])
 
-    const ifShowAbout = computed({
-        get() {
-            return props.modelValue
-        },
-        set(value) {
-            emit('update:modelValue', value);
-        }
-    });
+const ifShowAbout = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
+    }
+})
 
-    const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9);
+const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9)
 
-    const contributors = [
-        ['meeboo3', 'meeboo3', '118372959'],
-        ['Lightyears', '1MLightyears', '31664721']
-    ]
+const contributors = [
+    ['meeboo3', 'meeboo3', '118372959'],
+    ['Lightyears', '1MLightyears', '31664721']
+]
 </script>
 
 <template>
@@ -38,7 +38,7 @@
         </p>
         <h3>贡献者</h3>
         <div class="contributors">
-            <div v-for="user in contributors" :title="user[0]" class="avatar">
+            <div v-for="user in contributors" :title="user[0]" class="avatar" :key="user[2]">
                 <a :href="'https://github.com/'+user[1]" target="_blank">
                     <img :src="'https://avatars.githubusercontent.com/u/' + user[2] + '?v=4'" alt=""/>
                 </a>
@@ -48,7 +48,6 @@
         网站内使用的游戏图片、文本原文，仅用于更好地表现游戏资料，其版权属于 Arknights/上海鹰角网络科技有限公司
     </el-dialog>
 </template>
-
 
 <style scoped>
     .contributors {

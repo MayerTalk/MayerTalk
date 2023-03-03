@@ -1,37 +1,37 @@
 <script setup>
-    import {ref, inject, computed, onMounted} from 'vue'
-    import {chars, avatars} from '@/lib/data'
+import { ref, computed, onMounted } from 'vue'
+import { chars, avatars } from '@/lib/data'
 
-    const props = defineProps({
-        modelValue: null,
-        narration: Boolean,
-        select: null,
-        placeholder: {
-            type: String,
-            default: '角色'
-        }
-    });
-    const emit = defineEmits([
-        'update:modelValue',
-        'update:select',
-        'onMounted',
-        'showGuide',
-    ]);
+const props = defineProps({
+    modelValue: null,
+    narration: Boolean,
+    select: null,
+    placeholder: {
+        type: String,
+        default: '角色'
+    }
+})
+const emit = defineEmits([
+    'update:modelValue',
+    'update:select',
+    'onMounted',
+    'showGuide'
+])
 
-    const select = ref(null);
+const select = ref(null)
 
-    const modelValue = computed({
-        get() {
-            return props.modelValue
-        },
-        set(value) {
-            emit('update:modelValue', value);
-        }
-    });
+const modelValue = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
+    }
+})
 
-    onMounted(() => {
-        emit("update:select", select.value);
-    });
+onMounted(() => {
+    emit('update:select', select.value)
+})
 
 </script>
 

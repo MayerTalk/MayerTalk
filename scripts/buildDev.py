@@ -61,11 +61,11 @@ info = {
     'tag': tag
 }
 
-with open(join('src', 'Announce.dev.vue'), mode='rt', encoding='utf-8') as f:
+with open(join('src', 'AnnounceDialog.dev.vue'), mode='rt', encoding='utf-8') as f:
     announce_dev = f.read()
-with open(join('src', 'Announce.vue'), mode='rt', encoding='utf-8') as f:
+with open(join('src', 'AnnounceDialog.vue'), mode='rt', encoding='utf-8') as f:
     announce = f.read()
-with open(join('src', 'Announce.vue'), mode='wt', encoding='utf-8') as f:
+with open(join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
     f.write(announce_dev)
 
 with open(join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:
@@ -74,7 +74,7 @@ with open(join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:
 os.system('')
 os.system(f'npm run build -- --base=/{version}/')
 
-with open(join('src', 'Announce.vue'), mode='wt', encoding='utf-8') as f:
+with open(join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
     f.write(announce)
 
 shutil.rmtree(join('dist', 'avatar'))
