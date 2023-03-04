@@ -6,6 +6,7 @@ import Option from './type/OptionDialog.vue'
 import CharSelector from './CharSelector.vue'
 import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
+import EditDialogueDialog from './components/EditDialogueDialog.vue'
 
 import message from '@/lib/message'
 import {
@@ -18,8 +19,6 @@ import {
     getDialogue
 } from '@/lib/tool'
 import {
-    TypeDict,
-    TypeDefault,
     windowWidth,
     dialogWidth,
     MobileView
@@ -27,9 +26,9 @@ import {
 import {
     chats,
     chars,
-    images,
     avatars,
     currCharId,
+    currDialogueIndex,
     DataControl
 } from '@/lib/data'
 import {
@@ -41,7 +40,6 @@ import {
     createDialogue,
     createTextDialogue,
     createImageDialogue,
-    uploadImage,
     copyDialogue,
     createDialogueHook,
     copyDialogueHook
@@ -49,6 +47,7 @@ import {
 import tipControl from '@/lib/tip'
 
 const EditChar = ref(null)
+const EditDialogue = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
@@ -72,17 +71,6 @@ document.addEventListener('keydown', event => {
 }, { signal: controller.signal })
 onUnmounted(() => {
     controller.abort()
-})
-
-const editor = computed(() => {
-    if (['char', 'monologue', 'image'].indexOf(currDialogueData.value.type) !== -1) {
-        return false
-    } else if (currDialogueData.value.type === 'option') {
-        return Option
-    } else {
-        console.warn('Unknown Type Editor ' + currDialogue.value.type)
-        return false
-    }
 })
 
 const ifShowAnnouncement = inject('ifShowAnnouncement')
@@ -201,11 +189,6 @@ function roll360 () {
         resizeScroll(100)
     }
 }
-
-const ifShowEditDialogue = ref(false)
-const currDialogue = ref(-1)
-const currDialogueData = ref({})
-const editDialogue = ref(true)
 
 const showToolBar = ref(false)
 const toolBarMask = ref(true)
@@ -338,60 +321,6 @@ copyDialogueHook.push((index, data, config) => {
 
 const scrollHeight = ref(window.innerHeight - 90 + 'px')
 
-function clearDialogueData () {
-    if (!editDialogue.value && currDialogueData.value.type === 'image') {
-        DataControl.image.delete(currDialogueData.value.content)
-    }
-    currDialogueData.value = {}
-}
-
-function showEditDialogue (index) {
-    editDialogue.value = true
-    DataControl.curr.setDialogue(index)
-    currDialogueData.value = chats.value[currDialogue.value]
-    ifShowEditDialogue.value = true
-}
-
-function switchEdit (edit) {
-    editDialogue.value = edit
-    if (edit) {
-        currDialogueData.value = chats.value[currDialogue.value]
-    } else {
-        currDialogueData.value = {}
-    }
-}
-
-function delDialogue () {
-    message.confirm(
-        '即将删除该对话',
-        '提示',
-        () => {
-            const chat = chats.value.splice(currDialogue.value, 1)[0]
-            if (chat.type === 'image') {
-                DataControl.image.delete(chat.content)
-            }
-            message.notify('删除成功', message.success)
-            ifShowEditDialogue.value = false
-        }
-    )
-}
-
-function insertDialogue () {
-    if (currDialogueData.value.char === undefined) {
-        message.notify('请选择角色', message.warning)
-        return
-    }
-    if (!currDialogueData.value.type) {
-        message.notify('请选择类型', message.warning)
-        return
-    }
-    currDialogueData.value.id = uuid()
-    chats.value.splice(currDialogue.value, 0, copy(currDialogueData.value))
-    message.notify('插入成功', message.success)
-    currDialogueData.value = {}
-    ifShowEditDialogue.value = false
-}
-
 function screenshot () {
     preScreenshot.value = true
     ResizeWindow.resize()
@@ -424,7 +353,6 @@ function clearChats () {
         () => {
             DataControl.clear(0)
             DataControl.curr.setDialogue(0)
-            currDialogueData.value = {}
             ifShowClear.value = false
         }
     )
@@ -438,7 +366,6 @@ function clearAll () {
             DataControl.clear(1)
             DataControl.curr.setChar('', true)
             DataControl.curr.setDialogue(0)
-            currDialogueData.value = {}
             ifShowClear.value = false
         }
     )
@@ -467,11 +394,11 @@ function handleCopy () {
     }
     const last = copyChars.value.length - 1
     for (let i = 0; i < copyChars.value.length; i++) {
-        copyDialogue(currDialogue.value, { char: copyChars.value[i] }, { locate: i === last, save: i === last })
+        copyDialogue(currDialogueIndex.value, { char: copyChars.value[i] }, { locate: i === last, save: i === last })
     }
     copyChars.value = []
     ifShowCopy.value = false
-    ifShowEditDialogue.value = false
+    EditDialogue.value.close()
 }
 </script>
 
@@ -482,71 +409,7 @@ function handleCopy () {
                 <Settings/>
                 <Savefile v-model="ifShowSavefile"/>
                 <EditCharDialog ref="EditChar"/>
-                <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
-                           @closed="() => {clearDialogueData();DataControl.save('chats')}"
-                           :before-close="editDialogue?null:ensureClose">
-                    <component v-if="editor" :is="editor" v-model="currDialogueData.content"/>
-                    <el-upload v-else-if="currDialogueData.type==='image'"
-                               action="#"
-                               drag
-                               :show-file-list="false"
-                               class="image-uploader"
-                               accept="image/png, image/jpeg, image/gif"
-                               :before-upload="uploadImage"
-                    >
-                        <div class="container">
-                            <el-scrollbar v-if="images[currDialogueData.content]">
-                                <img :src="images[currDialogueData.content].src" style="width:100%"/>
-                            </el-scrollbar>
-
-                            <el-icon v-else class="avatar-uploader-icon">
-                                <IconPlus/>
-                            </el-icon>
-                        </div>
-                    </el-upload>
-                    <el-input v-else
-                              v-model="currDialogueData.content"
-                              :autosize="{minRows: 1, maxRows: 5}"
-                              resize="none"
-                              type="textarea"
-                              :disabled="currDialogueData.type==='image'"
-                    ></el-input>
-                    <div class="edit-bar" style="margin-top: 5px">
-                        <div style="width: calc(50% - 2px); display: flex">
-                            <CharSelector v-model="currDialogueData.char" narration/>
-                        </div>
-                        <div style="width: calc(50% - 3px); margin-left: 5px; display: flex">
-                            <el-select v-model="currDialogueData.type" style="flex-grow: 1"
-                                       :disabled="['image','option'].indexOf(currDialogueData.type) !== -1 && editDialogue"
-                                       placeholder="类型"
-                                       @change="() => {if(!editDialogue) {currDialogueData.content=TypeDefault[currDialogueData.type]}}"
-                            >
-                                <el-option
-                                    v-for="(text, type) in TypeDict"
-                                    :key="type"
-                                    :label="text"
-                                    :value="type"
-                                    :disabled="['image','option'].indexOf(type) !== -1 && editDialogue"
-                                />
-                            </el-select>
-                        </div>
-                        <div
-                            style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
-                        <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
-                            <el-button style="width: 100%" @click="delDialogue">删除</el-button>
-                            <el-button style="width: 100%; margin-left: 0" @click="ifShowCopy=true">复读</el-button>
-                            <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">向上插入
-                            </el-button>
-                        </div>
-                        <div v-else class="column-display" style="width: 100%; margin-top: 5px">
-                            <el-button style="width: 100%" @click="insertDialogue">插入</el-button>
-                            <el-button style="width: 100%; margin-left: 0"
-                                       @click="() => {clearDialogueData();switchEdit(true)}">返回
-                            </el-button>
-                        </div>
-                    </div>
-
-                </el-dialog>
+                <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
                 <el-dialog v-model="ifShowAt" :width="dialogWidth"
                            title="想@哪个角色?"
                            :modal="false">
@@ -659,7 +522,7 @@ function handleCopy () {
                         <div class="window" id="window"
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
-                            <Dialogue v-for="(dialogue, index) in chats" @edit="showEditDialogue" @plus1="copyDialogue"
+                            <Dialogue v-for="(dialogue, index) in chats" @edit="EditDialogue.open(index)" @plus1="copyDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
                                       style="position:relative"></Dialogue>
                         </div>

@@ -67,12 +67,12 @@ function createImageDialogue (fileUpload) {
     return false
 }
 
-function uploadImage (fileUpload) {
+function uploadImage (data, fileUpload) {
     DataControl.image.new(fileUpload, (id) => {
-        if (currDialogueData.value.type === 'image') {
-            DataControl.image.delete(currDialogueData.value.content)
+        if (data.type === 'image') {
+            DataControl.image.delete(data.content)
         }
-        currDialogueData.value.content = id
+        data.content = id
     })
     return false
 }
