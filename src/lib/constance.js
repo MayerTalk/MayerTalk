@@ -21,9 +21,10 @@ const TypeDefault = {
 }
 
 const defaultWidth = 520
-const windowWidth = Math.min(defaultWidth, document.body.clientWidth)
+// #22 后 document.body.clientWidth 比实际视窗小（Why？）
+const windowWidth = Math.min(defaultWidth, window.innerWidth)
 const dialogWidth = Math.ceil(windowWidth * 0.9)
-const MobileView = !(document.body.clientWidth - defaultWidth > 250)
+const MobileView = !(window.innerWidth - defaultWidth > 250)
 
 export {
     StaticUrl,
