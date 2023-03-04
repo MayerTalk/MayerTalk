@@ -14,8 +14,8 @@ import {
     downloadImage,
     ensureClose,
     clickBySelector,
-    getDialogue,
-    doAfterMounted
+    doAfterMounted,
+    getDialogue
 } from '@/lib/tool'
 import {
     TypeDict,
@@ -36,6 +36,17 @@ import {
     uploadData,
     downloadData
 } from '@/lib/versionControl'
+import {
+    textarea,
+    createDialogue,
+    createTextDialogue,
+    createImageDialogue,
+    uploadImage,
+    copyDialogue,
+    createDialogueHook,
+    copyDialogueHook
+} from '@/lib/dialogue'
+import tipControl from '@/lib/tip'
 
 const EditChar = ref(null)
 
@@ -51,7 +62,7 @@ document.addEventListener('keydown', event => {
             const index = (+event.key || 10) - 1
             const list = Object.entries(chars.value)
             if (index < list.length) {
-                DataControl.curr.set(list[index][0])
+                DataControl.curr.setChar(list[index][0])
             } else {
                 EditChar.value.show(true)
             }
@@ -164,7 +175,6 @@ onMounted(() => {
     resizeBody()
 })
 
-const textarea = ref('')
 const scroll = ref()
 const preScreenshot = ref(false)
 const ifShowMoreType = ref(false)
@@ -266,6 +276,17 @@ function plus1Hook (index) {
     }
 }
 
+createDialogueHook.push((data, locate) => {
+    plus1Hook(chats.value.length - 1)
+})
+
+copyDialogueHook.push((index, data, config) => {
+    if (Object.prototype.hasOwnProperty.call(config, 'save') ? config.save : true) {
+        DataControl.save('chats')
+        plus1Hook(chats.value.length - 1)
+    }
+})
+
 if (MobileView) {
     showToolBar.value = false
     toolBarMask.value = true
@@ -290,58 +311,12 @@ window.onresize = () => {
     resizeScroll()
     resizeBody()
 }
-
-const scrollHeight = ref(window.innerHeight - 90 + 'px')
-
-const tipControl = {
-    tip: ref(''),
-    pool: [
-        '素材库里除了有干员头像，还有召唤物/敌人/装置的',
-        '上传的头像会自动剪裁成正方形',
-        '博士，剿灭打了吗？',
-        '点击对话框可以编辑/插入对话',
-        '不选中任何角色时，将以旁白视角发送对话',
-        'Ctrl+Enter可以快捷发送',
-        'Ctrl+Z/ctrl+Y可以撤回/重做',
-        'Ctrl+1~9可以快捷切换角色'
-    ],
-    cache: [],
-    until: 0,
-    cd: 5000,
-    loop () {
-        if (Date.now() > this.until) {
-            if (this.cache.length < 1) {
-                this.cache = copy(this.pool)
-            }
-            const p = Math.floor(Math.random() * this.cache.length) - 1
-            this.tip.value = this.cache.splice(p, 1)
-            nextTick(() => {
-                resizeScroll()
-            })
-        }
-        setTimeout(() => {
-            this.loop()
-        }, this.cd)
-    },
-    setTmpTip (tip, timeout = 5000) {
-        this.tip.value = tip
-        this.until = Date.now() + timeout
-    }
+tipControl.hook = () => {
+    nextTick(() => {
+        resizeScroll()
+    })
 }
-onMounted(() => {
-    tipControl.loop()
-})
-
-function createDialogue (data, locate = true) {
-    data = {
-        content: data.content,
-        type: data.type,
-        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
-        id: data.id || uuid()
-    }
-    chats.value.push(data)
-    DataControl.save('chats')
-    plus1Hook(chats.value.length - 1)
+createDialogueHook.push((data, locate) => {
     nextTick(() => {
         resizeScroll()
         if (locate) {
@@ -349,23 +324,9 @@ function createDialogue (data, locate = true) {
             scroll.value.setScrollTop(el.offsetTop)
         }
     })
-}
+})
 
-function copyDialogue (index, data = {}, config = {}) {
-    data = {
-        content: data.content || chats.value[index].content,
-        type: data.type || chats.value[index].type,
-        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
-        id: data.id || uuid()
-    }
-    if (data.type === 'image') {
-        DataControl.image.count(data.content)
-    }
-    chats.value.push(data)
-    if (Object.prototype.hasOwnProperty.call(config, 'save') ? config.save : true) {
-        DataControl.save('chats')
-        plus1Hook(chats.value.length - 1)
-    }
+copyDialogueHook.push((index, data, config) => {
     nextTick(() => {
         resizeScroll()
         if (Object.prototype.hasOwnProperty.call(config, 'locate') ? config.locate : true) {
@@ -373,40 +334,9 @@ function copyDialogue (index, data = {}, config = {}) {
             scroll.value.setScrollTop(el.offsetTop)
         }
     })
-}
+})
 
-function createTextDialogue (type) {
-    if (textarea.value) {
-        createDialogue({
-            content: textarea.value,
-            type
-        })
-        textarea.value = ''
-    } else {
-        message.notify('请在输入框内输入文本', message.info)
-        tipControl.setTmpTip('请在此输入文本')
-    }
-}
-
-function createImageDialogue (fileUpload) {
-    DataControl.image.new(fileUpload, (id) => {
-        createDialogue({
-            content: id,
-            type: 'image'
-        })
-    })
-    return false
-}
-
-function uploadImage (fileUpload) {
-    DataControl.image.new(fileUpload, (id) => {
-        if (currDialogueData.value.type === 'image') {
-            DataControl.image.delete(currDialogueData.value.content)
-        }
-        currDialogueData.value.content = id
-    })
-    return false
-}
+const scrollHeight = ref(window.innerHeight - 90 + 'px')
 
 function clearDialogueData () {
     if (!editDialogue.value && currDialogueData.value.type === 'image') {
@@ -415,15 +345,9 @@ function clearDialogueData () {
     currDialogueData.value = {}
 }
 
-DataControl.switchHook = () => {
-    if (!Object.prototype.hasOwnProperty.call(chars.value, currCharId.value)) {
-        DataControl.curr.set('', true)
-    }
-}
-
 function showEditDialogue (index) {
     editDialogue.value = true
-    currDialogue.value = index
+    DataControl.curr.setDialogue(index)
     currDialogueData.value = chats.value[currDialogue.value]
     ifShowEditDialogue.value = true
 }
@@ -499,7 +423,7 @@ function clearChats () {
         '提示',
         () => {
             DataControl.clear(0)
-            currDialogue.value = 0
+            DataControl.curr.setDialogue(0)
             currDialogueData.value = {}
             ifShowClear.value = false
         }
@@ -512,8 +436,8 @@ function clearAll () {
         '提示',
         () => {
             DataControl.clear(1)
-            DataControl.curr.set('', true)
-            currDialogue.value = 0
+            DataControl.curr.setChar('', true)
+            DataControl.curr.setDialogue(0)
             currDialogueData.value = {}
             ifShowClear.value = false
         }
@@ -801,7 +725,7 @@ function handleCopy () {
                                     <div class="container">
                                         <div v-for="(char, id) in chars" :key="id"
                                              :class="[id === currCharId?'char-curr':'char']"
-                                             @click="DataControl.curr.set(id)">
+                                             @click="DataControl.curr.setChar(id)">
                                             <img :src="avatars[id]">
                                         </div>
                                         <div class="option"

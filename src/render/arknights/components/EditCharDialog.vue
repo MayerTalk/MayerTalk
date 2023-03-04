@@ -66,7 +66,7 @@ function editChar () {
         if (charData.value.name === '') {
             charData.value.name = defaultName.value
         }
-        DataControl.curr.set(DataControl.char.new(charData.value))
+        DataControl.curr.setChar(DataControl.char.new(charData.value))
         ifShow.value = false
         charData.value = {}
         message.notify('创建成功', message.success)
@@ -79,7 +79,7 @@ function editChar () {
             '提示',
             () => {
                 DataControl.char.delete(currCharId.value)
-                DataControl.curr.set('', true)
+                DataControl.curr.setChar('', true)
                 message.notify('删除成功', message.success)
                 ifShow.value = false
             }

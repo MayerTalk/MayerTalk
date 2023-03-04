@@ -12,6 +12,8 @@ const images = ref({})
 const avatars = ref({})
 const currCharId = ref('')
 const currCharData = ref({})
+const currDialogueIndex = ref(0)
+const currDialogueData = ref({})
 
 const Data = {
     config,
@@ -383,7 +385,7 @@ const DataControl = {
     },
     image: null,
     curr: {
-        set (id, force = false) {
+        setChar (id, force = false) {
             if (id !== currCharId.value || force) {
                 currCharId.value = id
                 currCharData.value = chars.value[id]
@@ -391,6 +393,10 @@ const DataControl = {
                 currCharId.value = ''
                 currCharData.value = {}
             }
+        },
+        setDialogue (index) {
+            currDialogueIndex.value = index
+            currDialogueData.value = chats.value[index]
         }
     }
 }
@@ -423,6 +429,12 @@ document.addEventListener('keydown', event => {
     }
 })
 
+DataControl.switchHook = () => {
+    if (!Object.prototype.hasOwnProperty.call(chars.value, currCharId.value)) {
+        DataControl.curr.setChar('', true)
+    }
+}
+
 export {
     config,
     settings,
@@ -432,6 +444,8 @@ export {
     avatars,
     currCharId,
     currCharData,
+    currDialogueIndex,
+    currDialogueData,
     Storage,
     ImageStorage,
     DataControl
