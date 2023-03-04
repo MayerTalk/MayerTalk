@@ -112,7 +112,7 @@ const ResizeWindow = {
             width.value.image = renderSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
-            const w = Math.min(max, document.body.clientWidth)
+            const w = Math.min(max, window.innerWidth)
             width.value.window = w
             if (w === max) {
                 this.time = 1

@@ -13,7 +13,7 @@ const ifShowAbout = computed({
     }
 })
 
-const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9)
+const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 const contributors = [
     ['meeboo3', 'meeboo3', '118372959'],

@@ -14,12 +14,12 @@ const ifShowAnnouncement = computed({
     }
 })
 
-const dialogWidth = Math.ceil(Math.min(document.body.clientWidth, 700) * 0.9)
+const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
     ifShowAnnouncement.value = true
 })
-</script>
+</script>R
 
 <template>
     <el-dialog v-model="ifShowAnnouncement" :title="'DevSite ' + info.tag" :width="dialogWidth">
