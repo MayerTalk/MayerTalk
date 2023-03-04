@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
+import SideBar from './components/SideBar.vue'
 import Dialogue from './DialogueItem.vue'
 import Settings from './SettingDialog.vue'
 import Option from './type/OptionDialog.vue'
@@ -9,7 +10,6 @@ import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
 
-import message from '@/lib/message'
 import {
     copy,
     uuid,
@@ -30,10 +30,6 @@ import {
     currCharId,
     DataControl
 } from '@/lib/data'
-import {
-    uploadData,
-    downloadData
-} from '@/lib/versionControl'
 import {
     textarea,
     createDialogue,
@@ -73,6 +69,7 @@ onUnmounted(() => {
     controller.abort()
 })
 
+const ifShowSideBar = ref(!MobileView)
 const ifShowAnnouncement = inject('ifShowAnnouncement')
 const ifShowAbout = inject('ifShowAbout')
 const ifShowSettings = inject('ifShowSettings')
@@ -83,10 +80,6 @@ const width = ref({})
 provide('renderSettings', renderSettings)
 provide('width', width)
 provide('dialogWidth', dialogWidth)
-
-function toGuide () {
-    location.href = '/docs/guide/start.html'
-}
 
 const charDirection = computed(() => {
     const dict = chars.value
@@ -191,9 +184,6 @@ function roll360 () {
     }
 }
 
-const showToolBar = ref(false)
-const toolBarMask = ref(true)
-
 // +1功能
 const plus1 = ref(-1)
 
@@ -211,7 +201,7 @@ function plus1Hook (index) {
     }
 }
 
-createDialogueHook.push((data, locate) => {
+createDialogueHook.push(() => {
     plus1Hook(chats.value.length - 1)
 })
 
@@ -221,14 +211,6 @@ copyDialogueHook.push((index, data, config) => {
         plus1Hook(chats.value.length - 1)
     }
 })
-
-if (MobileView) {
-    showToolBar.value = false
-    toolBarMask.value = true
-} else {
-    showToolBar.value = true
-    toolBarMask.value = false
-}
 
 function resizeScroll (offset = 0) {
     const el = document.getElementById('textarea')
@@ -296,33 +278,6 @@ function screenshot () {
     })
 }
 
-const ifShowClear = ref(false)
-
-function clearChats () {
-    message.confirm(
-        '即将清空所有对话',
-        '提示',
-        () => {
-            DataControl.clear(0)
-            DataControl.curr.setDialogue(0)
-            ifShowClear.value = false
-        }
-    )
-}
-
-function clearAll () {
-    message.confirm(
-        '即将清空所有角色、对话',
-        '提示',
-        () => {
-            DataControl.clear(1)
-            DataControl.curr.setChar('', true)
-            DataControl.curr.setDialogue(0)
-            ifShowClear.value = false
-        }
-    )
-}
-
 function showCreateOption () {
     options.value = [[uuid(), '']]
     ifShowCreateOption.value = true
@@ -352,94 +307,15 @@ function createOptionDialogue () {
                     <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
                 </el-dialog>
                 <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
-                <div class="drawer" :class="showToolBar?'show':''">
-                    <div class="bar" @click="screenshot">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconCrop/>
-                        </el-icon>
-                        截屏
-                    </div>
-                    <div class="bar" @click="ifShowAnnouncement=true">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconNotification/>
-                        </el-icon>
-                        公告
-                    </div>
-                    <div class="bar" @click="toGuide">
-                        <el-icon :size="35">
-                            <IconCompass/>
-                        </el-icon>
-                        指南
-                    </div>
-                    <div class="bar" @click="ifShowClear=true">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconDelete/>
-                        </el-icon>
-                        清空
-                    </div>
-                    <el-dialog v-model="ifShowClear" title="请选择要清空的类型" :width="dialogWidth">
-                        <div style="display: flex; column-gap: 5px">
-                            <el-button size="large" style="width: 100%;" @click="clearChats">对话</el-button>
-                            <el-button size="large" style="width:100%; margin: 0" @click="clearAll">全部</el-button>
-                        </div>
-                    </el-dialog>
-                    <div class="bar" @click="ifShowSavefile=true">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconCollection/>
-                        </el-icon>
-                        存档
-                    </div>
-                    <div class="bar" @click="DataControl.withdraw">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconBack/>
-                        </el-icon>
-                        撤回
-                    </div>
-                    <div class="bar" @click="DataControl.redo">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconRight/>
-                        </el-icon>
-                        重做
-                    </div>
-                    <div class="bar" @click="downloadData">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconDownload/>
-                        </el-icon>
-                        导出
-                    </div>
-                    <div class="bar" style="position: relative">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconUpload/>
-                        </el-icon>
-                        导入
-                        <el-upload
-                            action="#"
-                            :show-file-list="false"
-                            class="avatar-uploader"
-                            accept="application/json"
-                            :before-upload="(file) => uploadData(file,resizeScroll)"
-                            style="position: absolute; width: 100%; height: 50px; overflow: hidden"
-                        >
-                            <div style=" width: 80px; height: 50px; user-select: none">
-                            </div>
-                        </el-upload>
-                    </div>
-                    <div class="bar" @click="ifShowSettings=true">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconSetting/>
-                        </el-icon>
-                        设置
-                    </div>
-                    <div class="bar" @click="ifShowAbout=true">
-                        <el-icon color="lightgrey" :size="35">
-                            <IconCoffeeCup/>
-                        </el-icon>
-                        关于
-                    </div>
-                </div>
-                <Transition name="fade">
-                    <div v-if="showToolBar && toolBarMask" @click="showToolBar=false" class="drawer-mask"></div>
-                </Transition>
+                <SideBar
+                    v-model="ifShowSideBar"
+                    @showAnnounce="ifShowAnnouncement=true"
+                    @showSettings="ifShowSettings=true"
+                    @showSavefile="ifShowSavefile=true"
+                    @showAbout="ifShowAbout=true"
+                    @resizeWindow="() => {ResizeWindow.resize()}"
+                    @screenshot="screenshot"
+                />
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
                         <div class="window" id="window"
@@ -535,7 +411,7 @@ function createOptionDialogue () {
                                                       d="M600.704 64a32 32 0 0 1 30.464 22.208l35.2 109.376c14.784 7.232 28.928 15.36 42.432 24.512l112.384-24.192a32 32 0 0 1 34.432 15.36L944.32 364.8a32 32 0 0 1-4.032 37.504l-77.12 85.12a357.12 357.12 0 0 1 0 49.024l77.12 85.248a32 32 0 0 1 4.032 37.504l-88.704 153.6a32 32 0 0 1-34.432 15.296L708.8 803.904c-13.44 9.088-27.648 17.28-42.368 24.512l-35.264 109.376A32 32 0 0 1 600.704 960H423.296a32 32 0 0 1-30.464-22.208L357.696 828.48a351.616 351.616 0 0 1-42.56-24.64l-112.32 24.256a32 32 0 0 1-34.432-15.36L79.68 659.2a32 32 0 0 1 4.032-37.504l77.12-85.248a357.12 357.12 0 0 1 0-48.896l-77.12-85.248A32 32 0 0 1 79.68 364.8l88.704-153.6a32 32 0 0 1 34.432-15.296l112.32 24.256c13.568-9.152 27.776-17.408 42.56-24.64l35.2-109.312A32 32 0 0 1 423.232 64H600.64zm-23.424 64H446.72l-36.352 113.088-24.512 11.968a294.113 294.113 0 0 0-34.816 20.096l-22.656 15.36-116.224-25.088-65.28 113.152 79.68 88.192-1.92 27.136a293.12 293.12 0 0 0 0 40.192l1.92 27.136-79.808 88.192 65.344 113.152 116.224-25.024 22.656 15.296a294.113 294.113 0 0 0 34.816 20.096l24.512 11.968L446.72 896h130.688l36.48-113.152 24.448-11.904a288.282 288.282 0 0 0 34.752-20.096l22.592-15.296 116.288 25.024 65.28-113.152-79.744-88.192 1.92-27.136a293.12 293.12 0 0 0 0-40.256l-1.92-27.136 79.808-88.128-65.344-113.152-116.288 24.96-22.592-15.232a287.616 287.616 0 0 0-34.752-20.096l-24.448-11.904L577.344 128zM512 320a192 192 0 1 1 0 384 192 192 0 0 1 0-384zm0 64a128 128 0 1 0 0 256 128 128 0 0 0 0-256z"></path>
                                             </svg>
                                         </div>
-                                        <div v-else class="scale" @click="showToolBar=!showToolBar">
+                                        <div v-else class="scale" @click="ifShowSideBar=!ifShowSideBar">
                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                  viewBox="0 0 16 16" focusable="false"
                                                  style="stroke: #606060">
@@ -556,18 +432,3 @@ function createOptionDialogue () {
 
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
-<style>
-.drawer-mask {
-    opacity: 0.5;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-</style>
