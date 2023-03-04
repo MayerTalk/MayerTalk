@@ -34,10 +34,6 @@ jobs:
           pip install --upgrade pip wheel setuptools
           pip install aiohttp
 
-      - name: Build Style
-        run: |
-          python build/style.py
-
       - name: Build Dev
         run: |
           python build/dev.py
