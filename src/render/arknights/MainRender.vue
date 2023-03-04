@@ -3,11 +3,11 @@ import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted
 import Dialogue from './DialogueItem.vue'
 import Settings from './SettingDialog.vue'
 import Option from './type/OptionDialog.vue'
-import CharSelector from './CharSelector.vue'
 import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
 import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
+import CopyDialog from './components/CopyDialog.vue'
 
 import message from '@/lib/message'
 import {
@@ -16,7 +16,6 @@ import {
     downloadImage,
     ensureClose,
     clickBySelector,
-    doAfterMounted,
     getDialogue
 } from '@/lib/tool'
 import {
@@ -29,7 +28,6 @@ import {
     chars,
     avatars,
     currCharId,
-    currDialogueIndex,
     DataControl
 } from '@/lib/data'
 import {
@@ -79,6 +77,7 @@ const ifShowAnnouncement = inject('ifShowAnnouncement')
 const ifShowAbout = inject('ifShowAbout')
 const ifShowSettings = inject('ifShowSettings')
 const ifShowSavefile = ref(false)
+const ifShowCopy = ref(false)
 const renderSettings = ref({})
 const width = ref({})
 provide('renderSettings', renderSettings)
@@ -336,23 +335,6 @@ function createOptionDialogue () {
         type: 'option'
     })
 }
-
-const ifShowCopy = ref(false)
-const copyChars = ref([])
-
-function handleCopy () {
-    if (copyChars.value.length === 0) {
-        message.notify('请选择至少一个角色', message.warning)
-        return
-    }
-    const last = copyChars.value.length - 1
-    for (let i = 0; i < copyChars.value.length; i++) {
-        copyDialogue(currDialogueIndex.value, { char: copyChars.value[i] }, { locate: i === last, save: i === last })
-    }
-    copyChars.value = []
-    ifShowCopy.value = false
-    EditDialogue.value.close()
-}
 </script>
 
 <template>
@@ -369,12 +351,7 @@ function handleCopy () {
                            :show-close="false">
                     <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
                 </el-dialog>
-                <el-dialog v-model="ifShowCopy" title="请选择要复读的角色" :width="dialogWidth"
-                           @closed="copyChars = []">
-                    <el-button style="width: 100%;" @click="handleCopy">复读</el-button>
-                    <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true"
-                                  :multiple="true" :filterable="false"/>
-                </el-dialog>
+                <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
                 <div class="drawer" :class="showToolBar?'show':''">
                     <div class="bar" @click="screenshot">
                         <el-icon color="lightgrey" :size="35">
