@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import CharSelector from '../CharSelector.vue'
+import CharSelector from './CharSelector.vue'
 
 import { textarea } from '@/lib/dialogue'
 import { chars } from '@/lib/data'

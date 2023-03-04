@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
 import SideBar from './components/SideBar.vue'
-import Dialogue from './DialogueItem.vue'
-import Settings from './SettingDialog.vue'
+import Dialogue from './components/DialogueItem.vue'
+import Settings from './components/SettingDialog.vue'
 import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
 import EditDialogueDialog from './components/EditDialogueDialog.vue'

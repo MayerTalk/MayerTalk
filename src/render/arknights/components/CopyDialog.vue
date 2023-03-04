@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import CharSelector from '../CharSelector.vue'
+import CharSelector from './CharSelector.vue'
 
 import message from '@/lib/message'
 import { copyDialogue } from '@/lib/dialogue'

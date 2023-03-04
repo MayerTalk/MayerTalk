@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
-import CharSelector from '../CharSelector.vue'
-import Option from '../type/OptionDialog.vue'
+import CharSelector from './CharSelector.vue'
+import OptionDialog from '../type/OptionDialog.vue'
 
 import { dialogWidth, TypeDict, TypeDefault } from '@/lib/constance'
 import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data'
@@ -31,7 +31,7 @@ const editor = computed(() => {
     if (['chat', 'monologue', 'image', undefined].indexOf(dialogueData.value.type) !== -1) {
         return false
     } else if (dialogueData.value.type === 'option') {
-        return Option
+        return OptionDialog
     } else {
         console.warn('Unknown Type Editor ' + dialogueData.value.type)
         return false
