@@ -66,7 +66,7 @@ function delDialogue () {
         '即将删除该对话',
         '提示',
         () => {
-            const chat = chats.value.splice(dialogueData.value, 1)[0]
+            const chat = chats.value.splice(currDialogueIndex.value, 1)[0]
             if (chat.type === 'image') {
                 DataControl.image.delete(chat.content)
             }
