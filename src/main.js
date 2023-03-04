@@ -1,4 +1,4 @@
-import {createApp} from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 
 import {
@@ -22,31 +22,31 @@ import {
     Collection,
     Refresh,
     CoffeeCup
-} from "@element-plus/icons";
+} from '@element-plus/icons'
 
-const app = createApp(App);
+const app = createApp(App)
 
-app.component('Plus', Plus);
-app.component('Crop', Crop);
-app.component('Compass', Compass);
-app.component('Notification', Notification);
-app.component('Promotion', Promotion);
-app.component('Picture', Picture);
-app.component('ChatDotSquare', ChatDotSquare);
-app.component('Delete', Delete);
-app.component('Upload', Upload);
-app.component('Download', Download);
-app.component('Back', Back);
-app.component('Right', Right);
-app.component('ArrowUp', ArrowUp);
-app.component('Operation', Operation);
-app.component('Edit', Edit);
-app.component('Close', Close);
-app.component('Setting', Setting);
-app.component('Collection', Collection);
-app.component('Refresh', Refresh);
-app.component('CoffeeCup', CoffeeCup);
+app.component('IconPlus', Plus)
+app.component('IconCrop', Crop)
+app.component('IconCompass', Compass)
+app.component('IconNotification', Notification)
+app.component('IconPromotion', Promotion)
+app.component('IconPicture', Picture)
+app.component('IconChatDotSquare', ChatDotSquare)
+app.component('IconDelete', Delete)
+app.component('IconUpload', Upload)
+app.component('IconDownload', Download)
+app.component('IconBack', Back)
+app.component('IconRight', Right)
+app.component('IconArrowUp', ArrowUp)
+app.component('IconOperation', Operation)
+app.component('IconEdit', Edit)
+app.component('IconClose', Close)
+app.component('IconSetting', Setting)
+app.component('IconCollection', Collection)
+app.component('IconRefresh', Refresh)
+app.component('IconCoffeeCup', CoffeeCup)
 
-app.provide('avatarsJs', 'avatar.js?v=78319d24');
+app.provide('avatarsJs', 'avatar.js?v=78319d24')
 
-app.mount('#app');
+app.mount('#app')

@@ -1,18 +1,18 @@
 <script setup>
-    import '@/lib/versionControl'
-    import {ref, provide} from 'vue'
-    import Renders from './render'
-    import Announce from './Announce.vue'
-    import About from './About.vue'
-    import {config} from '@/lib/data'
+import '@/lib/versionControl'
+import { ref, provide } from 'vue'
+import Renders from './render'
+import Announce from './AnnounceDialog.vue'
+import About from './AboutDialog.vue'
+import { config } from '@/lib/data'
 
-    const ifShowAnnouncement = ref(false);
-    const ifShowSettings = ref(false);
-    const ifShowAbout = ref(false);
+const ifShowAnnouncement = ref(false)
+const ifShowSettings = ref(false)
+const ifShowAbout = ref(false)
 
-    provide('ifShowAnnouncement', ifShowAnnouncement);
-    provide('ifShowSettings', ifShowSettings);
-    provide('ifShowAbout', ifShowAbout);
+provide('ifShowAnnouncement', ifShowAnnouncement)
+provide('ifShowSettings', ifShowSettings)
+provide('ifShowAbout', ifShowAbout)
 </script>
 
 <template>
