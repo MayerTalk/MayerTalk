@@ -3,18 +3,15 @@ import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted
 import SideBar from './components/SideBar.vue'
 import Dialogue from './DialogueItem.vue'
 import Settings from './SettingDialog.vue'
-import Option from './type/OptionDialog.vue'
 import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
 import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
+import CreateOptionDialog from './components/CreateOptionDialog.vue'
 
 import {
-    copy,
-    uuid,
     downloadImage,
-    ensureClose,
     clickBySelector,
     getDialogue
 } from '@/lib/tool'
@@ -32,7 +29,6 @@ import {
 } from '@/lib/data'
 import {
     textarea,
-    createDialogue,
     createTextDialogue,
     createImageDialogue,
     copyDialogue,
@@ -44,6 +40,7 @@ import tipControl from '@/lib/tip'
 const EditChar = ref(null)
 const EditDialogue = ref(null)
 const AtRef = ref(null)
+const CreateOption = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
@@ -161,8 +158,6 @@ const scroll = ref()
 const preScreenshot = ref(false)
 const ifShowMoreType = ref(false)
 const arrowStyle = ref({})
-const options = ref({})
-const ifShowCreateOption = ref(false)
 provide('preScreenshot', preScreenshot)
 
 function roll360 () {
@@ -277,19 +272,6 @@ function screenshot () {
         }, 100)
     })
 }
-
-function showCreateOption () {
-    options.value = [[uuid(), '']]
-    ifShowCreateOption.value = true
-}
-
-function createOptionDialogue () {
-    ifShowCreateOption.value = false
-    createDialogue({
-        content: copy(options.value),
-        type: 'option'
-    })
-}
 </script>
 
 <template>
@@ -301,11 +283,7 @@ function createOptionDialogue () {
                 <EditCharDialog ref="EditChar"/>
                 <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
                 <AtDialog ref="AtRef"/>
-                <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth"
-                           :before-close="ensureClose"
-                           :show-close="false">
-                    <Option v-model="options" extraButton="创建" @done="createOptionDialogue"/>
-                </el-dialog>
+                <CreateOptionDialog ref="CreateOption"/>
                 <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
                 <SideBar
                     v-model="ifShowSideBar"
@@ -360,7 +338,7 @@ function createOptionDialogue () {
                                     </el-icon>
                                     图片
                                 </div>
-                                <div class="block" @click="showCreateOption">
+                                <div class="block" @click="CreateOption.open">
                                     <el-icon color="#707070" :size="35">
                                         <IconOperation/>
                                     </el-icon>
