@@ -36,6 +36,7 @@ import {
     copyDialogueHook
 } from '@/lib/dialogue'
 import tipControl from '@/lib/tip'
+import plus1 from '@/lib/plus1'
 
 const EditChar = ref(null)
 const EditDialogue = ref(null)
@@ -179,34 +180,6 @@ function roll360 () {
     }
 }
 
-// +1功能
-const plus1 = ref(-1)
-
-function plus1Hook (index) {
-    if (index > 0) {
-        const c1 = chats.value[index]
-        const c2 = chats.value[index - 1]
-        if (c1.content === c2.content && c1.type === c2.type) {
-            plus1.value = index
-        } else {
-            plus1.value = -1
-        }
-    } else {
-        plus1.value = -1
-    }
-}
-
-createDialogueHook.push(() => {
-    plus1Hook(chats.value.length - 1)
-})
-
-copyDialogueHook.push((index, data, config) => {
-    if (Object.prototype.hasOwnProperty.call(config, 'save') ? config.save : true) {
-        DataControl.save('chats')
-        plus1Hook(chats.value.length - 1)
-    }
-})
-
 function resizeScroll (offset = 0) {
     const el = document.getElementById('textarea')
     el.style.height = '20px'
@@ -299,7 +272,8 @@ function screenshot () {
                         <div class="window" id="window"
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
-                            <Dialogue v-for="(dialogue, index) in chats" @edit="EditDialogue.open(index)" @plus1="copyDialogue"
+                            <Dialogue v-for="(dialogue, index) in chats" @edit="EditDialogue.open(index)"
+                                      @plus1="copyDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
                                       style="position:relative"></Dialogue>
                         </div>
