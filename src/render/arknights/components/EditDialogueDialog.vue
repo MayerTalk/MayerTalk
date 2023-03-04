@@ -167,4 +167,27 @@ defineExpose({
 
 </template>
 
-<style src="../.scoped.css" scoped/>
+<style scoped>
+.image-uploader .el-upload:hover {
+    border-color: var(--el-color-primary);
+}
+
+.container {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-bar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.column-display {
+    display: flex;
+    column-gap: 5px;
+}
+</style>

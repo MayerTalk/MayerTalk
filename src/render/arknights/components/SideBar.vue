@@ -121,7 +121,6 @@ function clearAll () {
             <el-upload
                 action="#"
                 :show-file-list="false"
-                class="avatar-uploader"
                 accept="application/json"
                 :before-upload="(file) => uploadData(file, () => {emit('resizeWindow')})"
                 style="position: absolute; width: 100%; height: 50px; overflow: hidden"
@@ -148,9 +147,48 @@ function clearAll () {
     </Transition>
 </template>
 
-<style src="../.scoped.css" scoped/>
-<style>
+<style scoped>
+.drawer {
+    width: 80px;
+    height: 100%;
+    position: fixed;
+    right: -100px;
+    background: #606060;
+    border-left: grey solid 1px;
+    transition: right ease 0.5s;
+    z-index: 404;
+    padding: 5px;
+    user-select: none;
+}
+
+.drawer.show {
+    right: 0;
+}
+
+.drawer .bar {
+    height: 50px;
+    border-bottom: grey solid 1px;
+    margin: 2px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: lightgrey;
+}
+
+.drawer .bar:hover {
+    color: lightblue;
+}
+
+.drawer .bar svg {
+    margin-right: 5px;
+}
+
 .drawer-mask {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    z-index: 100;
     opacity: 0.5;
 }
 

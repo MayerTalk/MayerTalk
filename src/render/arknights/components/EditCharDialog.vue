@@ -147,5 +147,3 @@ defineExpose({
     </el-dialog>
     <SelectCharDialog v-model="ifShowSelectChar" @select="handleSelect"/>
 </template>
-
-<style src="../.scoped.css" scoped/>

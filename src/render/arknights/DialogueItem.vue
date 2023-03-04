@@ -161,9 +161,8 @@ watch(charDirection, () => {
         </div>
     </div>
 </template>
-
-<style src=".global.css"></style>
-<style src=".scoped.css" scoped></style>
+<style src="./style/dialogue.css" scoped/>
+<style src="./style/plus1.css" scoped/>
 <style scoped>
     .avatar {
         width: v-bind('width.avatar');

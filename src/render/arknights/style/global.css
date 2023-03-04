@@ -14,3 +14,9 @@
 #operateBar > div.char-bar > div.el-scrollbar > div.el-scrollbar__bar.is-vertical > div {
     background-color: lightgrey;
 }
+
+.dialogue {
+    --dialogue-border-color: #666666;
+    --dialogue-background: #222222;
+    --dialogue-color: #EEEEEE;
+}

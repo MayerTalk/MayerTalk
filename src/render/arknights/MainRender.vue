@@ -382,5 +382,9 @@ function screenshot () {
     </div>
 </template>
 
-<style src=".global.css"></style>
-<style src=".scoped.css" scoped></style>
+<style src="./style/global.css"/>
+<style src="./style/avatar-uploader.css"/>
+
+<style src="./style/render.css" scoped/>
+<style src="./style/operateBar.css" scoped/>
+<style src="./style/animation.css" scoped/>
