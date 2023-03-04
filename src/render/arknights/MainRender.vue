@@ -48,7 +48,7 @@ document.addEventListener('keydown', event => {
     if (event.ctrlKey) {
         if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
             if (event.code === 'KeyC') {
-                EditChar.value.show(true)
+                EditChar.value.open(true)
                 event.preventDefault()
             }
         } else if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
@@ -57,7 +57,7 @@ document.addEventListener('keydown', event => {
             if (index < list.length) {
                 DataControl.curr.setChar(list[index][0])
             } else {
-                EditChar.value.show(true)
+                EditChar.value.open(true)
             }
             event.preventDefault()
         }
@@ -344,7 +344,7 @@ function screenshot () {
                                         </div>
                                         <div class="option"
                                              style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"
-                                             @click="EditChar.show(true)">
+                                             @click="EditChar.open(true)">
                                             <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                                  data-v-029747aa="" style="background: #707070">
                                                 <path fill="#858585"
@@ -356,7 +356,7 @@ function screenshot () {
                                 <div style="display: flex; align-items: center; justify-content: center;">
                                     <div class="option edit" style="height: 80%">
                                         <div v-if="currCharId" style="width: 40px; height: 40px"
-                                             @click="EditChar.show(false)">
+                                             @click="EditChar.open(false)">
                                             <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                                  data-v-029747aa="">
                                                 <path fill="#606060"

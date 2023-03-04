@@ -1,16 +1,22 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { StaticUrl, dialogWidth } from '@/lib/constance'
 import { searchCharHandler, searchResult, loadChar } from '@/lib/character'
 
-defineEmits(['select'])
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue', 'select'])
 
-const ifShow = ref(false)
+const ifShow = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
+    }
+})
+
 const search = ref('')
 const avatarBarFrameWidth = Math.floor((dialogWidth - 48) / 4) + 'px'
-function show () {
-    ifShow.value = true
-}
 
 function initSearchChar () {
     const el = document.querySelector('#searchCharInput')
@@ -19,10 +25,6 @@ function initSearchChar () {
     })
     searchCharHandler('')
 }
-
-defineExpose({
-    show
-})
 </script>
 
 <template>

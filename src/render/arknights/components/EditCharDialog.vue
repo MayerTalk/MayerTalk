@@ -13,9 +13,9 @@ const charData = ref({})
 const createChar = ref(false)
 const defaultName = ref('')
 
-const SelectChar = ref(null)
+const ifShowSelectChar = ref(false)
 
-function show (create) {
+function open (create) {
     // 启动角色编辑 create:是否创建角色
     createChar.value = create
     if (create) {
@@ -96,7 +96,7 @@ function handleSelect (char) {
 }
 
 defineExpose({
-    show
+    open
 })
 </script>
 
@@ -136,7 +136,7 @@ defineExpose({
                 </div>
             </div>
             <div style="width: 100%; margin-top: 10px">
-                <el-button style="width: 60%" @click="SelectChar.show">
+                <el-button style="width: 60%" @click="ifShowSelectChar=true">
                     从素材库中选择角色
                 </el-button>
                 <el-button style="width: calc(40% - 12px)" @click="editChar">
@@ -145,7 +145,7 @@ defineExpose({
             </div>
         </div>
     </el-dialog>
-    <SelectCharDialog ref="SelectChar" @select="handleSelect"/>
+    <SelectCharDialog v-model="ifShowSelectChar" @select="handleSelect"/>
 </template>
 
 <style src="../.scoped.css" scoped/>
