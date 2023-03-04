@@ -10,6 +10,8 @@ const chars = ref({})
 const chats = ref([])
 const images = ref({})
 const avatars = ref({})
+const currCharId = ref('')
+const currCharData = ref({})
 
 const Data = {
     config,
@@ -379,7 +381,18 @@ const DataControl = {
             }
         }
     },
-    image: null
+    image: null,
+    curr: {
+        set (id, force = false) {
+            if (id !== currCharId.value || force) {
+                currCharId.value = id
+                currCharData.value = chars.value[id]
+            } else {
+                currCharId.value = ''
+                currCharData.value = {}
+            }
+        }
+    }
 }
 
 for (const key in Data) {
@@ -417,6 +430,8 @@ export {
     chars,
     images,
     avatars,
+    currCharId,
+    currCharData,
     Storage,
     ImageStorage,
     DataControl

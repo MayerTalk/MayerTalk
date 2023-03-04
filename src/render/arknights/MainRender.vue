@@ -5,58 +5,55 @@ import Settings from './SettingDialog.vue'
 import Option from './type/OptionDialog.vue'
 import CharSelector from './CharSelector.vue'
 import Savefile from './components/SavefileDialog.vue'
+import EditCharDialog from './components/EditCharDialog.vue'
 
 import message from '@/lib/message'
 import {
     copy,
     uuid,
     downloadImage,
-    blob2url,
-    image2square,
     ensureClose,
     clickBySelector,
     getDialogue,
     doAfterMounted
 } from '@/lib/tool'
 import {
-    StaticUrl,
     TypeDict,
-    TypeDefault
+    TypeDefault,
+    windowWidth,
+    dialogWidth,
+    MobileView
 } from '@/lib/constance'
 import {
     chats,
     chars,
     images,
     avatars,
+    currCharId,
     DataControl
 } from '@/lib/data'
 import {
     uploadData,
     downloadData
 } from '@/lib/versionControl'
-import {
-    loadChar,
-    searchResult,
-    searchCharHandler
-} from '@/lib/character'
+
+const EditChar = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
     if (event.ctrlKey) {
         if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
             if (event.code === 'KeyC') {
-                createChar.value = true
-                ifShowEditChar.value = true
+                EditChar.value.show(true)
                 event.preventDefault()
             }
         } else if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
             const index = (+event.key || 10) - 1
             const list = Object.entries(chars.value)
             if (index < list.length) {
-                setCurr(list[index][0])
+                DataControl.curr.set(list[index][0])
             } else {
-                createChar.value = true
-                ifShowEditChar.value = true
+                EditChar.value.show(true)
             }
             event.preventDefault()
         }
@@ -83,9 +80,6 @@ const ifShowSettings = inject('ifShowSettings')
 const ifShowSavefile = ref(false)
 const renderSettings = ref({})
 const width = ref({})
-const windowWidth = Math.min(520, document.body.clientWidth)
-const dialogWidth = Math.ceil(windowWidth * 0.9)
-const avatarBarFrameWidth = Math.floor((dialogWidth - 48) / 4) + 'px'
 provide('renderSettings', renderSettings)
 provide('width', width)
 provide('dialogWidth', dialogWidth)
@@ -198,22 +192,6 @@ function roll360 () {
     }
 }
 
-const currChar = ref('')
-const ifShowEditChar = ref(false)
-const ifShowSelectChar = ref(false)
-const defaultName = ref('')
-const createChar = ref(true)
-const newChar = ref({ name: '' })
-const searchChar = ref('')
-
-function initSearchChar () {
-    const el = document.querySelector('#searchCharInput')
-    el.addEventListener('input', () => {
-        searchCharHandler(el.value)
-    })
-    searchCharHandler('')
-}
-
 const ifShowEditDialogue = ref(false)
 const currDialogue = ref(-1)
 const currDialogueData = ref({})
@@ -288,12 +266,12 @@ function plus1Hook (index) {
     }
 }
 
-if (window.innerWidth - 520 > 250) {
-    showToolBar.value = true
-    toolBarMask.value = false
-} else {
+if (MobileView) {
     showToolBar.value = false
     toolBarMask.value = true
+} else {
+    showToolBar.value = true
+    toolBarMask.value = false
 }
 
 function resizeScroll (offset = 0) {
@@ -358,7 +336,7 @@ function createDialogue (data, locate = true) {
     data = {
         content: data.content,
         type: data.type,
-        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currChar.value,
+        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
         id: data.id || uuid()
     }
     chats.value.push(data)
@@ -377,7 +355,7 @@ function copyDialogue (index, data = {}, config = {}) {
     data = {
         content: data.content || chats.value[index].content,
         type: data.type || chats.value[index].type,
-        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currChar.value,
+        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
         id: data.id || uuid()
     }
     if (data.type === 'image') {
@@ -437,95 +415,10 @@ function clearDialogueData () {
     currDialogueData.value = {}
 }
 
-function setCurr (id) {
-    if (id === currChar.value) {
-        currChar.value = ''
-    } else {
-        currChar.value = id
-    }
-}
-
-function showEditChar (create) {
-    createChar.value = create
-    if (create) {
-        newChar.value = { name: '' }
-    } else {
-        if (currChar.value) {
-            newChar.value = chars.value[currChar.value]
-        } else {
-            message.notify('请选择角色', message.warning)
-            return
-        }
-    }
-    searchResult.value = false
-    ifShowEditChar.value = true
-}
-
-function uploadAvatar (uploadFile) {
-    const url = blob2url(uploadFile)
-    if (url) {
-        const image = new Image()
-        image.onload = () => {
-            image2square(image).toBlob((blob) => {
-                DataControl.image.new(blob, (id) => {
-                    DataControl.image.delete(newChar.value.avatar)
-                    newChar.value.avatar = id
-                })
-            })
-        }
-        image.src = url
-    }
-    return false
-}
-
 DataControl.switchHook = () => {
-    if (!Object.prototype.hasOwnProperty.call(chars.value, currChar.value)) {
-        currChar.value = ''
+    if (!Object.prototype.hasOwnProperty.call(chars.value, currCharId.value)) {
+        DataControl.curr.set('', true)
     }
-}
-
-function selectChar (avatar) {
-    DataControl.image.delete(newChar.value.avatar)
-    newChar.value.avatar = avatar[1]
-    ifShowSelectChar.value = false
-}
-
-function editChar () {
-    if (createChar.value) {
-        if (newChar.value.name === '' && !defaultName.value) {
-            message.notify('名字是必须的', message.error)
-            return
-        }
-        if (newChar.value.name === '') {
-            newChar.value.name = defaultName.value
-        }
-        currChar.value = DataControl.char.new(newChar.value)
-        ifShowEditChar.value = false
-        newChar.value = { name: '' }
-        message.notify('创建成功', message.success)
-        if (!toolBarMask.value) {
-            document.getElementById('textarea').focus()
-        }
-    } else {
-        message.confirm(
-            '即将删除该角色',
-            '提示',
-            () => {
-                DataControl.char.delete(currChar.value)
-                currChar.value = ''
-                message.notify('删除成功', message.success)
-                ifShowEditChar.value = false
-            }
-        )
-    }
-}
-
-function clearNewChar () {
-    if (createChar.value && newChar.value) {
-        DataControl.image.delete(newChar.value.avatar)
-    }
-    newChar.value = { name: '' }
-    defaultName.value = ''
 }
 
 function showEditDialogue (index) {
@@ -619,7 +512,7 @@ function clearAll () {
         '提示',
         () => {
             DataControl.clear(1)
-            currChar.value = ''
+            DataControl.curr.set('', true)
             currDialogue.value = 0
             currDialogueData.value = {}
             ifShowClear.value = false
@@ -656,7 +549,6 @@ function handleCopy () {
     ifShowCopy.value = false
     ifShowEditDialogue.value = false
 }
-
 </script>
 
 <template>
@@ -665,73 +557,7 @@ function handleCopy () {
             <div id="body" :style="{background: renderSettings.background}">
                 <Settings/>
                 <Savefile v-model="ifShowSavefile"/>
-                <el-dialog v-model="ifShowEditChar" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
-                           @closed="() => {DataControl.save('chars'); clearNewChar()}">
-                    <div style="display: flex; flex-wrap: wrap">
-                        <div style="width: 100%; display: flex;">
-                            <el-upload
-                                action="#"
-                                drag
-                                :show-file-list="false"
-                                class="avatar-uploader"
-                                accept="image/png, image/jpeg, image/gif"
-                                :before-upload="(file) => {defaultName='';return uploadAvatar(file)}"
-                            >
-                                <div class="container"><img v-if="newChar.avatar"
-                                                            :src="Object.prototype.hasOwnProperty.call(images, newChar.avatar) ? images[newChar.avatar].src : StaticUrl + newChar.avatar"/>
-                                    <el-icon v-else class="avatar-uploader-icon">
-                                        <IconPlus/>
-                                    </el-icon>
-                                </div>
-                            </el-upload>
-                            <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
-                                名称：
-                                <el-input v-model="newChar.name" style="margin-top: 10px" :placeholder="defaultName"
-                                          @keypress.enter="createChar && editChar()"></el-input>
-                                <div style="margin-top: 5px">
-                                    头像位置
-                                    <el-switch
-                                        v-model="newChar.right"
-                                        active-text="右"
-                                        inactive-text="左"
-                                        style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff"
-                                    ></el-switch>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="width: 100%; margin-top: 10px">
-                            <el-button style="width: 60%" @click="ifShowSelectChar=true">
-                                从素材库中选择角色
-                            </el-button>
-                            <el-button style="width: calc(40% - 12px)" @click="editChar">
-                                {{ createChar ? '创建' : '删除' }}
-                            </el-button>
-                        </div>
-                    </div>
-                </el-dialog>
-                <el-dialog v-model="ifShowSelectChar" title="选择角色" :width="dialogWidth" top="10vh"
-                           @open="loadChar('arknights');initSearchChar()"
-                           @closed="searchCharHandler('');searchChar=''">
-                    <!--        素材库选择角色-->
-                    <template v-if="ifShowSelectChar">
-                        <el-input placeholder="搜索更多角色" v-model="searchChar" id="searchCharInput"></el-input>
-                        <template v-if="searchResult">
-                            <el-scrollbar max-height="50vh" style="width: 100%">
-                                <div class="avatar-bar">
-                                    <div class="frame" v-for="char in searchResult" :key="char[0]">
-                                        <img :src="StaticUrl + char[1]" loading="lazy" :title="char[2]"
-                                             @click="() => {selectChar(char);defaultName=char[2]}">
-                                    </div>
-                                </div>
-                            </el-scrollbar>
-                        </template>
-                        <div v-else
-                             style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
-                            <p>No Result</p>
-                            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置</p>
-                        </div>
-                    </template>
-                </el-dialog>
+                <EditCharDialog ref="EditChar"/>
                 <el-dialog v-model="ifShowEditDialogue" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                            @closed="() => {clearDialogueData();DataControl.save('chats')}"
                            :before-close="editDialogue?null:ensureClose">
@@ -974,13 +800,13 @@ function handleCopy () {
                                 <el-scrollbar :max-height="120" style="width: calc(100% - 55px)">
                                     <div class="container">
                                         <div v-for="(char, id) in chars" :key="id"
-                                             :class="[id === currChar?'char-curr':'char']"
-                                             @click="setCurr(id)">
+                                             :class="[id === currCharId?'char-curr':'char']"
+                                             @click="DataControl.curr.set(id)">
                                             <img :src="avatars[id]">
                                         </div>
                                         <div class="option"
                                              style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"
-                                             @click="showEditChar(true)">
+                                             @click="EditChar.show(true)">
                                             <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                                  data-v-029747aa="" style="background: #707070">
                                                 <path fill="#858585"
@@ -991,8 +817,8 @@ function handleCopy () {
                                 </el-scrollbar>
                                 <div style="display: flex; align-items: center; justify-content: center;">
                                     <div class="option edit" style="height: 80%">
-                                        <div v-if="currChar" style="width: 40px; height: 40px"
-                                             @click="showEditChar(false)">
+                                        <div v-if="currCharId" style="width: 40px; height: 40px"
+                                             @click="EditChar.show(false)">
                                             <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                                  data-v-029747aa="">
                                                 <path fill="#606060"
@@ -1021,11 +847,6 @@ function handleCopy () {
 <style src=".global.css"></style>
 <style src=".scoped.css" scoped></style>
 <style>
-.avatar-bar .frame {
-    width: v-bind('avatarBarFrameWidth');
-    height: v-bind('avatarBarFrameWidth')
-}
-
 .drawer-mask {
     opacity: 0.5;
 }
