@@ -7,6 +7,7 @@ import CharSelector from './CharSelector.vue'
 import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
 import EditDialogueDialog from './components/EditDialogueDialog.vue'
+import AtDialog from './components/AtDialog.vue'
 
 import message from '@/lib/message'
 import {
@@ -48,6 +49,7 @@ import tipControl from '@/lib/tip'
 
 const EditChar = ref(null)
 const EditDialogue = ref(null)
+const AtRef = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
@@ -192,55 +194,6 @@ function roll360 () {
 
 const showToolBar = ref(false)
 const toolBarMask = ref(true)
-
-// @列表处理
-const ifShowAt = ref(false)
-const atWho = ref('')
-const atWhoSelRef = ref(null)
-let insertAt = 0
-
-function handleAt (id) {
-    // 被@角色刷入文本框
-    textarea.value = textarea.value.slice(0, insertAt) +
-        chars.value[id].name +
-        ' ' +
-        textarea.value.slice(insertAt)
-    atWho.value = ''
-    if (atWhoSelRef.value) {
-        atWhoSelRef.value.blur()
-    }
-    ifShowAt.value = false
-    setTimeout(() => {
-        const el = document.querySelector('#textarea')
-        const range = insertAt + chars.value[id].name.length + 1
-        el.focus()
-        el.setSelectionRange(range, range)
-    }, 100)
-}
-
-function atWhoOpen () {
-    // @提示框显示后聚焦输入
-    doAfterMounted(atWhoSelRef, (ref) => {
-        // 等待动画结束
-        setTimeout(() => {
-            ref.value.focus()
-        }, 150)
-    })
-}
-
-function processInput (e) {
-    // 处理键入@事件
-    if (e.data === '@' && (e.inputType === 'insertText' || e.inputType === 'insertCompositionText')) {
-        if (ifShowAt.value) {
-            textarea.value = e.target.value.slice(0, e.target.selectionStart - 1) + e.target.value.slice(e.target.selectionStart)
-            insertAt = e.target.selectionStart - 1
-        } else {
-            insertAt = e.target.selectionStart
-            ifShowAt.value = true
-            atWhoOpen()
-        }
-    }
-}
 
 // +1功能
 const plus1 = ref(-1)
@@ -410,14 +363,7 @@ function handleCopy () {
                 <Savefile v-model="ifShowSavefile"/>
                 <EditCharDialog ref="EditChar"/>
                 <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
-                <el-dialog v-model="ifShowAt" :width="dialogWidth"
-                           title="想@哪个角色?"
-                           :modal="false">
-                    <CharSelector v-model="atWho"
-                                  v-model:select="atWhoSelRef"
-                                  style="width: 100%"
-                                  @change="handleAt" @visible-change="(visible) => {if (!visible) {ifShowAt=false}}"/>
-                </el-dialog>
+                <AtDialog ref="AtRef"/>
                 <el-dialog v-model="ifShowCreateOption" title="创建选项" :width="dialogWidth"
                            :before-close="ensureClose"
                            :show-close="false">
@@ -540,7 +486,7 @@ function handleCopy () {
                             <textarea class="textarea" id="textarea" v-model="textarea"
                                       :placeholder="tipControl.tip.value"
                                       @keydown.ctrl.enter="createTextDialogue('chat')"
-                                      @input="processInput"></textarea>
+                                      @input="AtRef.processInput"></textarea>
                             <div class="button-bar">
                                 <el-icon @click="createTextDialogue('chat')" color="#808080" :size="35">
                                     <IconPromotion/>
