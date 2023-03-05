@@ -27,3 +27,5 @@
  - 参考
    - [yuzutalk](https://www.yuzutalk.net/) 对话形式二创的启发
    - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现
+ - IDE授权
+   - 特别感谢 [JetBrains](https://www.jetbrains.com/?from=MayerTalk) 为开源项目提供免费的 [WebStorm](https://www.jetbrains.com/webstorm/?from=MayerTalk) 等 IDE 的授权
