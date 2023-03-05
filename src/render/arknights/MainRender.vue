@@ -300,22 +300,20 @@ function screenshot () {
                 return
             }
             chats.value = chatsData.slice(group[i - 1], group[i])
-            nextTick(() => {
+            setTimeout(() => {
+                node.style.height = null
+                node.style.height = node.scrollHeight - 30 + 'px'
                 setTimeout(() => {
-                    node.style.height = null
-                    node.style.height = node.scrollHeight - 30 + 'px'
-                    setTimeout(() => {
-                        downloadImage(node, {
-                            windowWidth: width.value.window + 20,
-                            scale: renderSettings.value.scale,
-                            useCORS: true
-                        }, () => {
-                            message.notify('截图成功 [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
-                            next(i + 1)
-                        }, seq + (i + 1))
-                    }, 100)
+                    downloadImage(node, {
+                        windowWidth: width.value.window + 20,
+                        scale: renderSettings.value.scale,
+                        useCORS: true
+                    }, () => {
+                        message.notify('截图成功 [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
+                        next(i + 1)
+                    }, seq + (i + 1))
                 }, 100)
-            })
+            }, 100)
         }
         message.notify('正在开始截图，长截图初始化时间较长，请耐心等待', message.warning)
         setTimeout(() => {
