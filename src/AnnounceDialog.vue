@@ -15,7 +15,7 @@ const ifShowAnnouncement = computed({
 })
 const ifShowNotSupportBrowser = ref(false)
 
-const version = 'v0.1.4'
+const version = 'v0.1.5'
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
@@ -50,13 +50,13 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <el-link href="/docs/guide/start.html" type="primary">快速上手 (首次使用推荐阅读)</el-link>
             <h3>
-                v0.1.4
+                v0.1.5
             </h3>
             <b>新增</b>
             <ul>
                 <li>
-                    <p style="display: flex; align-items: center">存档
-                        <el-link href="/docs/guide/feature.html#存档" type="primary" style="margin-left: 10px">查看指南</el-link>
+                    <p style="display: flex; align-items: center">长截图自动剪裁
+                        <el-link href="/docs/guide/feature.html#长截图自动剪裁" type="primary" style="margin-left: 10px">查看指南</el-link>
                     </p>
                 </li>
             </ul>
