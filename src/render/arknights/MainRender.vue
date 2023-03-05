@@ -235,27 +235,27 @@ function getScreenshotGroup () {
     // 裁分点
     const points = []
     // 已裁分Height
-    let cutHeight = 0
+    let croppedHeight = 0
     // 最后一次裁分index
     let index = 0
     if (totalHeight / maxHeight > 2) {
         for (let i = 0; i < chats.value.length; i++) {
             const dialogue = getDialogue(chats.value[i].id)
-            if (dialogue.offsetTop - cutHeight > maxHeight) {
+            if (dialogue.offsetTop - croppedHeight > maxHeight) {
                 points.push(i - 1)
-                cutHeight = getDialogue(chats.value[i - 1].id).offsetTop
-                if (totalHeight - cutHeight < 2 * maxHeight) {
+                croppedHeight = getDialogue(chats.value[i - 1].id).offsetTop
+                if (totalHeight - croppedHeight < 2 * maxHeight) {
                     index = i
                     break
                 }
             }
         }
     }
-    // totalHeight - cutHeight < 2 * maxHeight 二分
+    // totalHeight - croppedHeight < 2 * maxHeight 二分
     index = chats.value.length - Math.floor((chats.value.length - index) / 2)
     while (true) {
         const dialogue = getDialogue(chats.value[index].id)
-        if (dialogue.offsetTop - cutHeight > maxHeight) {
+        if (dialogue.offsetTop - croppedHeight > maxHeight) {
             if (totalHeight - dialogue.offsetTop >= maxHeight) {
                 // 极端情况，此时三等分
                 const diff = Math.ceil((chats.value.length - index) / 3)
