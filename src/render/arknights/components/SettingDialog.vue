@@ -1,110 +1,110 @@
 <script setup>
-    import {ref, inject, watch, computed} from 'vue'
-    import Renders from '@/render'
-    import message from '@/lib/message'
-    import {ensure, formatSize} from '@/lib/tool';
-    import Save from '@/lib/savefile'
+import { ref, inject, watch, computed } from 'vue'
+import Renders from '@/render'
+import message from '@/lib/message'
+import { ensure, formatSize } from '@/lib/tool'
+import Save from '@/lib/savefile'
 
-    import {TypeDict} from "@/lib/constance";
-    import {
-        config,
-        settings,
-        DataControl
-    } from '@/lib/data'
+import { TypeDict } from '@/lib/constance'
+import {
+    config,
+    settings,
+    DataControl
+} from '@/lib/data'
 
-    const defaultSettings = {
-        background: '#303030',
-        width: 400,
-        style: 'default',
-        scale: 1.5,
-        showCharName: false,
-        showCharNameSettings: {
-            chat: true,
-            monologue: true,
-            image: true
-        }
-    };
+const defaultSettings = {
+    background: '#303030',
+    width: 400,
+    style: 'default',
+    scale: 1.5,
+    showCharName: false,
+    showCharNameSettings: {
+        chat: true,
+        monologue: true,
+        image: true
+    },
+    maxHeight: 10000
+}
 
-    const ifShow = inject('ifShowSettings');
-    const renderSettings = inject('renderSettings');
-    const dialogWidth = inject('dialogWidth');
+const ifShow = inject('ifShowSettings')
+const renderSettings = inject('renderSettings')
+const dialogWidth = inject('dialogWidth')
 
-    function _sync(dst, src1, src2, k) {
-        for (let key in src1) {
-            if (src1.hasOwnProperty(key)) {
-                if (typeof src1[key] === 'object') {
-                    dst[key] = {};
-                    _sync(dst[key], src1[key], src2[key] || {}, key)
-                } else {
-                    dst[key] = src1[key]
-                }
-            }
-        }
-        for (let key in src2) {
-            if (src2.hasOwnProperty(key)) {
-                if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === "boolean")) {
-                    dst[key] = src2[key]
-                }
+function _sync (dst, src1, src2) {
+    for (const key in src1) {
+        if (Object.prototype.hasOwnProperty.call(src1, key)) {
+            if (typeof src1[key] === 'object') {
+                dst[key] = {}
+                _sync(dst[key], src1[key], src2[key] || {}, key)
+            } else {
+                dst[key] = src1[key]
             }
         }
     }
-
-    function sync() {
-        _sync(renderSettings.value, defaultSettings, settings.value);
-    }
-
-
-    const fake = ref({
-        width: settings.value.width || null,
-        scale: settings.value.scale || null
-    });
-
-
-    const language = ref('zh-cn');
-
-    const ifShowEditShowCharName = ref(false);
-    const showCharNameSettings = computed(() => {
-        return renderSettings.value.showCharNameSettings || {}
-    });
-
-    function setShowCharNameSettings(type, value) {
-        if (!settings.value.hasOwnProperty('showCharNameSettings')) {
-            settings.value.showCharNameSettings = {}
-        }
-        settings.value.showCharNameSettings[type] = value
-    }
-
-    const storageSize = ref('计算中...');
-
-    function getStorageSize() {
-        let size = 0;
-        for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key)) {
-                size += localStorage.getItem(key).length
+    for (const key in src2) {
+        if (Object.prototype.hasOwnProperty.call(src2, key)) {
+            if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === 'boolean')) {
+                dst[key] = src2[key]
             }
         }
-        size += DataControl.image.lastSave.length;
-        Save.getInfo((data) => {
-            for (let key in data) {
-                if (data.hasOwnProperty(key)) {
-                    size += data[key].size
-                }
+    }
+}
+
+function sync () {
+    _sync(renderSettings.value, defaultSettings, settings.value)
+}
+
+const fake = ref({
+    width: settings.value.width || null,
+    scale: settings.value.scale || null,
+    maxHeight: settings.value.maxHeight || null
+})
+
+const language = ref('zh-cn')
+
+const ifShowEditShowCharName = ref(false)
+const showCharNameSettings = computed(() => {
+    return renderSettings.value.showCharNameSettings || {}
+})
+
+function setShowCharNameSettings (type, value) {
+    if (!Object.prototype.hasOwnProperty.call(settings.value, 'showCharNameSettings')) {
+        settings.value.showCharNameSettings = {}
+    }
+    settings.value.showCharNameSettings[type] = value
+}
+
+const storageSize = ref('计算中...')
+
+function getStorageSize () {
+    let size = 0
+    for (const key in localStorage) {
+        if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
+            size += localStorage.getItem(key).length
+        }
+    }
+    size += DataControl.image.lastSave.length
+    Save.getInfo((data) => {
+        for (const key in data) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                size += data[key].size
             }
-            storageSize.value = formatSize(size)
-        });
-    }
+        }
+        storageSize.value = formatSize(size)
+    })
+}
 
-    function clearStorage() {
-        DataControl.clear(2);
-        message.notify('清空成功，正在重载', message.success);
-        setTimeout(() => {
-            location.reload()
-        }, 500)
-    }
+function clearStorage () {
+    DataControl.clear(2)
+    message.notify('清空成功，正在重载', message.success)
+    setTimeout(() => {
+        location.reload()
+    }, 500)
+}
 
-    // 同步，否则加载延迟+++
-    sync();
-    watch(settings, () => sync(), {deep: true});
+// 同步，否则加载延迟+++
+sync()
+watch(settings, () => sync(), { deep: true })
 </script>
 
 <template>
@@ -164,6 +164,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>最大高度</th>
+                    <td>
+                        <el-input v-model="fake.maxHeight" :clearable="true"
+                                  :placeholder="'' + defaultSettings.maxHeight"
+                                  @input="settings.maxHeight=+fake.maxHeight"/>
+                    </td>
+                </tr>
+                <tr>
                     <th>显示角色名</th>
                     <td>
                         <div style="display: flex; align-items: center">
@@ -173,7 +181,7 @@
                             </el-switch>
                             <el-icon :size="35" color="#707070" style="margin-left: 10px; cursor: pointer"
                                      @click="ifShowEditShowCharName=true">
-                                <Operation/>
+                                <IconOperation/>
                             </el-icon>
                         </div>
                     </td>
@@ -198,7 +206,7 @@
     <el-dialog v-model="ifShowEditShowCharName" title="请选择要显示角色名的类型" :width="dialogWidth"
                @closed="DataControl.save('settings')">
         <table>
-            <tr v-for="(text, type) in TypeDict">
+            <tr v-for="(text, type) in TypeDict" :key="type">
                 <th>{{text}}</th>
                 <td>
                     <el-switch

@@ -1,6 +1,6 @@
-import {defineAsyncComponent} from 'vue'
+import { defineAsyncComponent } from 'vue'
 
-const Arknights = defineAsyncComponent(() => import('./arknights/Render.vue'));
+const Arknights = defineAsyncComponent(() => import('./arknights/MainRender.vue'))
 
 export default {
     Arknights

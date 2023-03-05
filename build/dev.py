@@ -57,9 +57,9 @@ info = {
     'tag': argv('tag') or tag
 }
 
-with open(os.path.join('src', 'Announce.git.vue'), mode='rt', encoding='utf-8') as f:
+with open(os.path.join('src', 'AnnounceDialog.git.vue'), mode='rt', encoding='utf-8') as f:
     announce_git = f.read()
-with open(os.path.join('src', 'Announce.vue'), mode='wt', encoding='utf-8') as f:
+with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
     f.write(announce_git)
 
 with open(os.path.join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:

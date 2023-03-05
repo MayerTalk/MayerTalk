@@ -1,6 +1,6 @@
-import {uuid} from '@/lib/tool'
+import { uuid } from '@/lib/tool'
 
-const StaticUrl = 'https://static.mayertalk.top/';
+const StaticUrl = 'https://static.mayertalk.top/'
 
 const TypeDict = {
     chat: '对话',
@@ -9,16 +9,7 @@ const TypeDict = {
     option: '选项',
     select: '选择',
     title: '标题'
-};
-
-const TypeHint = {
-    chat: 'text',
-    monologue: 'text',
-    image: 'bytes',
-    option: 'list',
-    select: 'text',
-    title: 'text'
-};
+}
 
 const TypeDefault = {
     chat: '',
@@ -27,12 +18,19 @@ const TypeDefault = {
     option: [[uuid(), '']],
     select: '',
     title: ''
-};
+}
 
+const defaultWidth = 520
+// #21 后 document.body.clientWidth 比实际视窗小（Why？）
+const windowWidth = Math.min(defaultWidth, window.innerWidth)
+const dialogWidth = Math.ceil(windowWidth * 0.9)
+const MobileView = !(window.innerWidth - defaultWidth > 250)
 
 export {
     StaticUrl,
     TypeDict,
     TypeDefault,
-    TypeHint
+    windowWidth,
+    dialogWidth,
+    MobileView
 }

@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+"""
+自 #21 弃用
+"""
 
 import os
 import re
