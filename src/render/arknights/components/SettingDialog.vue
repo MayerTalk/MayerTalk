@@ -22,7 +22,8 @@ const defaultSettings = {
         chat: true,
         monologue: true,
         image: true
-    }
+    },
+    maxHeight: 10000
 }
 
 const ifShow = inject('ifShowSettings')
@@ -55,7 +56,8 @@ function sync () {
 
 const fake = ref({
     width: settings.value.width || null,
-    scale: settings.value.scale || null
+    scale: settings.value.scale || null,
+    maxHeight: settings.value.maxHeight || null
 })
 
 const language = ref('zh-cn')
@@ -159,6 +161,14 @@ watch(settings, () => sync(), { deep: true })
                         <el-input v-model="fake.scale" :clearable="true"
                                   :placeholder="'' + defaultSettings.scale"
                                   @input="settings.scale=+fake.scale"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>最大高度</th>
+                    <td>
+                        <el-input v-model="fake.maxHeight" :clearable="true"
+                                  :placeholder="'' + defaultSettings.maxHeight"
+                                  @input="settings.maxHeight=+fake.maxHeight"/>
                     </td>
                 </tr>
                 <tr>

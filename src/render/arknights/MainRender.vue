@@ -13,7 +13,7 @@ import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import {
     downloadImage,
     clickBySelector,
-    getDialogue
+    getDialogue, copy
 } from '@/lib/tool'
 import {
     windowWidth,
@@ -35,6 +35,7 @@ import {
     createDialogueHook,
     copyDialogueHook
 } from '@/lib/dialogue'
+import message from '@/lib/message'
 import tipControl from '@/lib/tip'
 import plus1 from '@/lib/plus1'
 
@@ -223,27 +224,122 @@ copyDialogueHook.push((index, data, config) => {
 
 const scrollHeight = ref(window.innerHeight - 90 + 'px')
 
+function getScreenshotGroup () {
+    const totalHeight = (document.getElementById('window').scrollHeight - 30)
+    // 缩小比例后实际 maxHeight
+    const maxHeight = renderSettings.value.maxHeight / renderSettings.value.scale - 30
+    if (totalHeight < maxHeight) {
+        // 无需裁分
+        return false
+    }
+    // 裁分点
+    const points = []
+    // 已裁分Height
+    let cutHeight = 0
+    // 最后一次裁分index
+    let index = 0
+    if (totalHeight / maxHeight > 2) {
+        for (let i = 0; i < chats.value.length; i++) {
+            const dialogue = getDialogue(chats.value[i].id)
+            if (dialogue.offsetTop - cutHeight > maxHeight) {
+                points.push(i - 1)
+                cutHeight = getDialogue(chats.value[i - 1].id).offsetTop
+                if (totalHeight - cutHeight < 2 * maxHeight) {
+                    index = i
+                    break
+                }
+            }
+        }
+    }
+    // totalHeight - cutHeight < 2 * maxHeight 二分
+    index = chats.value.length - Math.floor((chats.value.length - index) / 2)
+    while (true) {
+        const dialogue = getDialogue(chats.value[index].id)
+        if (dialogue.offsetTop - cutHeight > maxHeight) {
+            if (totalHeight - dialogue.offsetTop >= maxHeight) {
+                // 极端情况，此时三等分
+                const diff = Math.ceil((chats.value.length - index) / 3)
+                points.push(index - diff)
+                points.push(index + diff)
+                break
+            }
+            index--
+            continue
+        }
+        if (totalHeight - dialogue.offsetTop > maxHeight) {
+            index++
+            continue
+        }
+        points.push(index)
+        break
+    }
+    return points
+}
+
 function screenshot () {
     preScreenshot.value = true
     ResizeWindow.resize()
     const node = document.getElementById('window')
-    nextTick(() => {
-        // 将height定为整数，防止截图下方出现白条
-        node.style.height = node.scrollHeight - 30 + 'px'
-        setTimeout(() => {
-            downloadImage(node, {
-                windowWidth: width.value.window + 20,
-                scale: renderSettings.value.scale,
-                useCORS: true
-            }, () => {
+    const group = getScreenshotGroup()
+    if (group) {
+        const seq = Date.now() + '-'
+        const chatsData = copy(chats.value)
+        const next = (i) => {
+            if (i > group.length) {
+                message.notify('截图完成，正在恢复，请耐心等待', message.success)
                 preScreenshot.value = false
                 node.style.height = null
                 setTimeout(() => {
-                    ResizeWindow.resize()
-                }, 50)
+                    chats.value = chatsData
+                    setTimeout(() => {
+                        message.notify('恢复成功', message.success)
+                        ResizeWindow.resize()
+                    }, 50)
+                }, 500)
+                // 截图结束
+                return
+            }
+            chats.value = chatsData.slice(group[i - 1], group[i])
+            nextTick(() => {
+                setTimeout(() => {
+                    node.style.height = null
+                    node.style.height = node.scrollHeight - 30 + 'px'
+                    setTimeout(() => {
+                        downloadImage(node, {
+                            windowWidth: width.value.window + 20,
+                            scale: renderSettings.value.scale,
+                            useCORS: true
+                        }, () => {
+                            message.notify('截图成功 [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
+                            next(i + 1)
+                        }, seq + (i + 1))
+                    }, 100)
+                }, 100)
             })
-        }, 100)
-    })
+        }
+        message.notify('正在开始截图，长截图初始化时间较长，请耐心等待', message.warning)
+        setTimeout(() => {
+            next(0)
+        }, 500)
+    } else {
+        nextTick(() => {
+            // 将height定为整数，防止截图下方出现白条
+            node.style.height = node.scrollHeight - 30 + 'px'
+            setTimeout(() => {
+                downloadImage(node, {
+                    windowWidth: width.value.window + 20,
+                    scale: renderSettings.value.scale,
+                    useCORS: true
+                }, () => {
+                    preScreenshot.value = false
+                    node.style.height = null
+                    setTimeout(() => {
+                        ResizeWindow.resize()
+                    }, 50)
+                })
+            }, 100)
+        })
+    }
 }
 </script>
 

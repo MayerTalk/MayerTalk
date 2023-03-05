@@ -16,6 +16,8 @@
  - [@提示](https://www.mayertalk.top/docs/guide/feature.html#%E6%8F%90%E7%A4%BA) （就像qq）
  - [批量复读](https://www.mayertalk.top/docs/guide/feature.html#%E6%89%B9%E9%87%8F%E5%A4%8D%E8%AF%BB) （）是人类的本质
  - [+1](https://www.mayertalk.top/docs/guide/feature.html#%E5%BF%AB%E6%8D%B7-1) 《+1的诱惑》
+ - [长截图自动剪裁](https://www.mayertalk.top/docs/guide/feature.html#%E9%95%BF%E6%88%AA%E5%9B%BE%E8%87%AA%E5%8A%A8%E5%89%AA%E8%A3%81)
+   再也不怕写的太长无法截屏了
  
 ## 鸣谢
  
