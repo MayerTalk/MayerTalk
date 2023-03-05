@@ -282,6 +282,7 @@ function screenshot () {
     const node = document.getElementById('window')
     const group = getScreenshotGroup()
     if (group) {
+        const seq = Date.now() + '-'
         const chatsData = copy(chats.value)
         const next = (i) => {
             if (i > group.length) {
@@ -311,7 +312,7 @@ function screenshot () {
                         }, () => {
                             message.notify('截图成功 [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
                             next(i + 1)
-                        })
+                        }, seq + (i + 1))
                     }, 100)
                 }, 100)
             })
