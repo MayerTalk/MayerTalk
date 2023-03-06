@@ -386,6 +386,7 @@ const DataControl = {
     image: null,
     curr: {
         setChar (id, force = false) {
+            // 非force一般表示用户主动切换(或创建角色)
             if (id !== currCharId.value || force) {
                 currCharId.value = id
                 currCharData.value = chars.value[id]
@@ -393,6 +394,10 @@ const DataControl = {
                 currCharId.value = ''
                 currCharData.value = {}
             }
+            if (!force) {
+                document.getElementById('textarea').focus()
+            }
+            return id !== currCharId.value
         },
         setDialogue (index) {
             currDialogueIndex.value = index
