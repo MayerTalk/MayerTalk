@@ -32,6 +32,7 @@ import {
     createTextDialogue,
     createImageDialogue,
     copyDialogue,
+    deleteDialogue,
     createDialogueHook,
     copyDialogueHook
 } from '@/lib/dialogue'
@@ -374,6 +375,7 @@ function screenshot () {
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="EditDialogue.open(index)"
+                                      @delete="deleteDialogue"
                                       @plus1="copyDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
                                       style="position:relative"></Dialogue>

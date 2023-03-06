@@ -7,7 +7,7 @@ import { dialogWidth, TypeDict, TypeDefault } from '@/lib/constance'
 import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data'
 import message from '@/lib/message'
 import { copy, uuid, ensureClose } from '@/lib/tool'
-import { uploadImage } from '@/lib/dialogue'
+import { uploadImage, deleteDialogue } from '@/lib/dialogue'
 
 defineEmits(['showCopy'])
 
@@ -66,10 +66,7 @@ function delDialogue () {
         '即将删除该对话',
         '提示',
         () => {
-            const chat = chats.value.splice(currDialogueIndex.value, 1)[0]
-            if (chat.type === 'image') {
-                DataControl.image.delete(chat.content)
-            }
+            deleteDialogue(currDialogueIndex.value)
             message.notify('删除成功', message.success)
             ifShow.value = false
         }

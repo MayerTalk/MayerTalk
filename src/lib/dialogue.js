@@ -5,7 +5,6 @@ import tipControl from '@/lib/tip'
 import {
     chats,
     currCharId,
-    currDialogueData,
     DataControl
 } from '@/lib/data'
 
@@ -77,12 +76,23 @@ function uploadImage (data, fileUpload) {
     return false
 }
 
+function deleteDialogue (index, config = {}) {
+    const chat = chats.value.splice(index, 1)[0]
+    if (chat.type === 'image') {
+        DataControl.image.delete(chat.content)
+    }
+    if (config.save === undefined || config.save) {
+        DataControl.save('chats')
+    }
+}
+
 export {
     createDialogue,
     createDialogueHook,
     createTextDialogue,
     createImageDialogue,
     copyDialogue,
+    deleteDialogue,
     copyDialogueHook,
     uploadImage,
     textarea
