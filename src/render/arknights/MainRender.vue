@@ -9,6 +9,7 @@ import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
+import NavigationBar from './components/NavigationBar.vue'
 
 import {
     downloadImage,
@@ -168,6 +169,7 @@ const scroll = ref()
 const preScreenshot = ref(false)
 const ifShowMoreType = ref(false)
 const arrowStyle = ref({})
+provide('scroll', scroll)
 provide('preScreenshot', preScreenshot)
 
 function roll360 () {
@@ -353,6 +355,7 @@ function screenshot () {
     <div :class="renderSettings.style">
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
+                <NavigationBar/>
                 <Settings/>
                 <Savefile v-model="ifShowSavefile"/>
                 <EditCharDialog ref="EditChar"/>
