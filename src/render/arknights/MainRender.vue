@@ -47,8 +47,8 @@ const CreateOption = ref(null)
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
     if (event.ctrlKey) {
-        if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
-            if (event.code === 'KeyC') {
+        if (event.code === 'KeyC') {
+            if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
                 EditChar.value.open(true)
                 event.preventDefault()
             }
