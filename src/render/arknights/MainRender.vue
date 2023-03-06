@@ -49,10 +49,11 @@ document.addEventListener('keydown', event => {
     if (event.ctrlKey) {
         if (event.code === 'KeyC') {
             if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
-                EditChar.value.open(true)
                 event.preventDefault()
+                EditChar.value.open(true)
             }
         } else if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
+            event.preventDefault()
             const index = (+event.key || 10) - 1
             const list = Object.entries(chars.value)
             if (index < list.length) {
@@ -60,7 +61,13 @@ document.addEventListener('keydown', event => {
             } else {
                 EditChar.value.open(true)
             }
+        } else if (event.code === 'KeyE') {
             event.preventDefault()
+            if (!currCharId.value) {
+                message.notify('请选择角色', message.warning)
+                return
+            }
+            EditChar.value.open(false)
         }
     }
 }, { signal: controller.signal })
