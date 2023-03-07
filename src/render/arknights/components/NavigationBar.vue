@@ -32,7 +32,8 @@ onUnmounted(() => {
 
 function handleInput (value) {
     if (+value) {
-        lineno.value = +value
+        // 会有人copy小数来输入吗（
+        lineno.value = Math.floor(+value)
     } else if (value === '') {
         lineno.value = null
     }
