@@ -9,6 +9,7 @@ const emit = defineEmits([
     'showAnnounce',
     'showSettings',
     'showAbout',
+    'showNavigation',
     'screenshot',
     'update:modelValue'
 ])
@@ -70,7 +71,7 @@ function clearAll () {
         </div>
         <div class="bar" @click="toGuide">
             <el-icon :size="35">
-                <IconCompass/>
+                <IconNotebook/>
             </el-icon>
             指南
         </div>
@@ -97,6 +98,12 @@ function clearAll () {
                 <IconRight/>
             </el-icon>
             重做
+        </div>
+        <div class="bar" @click="$emit('showNavigation')">
+            <el-icon color="lightgrey" :size="35">
+                <IconCompass/>
+            </el-icon>
+            转到
         </div>
         <div class="bar" @click="$emit('showSettings')">
             <el-icon color="lightgrey" :size="35">

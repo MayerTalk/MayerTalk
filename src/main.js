@@ -21,7 +21,8 @@ import {
     Setting,
     Collection,
     Refresh,
-    CoffeeCup
+    CoffeeCup,
+    Notebook
 } from '@element-plus/icons'
 
 const app = createApp(App)
@@ -46,6 +47,7 @@ app.component('IconSetting', Setting)
 app.component('IconCollection', Collection)
 app.component('IconRefresh', Refresh)
 app.component('IconCoffeeCup', CoffeeCup)
+app.component('IconNotebook', Notebook)
 
 app.provide('avatarsJs', 'avatar.js?v=78319d24')
 

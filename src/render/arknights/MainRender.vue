@@ -45,6 +45,7 @@ const EditChar = ref(null)
 const EditDialogue = ref(null)
 const AtRef = ref(null)
 const CreateOption = ref(null)
+const NavigationBarRef = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
@@ -355,7 +356,7 @@ function screenshot () {
     <div :class="renderSettings.style">
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
-                <NavigationBar/>
+                <NavigationBar ref="NavigationBarRef"/>
                 <Settings
                     @resizeWindow="() => {ResizeWindow.resize()}"
                     @showSavefile="ifShowSavefile=true"
@@ -371,6 +372,7 @@ function screenshot () {
                     @showAnnounce="ifShowAnnouncement=true"
                     @showSettings="ifShowSettings=true"
                     @showAbout="ifShowAbout=true"
+                    @showNavigation="() => {NavigationBarRef.open()}"
                     @screenshot="screenshot"
                 />
                 <el-scrollbar :height="scrollHeight" ref="scroll">
