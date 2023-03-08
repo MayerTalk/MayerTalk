@@ -2,16 +2,14 @@
 import { computed, ref } from 'vue'
 import message from '@/lib/message'
 import { DataControl } from '@/lib/data'
-import { downloadData, uploadData } from '@/lib/versionControl'
 import { dialogWidth, MobileView } from '@/lib/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits([
     'showAnnounce',
     'showSettings',
-    'showSavefile',
     'showAbout',
-    'resizeWindow',
+    'showNavigation',
     'screenshot',
     'update:modelValue'
 ])
@@ -73,7 +71,7 @@ function clearAll () {
         </div>
         <div class="bar" @click="toGuide">
             <el-icon :size="35">
-                <IconCompass/>
+                <IconNotebook/>
             </el-icon>
             指南
         </div>
@@ -89,12 +87,6 @@ function clearAll () {
                 <el-button size="large" style="width:100%; margin: 0" @click="clearAll">全部</el-button>
             </div>
         </el-dialog>
-        <div class="bar" @click="$emit('showSavefile')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCollection/>
-            </el-icon>
-            存档
-        </div>
         <div class="bar" @click="DataControl.withdraw">
             <el-icon color="lightgrey" :size="35">
                 <IconBack/>
@@ -107,27 +99,11 @@ function clearAll () {
             </el-icon>
             重做
         </div>
-        <div class="bar" @click="downloadData">
+        <div class="bar" @click="$emit('showNavigation')">
             <el-icon color="lightgrey" :size="35">
-                <IconDownload/>
+                <IconCompass/>
             </el-icon>
-            导出
-        </div>
-        <div class="bar" style="position: relative">
-            <el-icon color="lightgrey" :size="35">
-                <IconUpload/>
-            </el-icon>
-            导入
-            <el-upload
-                action="#"
-                :show-file-list="false"
-                accept="application/json"
-                :before-upload="(file) => uploadData(file, () => {emit('resizeWindow')})"
-                style="position: absolute; width: 100%; height: 50px; overflow: hidden"
-            >
-                <div style=" width: 80px; height: 50px; user-select: none">
-                </div>
-            </el-upload>
+            转到
         </div>
         <div class="bar" @click="$emit('showSettings')">
             <el-icon color="lightgrey" :size="35">
