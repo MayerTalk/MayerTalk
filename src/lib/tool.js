@@ -43,7 +43,7 @@ function download (url, filename) {
 function downloadImage (node, options, callback, seq = null) {
     html2canvas(node, options).then(canvas => {
         canvas.toBlob(blob => {
-            download(blob2url(blob), 'mayertalk-' + (seq || Date.now) + '.jpg')
+            download(blob2url(blob), 'mayertalk-' + (seq || Date.now()) + '.jpg')
             callback && callback()
         }, 'image/jpeg')
     }).catch(reason => {
