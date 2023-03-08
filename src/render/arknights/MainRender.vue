@@ -356,7 +356,10 @@ function screenshot () {
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
                 <NavigationBar/>
-                <Settings/>
+                <Settings
+                    @resizeWindow="() => {ResizeWindow.resize()}"
+                    @showSavefile="ifShowSavefile=true"
+                />
                 <Savefile v-model="ifShowSavefile"/>
                 <EditCharDialog ref="EditChar"/>
                 <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
@@ -367,9 +370,7 @@ function screenshot () {
                     v-model="ifShowSideBar"
                     @showAnnounce="ifShowAnnouncement=true"
                     @showSettings="ifShowSettings=true"
-                    @showSavefile="ifShowSavefile=true"
                     @showAbout="ifShowAbout=true"
-                    @resizeWindow="() => {ResizeWindow.resize()}"
                     @screenshot="screenshot"
                 />
                 <el-scrollbar :height="scrollHeight" ref="scroll">

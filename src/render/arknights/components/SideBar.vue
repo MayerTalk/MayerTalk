@@ -2,16 +2,13 @@
 import { computed, ref } from 'vue'
 import message from '@/lib/message'
 import { DataControl } from '@/lib/data'
-import { downloadData, uploadData } from '@/lib/versionControl'
 import { dialogWidth, MobileView } from '@/lib/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits([
     'showAnnounce',
     'showSettings',
-    'showSavefile',
     'showAbout',
-    'resizeWindow',
     'screenshot',
     'update:modelValue'
 ])
@@ -89,12 +86,6 @@ function clearAll () {
                 <el-button size="large" style="width:100%; margin: 0" @click="clearAll">全部</el-button>
             </div>
         </el-dialog>
-        <div class="bar" @click="$emit('showSavefile')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCollection/>
-            </el-icon>
-            存档
-        </div>
         <div class="bar" @click="DataControl.withdraw">
             <el-icon color="lightgrey" :size="35">
                 <IconBack/>
@@ -106,28 +97,6 @@ function clearAll () {
                 <IconRight/>
             </el-icon>
             重做
-        </div>
-        <div class="bar" @click="downloadData">
-            <el-icon color="lightgrey" :size="35">
-                <IconDownload/>
-            </el-icon>
-            导出
-        </div>
-        <div class="bar" style="position: relative">
-            <el-icon color="lightgrey" :size="35">
-                <IconUpload/>
-            </el-icon>
-            导入
-            <el-upload
-                action="#"
-                :show-file-list="false"
-                accept="application/json"
-                :before-upload="(file) => uploadData(file, () => {emit('resizeWindow')})"
-                style="position: absolute; width: 100%; height: 50px; overflow: hidden"
-            >
-                <div style=" width: 80px; height: 50px; user-select: none">
-                </div>
-            </el-upload>
         </div>
         <div class="bar" @click="$emit('showSettings')">
             <el-icon color="lightgrey" :size="35">

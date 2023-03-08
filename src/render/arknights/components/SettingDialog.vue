@@ -2,15 +2,17 @@
 import { ref, inject, watch, computed } from 'vue'
 import Renders from '@/render'
 import message from '@/lib/message'
-import { ensure, formatSize } from '@/lib/tool'
+import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
-
-import { TypeDict } from '@/lib/constance'
+import { downloadData, uploadData } from '@/lib/versionControl'
+import { TypeDict, dialogWidth } from '@/lib/constance'
 import {
     config,
     settings,
     DataControl
 } from '@/lib/data'
+
+const emit = defineEmits(['resizeWindow', 'showSavefile'])
 
 const defaultSettings = {
     background: '#303030',
@@ -28,7 +30,6 @@ const defaultSettings = {
 
 const ifShow = inject('ifShowSettings')
 const renderSettings = inject('renderSettings')
-const dialogWidth = inject('dialogWidth')
 
 function _sync (dst, src1, src2) {
     for (const key in src1) {
@@ -176,8 +177,8 @@ watch(settings, () => sync(), { deep: true })
                     <td>
                         <div style="display: flex; align-items: center">
                             <el-switch
-                                    v-model="settings.showCharName"
-                                    style="--el-switch-on-color: #79bbff;">
+                                v-model="settings.showCharName"
+                                style="--el-switch-on-color: #79bbff;">
                             </el-switch>
                             <el-icon :size="35" color="#707070" style="margin-left: 10px; cursor: pointer"
                                      @click="ifShowEditShowCharName=true">
@@ -192,12 +193,43 @@ watch(settings, () => sync(), { deep: true })
                 <h2 style="margin: 10px 0">储存</h2>
                 <div class="line-right"></div>
             </div>
+            <div style="margin: 5px 0 10px 10px">
+                <el-button @click="downloadData">
+                    <el-icon color="grey" :size="20">
+                        <IconDownload/>
+                    </el-icon>
+                    导出
+                </el-button>
+                <el-button @click="clickBySelector('#uploadData > div > input')">
+                    <el-icon color="grey" :size="20">
+                        <IconUpload/>
+                    </el-icon>
+                    导入
+                    <el-upload
+                        id="uploadData"
+                        action="#"
+                        :show-file-list="false"
+                        accept="application/json"
+                        :before-upload="(file) => uploadData(file, () => {emit('resizeWindow'); ifShow=false})"
+                        style="position: absolute" hidden
+                    >
+                    </el-upload>
+                </el-button>
+                <el-button @click="() => {ifShow=false; $emit('showSavefile')}">
+                    <el-icon color="grey" :size="20">
+                        <IconCollection/>
+                    </el-icon>
+                    存档
+                </el-button>
+            </div>
+
             <table>
                 <tr>
                     <th>本地</th>
-                    <td>{{storageSize}}</td>
+                    <td>{{ storageSize }}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、存档），且无法恢复')">清空</el-button>
+                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、存档），且无法恢复')">清空
+                        </el-button>
                     </td>
                 </tr>
             </table>
@@ -207,12 +239,12 @@ watch(settings, () => sync(), { deep: true })
                @closed="DataControl.save('settings')">
         <table>
             <tr v-for="(text, type) in TypeDict" :key="type">
-                <th>{{text}}</th>
+                <th>{{ text }}</th>
                 <td>
                     <el-switch
-                            v-model="showCharNameSettings[type]"
-                            style="--el-switch-on-color: #79bbff; margin-left: 10px"
-                            @change="(value) => {setShowCharNameSettings(type,value)}"
+                        v-model="showCharNameSettings[type]"
+                        style="--el-switch-on-color: #79bbff; margin-left: 10px"
+                        @change="(value) => {setShowCharNameSettings(type,value)}"
                     >
                     </el-switch>
                 </td>
@@ -224,21 +256,21 @@ watch(settings, () => sync(), { deep: true })
 </template>
 
 <style scoped>
-    table {
-        padding-left: 10px;
-        border-spacing: 5px;
-    }
+table {
+    padding-left: 10px;
+    border-spacing: 5px;
+}
 
-    .line-left {
-        margin-right: 10px;
-        height: 0;
-        border-top: lightgrey solid 1px;
-    }
+.line-left {
+    margin-right: 10px;
+    height: 0;
+    border-top: lightgrey solid 1px;
+}
 
-    .line-right {
-        margin-left: 10px;
-        flex-grow: 1;
-        height: 0;
-        border-top: lightgrey solid 1px;
-    }
+.line-right {
+    margin-left: 10px;
+    flex-grow: 1;
+    height: 0;
+    border-top: lightgrey solid 1px;
+}
 </style>
