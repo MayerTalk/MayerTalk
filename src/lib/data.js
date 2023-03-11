@@ -224,7 +224,6 @@ const DataControl = {
     switchHook: null,
     updateHook: null,
     update (update) {
-        this.updateHook && this.updateHook()
         if (typeof update === 'string') {
             if (Object.prototype.hasOwnProperty.call(this.storage, update)) {
                 this.storage[update].update = true
@@ -259,6 +258,8 @@ const DataControl = {
 
         if (operator.length > 0) {
             this.version.unshift(operator)
+            // 因为只有save才会作将数据为一个节点保存在本地，所以在此处调用hook
+            this.updateHook()
         }
     },
     genCharSrc () {
