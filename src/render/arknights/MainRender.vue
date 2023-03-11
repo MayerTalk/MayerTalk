@@ -249,12 +249,17 @@ function getScreenshotGroup () {
     let croppedHeight = 0
     // 最后一次裁分index
     let index = 0
+    let lastCrop = 0
     if (totalHeight / maxHeight > 2) {
         for (let i = 0; i < chats.value.length; i++) {
             const dialogue = getDialogue(chats.value[i].id)
             if (dialogue.offsetTop - croppedHeight > maxHeight) {
+                if (i - 1 <= lastCrop) {
+                    i++
+                }
                 points.push(i - 1)
                 croppedHeight = getDialogue(chats.value[i - 1].id).offsetTop
+                lastCrop = i - 1
                 if (totalHeight - croppedHeight < 2 * maxHeight) {
                     index = i
                     break
