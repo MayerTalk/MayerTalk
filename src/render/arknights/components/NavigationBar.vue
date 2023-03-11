@@ -40,9 +40,12 @@ function handleInput (value) {
 }
 
 function handleNav () {
-    if (lineno.value > chats.value.length || lineno.value < 1) {
-        message.notify('该行数不存在', message.warning)
-        return
+    if (lineno.value > chats.value.length) {
+        // 超出最大上限，选择最后对话
+        lineno.value = chats.value.length
+    } else if (lineno.value < 1) {
+        // 不存在的index，虽然一般不会如此输入（
+        lineno.value = 1
     }
     const chat = getDialogue(chats.value[lineno.value - 1].id)
     if (document.getElementById('window').offsetHeight - chat.offsetTop < window.innerHeight) {
