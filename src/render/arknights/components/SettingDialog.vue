@@ -103,6 +103,19 @@ function clearStorage () {
     }, 500)
 }
 
+function checkClose (fn, ignore = []) {
+    console.log(fn, ignore)
+    if (Object.prototype.hasOwnProperty.call(settings.value, 'maxHeight') &&
+        settings.value.maxHeight < 1000 && settings.value.maxHeight !== 0 &&
+        ignore.indexOf(1) === -1) {
+        message.confirm('请注意，最大高度的单位是px，一般而言1000px能容纳10条对话', '提示', () => {
+            checkClose(fn, [...ignore, 1])
+        })
+    } else {
+        fn()
+    }
+}
+
 // 同步，否则加载延迟+++
 sync()
 watch(settings, () => sync(), { deep: true })
@@ -110,6 +123,7 @@ watch(settings, () => sync(), { deep: true })
 
 <template>
     <el-dialog v-model="ifShow" title="设置" :width="dialogWidth"
+               :before-close="checkClose"
                @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
         <div id="settings">
             <div style="display: flex; align-items: center">

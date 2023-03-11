@@ -30,19 +30,17 @@ onUnmounted(() => {
     controller.abort()
 })
 
-function handleInput (value) {
-    if (+value) {
-        // 会有人copy小数来输入吗（
-        lineno.value = Math.floor(+value)
-    } else if (value === '') {
-        lineno.value = null
-    }
-}
-
 function handleNav () {
-    if (lineno.value > chats.value.length || lineno.value < 1) {
-        message.notify('该行数不存在', message.warning)
+    if (!+lineno.value && +lineno.value !== 0) {
+        message.notify('请输入合法的数字', message.warning)
         return
+    }
+    if (lineno.value > chats.value.length) {
+        // 超出最大上限，选择最后对话
+        lineno.value = chats.value.length
+    } else if (lineno.value < 1) {
+        // 不存在的index，虽然一般不会如此输入（
+        lineno.value = 1
     }
     const chat = getDialogue(chats.value[lineno.value - 1].id)
     if (document.getElementById('window').offsetHeight - chat.offsetTop < window.innerHeight) {
@@ -59,15 +57,15 @@ defineExpose({
 </script>
 
 <template>
-<el-dialog v-model="ifShow" title="转到行" :width="dialogWidth" @closed="lineno=null">
-    <el-input :modelValue="lineno" @update:modelValue="handleInput"
-              :placeholder="'在此输入行数 (1~' + chats.length + ')' "
-              @keypress.enter="handleNav"
-              clearable ref="input"
-    />
-    <div class="column-display" style="margin-top: 10px; display: flex; justify-content: flex-end">
-        <el-button style="width: 20%" @click="ifShow=false">取消</el-button>
-        <el-button style="width: 20%" @click="handleNav" type="primary">确定</el-button>
-    </div>
-</el-dialog>
+    <el-dialog v-model="ifShow" title="转到行" :width="dialogWidth" @closed="lineno=null">
+        <el-input v-model="lineno"
+                  :placeholder="'在此输入行数 (1~' + chats.length + ')' "
+                  @keypress.enter="handleNav"
+                  clearable ref="input"
+        />
+        <div class="column-display" style="margin-top: 10px; display: flex; justify-content: flex-end">
+            <el-button style="width: 20%" @click="ifShow=false">取消</el-button>
+            <el-button style="width: 20%" @click="handleNav" type="primary">确定</el-button>
+        </div>
+    </el-dialog>
 </template>
