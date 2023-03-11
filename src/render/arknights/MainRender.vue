@@ -213,10 +213,10 @@ tipControl.hook = () => {
         resizeScroll()
     })
 }
-createDialogueHook.push((data, locate) => {
+createDialogueHook.push((data, config) => {
     nextTick(() => {
         resizeScroll()
-        if (locate) {
+        if (!Object.prototype.hasOwnProperty.call(config, 'locate') || config.locate) {
             const el = getDialogue(data.id)
             scroll.value.setScrollTop(el.offsetTop)
         }
