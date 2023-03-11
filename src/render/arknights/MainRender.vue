@@ -9,6 +9,7 @@ import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
+import NavigationBar from './components/NavigationBar.vue'
 
 import {
     downloadImage,
@@ -32,6 +33,7 @@ import {
     createTextDialogue,
     createImageDialogue,
     copyDialogue,
+    deleteDialogue,
     createDialogueHook,
     copyDialogueHook
 } from '@/lib/dialogue'
@@ -43,16 +45,18 @@ const EditChar = ref(null)
 const EditDialogue = ref(null)
 const AtRef = ref(null)
 const CreateOption = ref(null)
+const NavigationBarRef = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
     if (event.ctrlKey) {
-        if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
-            if (event.code === 'KeyC') {
-                EditChar.value.open(true)
+        if (event.code === 'KeyC') {
+            if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
                 event.preventDefault()
+                EditChar.value.open(true)
             }
         } else if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
+            event.preventDefault()
             const index = (+event.key || 10) - 1
             const list = Object.entries(chars.value)
             if (index < list.length) {
@@ -60,7 +64,13 @@ document.addEventListener('keydown', event => {
             } else {
                 EditChar.value.open(true)
             }
+        } else if (event.code === 'KeyE') {
             event.preventDefault()
+            if (!currCharId.value) {
+                message.notify('请选择角色', message.warning)
+                return
+            }
+            EditChar.value.open(false)
         }
     }
 }, { signal: controller.signal })
@@ -160,6 +170,7 @@ const scroll = ref()
 const preScreenshot = ref(false)
 const ifShowMoreType = ref(false)
 const arrowStyle = ref({})
+provide('scroll', scroll)
 provide('preScreenshot', preScreenshot)
 
 function roll360 () {
@@ -202,10 +213,10 @@ tipControl.hook = () => {
         resizeScroll()
     })
 }
-createDialogueHook.push((data, locate) => {
+createDialogueHook.push((data, config) => {
     nextTick(() => {
         resizeScroll()
-        if (locate) {
+        if (!Object.prototype.hasOwnProperty.call(config, 'locate') || config.locate) {
             const el = getDialogue(data.id)
             scroll.value.setScrollTop(el.offsetTop)
         }
@@ -238,12 +249,17 @@ function getScreenshotGroup () {
     let croppedHeight = 0
     // 最后一次裁分index
     let index = 0
+    let lastCrop = 0
     if (totalHeight / maxHeight > 2) {
         for (let i = 0; i < chats.value.length; i++) {
             const dialogue = getDialogue(chats.value[i].id)
             if (dialogue.offsetTop - croppedHeight > maxHeight) {
+                if (i - 1 <= lastCrop) {
+                    i++
+                }
                 points.push(i - 1)
                 croppedHeight = getDialogue(chats.value[i - 1].id).offsetTop
+                lastCrop = i - 1
                 if (totalHeight - croppedHeight < 2 * maxHeight) {
                     index = i
                     break
@@ -345,7 +361,11 @@ function screenshot () {
     <div :class="renderSettings.style">
         <div class="render">
             <div id="body" :style="{background: renderSettings.background}">
-                <Settings/>
+                <NavigationBar ref="NavigationBarRef"/>
+                <Settings
+                    @resizeWindow="() => {ResizeWindow.resize()}"
+                    @showSavefile="ifShowSavefile=true"
+                />
                 <Savefile v-model="ifShowSavefile"/>
                 <EditCharDialog ref="EditChar"/>
                 <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
@@ -356,9 +376,8 @@ function screenshot () {
                     v-model="ifShowSideBar"
                     @showAnnounce="ifShowAnnouncement=true"
                     @showSettings="ifShowSettings=true"
-                    @showSavefile="ifShowSavefile=true"
                     @showAbout="ifShowAbout=true"
-                    @resizeWindow="() => {ResizeWindow.resize()}"
+                    @showNavigation="() => {NavigationBarRef.open()}"
                     @screenshot="screenshot"
                 />
                 <el-scrollbar :height="scrollHeight" ref="scroll">
@@ -367,6 +386,7 @@ function screenshot () {
                              :style="{width: width.window+'px', background: renderSettings.background}"
                         >
                             <Dialogue v-for="(dialogue, index) in chats" @edit="EditDialogue.open(index)"
+                                      @delete="deleteDialogue"
                                       @plus1="copyDialogue"
                                       :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
                                       style="position:relative"></Dialogue>

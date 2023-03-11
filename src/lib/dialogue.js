@@ -5,7 +5,6 @@ import tipControl from '@/lib/tip'
 import {
     chats,
     currCharId,
-    currDialogueData,
     DataControl
 } from '@/lib/data'
 
@@ -13,7 +12,7 @@ const textarea = ref('')
 
 const createDialogueHook = []
 
-function createDialogue (data, locate = true) {
+function createDialogue (data, config = {}) {
     data = {
         content: data.content,
         type: data.type,
@@ -23,7 +22,7 @@ function createDialogue (data, locate = true) {
     chats.value.push(data)
     DataControl.save('chats')
     createDialogueHook.forEach((hook) => {
-        hook(data, locate)
+        hook(data, config)
     })
 }
 
@@ -44,12 +43,12 @@ function copyDialogue (index, data = {}, config = {}) {
     })
 }
 
-function createTextDialogue (type) {
+function createTextDialogue (type, config = {}) {
     if (textarea.value) {
         createDialogue({
             content: textarea.value,
             type
-        })
+        }, config)
         textarea.value = ''
     } else {
         message.notify('请在输入框内输入文本', message.info)
@@ -57,13 +56,13 @@ function createTextDialogue (type) {
     }
 }
 
-function createImageDialogue (fileUpload) {
+function createImageDialogue (fileUpload, config = {}) {
     DataControl.image.new(fileUpload, (id) => {
         createDialogue({
             content: id,
             type: 'image'
         })
-    })
+    }, config)
     return false
 }
 
@@ -77,12 +76,23 @@ function uploadImage (data, fileUpload) {
     return false
 }
 
+function deleteDialogue (index, config = {}) {
+    const chat = chats.value.splice(index, 1)[0]
+    if (chat.type === 'image') {
+        DataControl.image.delete(chat.content)
+    }
+    if (config.save === undefined || config.save) {
+        DataControl.save('chats')
+    }
+}
+
 export {
     createDialogue,
     createDialogueHook,
     createTextDialogue,
     createImageDialogue,
     copyDialogue,
+    deleteDialogue,
     copyDialogueHook,
     uploadImage,
     textarea

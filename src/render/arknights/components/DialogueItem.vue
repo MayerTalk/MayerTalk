@@ -13,7 +13,7 @@ const width = inject('width')
 const charDirection = inject('charDirection')
 const preScreenshot = inject('preScreenshot')
 const props = defineProps(['data', 'index', 'plus1'])
-defineEmits(['edit', 'plus1'])
+defineEmits(['edit', 'delete', 'plus1'])
 
 const data = computed(() => props.data)
 const index = computed(() => props.index)
@@ -51,7 +51,8 @@ watch(charDirection, () => {
 <template>
     <div :class="renderSettings.style" :id="data.id">
         <div class="dialogue">
-            <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="$emit('edit', index)"
+            <div style="display: flex; width: 100%; margin-bottom: 10px;"
+                 @click="(event) => {$emit(event.ctrlKey ? 'delete' : 'edit', index)}"
                  :style="{justifyContent:(right?'flex-end':'flex-start')}">
                 <div v-if="data.type==='title'" style="flex-grow: 1">
                     <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"

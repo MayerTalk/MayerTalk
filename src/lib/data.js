@@ -224,7 +224,6 @@ const DataControl = {
     switchHook: null,
     updateHook: null,
     update (update) {
-        this.updateHook && this.updateHook()
         if (typeof update === 'string') {
             if (Object.prototype.hasOwnProperty.call(this.storage, update)) {
                 this.storage[update].update = true
@@ -259,6 +258,8 @@ const DataControl = {
 
         if (operator.length > 0) {
             this.version.unshift(operator)
+            // 因为只有save才会作将数据为一个节点保存在本地，所以在此处调用hook
+            this.updateHook()
         }
     },
     genCharSrc () {
@@ -386,6 +387,7 @@ const DataControl = {
     image: null,
     curr: {
         setChar (id, force = false) {
+            // 非force一般表示用户主动切换(或创建角色)
             if (id !== currCharId.value || force) {
                 currCharId.value = id
                 currCharData.value = chars.value[id]
@@ -393,6 +395,10 @@ const DataControl = {
                 currCharId.value = ''
                 currCharData.value = {}
             }
+            if (!force) {
+                document.getElementById('textarea').focus()
+            }
+            return id !== currCharId.value
         },
         setDialogue (index) {
             currDialogueIndex.value = index
