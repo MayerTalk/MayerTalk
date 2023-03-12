@@ -240,7 +240,7 @@ function getScreenshotGroup () {
     // 缩小比例后实际 maxHeight
     let maxHeight = renderSettings.value.maxHeight / renderSettings.value.scale - 30
     maxHeight = maxHeight < 0 ? 0 : maxHeight
-    if (totalHeight < maxHeight) {
+    if (totalHeight < maxHeight || chats.value < 2) {
         // 无需裁分
         return false
     }
