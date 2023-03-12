@@ -238,7 +238,8 @@ const scrollHeight = ref(window.innerHeight - 90 + 'px')
 function getScreenshotGroup () {
     const totalHeight = (document.getElementById('window').scrollHeight - 30)
     // 缩小比例后实际 maxHeight
-    const maxHeight = renderSettings.value.maxHeight / renderSettings.value.scale - 30
+    let maxHeight = renderSettings.value.maxHeight / renderSettings.value.scale - 30
+    maxHeight = maxHeight < 0 ? 0 : maxHeight
     if (totalHeight < maxHeight) {
         // 无需裁分
         return false
@@ -251,11 +252,12 @@ function getScreenshotGroup () {
     let index = 0
     let lastCrop = 0
     if (totalHeight / maxHeight > 2) {
-        for (let i = 0; i < chats.value.length; i++) {
+        for (let i = 1; i < chats.value.length; i++) {
             const dialogue = getDialogue(chats.value[i].id)
             if (dialogue.offsetTop - croppedHeight > maxHeight) {
                 if (i - 1 <= lastCrop) {
-                    i++
+                    // 最小粒度 (1对话)
+                    continue
                 }
                 points.push(i - 1)
                 croppedHeight = getDialogue(chats.value[i - 1].id).offsetTop
@@ -272,20 +274,41 @@ function getScreenshotGroup () {
     while (true) {
         const dialogue = getDialogue(chats.value[index].id)
         if (dialogue.offsetTop - croppedHeight > maxHeight) {
+            // part1 过长
             if (totalHeight - dialogue.offsetTop >= maxHeight) {
+                // 同时part2过长
                 // 极端情况，此时三等分
                 const diff = Math.ceil((chats.value.length - index) / 3)
-                points.push(index - diff)
-                points.push(index + diff)
+                const i1 = index - diff
+                if (i1 > points[points.length - 1]) {
+                    if (i1 < chats.value.length) {
+                    // 确保最小粒度 (1对话)
+                        points.push(i1)
+                    }
+                } else if (i1 + 1 < chats.value.length) {
+                    points.push(i1 + 1)
+                }
+                const i2 = index + diff
+                if (i2 < points.length) {
+                    if (i2 > points[points.length - 1]) {
+                    // 确保最小粒度 (1对话)
+                        points.push(i2)
+                    }
+                } else if (i2 - 1 > points[points.length - 1]) {
+                    points.push(i2 - 1)
+                }
                 break
             }
+            // index前移
             index--
             continue
         }
         if (totalHeight - dialogue.offsetTop > maxHeight) {
+            // part2过长，index后移
             index++
             continue
         }
+        // check pass -> push
         points.push(index)
         break
     }
