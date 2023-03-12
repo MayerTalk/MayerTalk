@@ -179,7 +179,7 @@ watch(settings, () => sync(), { deep: true })
                     </td>
                 </tr>
                 <tr>
-                    <th>最大高度</th>
+                    <th>截图最大高度</th>
                     <td>
                         <el-input v-model="fake.maxHeight" :clearable="true"
                                   :placeholder="'' + defaultSettings.maxHeight"
