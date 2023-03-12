@@ -104,7 +104,6 @@ function clearStorage () {
 }
 
 function checkClose (fn, ignore = []) {
-    console.log(fn, ignore)
     if (Object.prototype.hasOwnProperty.call(settings.value, 'maxHeight') &&
         settings.value.maxHeight < 1000 && settings.value.maxHeight !== 0 &&
         ignore.indexOf(1) === -1) {
