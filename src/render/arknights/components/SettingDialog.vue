@@ -104,7 +104,6 @@ function clearStorage () {
 }
 
 function checkClose (fn, ignore = []) {
-    console.log(fn, ignore)
     if (Object.prototype.hasOwnProperty.call(settings.value, 'maxHeight') &&
         settings.value.maxHeight < 1000 && settings.value.maxHeight !== 0 &&
         ignore.indexOf(1) === -1) {
@@ -179,7 +178,7 @@ watch(settings, () => sync(), { deep: true })
                     </td>
                 </tr>
                 <tr>
-                    <th>最大高度</th>
+                    <th>截图最大高度</th>
                     <td>
                         <el-input v-model="fake.maxHeight" :clearable="true"
                                   :placeholder="'' + defaultSettings.maxHeight"
