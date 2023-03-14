@@ -315,12 +315,18 @@ function getScreenshotGroup () {
     return points
 }
 
-function screenshot () {
+function screenshot (ensure = false) {
     preScreenshot.value = true
     ResizeWindow.resize()
     const node = document.getElementById('window')
     const group = getScreenshotGroup()
     if (group) {
+        if (group.length > 9 && !ensure) {
+            message.confirm('截图数量超过10张，是否继续截屏', '提示', () => {
+                screenshot(true)
+            })
+            return
+        }
         const seq = Date.now() + '-'
         const chatsData = copy(chats.value)
         const next = (i) => {
