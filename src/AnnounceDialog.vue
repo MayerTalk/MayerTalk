@@ -75,6 +75,8 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
                 交流群：560295639
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
+            <el-link href="https://github.com/Arkfans/MayerTalk" type="primary" style="margin: 0 5px;">Github</el-link>
+            <span style="border-left: solid 1px darkgrey"></span>
             <el-link href="https://wj.qq.com/s2/11537223/aa61/" type="primary" style="margin-left: 5px;">bug反馈</el-link>
         </div>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
