@@ -321,7 +321,7 @@ function screenshot (ensure = false) {
     const node = document.getElementById('window')
     const group = getScreenshotGroup()
     if (group) {
-        if (group.length > 9 && !ensure) {
+        if (group.length > 10 && !ensure) {
             message.confirm('截图数量超过10张，是否继续截屏', '提示', () => {
                 screenshot(true)
             })
