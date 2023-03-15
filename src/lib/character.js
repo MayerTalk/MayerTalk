@@ -226,7 +226,17 @@ const SearchManager = class SearchManager {
     }
 }
 
+function parseSearch (search) {
+    // TODO i18n 根据lang决定是否处理
+    // 部分输入法拼音输入阶段会携带” ' “，导致拼音搜索失效
+    search = search.replaceAll('\'', '')
+    // “6/MSP” 不清楚此字符为何，但出现在部分输入法拼音输入阶段
+    search = search.replaceAll(' ', '')
+    return search
+}
+
 function searchCharHandler (search) {
+    search = parseSearch(search)
     const t = Date.now()
     searchResultFullShow = t
     if (search) {
