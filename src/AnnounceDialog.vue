@@ -80,7 +80,7 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
                 Github
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="https://wj.qq.com/s2/11537223/aa61/" type="primary" style="margin-left: 5px;"
+            <el-link href="/docs/guide/report_bug.html" type="primary" style="margin-left: 5px;"
                      target="_blank">bug反馈
             </el-link>
         </div>
