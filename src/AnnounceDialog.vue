@@ -14,7 +14,7 @@ const ifShowAnnouncement = computed({
     }
 })
 
-const version = 'v0.1.6'
+const version = 'v0.1.6-1'
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
@@ -49,25 +49,12 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <el-link href="/docs/guide/start.html" type="primary">快速上手 (首次使用推荐阅读)</el-link>
             <h3>
-                v0.1.6
+                v0.1.6-1
             </h3>
-            <b>新增</b>
+            <b>公告</b>
             <ul>
-                <li>
-                    转跳<br/>快捷键 ctrl + g
-                </li>
-                <li>
-                    ctrl + e 启用编辑角色
-                </li>
-                <li>
-                    ctrl + 点击 删除对话
-                </li>
-            </ul>
-            <b>改动</b>
-            <ul>
-                <li>
-                    移动 导入/导出/存档 至设置
-                </li>
+                <li>由于鹰角修改了gamedata数据，导致目前无法自动更新。</li>
+                <li>”孤星“活动资源将在五一假期结束前更新。</li>
             </ul>
         </template>
         <div style="display: flex; margin-top: 10px">
