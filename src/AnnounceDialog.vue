@@ -53,8 +53,8 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
             </h3>
             <b>公告</b>
             <ul>
-                <li>由于鹰角修改了gamedata数据，导致目前无法自动更新。</li>
-                <li>”孤星“活动资源将在五一假期结束前更新。</li>
+                <li>由于鹰角修改了gamedata数据，导致目前无法自动更新资源。</li>
+                <li>资源更新速度可能因此减慢，敬请谅解。</li>
             </ul>
         </template>
         <div style="display: flex; margin-top: 10px">
