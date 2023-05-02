@@ -52,7 +52,7 @@ function loadChar (series) {
 }
 
 // const seriesSort = {
-//     Default: 1
+//     arknights: 1
 // }
 
 const TagSort = {
@@ -260,10 +260,10 @@ function searchCharHandler (search) {
     } else {
         AliasAddition.value = []
         searchResult.value = [
-            ['博士', 'avatar/Default/doctor' + Suffix, '博士'],
-            ['PRTS', 'avatar/Default/PRTS' + Suffix, 'PRTS'],
-            ['mon3tr', 'avatar/Default/mon3tr' + Suffix, 'mon3tr'],
-            ['凯尔希', 'avatar/Default/char_003_kalts' + Suffix, '凯尔希']
+            ['博士', 'avatar/arknights/doctor' + Suffix, '博士'],
+            ['PRTS', 'avatar/arknights/PRTS' + Suffix, 'PRTS'],
+            ['mon3tr', 'avatar/arknights/mon3tr' + Suffix, 'mon3tr'],
+            ['凯尔希', 'avatar/arknights/char_003_kalts' + Suffix, '凯尔希']
         ]
     }
 }

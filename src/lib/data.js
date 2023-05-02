@@ -4,7 +4,7 @@ import message from '@/lib/message'
 import { copy, blob2base64, md5, uuid } from '@/lib/tool'
 import DataBase from './db'
 
-const config = ref({ editor: 'Default' })
+const config = ref({ editor: 'Default', render: 'Siracusa' })
 const settings = ref({})
 const chars = ref({})
 const chats = ref([])

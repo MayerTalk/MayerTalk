@@ -9,7 +9,7 @@ import {
     DataControl
 } from '@/lib/data'
 
-const latestVersion = 'c'
+const latestVersion = 'd'
 const initialVersion = 'a'
 let currVersion = getData('data.version') || initialVersion
 const versionSwitcher = {
@@ -61,6 +61,15 @@ const versionSwitcher = {
             }
         }
         return 'c'
+    },
+    c: (data, opt) => {
+        if (!Object.prototype.hasOwnProperty.call(data.config, 'editor')) {
+            data.config.editor = 'Default'
+        }
+        if (!Object.prototype.hasOwnProperty.call(data.config, 'render') || data.config.render === 'Arknights') {
+            data.config.result = 'Siracusa'
+        }
+        return 'd'
     }
 }
 

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
+import Renders from '@/render'
 import SideBar from './components/SideBar.vue'
-import Dialogue from './components/DialogueItem.vue'
 import Settings from './components/SettingDialog.vue'
 import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
@@ -24,6 +24,7 @@ import {
 import {
     chats,
     chars,
+    config,
     avatars,
     currCharId,
     DataControl
@@ -39,7 +40,6 @@ import {
 } from '@/lib/dialogue'
 import message from '@/lib/message'
 import tipControl from '@/lib/tip'
-import plus1 from '@/lib/plus1'
 
 const EditChar = ref(null)
 const EditDialogue = ref(null)
@@ -282,7 +282,7 @@ function getScreenshotGroup () {
                 const i1 = index - diff
                 if (i1 > points[points.length - 1]) {
                     if (i1 < chats.value.length) {
-                    // 确保最小粒度 (1对话)
+                        // 确保最小粒度 (1对话)
                         points.push(i1)
                     }
                 } else if (i1 + 1 < chats.value.length) {
@@ -291,7 +291,7 @@ function getScreenshotGroup () {
                 const i2 = index + diff
                 if (i2 < points.length) {
                     if (i2 > points[points.length - 1]) {
-                    // 确保最小粒度 (1对话)
+                        // 确保最小粒度 (1对话)
                         points.push(i2)
                     }
                 } else if (i2 - 1 > points[points.length - 1]) {
@@ -411,15 +411,10 @@ function screenshot (ensure = false) {
                 />
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
-                        <div class="window" id="window"
-                             :style="{width: width.window+'px', background: renderSettings.background}"
-                        >
-                            <Dialogue v-for="(dialogue, index) in chats" @edit="EditDialogue.open(index)"
-                                      @delete="deleteDialogue"
-                                      @plus1="copyDialogue"
-                                      :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
-                                      style="position:relative"></Dialogue>
-                        </div>
+                        <component :is="Renders[config.render]"
+                                   @edit="(index) => {EditDialogue.open(index)}"
+                                   @delete="deleteDialogue"
+                                   @plus1="copyDialogue"/>
                         <div id="operateBar" class="operateBar" :style="{width: windowWidth + 'px'}">
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35"
@@ -528,6 +523,6 @@ function screenshot (ensure = false) {
 <style src="./style/global.css"/>
 <style src="./style/avatar-uploader.css"/>
 
-<style src="./style/render.css" scoped/>
+<style src="./style/editor.css" scoped/>
 <style src="./style/operateBar.css" scoped/>
 <style src="./style/animation.css" scoped/>
