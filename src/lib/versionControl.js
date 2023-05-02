@@ -69,6 +69,9 @@ const versionSwitcher = {
         if (!Object.prototype.hasOwnProperty.call(data.config, 'render') || data.config.render === 'Arknights') {
             data.config.result = 'Siracusa'
         }
+        if (opt.load) {
+            saveData('data.config', data.config)
+        }
         return 'd'
     }
 }
