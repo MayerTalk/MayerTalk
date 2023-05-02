@@ -1,7 +1,7 @@
 <script setup>
 import '@/lib/versionControl'
 import { ref, provide } from 'vue'
-import Renders from './render'
+import Editors from './editor'
 import Announce from './AnnounceDialog.vue'
 import About from './AboutDialog.vue'
 import { config } from '@/lib/data'
@@ -18,7 +18,7 @@ provide('ifShowAbout', ifShowAbout)
 <template>
     <Announce v-model="ifShowAnnouncement"/>
     <About v-model="ifShowAbout"/>
-    <component :is="Renders[config.render]"/>
+    <component :is="Editors[config.editor]"/>
 </template>
 
 <style src="./font.css"></style>
