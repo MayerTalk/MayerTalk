@@ -84,7 +84,7 @@ class Render:
 
 
 if __name__ == '__main__':
-    render_path = join('src', 'render')
+    render_path = join('src', 'editor')
     renders = {r: Render(os.path.join(render_path, r)) for r in os.listdir(render_path) if not r.endswith('.js')}
     cls = False
 

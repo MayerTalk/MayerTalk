@@ -55,7 +55,7 @@ class Render:
 
 
 if __name__ == '__main__':
-    render_path = os.path.join(cwd, 'src', 'render')
+    render_path = os.path.join(cwd, 'src', 'editor')
     renders = {r: Render(os.path.join(render_path, r)) for r in os.listdir(render_path) if not r.endswith('.js')}
 
     for path, render in renders.copy().items():

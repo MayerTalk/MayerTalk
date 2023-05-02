@@ -1,0 +1,6 @@
+.window {
+    height: 100%;
+    position: relative;
+    padding: 20px 10px 10px 10px;
+    transition: background-color ease 1s;
+}
