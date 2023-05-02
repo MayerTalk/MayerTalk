@@ -2,6 +2,8 @@
 import { ref, inject, watch, computed } from 'vue'
 import Editors from '@/editor'
 import EditorsName from '@/editor/name'
+import Renders from '@/render'
+import RendersName from '@/render/name'
 import message from '@/lib/message'
 import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
@@ -136,7 +138,18 @@ watch(settings, () => sync(), { deep: true })
                     <th>编辑器</th>
                     <td>
                         <el-select v-model="config.editor">
-                            <el-option v-for="(render, key) in Editors" :key="key" :value="key" :label="EditorsName[key]"/>
+                            <el-option v-for="(render, key) in Editors" :key="key" :value="key"
+                                       :label="EditorsName[key]"/>
+                        </el-select>
+                    </td>
+
+                </tr>
+                <tr>
+                    <th>渲染器</th>
+                    <td>
+                        <el-select v-model="config.render">
+                            <el-option v-for="(render, key) in Renders" :key="key" :value="key"
+                                       :label="RendersName[key]"/>
                         </el-select>
                     </td>
                 </tr>
