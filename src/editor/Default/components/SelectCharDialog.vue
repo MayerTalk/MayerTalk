@@ -29,7 +29,7 @@ function initSearchChar () {
 
 <template>
     <el-dialog v-model="ifShow" title="选择角色" :width="dialogWidth" top="10vh"
-               @open="loadChar('arknights');initSearchChar()"
+               @open="loadChar('Default');initSearchChar()"
                @closed="searchCharHandler('');search=''">
         <!--        素材库选择角色-->
         <el-input placeholder="搜索更多角色" v-model="search" id="searchCharInput"></el-input>
