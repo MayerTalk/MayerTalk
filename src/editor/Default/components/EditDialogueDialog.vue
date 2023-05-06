@@ -3,10 +3,10 @@ import { computed, ref } from 'vue'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
 
-import { dialogWidth, TypeDict, TypeDefault } from '@/lib/constance'
+import { dialogWidth, TypeDict, TypeDefault, TypeSeries, MobileView } from '@/lib/constance'
 import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data'
 import message from '@/lib/message'
-import { copy, uuid, ensureClose } from '@/lib/tool'
+import { copy, uuid, ensureClose, doAfterMounted } from '@/lib/tool'
 import { uploadImage, deleteDialogue } from '@/lib/dialogue'
 
 defineEmits(['showCopy'])
@@ -15,12 +15,18 @@ const ifShow = ref(false)
 
 const dialogueData = ref({})
 const editDialogue = ref(false)
+const inputRef = ref(null)
 
 function open (index) {
     editDialogue.value = true
     DataControl.curr.setDialogue(index)
     dialogueData.value = currDialogueData.value
     ifShow.value = true
+    if (TypeSeries[dialogueData.value.type] === 'text' && !MobileView) {
+        doAfterMounted(inputRef, (r) => {
+            r.value.focus()
+        })
+    }
 }
 
 function close () {
@@ -28,7 +34,8 @@ function close () {
 }
 
 const editor = computed(() => {
-    if (['chat', 'monologue', 'image', undefined].indexOf(dialogueData.value.type) !== -1) {
+    if (!dialogueData.value.length) { return }
+    if (TypeSeries[dialogueData.value.type] === 'text' || dialogueData.value.type === 'image') {
         return false
     } else if (dialogueData.value.type === 'option') {
         return OptionDialog
@@ -124,6 +131,7 @@ defineExpose({
                   resize="none"
                   type="textarea"
                   :disabled="dialogueData.type==='image'"
+                  ref="inputRef"
         ></el-input>
         <div class="edit-bar" style="margin-top: 5px">
             <div style="width: calc(50% - 2px); display: flex">
