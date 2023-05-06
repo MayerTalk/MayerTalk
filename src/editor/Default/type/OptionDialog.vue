@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import message from '@/lib/message'
 import { uuid } from '@/lib/tool'
 
@@ -37,6 +37,23 @@ function focusFirst () {
     inputRefs.value[0].focus()
 }
 
+function focusLast () {
+    inputRefs.value[inputRefs.value.length - 1].focus()
+}
+
+function handleEnder (event) {
+    if (event.ctrlKey) {
+        if (props.extraButton) {
+            emit('done')
+        }
+        return
+    }
+    modelValue.value.push([uuid(), ''])
+    nextTick(() => {
+        focusLast()
+    })
+}
+
 defineExpose({
     focusFirst
 })
@@ -44,6 +61,7 @@ defineExpose({
 
 <template>
     <el-input id="" v-model="modelValue[index][1]" v-for="(value, index) in modelValue" :key="value[0]" ref="inputRefs"
+              @keydown.enter="handleEnder"
               style="margin-bottom: 5px">
         <template #append>
             <el-icon @click="deleteOption(index)">
