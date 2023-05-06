@@ -132,6 +132,7 @@ defineExpose({
                   type="textarea"
                   :disabled="dialogueData.type==='image'"
                   ref="inputRef"
+                  @keydown.ctrl.enter="ifShow=false"
         ></el-input>
         <div class="edit-bar" style="margin-top: 5px">
             <div style="width: calc(50% - 2px); display: flex">
