@@ -20,6 +20,15 @@ const TypeDefault = {
     title: ''
 }
 
+const TypeSeries = {
+    chat: 'text',
+    monologue: 'text',
+    image: 'image',
+    option: 'option',
+    select: 'text',
+    title: 'text'
+}
+
 const defaultWidth = 520
 // #21 后 document.body.clientWidth 比实际视窗小（Why？）
 const windowWidth = Math.min(defaultWidth, window.innerWidth)
@@ -30,6 +39,7 @@ export {
     StaticUrl,
     TypeDict,
     TypeDefault,
+    TypeSeries,
     windowWidth,
     dialogWidth,
     MobileView
