@@ -23,7 +23,7 @@
  
  - 数据及资源
    - [Kengxxiao/ArknightsGameData](https://github.com/Kengxxiao/ArknightsGameData)
-   - [yuanyan3060/Arknights-Bot-Resource](https://github.com/yuanyan3060/Arknights-Bot-Resource)
+   - [yuanyan3060/ArknightsGameResource](https://github.com/yuanyan3060/ArknightsGameResource)
  - 参考
    - [yuzutalk](https://www.yuzutalk.net/) 对话形式二创的启发
    - [ClosureTalk](https://github.com/ClosureTalk/closure-talk) 明日方舟对话编辑器的先行实现
