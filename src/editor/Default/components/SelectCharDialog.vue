@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { StaticUrl, dialogWidth } from '@/lib/constance'
+import { StaticUrl, dialogWidth, MobileView } from '@/lib/constance'
 import { searchCharHandler, searchResult, loadChar } from '@/lib/character'
+import { doAfterMounted } from '@/lib/tool'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'select'])
@@ -16,6 +17,7 @@ const ifShow = computed({
 })
 
 const search = ref('')
+const inputRef = ref(null)
 const avatarBarFrameWidth = Math.floor((dialogWidth - 48) / 4) + 'px'
 
 function initSearchChar () {
@@ -25,14 +27,24 @@ function initSearchChar () {
     })
     searchCharHandler('')
 }
+
+function autoFocus () {
+    if (!MobileView) {
+        doAfterMounted(inputRef, (r) => {
+            setTimeout(() => {
+                r.value.focus()
+            }, 0)
+        })
+    }
+}
 </script>
 
 <template>
     <el-dialog v-model="ifShow" title="选择角色" :width="dialogWidth" top="10vh"
-               @open="loadChar('arknights');initSearchChar()"
+               @open="loadChar('arknights');initSearchChar();autoFocus()"
                @closed="searchCharHandler('');search=''">
         <!--        素材库选择角色-->
-        <el-input placeholder="搜索更多角色" v-model="search" id="searchCharInput"></el-input>
+        <el-input placeholder="搜索更多角色" v-model="search" id="searchCharInput" ref="inputRef"></el-input>
         <template v-if="searchResult">
             <el-scrollbar max-height="50vh" style="width: 100%">
                 <div class="avatar-bar">
