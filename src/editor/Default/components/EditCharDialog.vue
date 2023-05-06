@@ -95,6 +95,18 @@ function handleSelect (char) {
     charData.value.avatar = char[1]
 }
 
+function handleInputEnter () {
+    if (createChar.value) {
+        if (charData.value.avatar) {
+            editChar()
+        } else {
+            ifShowSelectChar.value = true
+        }
+    } else {
+        ifShow.value = false
+    }
+}
+
 defineExpose({
     open
 })
@@ -123,7 +135,7 @@ defineExpose({
                 <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                     名称：
                     <el-input v-model="charData.name" style="margin-top: 10px" :placeholder="defaultName"
-                              @keypress.enter="createChar && editChar()"></el-input>
+                              @keypress.enter="handleInputEnter"></el-input>
                     <div style="margin-top: 5px">
                         头像位置
                         <el-switch
