@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { saveData, getData } from './lib/tool'
+import { Location } from '@element-plus/icons'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'showGuide'])
@@ -14,7 +15,7 @@ const ifShowAnnouncement = computed({
     }
 })
 
-const version = 'v0.1.6-1'
+const version = 'v0.1.7'
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
@@ -49,12 +50,17 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <el-link href="/docs/guide/start.html" type="primary">快速上手 (首次使用推荐阅读)</el-link>
             <h3>
-                v0.1.6-1
+                v0.1.7
             </h3>
+            <b>优化</b>
+            <ul>
+                <li>电脑端现在会自动聚焦大部分输入框</li>
+                <li>编辑对话文本时，可以使用ctrl+enter结束编辑</li>
+            </ul>
             <b>公告</b>
             <ul>
-                <li>由于鹰角修改了gamedata数据，导致目前无法自动更新资源。</li>
-                <li>资源更新速度可能因此减慢，敬请谅解。</li>
+                <li>自动更新已恢复</li>
+                <li style="color: snow">饼：NPC头像有一点想法了</li>
             </ul>
         </template>
         <div style="display: flex; margin-top: 10px">
