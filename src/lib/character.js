@@ -205,7 +205,15 @@ const SearchManager = class SearchManager {
             AliasApi.cancelTokens = []
         }
         AliasApi.get({
-            url: 'alias/search?lang=7&output=4&type=39&mode=14&text=' + encodeURIComponent(this.search),
+            url: 'alias/search',
+            data: {
+                lang: 7, // zh_CN + en_US + ja_JP
+                output: 4, // ID
+                type: 39, // OPERATOR + TOKEN + ENEMY
+                mode: 14, // IN + PINYIN + IGNORE_CASE
+                text: this.search // 搜素文本
+                // 详细参数可在 https://alias.arkfans.top/docs/api/api.html 查看
+            },
             success,
             error
         })
