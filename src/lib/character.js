@@ -159,15 +159,17 @@ const SearchManager = class SearchManager {
         this.res = []
         for (let i = 0; i < this.list.length; i++) {
             const charId = this.list[i]
-            for (let j = 0; j < CharDict[charId].avatars.length; j++) {
-                this.res.push([CharDict[charId].avatars[j], CharDict[charId].avatars[j], CharDict[charId].names[this.lang]])
-            }
+            // [charId, charName]
+            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN])
+            // for (let j = 0; j < CharDict[charId].avatars.length; j++) {
+            //     this.res.push([CharDict[charId].avatars[j], CharDict[charId].avatars[j], CharDict[charId].names[this.lang]])
+            // }
         }
     }
 
     // 大批量结果优化，延迟输出
     show () {
-        if (this.res) {
+        if (this.res.length) {
             // 优化：延迟输出
             // TODO use virtual list
             if (this.res.length > 400) {
@@ -227,7 +229,7 @@ const SearchManager = class SearchManager {
             callback && callback(response)
             this.sort()
             this.gen()
-            if (this.showed && this.t === searchResultFullShow) {
+            if (this.showed && this.t === searchResultFullShow && this.res.length) {
                 searchResult.value = this.res
             }
         }
@@ -287,16 +289,12 @@ function searchCharHandler (search) {
         manager.run()
     } else {
         AliasAddition.value = []
-        searchResult.value = [
-            ['博士', 'avatar/arknights/doctor' + Suffix, '博士'],
-            ['PRTS', 'avatar/arknights/PRTS' + Suffix, 'PRTS'],
-            ['mon3tr', 'avatar/arknights/mon3tr' + Suffix, 'mon3tr'],
-            ['凯尔希', 'avatar/arknights/char_003_kalts' + Suffix, '凯尔希']
-        ]
+        searchResult.value = []
     }
 }
 
 export {
+    Suffix,
     CharDict,
     loadChar,
     sortChar,
