@@ -97,8 +97,7 @@ function handleSelect (char) {
     if (Object.prototype.hasOwnProperty.call(charData.value, 'avatar')) {
         DataControl.image.delete(charData.value.avatar)
     }
-    defaultName.value = char[2]
-    charData.value.avatar = char[1]
+    [charData.value.avatar, defaultName.value] = char
 }
 
 function handleInputEnter () {

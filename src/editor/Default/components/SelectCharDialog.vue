@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { StaticUrl, dialogWidth, MobileView } from '@/lib/constance'
-import { searchCharHandler, searchResult, loadChar } from '@/lib/character'
+import { searchCharHandler, searchResult, loadChar, CharDict, Suffix } from '@/lib/character'
 import { doAfterMounted } from '@/lib/tool'
 
 const props = defineProps(['modelValue'])
@@ -15,10 +15,19 @@ const ifShow = computed({
         emit('update:modelValue', value)
     }
 })
+const ifShowSubSelect = ref(false)
 
 const search = ref('')
 const inputRef = ref(null)
+const currSelect = ref([])
 const avatarBarFrameWidth = Math.floor((dialogWidth - 48) / 4) + 'px'
+
+const defaultChar = [
+    ['avatar/arknights/doctor' + Suffix, '博士'],
+    ['avatar/arknights/PRTS' + Suffix, 'PRTS'],
+    ['avatar/arknights/mon3tr' + Suffix, 'mon3tr'],
+    ['avatar/arknights/char_003_kalts' + Suffix, '凯尔希']
+]
 
 function initSearchChar () {
     const el = document.querySelector('#searchCharInput')
@@ -37,6 +46,16 @@ function autoFocus () {
         })
     }
 }
+
+function handleSelect (char) {
+    if (CharDict[char[0]].avatars.length > 1) {
+        currSelect.value = char
+        ifShowSubSelect.value = true
+    } else {
+        emit('select', [CharDict[char[0]].avatars[0], char[1]])
+        ifShow.value = false
+    }
+}
 </script>
 
 <template>
@@ -48,11 +67,23 @@ function autoFocus () {
         <template v-if="searchResult">
             <el-scrollbar max-height="50vh" style="width: 100%">
                 <div class="avatar-bar">
-                    <div class="frame" v-for="char in searchResult" :key="char[0]"
-                         :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">
-                        <img :src="StaticUrl + char[1]" loading="lazy" :title="char[2]"
-                             @click="() => {$emit('select',char);ifShow=false}">
-                    </div>
+                    <template v-if="searchResult.length">
+                        <div class="frame" v-for="char in searchResult" :key="char[0]"
+                             :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">
+                            <img :src="StaticUrl + CharDict[char[0]].avatars[0]" loading="lazy" :title="char[1]"
+                                 @click="handleSelect(char)">
+                            <div class="subscript" v-if="CharDict[char[0]].avatars.length > 1">
+                                {{ CharDict[char[0]].avatars.length - 1 }}+
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="frame" v-for="char in defaultChar" :key="char[1]"
+                             :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">
+                            <img :src="StaticUrl + char[0]" loading="lazy" :title="char[1]"
+                                 @click="() => {$emit('select',char);ifShow=false}">
+                        </div>
+                    </template>
                 </div>
             </el-scrollbar>
         </template>
@@ -60,6 +91,15 @@ function autoFocus () {
              style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
             <p>No Result</p>
             <p>Tips: 素材库仅包含干员/敌人/召唤物/装置</p>
+        </div>
+    </el-dialog>
+    <el-dialog v-model="ifShowSubSelect" title="选择头像" :width="dialogWidth" top="10vh">
+        <div class="avatar-bar" style="margin-top: 0">
+            <div class="frame" v-for="avatar in CharDict[currSelect[0]].avatars" :key="avatar"
+                 :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">
+                <img :src="StaticUrl + avatar" loading="lazy" :title="currSelect[1]"
+                     @click="() => {$emit('select',[avatar, currSelect[1]]);ifShowSubSelect=false;ifShow=false}">
+            </div>
         </div>
     </el-dialog>
 </template>
@@ -73,12 +113,24 @@ function autoFocus () {
 }
 
 .avatar-bar .frame {
+    position: relative;
     margin: 1px;
 }
 
 .avatar-bar img {
     width: 100%;
     height: 100%;
+}
+
+.subscript {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background: darkgrey;
+    color: white;
+    opacity: 0.9;
+    padding: 0 4px;
+    border-top-left-radius: 3px;
 }
 
 .avatar-bar img:hover {

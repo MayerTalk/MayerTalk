@@ -14,6 +14,7 @@ const Suffix = (navigator.userAgent.indexOf('Chrome') === -1 && navigator.userAg
     : '.webp'
 
 function parseAvatarUrl (url, series, charId) {
+    // 生成可访问的头像url
     return 'avatar/' +
         encodeURIComponent(series) + '/' +
         encodeURIComponent(url.indexOf('id:') === 0 ? url.slice(3) : charId + url) +
@@ -21,6 +22,7 @@ function parseAvatarUrl (url, series, charId) {
 }
 
 function loadChar (series) {
+    // 从资源站加载头像
     if (loaded.indexOf(series) !== -1) {
         return
     }
@@ -63,6 +65,7 @@ const TagSort = {
 }
 
 function sortByLength (a, b, lang) {
+    // 按名称长短排序
     const A = a.names[lang]
     const B = b.names[lang]
     if (!A) {
@@ -74,10 +77,12 @@ function sortByLength (a, b, lang) {
 }
 
 function sortBySeries (a, b) {
+    // 按系列排序
     return (TagSort[a.series] || 100) - (TagSort[b.series] || 100)
 }
 
 function sortByTag (a, b) {
+    // 按Tag排序
     for (let i = 0; i < a.tags.length && i < b.tags.length; i++) {
         if (a.tags[i] === b.tags[i]) {
             continue
@@ -88,10 +93,12 @@ function sortByTag (a, b) {
 }
 
 function firstSort (a, b, lang) {
+    // 基础排序
     return sortBySeries(a, b) || sortByTag(a, b) || sortByLength(a, b, lang)
 }
 
 const sortDict = {
+    // 语种特殊排序
     zh_CN: (a, b) => {
         const A = a.names.fpy
         const B = b.names.fpy
@@ -104,6 +111,7 @@ const sortDict = {
 }
 
 function sortChar (list, lang) {
+    // 联合排序
     sortDict[lang]
         ? list.sort((a, b) => {
             const A = CharDict[a]
@@ -123,11 +131,14 @@ const AliasAddition = ref([])
 let searchResultFullShow = 0
 
 const SearchManager = class SearchManager {
+    // 管理单次搜索
     constructor (search, t, list, lang = 'zh_CN') {
         this.search = search
         this.t = t
+        // raw list 用于溯源
         this.raw_list = copy(list)
         this.list = list
+        // 继承上一次别名搜索结果，避免闪烁出现
         for (const charId of AliasAddition.value) {
             if (this.list.indexOf(charId) === -1) {
                 this.list.push(charId)
@@ -138,22 +149,27 @@ const SearchManager = class SearchManager {
         self.showed = false
     }
 
+    // 对搜索结果进行排序
     sort () {
         sortChar(this.list, this.lang)
     }
 
+    // 生成可供渲染的结果
     gen () {
         this.res = []
         for (let i = 0; i < this.list.length; i++) {
             const charId = this.list[i]
-            for (let j = 0; j < CharDict[charId].avatars.length; j++) {
-                this.res.push([CharDict[charId].avatars[j], CharDict[charId].avatars[j], CharDict[charId].names[this.lang]])
-            }
+            // [charId, charName]
+            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN])
+            // for (let j = 0; j < CharDict[charId].avatars.length; j++) {
+            //     this.res.push([CharDict[charId].avatars[j], CharDict[charId].avatars[j], CharDict[charId].names[this.lang]])
+            // }
         }
     }
 
+    // 大批量结果优化，延迟输出
     show () {
-        if (this.res) {
+        if (this.res.length) {
             // 优化：延迟输出
             // TODO use virtual list
             if (this.res.length > 400) {
@@ -182,6 +198,7 @@ const SearchManager = class SearchManager {
         }
     }
 
+    // 启动别名搜索
     searchAlias (success, error) {
         if (AliasApi.cancelTokens.length) {
             for (const item of AliasApi.cancelTokens) {
@@ -190,12 +207,21 @@ const SearchManager = class SearchManager {
             AliasApi.cancelTokens = []
         }
         AliasApi.get({
-            url: 'alias/search?lang=7&output=4&type=39&mode=14&text=' + encodeURIComponent(this.search),
+            url: 'alias/search',
+            data: {
+                lang: 7, // zh_CN + en_US + ja_JP
+                output: 4, // ID
+                type: 39, // OPERATOR + TOKEN + ENEMY
+                mode: 14, // IN + PINYIN + IGNORE_CASE
+                text: this.search // 搜素文本
+                // 详细参数可在 https://alias.arkfans.top/docs/api/api.html 查看
+            },
             success,
             error
         })
     }
 
+    // 处理别名搜索结果
     aliasHandler (callback) {
         return (response) => {
             this.list = this.raw_list
@@ -203,12 +229,13 @@ const SearchManager = class SearchManager {
             callback && callback(response)
             this.sort()
             this.gen()
-            if (this.showed && this.t === searchResultFullShow) {
+            if (this.showed && this.t === searchResultFullShow && this.res.length) {
                 searchResult.value = this.res
             }
         }
     }
 
+    // 运行搜索
     run () {
         this.sort()
         this.gen()
@@ -226,6 +253,7 @@ const SearchManager = class SearchManager {
     }
 }
 
+// 处理搜索文本
 function parseSearch (search) {
     // TODO i18n 根据lang决定是否处理
     // 部分输入法拼音输入阶段会携带” ' “，导致拼音搜索失效
@@ -235,8 +263,10 @@ function parseSearch (search) {
     return search
 }
 
+// 搜索函数
 function searchCharHandler (search) {
     search = parseSearch(search)
+    // 用于避免延时输出干扰后续搜索
     const t = Date.now()
     searchResultFullShow = t
     if (search) {
@@ -259,16 +289,12 @@ function searchCharHandler (search) {
         manager.run()
     } else {
         AliasAddition.value = []
-        searchResult.value = [
-            ['博士', 'avatar/arknights/doctor' + Suffix, '博士'],
-            ['PRTS', 'avatar/arknights/PRTS' + Suffix, 'PRTS'],
-            ['mon3tr', 'avatar/arknights/mon3tr' + Suffix, 'mon3tr'],
-            ['凯尔希', 'avatar/arknights/char_003_kalts' + Suffix, '凯尔希']
-        ]
+        searchResult.value = []
     }
 }
 
 export {
+    Suffix,
     CharDict,
     loadChar,
     sortChar,
