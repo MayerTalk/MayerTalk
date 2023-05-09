@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
 
@@ -17,6 +17,9 @@ const dialogueData = ref({})
 const editDialogue = ref(false)
 const inputRef = ref(null)
 let currType
+const Editor = {
+    option: OptionDialog
+}
 
 function open (index) {
     editDialogue.value = true
@@ -34,20 +37,6 @@ function open (index) {
 function close () {
     ifShow.value = false
 }
-
-const editor = computed(() => {
-    if (!dialogueData.value.length) {
-        return
-    }
-    if (TypeSeries[dialogueData.value.type] === 'text' || dialogueData.value.type === 'image') {
-        return false
-    } else if (dialogueData.value.type === 'option') {
-        return OptionDialog
-    } else {
-        console.warn('Unknown Type Editor ' + dialogueData.value.type)
-        return false
-    }
-})
 
 function clearDialogueData () {
     if (!editDialogue.value && dialogueData.value.type === 'image') {
@@ -119,7 +108,7 @@ defineExpose({
     <el-dialog v-model="ifShow" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                @closed="handleClose"
                :before-close="editDialogue?null:ensureClose">
-        <component v-if="editor" :is="editor" v-model="dialogueData.content"/>
+        <component v-if="Editor[dialogueData.type]" :is="Editor[dialogueData.type]" v-model="dialogueData.content"/>
         <el-upload v-else-if="dialogueData.type==='image'"
                    action="#"
                    drag
