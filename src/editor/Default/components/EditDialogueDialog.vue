@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
 
@@ -16,11 +16,16 @@ const ifShow = ref(false)
 const dialogueData = ref({})
 const editDialogue = ref(false)
 const inputRef = ref(null)
+let currType
+const Editor = {
+    option: OptionDialog
+}
 
 function open (index) {
     editDialogue.value = true
     DataControl.curr.setDialogue(index)
     dialogueData.value = currDialogueData.value
+    currType = dialogueData.value.type
     ifShow.value = true
     if (TypeSeries[dialogueData.value.type] === 'text' && !MobileView) {
         doAfterMounted(inputRef, (r) => {
@@ -32,18 +37,6 @@ function open (index) {
 function close () {
     ifShow.value = false
 }
-
-const editor = computed(() => {
-    if (!dialogueData.value.length) { return }
-    if (TypeSeries[dialogueData.value.type] === 'text' || dialogueData.value.type === 'image') {
-        return false
-    } else if (dialogueData.value.type === 'option') {
-        return OptionDialog
-    } else {
-        console.warn('Unknown Type Editor ' + dialogueData.value.type)
-        return false
-    }
-})
 
 function clearDialogueData () {
     if (!editDialogue.value && dialogueData.value.type === 'image') {
@@ -59,6 +52,14 @@ function handleClose () {
     DataControl.save('chats')
 }
 
+function handleChangeType (value) {
+    // 当类型数据格式不同时，重置为默认值
+    if (TypeSeries[currType] !== TypeSeries[value]) {
+        dialogueData.value.content = TypeDefault[dialogueData.value.type]
+    }
+    currType = value
+}
+
 function switchEdit (edit) {
     editDialogue.value = edit
     if (edit) {
@@ -66,6 +67,7 @@ function switchEdit (edit) {
     } else {
         dialogueData.value = { type: 'chat' }
     }
+    currType = dialogueData.value.type
 }
 
 function delDialogue () {
@@ -106,7 +108,7 @@ defineExpose({
     <el-dialog v-model="ifShow" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
                @closed="handleClose"
                :before-close="editDialogue?null:ensureClose">
-        <component v-if="editor" :is="editor" v-model="dialogueData.content"/>
+        <component v-if="Editor[dialogueData.type]" :is="Editor[dialogueData.type]" v-model="dialogueData.content"/>
         <el-upload v-else-if="dialogueData.type==='image'"
                    action="#"
                    drag
@@ -142,7 +144,7 @@ defineExpose({
                 <el-select v-model="dialogueData.type" style="flex-grow: 1"
                            :disabled="['image','option'].indexOf(dialogueData.type) !== -1 && editDialogue"
                            placeholder="类型"
-                           @change="() => {if(!editDialogue) {dialogueData.content=TypeDefault[dialogueData.type]}}"
+                           @change="handleChangeType"
                 >
                     <el-option
                         v-for="(text, type) in TypeDict"
