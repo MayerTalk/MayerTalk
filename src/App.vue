@@ -4,6 +4,7 @@ import { ref, provide } from 'vue'
 import Editors from './editor'
 import Announce from './AnnounceDialog.vue'
 import About from './AboutDialog.vue'
+import FileDragger from '@/components/FileDragger.vue'
 import { config } from '@/lib/data'
 
 const ifShowAnnouncement = ref(false)
@@ -16,14 +17,17 @@ provide('ifShowAbout', ifShowAbout)
 </script>
 
 <template>
-    <Announce v-model="ifShowAnnouncement"/>
-    <About v-model="ifShowAbout"/>
-    <component :is="Editors[config.editor]"/>
+    <div>
+        <Announce v-model="ifShowAnnouncement"/>
+        <About v-model="ifShowAbout"/>
+        <component :is="Editors[config.editor]"/>
+        <FileDragger/>
+    </div>
 </template>
 
 <style src="./font.css"></style>
 <style>
-    body, html {
-        margin: 0;
-    }
+body, html {
+    margin: 0;
+}
 </style>
