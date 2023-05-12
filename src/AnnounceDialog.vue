@@ -59,6 +59,7 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
             <b>优化</b>
             <ul>
                 <li>插入对话切换类型时，相同数据格式不清空输入</li>
+                <li>角色选择界面，相同角色头像并入二级菜单</li>
             </ul>
             <b>修复</b>
             <ul>
