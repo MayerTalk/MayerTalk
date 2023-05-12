@@ -15,7 +15,7 @@ const ifShowAnnouncement = computed({
     }
 })
 
-const version = 'v0.1.7'
+const version = 'v0.1.8'
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
@@ -50,17 +50,19 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
             <p><b>所有内容均在本地生成，不会上传至服务器，不具备云端保存功能</b></p>
             <el-link href="/docs/guide/start.html" type="primary">快速上手 (首次使用推荐阅读)</el-link>
             <h3>
-                v0.1.7
+                v0.1.8
             </h3>
+            <b>新增</b>
+            <ul>
+                <li>拖拽上传：拖拽数据文件到编辑器页面，即可快捷导入</li>
+            </ul>
             <b>优化</b>
             <ul>
-                <li>电脑端现在会自动聚焦大部分输入框</li>
-                <li>编辑对话文本时，可以使用ctrl+enter结束编辑</li>
+                <li>插入对话切换类型时，相同数据格式不清空输入</li>
             </ul>
-            <b>公告</b>
+            <b>修复</b>
             <ul>
-                <li>自动更新已恢复</li>
-                <li style="color: snow">饼：NPC头像有一点想法了</li>
+                <li>无法插入“选项”对话</li>
             </ul>
         </template>
         <div style="display: flex; margin-top: 10px">
