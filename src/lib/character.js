@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import Request from '@/lib/request'
 import { copy } from '@/lib/tool'
 import { StaticUrl } from '@/lib/constance'
+import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 
 const request = new Request({ host: StaticUrl })
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
@@ -270,7 +271,7 @@ function searchCharHandler (search) {
     const t = Date.now()
     searchResultFullShow = t
     if (search) {
-        const searchLower = search.toLowerCase()
+        const searchLower = fullWidth2HalfLatin(search).toLowerCase()
         const list = []
         for (const charId in CharDict) {
             if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
