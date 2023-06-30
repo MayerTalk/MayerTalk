@@ -19,9 +19,9 @@ const version = 'v0.1.8'
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
-    if (getData('a_version') !== version) {
+    if (getData('cache.announcementVersion') !== version) {
         emit('update:modelValue', true)
-        saveData('a_version', version)
+        saveData('cache.announcementVersion', version)
     } else if (invalidBrowser) {
         emit('update:modelValue', true)
     }
