@@ -1,11 +1,10 @@
 import { ref } from 'vue'
 
 import Request from '@/lib/request'
+import { cacheRequest } from '@/lib/cacheRequest'
 import { copy, getData, saveData } from '@/lib/tool'
-import { StaticUrl } from '@/lib/constance'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 
-const request = new Request({ host: StaticUrl })
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 
 const CharDict = {}
@@ -22,48 +21,29 @@ function parseAvatarUrl (url, series, charId) {
         Suffix
 }
 
-function fetchChar (series, version) {
-    request.get({
-        url: 'char/' + series + '.json?v=' + version,
-        success: (resp) => {
-            loaded.indexOf(series) === -1 && loaded.push(series)
-            for (const charId in resp.data) {
-                if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
-                    continue
-                }
-                const data = resp.data[charId]
-                for (const avatarId in data.avatars) {
-                    if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
-                        continue
-                    }
-                    data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
-                }
-                data.series = series
-                CharDict[charId] = data
-            }
-        }
-    })
-}
-
 function loadChar (series) {
     // 从资源站加载头像
     if (loaded.indexOf(series) !== -1) {
         return
     }
-    const cache = getData('cache.characterVersion.' + series) || ''
-    fetchChar(series, cache)
 
-    request.get({
-        url: 'version/' + series + '.txt?t=' + Date.now(),
-        success: (resp) => {
-            if (resp.data !== cache) {
-                saveData('cache.characterVersion.' + series, resp.data)
-                if (cache) {
-                    fetchChar(series, resp.data)
-                }
+    cacheRequest('char/' + series, 'characterVersion.' + series, (resp) => {
+        loaded.indexOf(series) === -1 && loaded.push(series)
+        for (const charId in resp.data) {
+            if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
+                continue
             }
+            const data = resp.data[charId]
+            for (const avatarId in data.avatars) {
+                if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
+                    continue
+                }
+                data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
+            }
+            data.series = series
+            CharDict[charId] = data
         }
-    })
+    }, 'version/' + series + '.txt')
 }
 
 // const seriesSort = {
