@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { t } from '@/lib/lang/translate'
 import { StaticUrl, dialogWidth, MobileView } from '@/lib/constance'
 import { searchCharHandler, searchResult, loadChar, CharDict, Suffix } from '@/lib/character'
 import { doAfterMounted } from '@/lib/tool'
@@ -23,10 +24,10 @@ const currSelect = ref([])
 const avatarBarFrameWidth = Math.floor((dialogWidth - 48) / 4) + 'px'
 
 const defaultChar = [
-    ['avatar/arknights/doctor' + Suffix, '博士'],
+    ['avatar/arknights/doctor' + Suffix, t.value.character.doctor],
     ['avatar/arknights/PRTS' + Suffix, 'PRTS'],
     ['avatar/arknights/mon3tr' + Suffix, 'mon3tr'],
-    ['avatar/arknights/char_003_kalts' + Suffix, '凯尔希']
+    ['avatar/arknights/char_003_kalts' + Suffix, t.value.character.kalts]
 ]
 
 function initSearchChar () {
@@ -59,11 +60,11 @@ function handleSelect (char) {
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" title="选择角色" :width="dialogWidth" top="10vh"
+    <el-dialog v-model="ifShow" :title="t.action.selectChar" :width="dialogWidth" top="10vh"
                @open="loadChar('arknights');initSearchChar();autoFocus()"
                @closed="searchCharHandler('');search=''">
         <!--        素材库选择角色-->
-        <el-input placeholder="搜索更多角色" v-model="search" id="searchCharInput" ref="inputRef"></el-input>
+        <el-input :placeholder="t.action.selectMoreCharacter" v-model="search" id="searchCharInput" ref="inputRef"></el-input>
         <template v-if="searchResult">
             <el-scrollbar max-height="50vh" style="width: 100%">
                 <div class="avatar-bar">
@@ -90,10 +91,10 @@ function handleSelect (char) {
         <div v-else
              style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: grey">
             <p>No Result</p>
-            <p>Tips: 素材库仅包含干员/敌人/召唤物/装置</p>
+            <p>Tips: {{ t.tip.selectCharDialog }}</p>
         </div>
     </el-dialog>
-    <el-dialog v-model="ifShowSubSelect" title="选择头像" :width="dialogWidth" top="10vh">
+    <el-dialog v-model="ifShowSubSelect" :title="t.action.selectAvatar" :width="dialogWidth" top="10vh">
         <div class="avatar-bar" style="margin-top: 0">
             <div class="frame" v-for="avatar in CharDict[currSelect[0]].avatars" :key="avatar"
                  :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">

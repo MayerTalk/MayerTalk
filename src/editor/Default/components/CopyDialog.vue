@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 
 import message from '@/lib/message'
@@ -23,7 +24,7 @@ const copyChars = ref([])
 
 function handleCopy () {
     if (copyChars.value.length === 0) {
-        message.notify('请选择至少一个角色', message.warning)
+        message.notify(t.value.notify.pleaseSelectAtLeastOneCharacter, message.warning)
         return
     }
     const last = copyChars.value.length - 1
@@ -37,9 +38,9 @@ function handleCopy () {
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" title="请选择要复读的角色" :width="dialogWidth"
+    <el-dialog v-model="ifShow" :title="t.notify.pleaseSelectTheCharToRepeat" :width="dialogWidth"
                @closed="copyChars = []">
-        <el-button style="width: 100%;" @click="handleCopy">复读</el-button>
+        <el-button style="width: 100%;" @click="handleCopy">{{ t.action.repeat }}</el-button>
         <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true"
                       :multiple="true" :filterable="false"/>
     </el-dialog>

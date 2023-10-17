@@ -100,6 +100,15 @@ const sortDict = {
         } else {
             return A > B ? 1 : -1
         }
+    },
+    zh_TW: (a, b) => {
+        const A = a.names.fpy
+        const B = b.names.fpy
+        if (A === B) {
+            return 0
+        } else {
+            return A > B ? 1 : -1
+        }
     }
 }
 

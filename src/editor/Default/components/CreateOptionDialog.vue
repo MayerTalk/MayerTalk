@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { t } from '@/lib/lang/translate'
 import OptionDialog from '../type/OptionDialog.vue'
 
 import { copy, uuid, ensureClose, doAfterMounted } from '@/lib/tool'
@@ -31,9 +32,9 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" title="创建选项" :width="dialogWidth"
+    <el-dialog v-model="ifShow" :title="t.action.createOption" :width="dialogWidth"
                :before-close="ensureClose"
                :show-close="false">
-        <OptionDialog v-model="options" extraButton="创建" @done="createOptionDialogue" ref="dialogRef"/>
+        <OptionDialog v-model="options" :extraButton="t.action.create" @done="createOptionDialogue" ref="dialogRef"/>
     </el-dialog>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, inject, onUnmounted } from 'vue'
+import { t } from '@/lib/lang/translate'
 import { chats } from '@/lib/data'
 import { getDialogue, doAfterMounted } from '@/lib/tool'
 import { dialogWidth } from '@/lib/constance'
@@ -32,7 +33,7 @@ onUnmounted(() => {
 
 function handleNav () {
     if (!+lineno.value && +lineno.value !== 0) {
-        message.notify('请输入合法的数字', message.warning)
+        message.notify(t.value.notify.pleaseEnterValidNumber, message.warning)
         return
     }
     if (lineno.value > chats.value.length) {
@@ -57,15 +58,15 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" title="转到行" :width="dialogWidth" @closed="lineno=null">
+    <el-dialog v-model="ifShow" :title="t.action.goto" :width="dialogWidth" @closed="lineno=null">
         <el-input v-model="lineno"
-                  :placeholder="'在此输入行数 (1~' + chats.length + ')' "
+                  :placeholder="t.notify.enterNumberOfLinesHere + ' (1~' + chats.length + ')' "
                   @keypress.enter="handleNav"
                   clearable ref="input"
         />
         <div class="column-display" style="margin-top: 10px; display: flex; justify-content: flex-end">
-            <el-button style="width: 20%" @click="ifShow=false">取消</el-button>
-            <el-button style="width: 20%" @click="handleNav" type="primary">确定</el-button>
+            <el-button style="width: 20%" @click="ifShow=false">{{ t.action.cancel }}</el-button>
+            <el-button style="width: 20%" @click="handleNav" type="primary">{{ t.action.confirm }}</el-button>
         </div>
     </el-dialog>
 </template>

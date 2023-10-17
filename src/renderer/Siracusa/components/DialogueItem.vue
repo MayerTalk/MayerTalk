@@ -8,7 +8,7 @@ import {
     avatars
 } from '@/lib/data'
 
-const renderSettings = inject('renderSettings')
+const rendererSettings = inject('rendererSettings')
 const width = inject('width')
 const charDirection = inject('charDirection')
 const preScreenshot = inject('preScreenshot')
@@ -49,13 +49,13 @@ watch(charDirection, () => {
 </script>
 
 <template>
-    <div :class="renderSettings.style" :id="data.id">
+    <div :class="rendererSettings.style" :id="data.id">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;"
                  @click="(event) => {$emit(event.ctrlKey ? 'delete' : 'edit', index)}"
                  :style="{justifyContent:(right?'flex-end':'flex-start')}">
                 <div v-if="data.type==='title'" style="flex-grow: 1">
-                    <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
+                    <div v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
                          class="charName">{{char.name}}
                     </div>
                     <div class="title-box">
@@ -79,7 +79,7 @@ watch(charDirection, () => {
                     </div>
                     <!--Content Start-->
                     <div :style="{'flex-grow':data.type==='image'?0:1}">
-                        <div v-if="renderSettings.showCharName && data.char && renderSettings.showCharNameSettings[data.type]"
+                        <div v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
                              class="charName">{{char.name}}
                         </div>
                         <div v-if="data.type==='image'" class="box image-box" style="justify-self: flex-start">

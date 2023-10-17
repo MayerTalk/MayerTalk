@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, nextTick } from 'vue'
+import { t } from '@/lib/lang/translate'
 import message from '@/lib/message'
 import { uuid } from '@/lib/tool'
 
@@ -25,7 +26,7 @@ const modelValue = computed({
 
 function deleteOption (index) {
     if (modelValue.value.length === 1) {
-        message.notify('你不能删除最后一个选项', message.warning)
+        message.notify(t.value.notify.cannotDeleteLastOption, message.warning)
     } else {
         modelValue.value.splice(index, 1)
     }
@@ -70,10 +71,10 @@ defineExpose({
         </template>
     </el-input>
     <div v-if="props.extraButton" style="display: flex;column-gap: 5px">
-        <el-button @click="() => {modelValue.push([uuid(),''])}" style="width: 100%">添加</el-button>
+        <el-button @click="() => {modelValue.push([uuid(),''])}" style="width: 100%">{{ t.action.add }}</el-button>
         <el-button @click="$emit('done')" style="width: 100%; margin-left: 0">{{ props.extraButton }}</el-button>
     </div>
-    <el-button v-else @click="() => {modelValue.push([uuid(),''])}" style="width: 100%">添加</el-button>
+    <el-button v-else @click="() => {modelValue.push([uuid(),''])}" style="width: 100%">{{ t.action.add }}</el-button>
 </template>
 
 <style>

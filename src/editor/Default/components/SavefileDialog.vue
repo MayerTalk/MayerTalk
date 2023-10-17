@@ -1,5 +1,6 @@
 <script setup>
 import { ref, inject, computed } from 'vue'
+import { t } from '@/lib/lang/translate'
 import { ensure, formatSize } from '@/lib/tool'
 import message from '@/lib/message'
 import Save from '@/lib/savefile'
@@ -49,13 +50,13 @@ function loadData () {
 
 function newSave () {
     if (savefileName.value.length === 0) {
-        message.notify('请输入存档名', message.warning)
+        message.notify(t.value.notify.pleaseEnterSavefileName, message.warning)
         return
     }
     Save.new(savefileName.value, () => {
         ifSave.value = false
         savefileName.value = ''
-        message.notify('保存成功', message.success)
+        message.notify(t.value.notify.savedSuccessfully, message.success)
         loadData()
     })
 }
@@ -63,25 +64,25 @@ function newSave () {
 function syncSave (row) {
     ensure(() => {
         Save.save(row.id, () => {
-            message.notify('同步成功', message.success)
+            message.notify(t.value.notify.synchronizedSuccessfully, message.success)
             loadData()
         })
-    }, '是否同步当前数据至存档「' + row.name + '」')
+    }, t.value.notify.whetherToSynchronizeSavefile + '「' + row.name + '」')
 }
 
 function loadSave (row) {
     if (Save.saved) {
         Save.load(row.id, () => {
-            message.notify('导入成功', message.success)
+            message.notify(t.value.notify.importedSuccessfully, message.success)
             loadData()
         })
     } else {
         ensure(() => {
             Save.load(row.id, () => {
-                message.notify('导入成功', message.success)
+                message.notify(t.value.notify.importedSuccessfully, message.success)
                 loadData()
             })
-        }, '是否导入存档 「' + row.name + '」')
+        }, t.value.notify.whetherToImportSavefile + '「' + row.name + '」')
     }
 }
 
@@ -89,30 +90,30 @@ function deleteSave (row) {
     ensure(() => {
         Save.delete(row.id, () => {
             loadData()
-            message.notify('删除成功', message.success)
+            message.notify(t.value.notify.deletedSuccessfully, message.success)
         })
-    }, '是否删除存档 「' + row.name + '」')
+    }, t.value.notify.whetherToDeleteSavefile + '「' + row.name + '」')
 }
 
 loadData()
 </script>
 
 <template>
-    <el-dialog v-model="ifShowSavefile" :width="dialogWidth" title="存档" @closed="ifSave=false">
+    <el-dialog v-model="ifShowSavefile" :width="dialogWidth" :title="t.noun.savefile" @closed="ifSave=false">
         <div style="display: flex; column-gap: 5px">
             <template v-if="ifSave">
-                <el-input v-model="savefileName" placeholder="存档名"></el-input>
-                <el-button @click="() => {newSave()}">保存</el-button>
+                <el-input v-model="savefileName" :placeholder="t.noun.savefileName"></el-input>
+                <el-button @click="() => {newSave()}">{{ t.action.save }}</el-button>
             </template>
             <template v-else>
-                <el-button style="width: 100%" @click="() => {ifSave=true;savefileName=''}">保存</el-button>
+                <el-button style="width: 100%" @click="() => {ifSave=true;savefileName=''}">{{ t.action.save }}</el-button>
             </template>
         </div>
         <el-table :data="tableData">
-            <el-table-column prop="name" label="名称"/>
-            <el-table-column prop="timeString" label="最后编辑"/>
-            <el-table-column prop="sizeString" label="体积" :width="80"/>
-            <el-table-column label="操作" :width="90">
+            <el-table-column prop="name" :label="t.noun.name"/>
+            <el-table-column prop="timeString" :label="t.noun.lastEdit"/>
+            <el-table-column prop="sizeString" :label="t.noun.size" :width="80"/>
+            <el-table-column :label="t.action.operate" :width="90">
                 <template #default="scope">
                     <div style="display: flex; justify-content: right; align-items: center; column-gap: 5px">
                         <el-icon :size="25" style="cursor: pointer" @click="() => {syncSave(scope.row)}">

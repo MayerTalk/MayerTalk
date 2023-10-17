@@ -1,14 +1,14 @@
 <script setup>
 import { ref, inject, watch, computed } from 'vue'
+import { t } from '@/lib/lang/translate'
+import { supportLang } from '@/lib/lang/constant'
 import Editors from '@/editor'
-import EditorsName from '@/editor/name'
-import Renders from '@/render'
-import RendersName from '@/render/name'
+import Renderers from '@/renderer'
 import message from '@/lib/message'
 import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
 import { downloadData, uploadData } from '@/lib/versionControl'
-import { TypeDict, dialogWidth } from '@/lib/constance'
+import { dialogWidth } from '@/lib/constance'
 import {
     config,
     settings,
@@ -32,7 +32,7 @@ const defaultSettings = {
 }
 
 const ifShow = inject('ifShowSettings')
-const renderSettings = inject('renderSettings')
+const rendererSettings = inject('rendererSettings')
 
 function _sync (dst, src1, src2) {
     for (const key in src1) {
@@ -55,7 +55,7 @@ function _sync (dst, src1, src2) {
 }
 
 function sync () {
-    _sync(renderSettings.value, defaultSettings, settings.value)
+    _sync(rendererSettings.value, defaultSettings, settings.value)
 }
 
 const fake = ref({
@@ -64,11 +64,9 @@ const fake = ref({
     maxHeight: settings.value.maxHeight || null
 })
 
-const language = ref('zh-cn')
-
 const ifShowEditShowCharName = ref(false)
 const showCharNameSettings = computed(() => {
-    return renderSettings.value.showCharNameSettings || {}
+    return rendererSettings.value.showCharNameSettings || {}
 })
 
 function setShowCharNameSettings (type, value) {
@@ -78,7 +76,7 @@ function setShowCharNameSettings (type, value) {
     settings.value.showCharNameSettings[type] = value
 }
 
-const storageSize = ref('计算中...')
+const storageSize = ref(t.value.notify.calculating + '...')
 
 function getStorageSize () {
     let size = 0
@@ -100,7 +98,7 @@ function getStorageSize () {
 
 function clearStorage () {
     DataControl.clear(2)
-    message.notify('清空成功，正在重载', message.success)
+    message.notify(t.value.notify.clearedSuccessfullyAndReloading, message.success)
     setTimeout(() => {
         location.reload()
     }, 500)
@@ -110,7 +108,7 @@ function checkClose (fn, ignore = []) {
     if (Object.prototype.hasOwnProperty.call(settings.value, 'maxHeight') &&
         settings.value.maxHeight < 1000 && settings.value.maxHeight !== 0 &&
         ignore.indexOf(1) === -1) {
-        message.confirm('请注意，最大高度的单位是px，一般而言1000px能容纳10条对话', '提示', () => {
+        message.confirm(t.value.tip.cutScreenshot, t.value.noun.hint, () => {
             checkClose(fn, [...ignore, 1])
         })
     } else {
@@ -124,59 +122,59 @@ watch(settings, () => sync(), { deep: true })
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" title="设置" :width="dialogWidth"
+    <el-dialog v-model="ifShow" :title="t.noun.settings" :width="dialogWidth"
                :before-close="checkClose"
                @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
         <div id="settings">
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">通用</h2>
+                <h2 style="margin: 10px 0">{{ t.noun.common }}</h2>
                 <div class="line-right"></div>
             </div>
             <table>
                 <tr class="tr">
-                    <th>编辑器</th>
+                    <th>{{ t.noun.editor }}</th>
                     <td>
                         <el-select v-model="config.editor">
-                            <el-option v-for="(render, key) in Editors" :key="key" :value="key"
-                                       :label="EditorsName[key]"/>
-                        </el-select>
-                    </td>
-
-                </tr>
-                <tr>
-                    <th>渲染器</th>
-                    <td>
-                        <el-select v-model="config.render">
-                            <el-option v-for="(render, key) in Renders" :key="key" :value="key"
-                                       :label="RendersName[key]"/>
+                            <el-option v-for="(renderer, key) in Editors" :key="key" :value="key"
+                                       :label="t.name.editor[key]"/>
                         </el-select>
                     </td>
                 </tr>
                 <tr>
-                    <th>语言</th>
+                    <th>{{ t.noun.renderer }}</th>
                     <td>
-                        <el-select v-model="language" style="">
-                            <el-option key="zh-cn" value="zh-cn"/>
+                        <el-select v-model="config.renderer">
+                            <el-option v-for="(renderer, key) in Renderers" :key="key" :value="key"
+                                       :label="t.name.renderer[key]"/>
+                        </el-select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ t.noun.language }}</th>
+                    <td>
+                        <el-select v-model="config.lang">
+                            <el-option v-for="lang in supportLang" :key="lang" :value="lang" :label="lang"/>
                         </el-select>
                     </td>
                 </tr>
             </table>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">渲染</h2>
+                <h2 style="margin: 10px 0">{{ t.noun.renderer }}</h2>
                 <div class="line-right"></div>
             </div>
             <table>
                 <tr>
-                    <th>背景色</th>
+                    <th>{{ t.noun.background }}</th>
                     <td>
                         <el-input v-model="settings.background" :clearable="true"
                                   :placeholder="'' + defaultSettings.background"/>
                     </td>
                 </tr>
                 <tr>
-                    <th>对话框宽度<span style="color:grey;"><br/>（不包含头像）</span></th>
+                    <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br/>({{ t.tip.settings.dialogWidth }})</span>
+                    </th>
                     <td>
                         <el-input v-model="fake.width" :clearable="true"
                                   :placeholder="'' + defaultSettings.width"
@@ -184,7 +182,7 @@ watch(settings, () => sync(), { deep: true })
                     </td>
                 </tr>
                 <tr>
-                    <th>生成图缩放</th>
+                    <th>{{ t.noun.imageQuality }}</th>
                     <td>
                         <el-input v-model="fake.scale" :clearable="true"
                                   :placeholder="'' + defaultSettings.scale"
@@ -192,7 +190,7 @@ watch(settings, () => sync(), { deep: true })
                     </td>
                 </tr>
                 <tr>
-                    <th>截图最大高度</th>
+                    <th>{{ t.noun.screenshotMaxHeight }}</th>
                     <td>
                         <el-input v-model="fake.maxHeight" :clearable="true"
                                   :placeholder="'' + defaultSettings.maxHeight"
@@ -200,7 +198,7 @@ watch(settings, () => sync(), { deep: true })
                     </td>
                 </tr>
                 <tr>
-                    <th>显示角色名</th>
+                    <th>{{ t.noun.showCharacterName }}</th>
                     <td>
                         <div style="display: flex; align-items: center">
                             <el-switch
@@ -217,7 +215,7 @@ watch(settings, () => sync(), { deep: true })
             </table>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">储存</h2>
+                <h2 style="margin: 10px 0">{{ t.noun.storage }}</h2>
                 <div class="line-right"></div>
             </div>
             <div style="margin: 5px 0 10px 10px">
@@ -225,13 +223,13 @@ watch(settings, () => sync(), { deep: true })
                     <el-icon color="grey" :size="20">
                         <IconDownload/>
                     </el-icon>
-                    导出
+                    {{ t.action.export }}
                 </el-button>
                 <el-button @click="clickBySelector('#uploadData > div > input')">
                     <el-icon color="grey" :size="20">
                         <IconUpload/>
                     </el-icon>
-                    导入
+                    {{ t.action.import }}
                     <el-upload
                         id="uploadData"
                         action="#"
@@ -246,26 +244,26 @@ watch(settings, () => sync(), { deep: true })
                     <el-icon color="grey" :size="20">
                         <IconCollection/>
                     </el-icon>
-                    存档
+                    {{ t.noun.savefile }}
                 </el-button>
             </div>
 
             <table>
                 <tr>
-                    <th>本地</th>
+                    <th>{{ t.noun.local }}</th>
                     <td>{{ storageSize }}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,'即将清空所有数据（对话、角色、存档），且无法恢复')">清空
+                        <el-button @click="ensure(clearStorage,t.tip.emptyData)">{{ t.action.empty }}
                         </el-button>
                     </td>
                 </tr>
             </table>
         </div>
     </el-dialog>
-    <el-dialog v-model="ifShowEditShowCharName" title="请选择要显示角色名的类型" :width="dialogWidth"
+    <el-dialog v-model="ifShowEditShowCharName" :title="t.action.pleaseSelectTypeOfCharacterToShow" :width="dialogWidth"
                @closed="DataControl.save('settings')">
         <table>
-            <tr v-for="(text, type) in TypeDict" :key="type">
+            <tr v-for="(text, type) in t.name.typeDict" :key="type">
                 <th>{{ text }}</th>
                 <td>
                     <el-switch

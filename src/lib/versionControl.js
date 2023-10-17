@@ -1,3 +1,5 @@
+import { t } from '@/lib/lang/translate'
+import { defaultLang } from '@/lib/lang/detect'
 import { getData, saveData, blob2url, download, md5, copy } from '@/lib/tool'
 import message from '@/lib/message'
 import {
@@ -9,7 +11,7 @@ import {
     DataControl
 } from '@/lib/data'
 
-const latestVersion = 'd'
+const latestVersion = 'e'
 const initialVersion = 'a'
 let currVersion = getData('data.version') || initialVersion
 const versionSwitcher = {
@@ -51,7 +53,7 @@ const versionSwitcher = {
     },
     b: (data, opt) => {
         if (opt.load) {
-            // v 0.1.0 -> v0.1.1 / b -> c
+            // v0.1.0 -> v0.1.1 / b -> c
             // indexDB
             const dataStr = localStorage.getItem('data.images')
             if (dataStr) {
@@ -63,16 +65,35 @@ const versionSwitcher = {
         return 'c'
     },
     c: (data, opt) => {
+        // v0.1.6 -> v0.1.7 / c -> d
+        // 编辑器/渲染器分离
         if (!Object.prototype.hasOwnProperty.call(data.config, 'editor')) {
             data.config.editor = 'Default'
         }
-        if (!Object.prototype.hasOwnProperty.call(data.config, 'render') || data.config.render === 'Arknights') {
-            data.config.render = 'Siracusa'
+        if (!Object.prototype.hasOwnProperty.call(data.config, 'renderer') || data.config.renderer === 'Arknights') {
+            data.config.renderer = 'Siracusa'
         }
         if (opt.load) {
             saveData('data.config', data.config)
         }
         return 'd'
+    },
+    d: (data, opt) => {
+        // v0.1.8 -> v0.1.9 / d -> e
+        // i18n & render -> renderer
+        if (!Object.prototype.hasOwnProperty.call(data.config, 'lang')) {
+            data.config.lang = defaultLang
+        }
+        if (!Object.prototype.hasOwnProperty.call(data.config, 'renderer')) {
+            data.config.renderer = 'Siracusa'
+        }
+        if (Object.prototype.hasOwnProperty.call(data.config, 'render')) {
+            delete data.config.render
+        }
+        if (opt.load) {
+            saveData('data.config', data.config)
+        }
+        return 'e'
     }
 }
 
@@ -120,11 +141,11 @@ function uploadData (uploadFile, callback) {
             switchVersion(data)
             DataControl.set(data, false)
             DataControl.save()
-            message.notify('导入成功', message.success)
+            message.notify(t.value.notify.importedSuccessfully, message.success)
             callback && callback()
         } catch (e) {
             console.log(e)
-            message.notify('导入失败，请确认文件名为 mayertalk-data-xxx.json', message.error)
+            message.notify(t.value.tip.importFailed, message.error)
         }
     }
     reader.readAsText(uploadFile)
