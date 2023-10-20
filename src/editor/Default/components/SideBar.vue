@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { t } from '@/lib/lang/translate'
 import message from '@/lib/message'
 import { DataControl } from '@/lib/data'
 import { dialogWidth, MobileView } from '@/lib/constance'
@@ -31,8 +32,8 @@ const ifShowClear = ref(false)
 
 function clearChats () {
     message.confirm(
-        '即将清空所有对话',
-        '提示',
+        t.value.notify.aboutToClearAllChats,
+        t.value.noun.hint,
         () => {
             DataControl.clear(0)
             DataControl.curr.setDialogue(0)
@@ -43,8 +44,8 @@ function clearChats () {
 
 function clearAll () {
     message.confirm(
-        '即将清空所有角色、对话',
-        '提示',
+        t.value.notify.aboutToClearAllCharactersAndChats,
+        t.value.noun.hint,
         () => {
             DataControl.clear(1)
             DataControl.curr.setChar('', true)
@@ -61,61 +62,61 @@ function clearAll () {
             <el-icon color="lightgrey" :size="35">
                 <IconCrop/>
             </el-icon>
-            截屏
+            {{ t.action.screenshot }}
         </div>
         <div class="bar" @click="$emit('showAnnounce')">
             <el-icon color="lightgrey" :size="35">
                 <IconNotification/>
             </el-icon>
-            公告
+            {{ t.noun.announcement }}
         </div>
         <div class="bar" @click="toGuide">
             <el-icon :size="35">
                 <IconNotebook/>
             </el-icon>
-            指南
+            {{ t.noun.guide }}
         </div>
         <div class="bar" @click="ifShowClear=true">
             <el-icon color="lightgrey" :size="35">
                 <IconDelete/>
             </el-icon>
-            清空
+            {{ t.action.empty }}
         </div>
-        <el-dialog v-model="ifShowClear" title="请选择要清空的类型" :width="dialogWidth">
+        <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
             <div style="display: flex; column-gap: 5px">
-                <el-button size="large" style="width: 100%;" @click="clearChats">对话</el-button>
-                <el-button size="large" style="width:100%; margin: 0" @click="clearAll">全部</el-button>
+                <el-button size="large" style="width: 100%;" @click="clearChats">{{ t.noun.chat }}</el-button>
+                <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{ t.noun.all }}</el-button>
             </div>
         </el-dialog>
         <div class="bar" @click="DataControl.withdraw">
             <el-icon color="lightgrey" :size="35">
                 <IconBack/>
             </el-icon>
-            撤回
+            {{ t.action.withdraw }}
         </div>
         <div class="bar" @click="DataControl.redo">
             <el-icon color="lightgrey" :size="35">
                 <IconRight/>
             </el-icon>
-            重做
+            {{ t.action.redo }}
         </div>
         <div class="bar" @click="$emit('showNavigation')">
             <el-icon color="lightgrey" :size="35">
                 <IconCompass/>
             </el-icon>
-            转到
+            {{ t.action.goto }}
         </div>
         <div class="bar" @click="$emit('showSettings')">
             <el-icon color="lightgrey" :size="35">
                 <IconSetting/>
             </el-icon>
-            设置
+            {{ t.noun.settings }}
         </div>
         <div class="bar" @click="$emit('showAbout')">
             <el-icon color="lightgrey" :size="35">
                 <IconCoffeeCup/>
             </el-icon>
-            关于
+            {{ t.noun.about }}
         </div>
     </div>
     <Transition name="fade">

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { t } from '@/lib/lang/translate'
 import { uuid } from '@/lib/tool'
 import message from '@/lib/message'
 import tipControl from '@/lib/tip'
@@ -27,6 +28,7 @@ function createDialogue (data, config = {}) {
 }
 
 const copyDialogueHook = []
+
 function copyDialogue (index, data = {}, config = {}) {
     data = {
         content: data.content || chats.value[index].content,
@@ -51,8 +53,8 @@ function createTextDialogue (type, config = {}) {
         }, config)
         textarea.value = ''
     } else {
-        message.notify('请在输入框内输入文本', message.info)
-        tipControl.setTmpTip('请在此输入文本')
+        message.notify(t.value.notify.pleaseEnterTextInTheInputBox, message.info)
+        tipControl.setTmpTip(t.value.notify.pleaseEnterTextHere)
     }
 }
 

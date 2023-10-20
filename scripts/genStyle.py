@@ -12,7 +12,7 @@ from common import join
 os.system('')
 
 
-class Render:
+class Renderer:
     def __init__(self, path: str):
         self.path = path
         self.scoped_cache = {}
@@ -84,27 +84,27 @@ class Render:
 
 
 if __name__ == '__main__':
-    render_path = join('src', 'editor')
-    renders = {r: Render(os.path.join(render_path, r)) for r in os.listdir(render_path) if not r.endswith('.js')}
+    renderer_path = join('src', 'editor')
+    renderers = {r: Renderer(os.path.join(renderer_path, r)) for r in os.listdir(renderer_path) if not r.endswith('.js')}
     cls = False
 
     while True:
-        for path, render in renders.copy().items():
-            if not os.path.exists(os.path.join(render_path, path)):
-                renders.pop(path)
+        for path, renderer in renderers.copy().items():
+            if not os.path.exists(os.path.join(renderer_path, path)):
+                renderers.pop(path)
                 continue
 
             try:
-                render.run()
+                renderer.run()
             except (RuntimeError, FileNotFoundError):
                 pass
 
-        for path in os.listdir(render_path):
-            if path not in renders and not path.endswith('.js'):
-                render = Render(os.path.join(render_path, path))
-                renders[path] = render
+        for path in os.listdir(renderer_path):
+            if path not in renderers and not path.endswith('.js'):
+                renderer = Renderer(os.path.join(renderer_path, path))
+                renderers[path] = renderer
                 try:
-                    render.run()
+                    renderer.run()
                 except RuntimeError:
                     pass
 

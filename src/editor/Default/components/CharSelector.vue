@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { t } from '@/lib/lang/translate'
 import { chars, avatars } from '@/lib/data'
 
 const props = defineProps({
@@ -8,7 +9,7 @@ const props = defineProps({
     select: null,
     placeholder: {
         type: String,
-        default: '角色'
+        default: null
     }
 })
 const emit = defineEmits([
@@ -25,6 +26,7 @@ const modelValue = computed({
         return props.modelValue
     },
     set (value) {
+        t.value.noun.character += '1'
         emit('update:modelValue', value)
     }
 })
@@ -40,7 +42,7 @@ onMounted(() => {
             v-model="modelValue"
             ref="select"
             style="flex-grow: 1;"
-            :placeholder="props.placeholder"
+            :placeholder="props.placeholder || t.noun.character"
             filterable>
         <el-option
                 v-for="(char, id) in chars"
@@ -56,7 +58,7 @@ onMounted(() => {
         </el-option>
         <el-option v-if="props.narration"
                    key=""
-                   label="旁白"
+                   :label="t.noun.narration"
                    value=""
         />
     </el-select>

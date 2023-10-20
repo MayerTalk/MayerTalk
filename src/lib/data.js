@@ -1,10 +1,12 @@
 import { ref, computed } from 'vue'
+import { t } from '@/lib/lang/translate'
+import { defaultLang } from '@/lib/lang/detect'
 import { StaticUrl } from '@/lib/constance'
 import message from '@/lib/message'
 import { copy, blob2base64, md5, uuid } from '@/lib/tool'
 import DataBase from './db'
 
-const config = ref({ editor: 'Default', render: 'Siracusa' })
+const config = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
 const settings = ref({})
 const chars = ref({})
 const chats = ref([])
@@ -149,7 +151,7 @@ const ImageStorage = class ImageStorage {
                     if (Object.prototype.hasOwnProperty.call(tmp[imageId], 'src')) {
                         if (tmp[imageId].src.indexOf('data:') !== 0) {
                             // 非avatar/(内置)和data:image(b64)视为不安全数据
-                            message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告')
+                            message.confirm(t.value.tip.unsafeImage + imageId + '）', t.value.noun.warning)
                             delete tmp[imageId]
                             throw TypeError
                         }
@@ -157,7 +159,7 @@ const ImageStorage = class ImageStorage {
                         tmp[imageId].indexOf('data:') !== 0) {
                         // 老数据适配
                         // 非avatar/(内置)和data:image(b64)视为不安全数据
-                        message.confirm('导入的文件有不安全图片，请核实来源（图片ID：' + imageId + '）', '警告')
+                        message.confirm(t.value.tip.unsafeImage + imageId + '）', t.value.noun.warning)
                         delete tmp[imageId]
                         throw TypeError
                     }

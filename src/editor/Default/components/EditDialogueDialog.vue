@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue'
+import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
 
-import { dialogWidth, TypeDict, TypeDefault, TypeSeries, MobileView } from '@/lib/constance'
+import { dialogWidth, TypeDefault, TypeSeries, MobileView } from '@/lib/constance'
 import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data'
 import message from '@/lib/message'
 import { copy, uuid, ensureClose, doAfterMounted } from '@/lib/tool'
@@ -72,11 +73,11 @@ function switchEdit (edit) {
 
 function delDialogue () {
     message.confirm(
-        '即将删除该对话',
-        '提示',
+        t.value.notify.whetherToDeleteChat,
+        t.value.noun.hint,
         () => {
             deleteDialogue(currDialogueIndex.value)
-            message.notify('删除成功', message.success)
+            message.notify(t.value.notify.deletedSuccessfully, message.success)
             ifShow.value = false
         }
     )
@@ -84,16 +85,16 @@ function delDialogue () {
 
 function insertDialogue () {
     if (dialogueData.value.char === undefined) {
-        message.notify('请选择角色', message.warning)
+        message.notify(t.value.notify.pleaseSelectCharacter, message.warning)
         return
     }
     if (!dialogueData.value.type) {
-        message.notify('请选择类型', message.warning)
+        message.notify(t.value.notify.pleaseSelectType, message.warning)
         return
     }
     dialogueData.value.id = uuid()
     chats.value.splice(currDialogueIndex.value, 0, copy(dialogueData.value))
-    message.notify('插入成功', message.success)
+    message.notify(t.value.notify.insertedSuccessfully, message.success)
     dialogueData.value = {}
     ifShow.value = false
 }
@@ -105,7 +106,7 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :title="editDialogue?'编辑对话':'插入对话'" :width="dialogWidth"
+    <el-dialog v-model="ifShow" :title="editDialogue?t.action.editChat:t.action.insertChat" :width="dialogWidth"
                @closed="handleClose"
                :before-close="editDialogue?null:ensureClose">
         <component v-if="Editor[dialogueData.type]" :is="Editor[dialogueData.type]" v-model="dialogueData.content"/>
@@ -143,11 +144,11 @@ defineExpose({
             <div style="width: calc(50% - 3px); margin-left: 5px; display: flex">
                 <el-select v-model="dialogueData.type" style="flex-grow: 1"
                            :disabled="['image','option'].indexOf(dialogueData.type) !== -1 && editDialogue"
-                           placeholder="类型"
+                           :placeholder="t.noun.type"
                            @change="handleChangeType"
                 >
                     <el-option
-                        v-for="(text, type) in TypeDict"
+                        v-for="(text, type) in t.name.typeDict"
                         :key="type"
                         :label="text"
                         :value="type"
@@ -158,15 +159,15 @@ defineExpose({
             <div
                 style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
             <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
-                <el-button style="width: 100%" @click="delDialogue">删除</el-button>
-                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">复读</el-button>
-                <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">向上插入
+                <el-button style="width: 100%" @click="delDialogue">{{ t.action.delete }}</el-button>
+                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">{{ t.action.repeat }}</el-button>
+                <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">{{ t.action.insertUp }}
                 </el-button>
             </div>
             <div v-else class="column-display" style="width: 100%; margin-top: 5px">
-                <el-button style="width: 100%" @click="insertDialogue">插入</el-button>
+                <el-button style="width: 100%" @click="insertDialogue">{{ t.action.insert }}</el-button>
                 <el-button style="width: 100%; margin-left: 0"
-                           @click="() => {clearDialogueData();switchEdit(true)}">返回
+                           @click="() => {clearDialogueData();switchEdit(true)}"> {{ t.action.return }}
                 </el-button>
             </div>
         </div>

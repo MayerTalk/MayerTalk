@@ -10,7 +10,7 @@ from typing import Match
 cwd = os.getcwd()
 
 
-class Render:
+class Renderer:
     def __init__(self, path: str):
         self.path = path
         self.scoped_cache = {}
@@ -55,8 +55,8 @@ class Render:
 
 
 if __name__ == '__main__':
-    render_path = os.path.join(cwd, 'src', 'editor')
-    renders = {r: Render(os.path.join(render_path, r)) for r in os.listdir(render_path) if not r.endswith('.js')}
+    renderer_path = os.path.join(cwd, 'src', 'editor')
+    renderers = {r: Renderer(os.path.join(renderer_path, r)) for r in os.listdir(renderer_path) if not r.endswith('.js')}
 
-    for path, render in renders.copy().items():
-        render.run()
+    for path, renderer in renderers.copy().items():
+        renderer.run()

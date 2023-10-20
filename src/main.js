@@ -24,7 +24,7 @@ import {
     Refresh,
     CoffeeCup,
     Notebook
-} from '@element-plus/icons'
+} from '@element-plus/icons-vue'
 
 const app = createApp(App)
 
