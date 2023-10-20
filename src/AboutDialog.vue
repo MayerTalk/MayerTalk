@@ -66,9 +66,9 @@ const t = computed(() => {
         <h2 style="display: inline">MayerTalk(beta)</h2><br/>
         <p>{{ t.about }}</p>
         <p style="display: flex; align-items: center">Github:
-            <el-link href="https://github.com/Arkfans/MayerTalk" type="primary" style="margin-left: 5px"
+            <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin-left: 5px"
                      target="_blank">
-                Arkfans/MayerTalk
+                MayerTalk/MayerTalk
             </el-link>
         </p>
         <p style="display: flex; align-items: center">{{ t.devSite }}:
