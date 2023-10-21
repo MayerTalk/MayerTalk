@@ -25,8 +25,8 @@ function cacheRequest (url, key, cb, versionUrl) {
         })
     }
 
-    const relVersionUrl = versionUrl ||
-        relUrl.split('.').slice(0, relUrl.split('.').length - 1).join('.')
+    const relVersionUrl = versionUrl || 'version/' +
+        relUrl.split('.').slice(0, relUrl.split('.').length - 1).join('.') + '.txt'
 
     fetch(cache)
     staticApi.get({
