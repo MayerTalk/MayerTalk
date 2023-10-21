@@ -1,6 +1,6 @@
 <script setup>
 import { ref, inject, watch, computed } from 'vue'
-import { t } from '@/lib/lang/translate'
+import { t, updateTranslation } from '@/lib/lang/translate'
 import { supportLang } from '@/lib/lang/constant'
 import Editors from '@/editor'
 import Renderers from '@/renderer'
@@ -8,6 +8,7 @@ import message from '@/lib/message'
 import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
 import { downloadData, uploadData } from '@/lib/versionControl'
+
 import { dialogWidth } from '@/lib/constance'
 import {
     config,
@@ -153,7 +154,7 @@ watch(settings, () => sync(), { deep: true })
                 <tr>
                     <th>{{ t.noun.language }}</th>
                     <td>
-                        <el-select v-model="config.lang">
+                        <el-select v-model="config.lang" @change="(lang) => updateTranslation(lang)">
                             <el-option v-for="lang in supportLang" :key="lang" :value="lang" :label="lang"/>
                         </el-select>
                     </td>

@@ -1,10 +1,10 @@
 import { ref } from 'vue'
-import { t } from '@/lib/lang/translate'
 import { copy } from '@/lib/tool'
 
 const tipControl = {
     tip: ref(''),
     cache: [],
+    pool: [],
     until: 0,
     cd: 5000,
     hook: null,
@@ -15,8 +15,6 @@ const tipControl = {
             } else {
                 this.drawTip()
             }
-            t.value.action.hint += '1'
-
             this.hook && this.hook()
         }
         setTimeout(() => {
@@ -28,8 +26,12 @@ const tipControl = {
         this.until = Date.now() + timeout
     },
     reloadTips () {
-        this.cache = copy(t.value.tip.pool)
+        this.cache = copy(this.pool)
         this.drawTip()
+    },
+    setTips (tips) {
+        this.pool = tips
+        this.reloadTips()
     },
     drawTip () {
         const p = Math.floor(Math.random() * this.cache.length) - 1
