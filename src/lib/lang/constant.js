@@ -5,6 +5,14 @@ const supportLang = [
     'ja_JP'
 ]
 
+const langShow = {
+    zh_CN: '简中',
+    zh_TW: '繁中',
+    en_US: 'English',
+    ja_JP: '日本語'
+
+}
+
 const emptyTranslation = {
     notify: {
         cannotDeleteLastOption: '',
@@ -141,5 +149,6 @@ const emptyTranslation = {
 
 export {
     supportLang,
+    langShow,
     emptyTranslation
 }
