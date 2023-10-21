@@ -4,7 +4,7 @@ import { StaticUrl } from '@/lib/constance'
 
 const staticApi = new Request({ host: StaticUrl })
 
-function cacheRequest (url, key, cb, versionUrl) {
+function cacheRequest (url, key, cb, versionUrl = null, fetchFirst = true) {
     // url: 静态站下资源链接& key: localStorage.cache.key& cb: 回调& versionUrl:默认从url中提取
     const name = 'cache.' + key
     const cache = getData(name) || ''
@@ -25,10 +25,10 @@ function cacheRequest (url, key, cb, versionUrl) {
         })
     }
 
-    const relVersionUrl = versionUrl ||
-        relUrl.split('.').slice(0, relUrl.split('.').length - 1).join('.')
+    const relVersionUrl = versionUrl || 'version/' +
+        relUrl.split('.').slice(0, relUrl.split('.').length - 1).join('.') + '.txt'
 
-    fetch(cache)
+    fetchFirst && fetch(cache)
     staticApi.get({
         url: relVersionUrl,
         data: {
@@ -37,7 +37,7 @@ function cacheRequest (url, key, cb, versionUrl) {
         success (resp) {
             if (resp.data !== cache) {
                 saveData(name, resp.data)
-                if (cache) {
+                if (cache || !fetchFirst) {
                     fetch(resp.data)
                 }
             }

@@ -57,66 +57,68 @@ function clearAll () {
 </script>
 
 <template>
-    <div class="drawer" :class="ifShow?'show':''">
-        <div class="bar" @click="$emit('screenshot')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCrop/>
-            </el-icon>
-            {{ t.action.screenshot }}
-        </div>
-        <div class="bar" @click="$emit('showAnnounce')">
-            <el-icon color="lightgrey" :size="35">
-                <IconNotification/>
-            </el-icon>
-            {{ t.noun.announcement }}
-        </div>
-        <div class="bar" @click="toGuide">
-            <el-icon :size="35">
-                <IconNotebook/>
-            </el-icon>
-            {{ t.noun.guide }}
-        </div>
-        <div class="bar" @click="ifShowClear=true">
-            <el-icon color="lightgrey" :size="35">
-                <IconDelete/>
-            </el-icon>
-            {{ t.action.empty }}
-        </div>
-        <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
-            <div style="display: flex; column-gap: 5px">
-                <el-button size="large" style="width: 100%;" @click="clearChats">{{ t.noun.chat }}</el-button>
-                <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{ t.noun.all }}</el-button>
+    <div class="drawer">
+        <div class="container" :class="ifShow?'show':''">
+            <div class="bar" @click="$emit('screenshot')">
+                <el-icon color="lightgrey" :size="35">
+                    <IconCrop/>
+                </el-icon>
+                {{ t.action.screenshot }}
             </div>
-        </el-dialog>
-        <div class="bar" @click="DataControl.withdraw">
-            <el-icon color="lightgrey" :size="35">
-                <IconBack/>
-            </el-icon>
-            {{ t.action.withdraw }}
-        </div>
-        <div class="bar" @click="DataControl.redo">
-            <el-icon color="lightgrey" :size="35">
-                <IconRight/>
-            </el-icon>
-            {{ t.action.redo }}
-        </div>
-        <div class="bar" @click="$emit('showNavigation')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCompass/>
-            </el-icon>
-            {{ t.action.goto }}
-        </div>
-        <div class="bar" @click="$emit('showSettings')">
-            <el-icon color="lightgrey" :size="35">
-                <IconSetting/>
-            </el-icon>
-            {{ t.noun.settings }}
-        </div>
-        <div class="bar" @click="$emit('showAbout')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCoffeeCup/>
-            </el-icon>
-            {{ t.noun.about }}
+            <div class="bar" @click="$emit('showAnnounce')">
+                <el-icon color="lightgrey" :size="35">
+                    <IconNotification/>
+                </el-icon>
+                {{ t.noun.announcement }}
+            </div>
+            <div class="bar" @click="toGuide">
+                <el-icon :size="35">
+                    <IconNotebook/>
+                </el-icon>
+                {{ t.noun.guide }}
+            </div>
+            <div class="bar" @click="ifShowClear=true">
+                <el-icon color="lightgrey" :size="35">
+                    <IconDelete/>
+                </el-icon>
+                {{ t.action.empty }}
+            </div>
+            <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
+                <div style="display: flex; column-gap: 5px">
+                    <el-button size="large" style="width: 100%;" @click="clearChats">{{ t.noun.chat }}</el-button>
+                    <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{ t.noun.all }}</el-button>
+                </div>
+            </el-dialog>
+            <div class="bar" @click="DataControl.withdraw">
+                <el-icon color="lightgrey" :size="35">
+                    <IconBack/>
+                </el-icon>
+                {{ t.action.withdraw }}
+            </div>
+            <div class="bar" @click="DataControl.redo">
+                <el-icon color="lightgrey" :size="35">
+                    <IconRight/>
+                </el-icon>
+                {{ t.action.redo }}
+            </div>
+            <div class="bar" @click="$emit('showNavigation')">
+                <el-icon color="lightgrey" :size="35">
+                    <IconCompass/>
+                </el-icon>
+                {{ t.action.goto }}
+            </div>
+            <div class="bar" @click="$emit('showSettings')">
+                <el-icon color="lightgrey" :size="35">
+                    <IconSetting/>
+                </el-icon>
+                {{ t.noun.settings }}
+            </div>
+            <div class="bar" @click="$emit('showAbout')">
+                <el-icon color="lightgrey" :size="35">
+                    <IconCoffeeCup/>
+                </el-icon>
+                {{ t.noun.about }}
+            </div>
         </div>
     </div>
     <Transition name="fade">
@@ -126,20 +128,29 @@ function clearAll () {
 
 <style scoped>
 .drawer {
-    width: 80px;
     height: 100%;
     position: fixed;
-    right: -100px;
-    background: #606060;
-    border-left: grey solid 1px;
-    transition: right ease 0.5s;
     z-index: 404;
-    padding: 5px;
-    user-select: none;
+    right: 0;
+    pointer-events: none;
 }
 
-.drawer.show {
-    right: 0;
+.container {
+    pointer-events: auto;
+    background: #606060;
+    min-width: 70px;
+    user-select: none;
+    height: 100%;
+    border-left: grey solid 1px;
+    padding: 5px;
+    width: 100%;
+    position: relative;
+    right: -105%;
+    transition: right ease 0.6s;
+}
+
+.container.show {
+    right: 11px;
 }
 
 .drawer .bar {

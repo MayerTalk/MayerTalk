@@ -2,7 +2,7 @@ import { ref } from 'vue'
 
 import Request from '@/lib/request'
 import { cacheRequest } from '@/lib/cacheRequest'
-import { copy, getData, saveData } from '@/lib/tool'
+import { copy } from '@/lib/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
@@ -43,7 +43,7 @@ function loadChar (series) {
             data.series = series
             CharDict[charId] = data
         }
-    }, 'version/' + series + '.txt')
+    })
 }
 
 // const seriesSort = {

@@ -1,13 +1,14 @@
 <script setup>
 import { ref, inject, watch, computed } from 'vue'
-import { t } from '@/lib/lang/translate'
-import { supportLang } from '@/lib/lang/constant'
+import { t, updateTranslation } from '@/lib/lang/translate'
+import { supportLang, langShow } from '@/lib/lang/constant'
 import Editors from '@/editor'
 import Renderers from '@/renderer'
 import message from '@/lib/message'
 import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
 import { downloadData, uploadData } from '@/lib/versionControl'
+
 import { dialogWidth } from '@/lib/constance'
 import {
     config,
@@ -153,8 +154,8 @@ watch(settings, () => sync(), { deep: true })
                 <tr>
                     <th>{{ t.noun.language }}</th>
                     <td>
-                        <el-select v-model="config.lang">
-                            <el-option v-for="lang in supportLang" :key="lang" :value="lang" :label="lang"/>
+                        <el-select v-model="config.lang" @change="(lang) => updateTranslation(lang)">
+                            <el-option v-for="lang in supportLang" :key="lang" :value="lang" :label="langShow[lang]"/>
                         </el-select>
                     </td>
                 </tr>
@@ -219,13 +220,13 @@ watch(settings, () => sync(), { deep: true })
                 <div class="line-right"></div>
             </div>
             <div style="margin: 5px 0 10px 10px">
-                <el-button @click="downloadData">
+                <el-button @click="downloadData" style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
                         <IconDownload/>
                     </el-icon>
                     {{ t.action.export }}
                 </el-button>
-                <el-button @click="clickBySelector('#uploadData > div > input')">
+                <el-button @click="clickBySelector('#uploadData > div > input')" style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
                         <IconUpload/>
                     </el-icon>
@@ -240,7 +241,7 @@ watch(settings, () => sync(), { deep: true })
                     >
                     </el-upload>
                 </el-button>
-                <el-button @click="() => {ifShow=false; $emit('showSavefile')}">
+                <el-button @click="() => {ifShow=false; $emit('showSavefile')}" style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
                         <IconCollection/>
                     </el-icon>
