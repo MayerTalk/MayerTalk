@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+
 import { saveData, getData } from '@/lib/tool'
 import { cacheRequest } from '@/lib/cacheRequest'
 import { emptyTranslation } from '@/lib/lang/constant'
@@ -14,17 +15,30 @@ function setTranslation (data) {
     tipControl.setTips(data.tip.pool)
 }
 
-function updateTranslation (lang, firstUpdate = false) {
+function updateTranslation (lang, firstUpdate = false, retry = true) {
     if (firstUpdate || getData(cacheKey + lang)) {
         setTranslation(getData(cacheKey + lang) || emptyTranslation)
     }
-    cacheRequest('translation/' + lang, 'translation.' + lang, (result) => {
+    cacheRequest('translation/' + lang, 'translation.' + lang, (result, success) => {
+        if (!success) {
+            retry && setTimeout(() => {
+                updateTranslation(lang, firstUpdate, false)
+            }, 100)
+        }
         setTranslation(result.data)
         saveData(cacheKey + lang, result.data)
     }, null, !getData(cacheKey + lang))
 }
 
 updateTranslation(config.lang, true)
+
+setTimeout(() => {
+    if (translate.value.empty) {
+        // retry
+        console.log('1')
+        updateTranslation(config.lang, true)
+    }
+}, 1000)
 
 export {
     translate as t,

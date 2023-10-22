@@ -14,6 +14,7 @@ const langShow = {
 }
 
 const emptyTranslation = {
+    empty: true,
     notify: {
         cannotDeleteLastOption: '',
         pleaseEnterTextInTheInputBox: '',
@@ -54,6 +55,7 @@ const emptyTranslation = {
     action: {
         add: '',
         create: '',
+        delete: '',
         createOption: '',
         repeat: '',
         cancel: '',
