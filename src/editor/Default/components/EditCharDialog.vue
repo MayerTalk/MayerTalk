@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import SelectCharDialog from './SelectCharDialog.vue'
 
-import { dialogWidth, StaticUrl, MobileView } from '@/lib/constance'
+import { dialogWidth, StaticUrl, IsMobile } from '@/lib/constance'
 import { DataControl, images, currCharId, currCharData } from '@/lib/data'
 import message from '@/lib/message'
 import { blob2url, image2square, doAfterMounted } from '@/lib/tool'
@@ -29,7 +29,7 @@ function open (create) {
         return
     }
     ifShow.value = true
-    if (!MobileView) {
+    if (!IsMobile) {
         doAfterMounted(inputRef, (r) => {
             r.value.focus()
         })
@@ -77,9 +77,6 @@ function editChar () {
         ifShow.value = false
         charData.value = {}
         message.notify(t.value.notify.createdSuccessfully, message.success)
-        if (!MobileView) {
-            document.getElementById('textarea').focus()
-        }
     } else {
         message.confirm(
             t.value.notify.whetherToDeleteCharacter,

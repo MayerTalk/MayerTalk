@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { StaticUrl, dialogWidth, MobileView } from '@/lib/constance'
+import { StaticUrl, dialogWidth, IsMobile } from '@/lib/constance'
 import { searchCharHandler, searchResult, loadChar, CharDict, Suffix } from '@/lib/character'
 import { doAfterMounted } from '@/lib/tool'
 
@@ -39,7 +39,7 @@ function initSearchChar () {
 }
 
 function autoFocus () {
-    if (!MobileView) {
+    if (!IsMobile) {
         doAfterMounted(inputRef, (r) => {
             setTimeout(() => {
                 r.value.focus()

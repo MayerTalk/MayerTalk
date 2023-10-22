@@ -15,7 +15,9 @@ import NavigationBar from './components/NavigationBar.vue'
 import {
     downloadImage,
     clickBySelector,
-    getDialogue, copy
+    getDialogue,
+    copy,
+    Textarea
 } from '@/lib/tool'
 import {
     windowWidth,
@@ -420,7 +422,7 @@ function screenshot (ensure = false) {
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35"
                                          style="margin-right: 5px; position: relative" :style="arrowStyle"
-                                         @click="() => {ifShowMoreType = !ifShowMoreType; roll360()}">
+                                         @click="ifShowMoreType = !ifShowMoreType; roll360(); Textarea.focus()">
                                     <IconArrowUp/>
                                 </el-icon>
                                 <el-icon @click="createTextDialogue('monologue')" color="#707070" :size="35">

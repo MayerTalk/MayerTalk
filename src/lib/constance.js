@@ -24,7 +24,9 @@ const defaultWidth = 520
 // #21 后 document.body.clientWidth 比实际视窗小（Why？）
 const windowWidth = Math.min(defaultWidth, window.innerWidth)
 const dialogWidth = Math.ceil(windowWidth * 0.9)
+const WindowHeight = window.innerHeight
 const MobileView = !(window.innerWidth - defaultWidth > 250)
+const IsMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
 
 export {
     StaticUrl,
@@ -32,5 +34,7 @@ export {
     TypeSeries,
     windowWidth,
     dialogWidth,
-    MobileView
+    MobileView,
+    WindowHeight,
+    IsMobile
 }

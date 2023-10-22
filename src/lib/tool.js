@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import md5 from 'blueimp-md5'
 import html2canvas from 'html2canvas'
 import message from './message'
+import { WindowHeight, IsMobile } from '@/lib/constance'
 
 function copy (obj) {
     return JSON.parse(JSON.stringify(obj))
@@ -134,6 +135,16 @@ function formatSize (size, unit = SizeUnit[0]) {
     return size.toFixed(2) + unit
 }
 
+const Textarea = {
+    focus () {
+        // message.notify(Date.now() - this.lastFocusout)
+        if (!IsMobile || WindowHeight - window.innerHeight > 100) {
+            // 非手机(自动focus) or 输入法唤起状态(保持输入法唤起)
+            document.getElementById('textarea').focus()
+        }
+    }
+}
+
 export {
     md5,
     copy,
@@ -150,5 +161,6 @@ export {
     clickBySelector,
     getDialogue,
     doAfterMounted,
+    Textarea,
     formatSize
 }
