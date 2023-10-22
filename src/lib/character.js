@@ -262,6 +262,8 @@ function parseSearch (search) {
     search = search.replaceAll('\'', '')
     // “6/MSP” 不清楚此字符为何，但出现在部分输入法拼音输入阶段
     search = search.replaceAll(' ', '')
+    // 全宽拉丁处理
+    search = fullWidth2HalfLatin(search)
     return search
 }
 
@@ -272,7 +274,7 @@ function searchCharHandler (search) {
     const t = Date.now()
     searchResultFullShow = t
     if (search) {
-        const searchLower = fullWidth2HalfLatin(search).toLowerCase()
+        const searchLower = search.toLowerCase()
         const list = []
         for (const charId in CharDict) {
             if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
