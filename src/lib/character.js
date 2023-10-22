@@ -4,6 +4,7 @@ import Request from '@/lib/request'
 import { cacheRequest } from '@/lib/cacheRequest'
 import { copy } from '@/lib/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
+import { config } from '@/lib/data'
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 
@@ -289,7 +290,7 @@ function searchCharHandler (search) {
                 }
             }
         }
-        const manager = new SearchManager(search, t, list)
+        const manager = new SearchManager(search, t, list, config.value.lang)
         manager.run()
     } else {
         AliasAddition.value = []
