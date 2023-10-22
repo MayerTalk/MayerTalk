@@ -54,6 +54,7 @@ const emptyTranslation = {
     action: {
         add: '',
         create: '',
+        delete: '',
         createOption: '',
         repeat: '',
         cancel: '',
