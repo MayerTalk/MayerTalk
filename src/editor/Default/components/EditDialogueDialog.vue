@@ -4,7 +4,7 @@ import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
 
-import { dialogWidth, TypeDefault, TypeSeries, MobileView } from '@/lib/constance'
+import { dialogWidth, TypeDefault, TypeSeries, IsMobile } from '@/lib/constance'
 import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data'
 import message from '@/lib/message'
 import { copy, uuid, ensureClose, doAfterMounted } from '@/lib/tool'
@@ -28,7 +28,7 @@ function open (index) {
     dialogueData.value = currDialogueData.value
     currType = dialogueData.value.type
     ifShow.value = true
-    if (TypeSeries[dialogueData.value.type] === 'text' && !MobileView) {
+    if (TypeSeries[dialogueData.value.type] === 'text' && !IsMobile) {
         doAfterMounted(inputRef, (r) => {
             r.value.focus()
         })

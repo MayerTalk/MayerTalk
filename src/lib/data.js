@@ -3,7 +3,7 @@ import { t } from '@/lib/lang/translate'
 import { defaultLang } from '@/lib/lang/detect'
 import { StaticUrl } from '@/lib/constance'
 import message from '@/lib/message'
-import { copy, blob2base64, md5, uuid } from '@/lib/tool'
+import { copy, blob2base64, md5, uuid, Textarea } from '@/lib/tool'
 import DataBase from './db'
 
 const config = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
@@ -398,7 +398,7 @@ const DataControl = {
                 currCharData.value = {}
             }
             if (!force) {
-                document.getElementById('textarea').focus()
+                Textarea.focus()
             }
             return id !== currCharId.value
         },

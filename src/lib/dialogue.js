@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { uuid } from '@/lib/tool'
+import { Textarea, uuid } from '@/lib/tool'
 import message from '@/lib/message'
 import tipControl from '@/lib/tip'
 import {
@@ -51,6 +51,7 @@ function createTextDialogue (type, config = {}) {
             content: textarea.value,
             type
         }, config)
+        Textarea.focus()
         textarea.value = ''
     } else {
         message.notify(t.value.notify.pleaseEnterTextInTheInputBox, message.info)
