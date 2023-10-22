@@ -21,7 +21,7 @@ function updateTranslation (lang, firstUpdate = false) {
     cacheRequest('translation/' + lang, 'translation.' + lang, (result) => {
         setTranslation(result.data)
         saveData(cacheKey + lang, result.data)
-    }, null, false)
+    }, null, !getData(cacheKey + lang))
 }
 
 updateTranslation(config.lang, true)
