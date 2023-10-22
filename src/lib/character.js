@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 
 import Request from '@/lib/request'
+import { cacheRequest } from '@/lib/cacheRequest'
 import { copy } from '@/lib/tool'
-import { StaticUrl } from '@/lib/constance'
+import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 
-const request = new Request({ host: StaticUrl })
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 
 const CharDict = {}
@@ -26,29 +26,22 @@ function loadChar (series) {
     if (loaded.indexOf(series) !== -1) {
         return
     }
-    request.get({
-        url: 'version/' + series + '.txt?t=' + Date.now(),
-        success: (resp) => {
-            request.get({
-                url: 'char/' + series + '.json?v=' + resp.data,
-                success: (resp) => {
-                    loaded.push(series)
-                    for (const charId in resp.data) {
-                        if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
-                            continue
-                        }
-                        const data = resp.data[charId]
-                        for (const avatarId in data.avatars) {
-                            if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
-                                continue
-                            }
-                            data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
-                        }
-                        data.series = series
-                        CharDict[charId] = data
-                    }
+
+    cacheRequest('char/' + series, 'characterVersion.' + series, (resp) => {
+        loaded.indexOf(series) === -1 && loaded.push(series)
+        for (const charId in resp.data) {
+            if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
+                continue
+            }
+            const data = resp.data[charId]
+            for (const avatarId in data.avatars) {
+                if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
+                    continue
                 }
-            })
+                data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
+            }
+            data.series = series
+            CharDict[charId] = data
         }
     })
 }
@@ -100,6 +93,15 @@ function firstSort (a, b, lang) {
 const sortDict = {
     // 语种特殊排序
     zh_CN: (a, b) => {
+        const A = a.names.fpy
+        const B = b.names.fpy
+        if (A === B) {
+            return 0
+        } else {
+            return A > B ? 1 : -1
+        }
+    },
+    zh_TW: (a, b) => {
         const A = a.names.fpy
         const B = b.names.fpy
         if (A === B) {
@@ -270,7 +272,7 @@ function searchCharHandler (search) {
     const t = Date.now()
     searchResultFullShow = t
     if (search) {
-        const searchLower = search.toLowerCase()
+        const searchLower = fullWidth2HalfLatin(search).toLowerCase()
         const list = []
         for (const charId in CharDict) {
             if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {

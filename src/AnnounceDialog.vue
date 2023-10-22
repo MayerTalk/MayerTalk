@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { saveData, getData } from './lib/tool'
-import { Location } from '@element-plus/icons'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'showGuide'])
@@ -19,9 +18,9 @@ const version = 'v0.1.8'
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
-    if (getData('a_version') !== version) {
+    if (getData('cache.announcementVersion') !== version) {
         emit('update:modelValue', true)
-        saveData('a_version', version)
+        saveData('cache.announcementVersion', version)
     } else if (invalidBrowser) {
         emit('update:modelValue', true)
     }
@@ -72,7 +71,7 @@ const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
                 交流群：560295639
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="https://github.com/Arkfans/MayerTalk" type="primary" style="margin: 0 5px;" target="_blank">
+            <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;" target="_blank">
                 Github
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>

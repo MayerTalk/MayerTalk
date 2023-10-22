@@ -1,3 +1,4 @@
+import { t } from '@/lib/lang/translate'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 export default {
@@ -15,7 +16,7 @@ export default {
         )
     },
     confirm (text,
-        title = '提示',
+        title = t.value.noun.hint,
         confirm,
         cancel,
         type = this.warning) {
@@ -23,8 +24,8 @@ export default {
             .confirm(text, title,
                 {
                     type,
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消'
+                    confirmButtonText: t.value.action.confirm,
+                    cancelButtonText: t.value.action.cancel
                 }
             )
             .then(confirm || null)

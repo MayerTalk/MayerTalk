@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 
 import { textarea } from '@/lib/dialogue'
@@ -62,7 +63,7 @@ defineExpose({
 
 <template>
     <el-dialog v-model="ifShow" :width="dialogWidth"
-               title="想@哪个角色?"
+               :title="t.notify.wantToAtWhichCharacter"
                :modal="false">
         <CharSelector v-model="atWho"
                       v-model:select="atWhoSelRef"

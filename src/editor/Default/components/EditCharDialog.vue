@@ -1,8 +1,9 @@
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
+import { t } from '@/lib/lang/translate'
 import SelectCharDialog from './SelectCharDialog.vue'
 
-import { dialogWidth, StaticUrl, MobileView } from '@/lib/constance'
+import { dialogWidth, StaticUrl, IsMobile } from '@/lib/constance'
 import { DataControl, images, currCharId, currCharData } from '@/lib/data'
 import message from '@/lib/message'
 import { blob2url, image2square, doAfterMounted } from '@/lib/tool'
@@ -24,11 +25,11 @@ function open (create) {
     } else if (currCharId.value) {
         charData.value = currCharData.value
     } else {
-        message.notify('请选择角色', message.warning)
+        message.notify(t.value.notify.pleaseSelectCharacter, message.warning)
         return
     }
     ifShow.value = true
-    if (!MobileView) {
+    if (!IsMobile) {
         doAfterMounted(inputRef, (r) => {
             r.value.focus()
         })
@@ -66,7 +67,7 @@ function editChar () {
     // 创建/删除角色
     if (createChar.value) {
         if (charData.value.name === '' && !defaultName.value) {
-            message.notify('名字是必须的', message.error)
+            message.notify(t.value.notify.nameIsRequired, message.error)
             return
         }
         if (charData.value.name === '') {
@@ -75,18 +76,15 @@ function editChar () {
         DataControl.curr.setChar(DataControl.char.new(charData.value))
         ifShow.value = false
         charData.value = {}
-        message.notify('创建成功', message.success)
-        if (!MobileView) {
-            document.getElementById('textarea').focus()
-        }
+        message.notify(t.value.notify.createdSuccessfully, message.success)
     } else {
         message.confirm(
-            '即将删除该角色',
-            '提示',
+            t.value.notify.whetherToDeleteCharacter,
+            t.value.noun.hint,
             () => {
                 DataControl.char.delete(currCharId.value)
                 DataControl.curr.setChar('', true)
-                message.notify('删除成功', message.success)
+                message.notify(t.value.notify.deletedSuccessfully, message.success)
                 ifShow.value = false
             }
         )
@@ -118,7 +116,7 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :title="createChar?'创建新角色':'编辑角色'" :width="dialogWidth"
+    <el-dialog v-model="ifShow" :title="createChar?t.action.createCharacter:t.action.editCharacter" :width="dialogWidth"
                @closed="() => {DataControl.save('chars'); clearCharData()}">
         <div style="display: flex; flex-wrap: wrap">
             <div style="width: 100%; display: flex;">
@@ -138,15 +136,15 @@ defineExpose({
                     </div>
                 </el-upload>
                 <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
-                    名称：
+                    {{ t.noun.name }}：
                     <el-input v-model="charData.name" style="margin-top: 10px" :placeholder="defaultName" ref="inputRef"
                               @keypress.enter="handleInputEnter"></el-input>
                     <div style="margin-top: 5px">
-                        头像位置
+                        {{ t.noun.avatarPosition }}
                         <el-switch
                             v-model="charData.right"
-                            active-text="右"
-                            inactive-text="左"
+                            :active-text="t.noun.left"
+                            :inactive-text="t.noun.right"
                             style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff"
                         ></el-switch>
                     </div>
@@ -154,10 +152,10 @@ defineExpose({
             </div>
             <div style="width: 100%; margin-top: 10px">
                 <el-button style="width: 60%" @click="ifShowSelectChar=true">
-                    从素材库中选择角色
+                    {{ t.action.chooseCharacterFromLibrary }}
                 </el-button>
                 <el-button style="width: calc(40% - 12px)" @click="editChar">
-                    {{ createChar ? '创建' : '删除' }}
+                    {{ createChar ? t.action.create : t.action.delete }}
                 </el-button>
             </div>
         </div>

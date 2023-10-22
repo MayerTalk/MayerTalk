@@ -6,14 +6,14 @@ import plus1 from '@/lib/plus1'
 import { chats } from '@/lib/data'
 
 const width = inject('width')
-const renderSettings = inject('renderSettings')
+const rendererSettings = inject('rendererSettings')
 
 defineEmits(['edit', 'delete', 'plus1'])
 </script>
 
 <template>
     <div class="window" id="window"
-         :style="{width: width.window+'px', background: renderSettings.background}"
+         :style="{width: width.window+'px', background: rendererSettings.background}"
     >
         <Dialogue v-for="(dialogue, index) in chats"
                   @edit="args => $emit('edit',args)"
@@ -25,4 +25,4 @@ defineEmits(['edit', 'delete', 'plus1'])
 
 </template>
 
-<style src="./style/render.css" scoped/>
+<style src="./style/renderer.css" scoped/>

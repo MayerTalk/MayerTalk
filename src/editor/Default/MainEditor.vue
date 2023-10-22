@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
-import Renders from '@/render'
+import { t } from '@/lib/lang/translate'
+import Renderers from '@/renderer'
 import SideBar from './components/SideBar.vue'
 import Settings from './components/SettingDialog.vue'
 import Savefile from './components/SavefileDialog.vue'
@@ -14,7 +15,9 @@ import NavigationBar from './components/NavigationBar.vue'
 import {
     downloadImage,
     clickBySelector,
-    getDialogue, copy
+    getDialogue,
+    copy,
+    Textarea
 } from '@/lib/tool'
 import {
     windowWidth,
@@ -67,7 +70,7 @@ document.addEventListener('keydown', event => {
         } else if (event.code === 'KeyE') {
             event.preventDefault()
             if (!currCharId.value) {
-                message.notify('请选择角色', message.warning)
+                message.notify(t.value.notify.pleaseSelectCharacter, message.warning)
                 return
             }
             EditChar.value.open(false)
@@ -84,9 +87,9 @@ const ifShowAbout = inject('ifShowAbout')
 const ifShowSettings = inject('ifShowSettings')
 const ifShowSavefile = ref(false)
 const ifShowCopy = ref(false)
-const renderSettings = ref({})
+const rendererSettings = ref({})
 const width = ref({})
-provide('renderSettings', renderSettings)
+provide('rendererSettings', rendererSettings)
 provide('width', width)
 provide('dialogWidth', dialogWidth)
 
@@ -117,10 +120,10 @@ const ResizeWindow = {
         fontsize: 16
     },
     resize () {
-        const max = renderSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
+        const max = rendererSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
         if (preScreenshot.value) {
             width.value.window = max
-            width.value.image = renderSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
+            width.value.image = rendererSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
             const w = Math.min(max, window.innerWidth)
@@ -146,7 +149,7 @@ watch(charDirection, () => {
     ResizeWindow.resize()
 })
 watch(() => {
-    return renderSettings.value.width
+    return rendererSettings.value.width
 }, () => {
     ResizeWindow.resize()
 })
@@ -238,7 +241,7 @@ const scrollHeight = ref(window.innerHeight - 90 + 'px')
 function getScreenshotGroup () {
     const totalHeight = (document.getElementById('window').scrollHeight - 30)
     // 缩小比例后实际 maxHeight
-    let maxHeight = renderSettings.value.maxHeight / renderSettings.value.scale - 30
+    let maxHeight = rendererSettings.value.maxHeight / rendererSettings.value.scale - 30
     maxHeight = maxHeight < 0 ? 0 : maxHeight
     if (totalHeight < maxHeight || chats.value.length < 2) {
         // 无需裁分
@@ -322,7 +325,7 @@ function screenshot (ensure = false) {
     const group = getScreenshotGroup()
     if (group) {
         if (group.length > 10 && !ensure) {
-            message.confirm('截图数量超过10张，是否继续截屏', '提示', () => {
+            message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 screenshot(true)
             })
             return
@@ -331,13 +334,13 @@ function screenshot (ensure = false) {
         const chatsData = copy(chats.value)
         const next = (i) => {
             if (i > group.length) {
-                message.notify('截图完成，正在恢复，请耐心等待', message.success)
+                message.notify(t.value.notify.screenshottedCompletely, message.success)
                 preScreenshot.value = false
                 node.style.height = null
                 setTimeout(() => {
                     chats.value = chatsData
                     setTimeout(() => {
-                        message.notify('恢复成功', message.success)
+                        message.notify(t.value.notify.recoveredSuccessfully, message.success)
                         ResizeWindow.resize()
                     }, 50)
                 }, 500)
@@ -351,16 +354,16 @@ function screenshot (ensure = false) {
                 setTimeout(() => {
                     downloadImage(node, {
                         windowWidth: width.value.window + 20,
-                        scale: renderSettings.value.scale,
+                        scale: rendererSettings.value.scale,
                         useCORS: true
                     }, () => {
-                        message.notify('截图成功 [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
+                        message.notify(t.value.notify.screenshottedCompletely + ' [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
                         next(i + 1)
                     }, seq + (i + 1))
                 }, 100)
             }, 100)
         }
-        message.notify('正在开始截图，长截图初始化时间较长，请耐心等待', message.warning)
+        message.notify(t.value.notify.startToScreenshot, message.warning)
         setTimeout(() => {
             next(0)
         }, 500)
@@ -371,7 +374,7 @@ function screenshot (ensure = false) {
             setTimeout(() => {
                 downloadImage(node, {
                     windowWidth: width.value.window + 20,
-                    scale: renderSettings.value.scale,
+                    scale: rendererSettings.value.scale,
                     useCORS: true
                 }, () => {
                     preScreenshot.value = false
@@ -387,9 +390,9 @@ function screenshot (ensure = false) {
 </script>
 
 <template>
-    <div :class="renderSettings.style">
-        <div class="render">
-            <div id="body" :style="{background: renderSettings.background}">
+    <div :class="rendererSettings.style">
+        <div class="renderer">
+            <div id="body" :style="{background: rendererSettings.background}">
                 <NavigationBar ref="NavigationBarRef"/>
                 <Settings
                     @resizeWindow="() => {ResizeWindow.resize()}"
@@ -411,7 +414,7 @@ function screenshot (ensure = false) {
                 />
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">
-                        <component :is="Renders[config.render]"
+                        <component :is="Renderers[config.renderer]"
                                    @edit="(index) => {EditDialogue.open(index)}"
                                    @delete="deleteDialogue"
                                    @plus1="copyDialogue"/>
@@ -419,7 +422,7 @@ function screenshot (ensure = false) {
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35"
                                          style="margin-right: 5px; position: relative" :style="arrowStyle"
-                                         @click="() => {ifShowMoreType = !ifShowMoreType; roll360()}">
+                                         @click="ifShowMoreType = !ifShowMoreType; roll360(); Textarea.focus()">
                                     <IconArrowUp/>
                                 </el-icon>
                                 <el-icon @click="createTextDialogue('monologue')" color="#707070" :size="35">
@@ -448,19 +451,19 @@ function screenshot (ensure = false) {
                                     <el-icon color="#707070" :size="35">
                                         <IconPicture/>
                                     </el-icon>
-                                    图片
+                                    {{ t.name.typeDict.image }}
                                 </div>
                                 <div class="block" @click="CreateOption.open">
                                     <el-icon color="#707070" :size="35">
                                         <IconOperation/>
                                     </el-icon>
-                                    选项
+                                    {{ t.name.typeDict.option }}
                                 </div>
                                 <div class="block" @click="createTextDialogue('select')">
                                     <el-icon color="#707070" :size="35">
                                         <IconEdit/>
                                     </el-icon>
-                                    选择
+                                    {{ t.name.typeDict.select }}
                                 </div>
                                 <div class="block" @click="createTextDialogue('title')">
                                     <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
@@ -469,7 +472,7 @@ function screenshot (ensure = false) {
                                             d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
                                             fill="#707070"></path>
                                     </svg>
-                                    标题
+                                    {{ t.name.typeDict.title }}
                                 </div>
                             </div>
                             <div class="char-bar">

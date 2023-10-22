@@ -8,7 +8,7 @@
  
  - [指南](https://www.mayertalk.top/docs/guide/start.html)
  - [更新日志](https://www.mayertalk.top/docs/about/change_log.html)
- - [开发计划](https://github.com/orgs/Arkfans/projects/2/views/1)
+ - [开发计划](https://github.com/orgs/MayerTalk/projects/2/views/1)
 
  ## 特色功能
  

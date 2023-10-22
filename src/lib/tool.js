@@ -1,7 +1,9 @@
+import { t } from '@/lib/lang/translate'
 import { v4 as uuid } from 'uuid'
 import md5 from 'blueimp-md5'
 import html2canvas from 'html2canvas'
 import message from './message'
+import { WindowHeight, IsMobile } from '@/lib/constance'
 
 function copy (obj) {
     return JSON.parse(JSON.stringify(obj))
@@ -47,7 +49,7 @@ function downloadImage (node, options, callback, seq = null) {
             callback && callback()
         }, 'image/jpeg')
     }).catch(reason => {
-        message.confirm(reason + '，如果可以，请截图此页面，并加入交流群反馈 (๑╹◡╹)ﾉ"""', '工口发生')
+        message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)
     })
 }
 
@@ -90,13 +92,13 @@ function image2square (image) {
 }
 
 function ensure (done, text) {
-    message.confirm(text, '提示', () => {
+    message.confirm(text, t.value.noun.hint, () => {
         done()
     })
 }
 
 function ensureClose (done) {
-    ensure(done, '是否退出编辑')
+    ensure(done, t.value.notify.whetherQuitEditing)
 }
 
 function clickBySelector (selector) {
@@ -133,6 +135,16 @@ function formatSize (size, unit = SizeUnit[0]) {
     return size.toFixed(2) + unit
 }
 
+const Textarea = {
+    focus () {
+        // message.notify(Date.now() - this.lastFocusout)
+        if (!IsMobile || WindowHeight - window.innerHeight > 100) {
+            // 非手机(自动focus) or 输入法唤起状态(保持输入法唤起)
+            document.getElementById('textarea').focus()
+        }
+    }
+}
+
 export {
     md5,
     copy,
@@ -149,5 +161,6 @@ export {
     clickBySelector,
     getDialogue,
     doAfterMounted,
+    Textarea,
     formatSize
 }
