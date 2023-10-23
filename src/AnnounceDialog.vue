@@ -157,8 +157,6 @@ syncTranslation(invalidBrowserTranslate, 'invalid')
 syncTranslation(defaultTranslate, 'default')
 syncTranslation(announcementTranslate, 'announcement')
 
-console.log(translate)
-
 const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
