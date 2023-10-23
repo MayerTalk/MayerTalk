@@ -82,7 +82,7 @@ function loadSave (row) {
                 message.notify(t.value.notify.loadedSuccessfully, message.success)
                 loadData()
             })
-        }, t.value.notify.whetherToReadSavefile + '「' + row.name + '」')
+        }, t.value.notify.whetherToLoadSavefile + '「' + row.name + '」')
     }
 }
 
@@ -124,7 +124,7 @@ loadData()
                             <IconUpload/>
                         </el-icon>
                         <el-icon :size="25" style="cursor: pointer" @click="() => {loadSave(scope.row)}"
-                                 :title="t.action.read">
+                                 :title="t.action.load">
                             <IconDownload/>
                         </el-icon>
                         <el-icon :size="25" style="cursor: pointer" @click="() => {deleteSave(scope.row)}"
