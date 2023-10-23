@@ -41,6 +41,10 @@ function cacheRequest (url, key, cb, versionUrl = null, fetchFirst = true) {
                     fetch(resp.data)
                 }
             }
+        },
+        error (resp) {
+            // 获取版本发生错误，强制更新
+            !fetchFirst && fetch(Date.now() + '')
         }
     })
 }
