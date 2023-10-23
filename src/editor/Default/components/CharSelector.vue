@@ -26,7 +26,6 @@ const modelValue = computed({
         return props.modelValue
     },
     set (value) {
-        t.value.noun.character += '1'
         emit('update:modelValue', value)
     }
 })
