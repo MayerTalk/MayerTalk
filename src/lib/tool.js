@@ -145,6 +145,17 @@ const Textarea = {
     }
 }
 
+function bool (obj) {
+    if (!obj) {
+        return false
+    } else if (obj.length === 0) {
+        return false
+    } else if (Object.keys(obj).length === 0) {
+        return false
+    }
+    return true
+}
+
 export {
     md5,
     copy,
@@ -162,5 +173,6 @@ export {
     getDialogue,
     doAfterMounted,
     Textarea,
-    formatSize
+    formatSize,
+    bool
 }
