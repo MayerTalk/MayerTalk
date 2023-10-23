@@ -3,7 +3,7 @@ import { t } from '@/lib/lang/translate'
 import { defaultLang } from '@/lib/lang/detect'
 import { StaticUrl } from '@/lib/constance'
 import message from '@/lib/message'
-import { copy, blob2base64, md5, uuid, Textarea } from '@/lib/tool'
+import { copy, blob2base64, md5, uuid, Textarea, bool } from '@/lib/tool'
 import DataBase from './db'
 
 const config = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
@@ -60,10 +60,11 @@ const Storage = class Storage {
         try {
             const dataStr = localStorage.getItem('data.' + this.key)
             const data = JSON.parse(dataStr) || copy(this.obj.value)
-            return [data, () => {
-                if (data) {
-                    this.obj.value = data
-                    this.lastSave = dataStr
+            return [data, (newData = null) => {
+                const currData = newData || data
+                if (bool(currData)) {
+                    this.obj.value = currData
+                    this.lastSave = JSON.stringify(currData)
                     this.update = false
                     return true
                 }
