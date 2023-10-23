@@ -64,25 +64,25 @@ function newSave () {
 function syncSave (row) {
     ensure(() => {
         Save.save(row.id, () => {
-            message.notify(t.value.notify.synchronizedSuccessfully, message.success)
+            message.notify(t.value.notify.savedSuccessfully, message.success)
             loadData()
         })
-    }, t.value.notify.whetherToSynchronizeSavefile + '「' + row.name + '」')
+    }, t.value.notify.whetherToSaveSavefile + '「' + row.name + '」')
 }
 
 function loadSave (row) {
     if (Save.saved) {
         Save.load(row.id, () => {
-            message.notify(t.value.notify.importedSuccessfully, message.success)
+            message.notify(t.value.notify.loadedSuccessfully, message.success)
             loadData()
         })
     } else {
         ensure(() => {
             Save.load(row.id, () => {
-                message.notify(t.value.notify.importedSuccessfully, message.success)
+                message.notify(t.value.notify.loadedSuccessfully, message.success)
                 loadData()
             })
-        }, t.value.notify.whetherToImportSavefile + '「' + row.name + '」')
+        }, t.value.notify.whetherToReadSavefile + '「' + row.name + '」')
     }
 }
 
@@ -106,7 +106,10 @@ loadData()
                 <el-button @click="() => {newSave()}">{{ t.action.save }}</el-button>
             </template>
             <template v-else>
-                <el-button style="width: 100%" @click="() => {ifSave=true;savefileName=''}">{{ t.action.save }}</el-button>
+                <el-button style="width: 100%" @click="() => {ifSave=true;savefileName=''}">{{
+                        t.action.createSavefile
+                    }}
+                </el-button>
             </template>
         </div>
         <el-table :data="tableData">
@@ -116,13 +119,16 @@ loadData()
             <el-table-column :label="t.action.operate" :width="90">
                 <template #default="scope">
                     <div style="display: flex; justify-content: right; align-items: center; column-gap: 5px">
-                        <el-icon :size="25" style="cursor: pointer" @click="() => {syncSave(scope.row)}" title="保存">
+                        <el-icon :size="25" style="cursor: pointer" @click="() => {syncSave(scope.row)}"
+                                 :title="t.action.save">
                             <IconUpload/>
                         </el-icon>
-                        <el-icon :size="25" style="cursor: pointer" @click="() => {loadSave(scope.row)}" title="读取">
+                        <el-icon :size="25" style="cursor: pointer" @click="() => {loadSave(scope.row)}"
+                                 :title="t.action.read">
                             <IconDownload/>
                         </el-icon>
-                        <el-icon :size="25" style="cursor: pointer" @click="() => {deleteSave(scope.row)}" title="删除">
+                        <el-icon :size="25" style="cursor: pointer" @click="() => {deleteSave(scope.row)}"
+                                 :title="t.action.delete">
                             <IconDelete/>
                         </el-icon>
                     </div>
@@ -133,7 +139,7 @@ loadData()
 </template>
 
 <style>
-    .el-table__inner-wrapper .cell {
-        padding: 0 5px;
-    }
+.el-table__inner-wrapper .cell {
+    padding: 0 5px;
+}
 </style>
