@@ -19,20 +19,19 @@ const emit = defineEmits([
     'showGuide'
 ])
 
-const select = ref(null)
+const selectRef = ref(null)
 
 const modelValue = computed({
     get () {
         return props.modelValue
     },
     set (value) {
-        t.value.noun.character += '1'
         emit('update:modelValue', value)
     }
 })
 
 onMounted(() => {
-    emit('update:select', select.value)
+    emit('update:select', selectRef.value)
 })
 
 </script>
@@ -40,7 +39,7 @@ onMounted(() => {
 <template>
     <el-select
             v-model="modelValue"
-            ref="select"
+            ref="selectRef"
             style="flex-grow: 1;"
             :placeholder="props.placeholder || t.noun.character"
             filterable>
