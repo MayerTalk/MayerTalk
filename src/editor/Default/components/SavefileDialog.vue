@@ -114,7 +114,7 @@ loadData()
         </div>
         <el-table :data="tableData">
             <el-table-column prop="name" :label="t.noun.name"/>
-            <el-table-column prop="timeString" :label="t.noun.lastEdit"/>
+            <el-table-column prop="timeString" :label="t.noun.lastEdit" :width="90"/>
             <el-table-column prop="sizeString" :label="t.noun.size" :width="80"/>
             <el-table-column :label="t.action.operate" :width="90">
                 <template #default="scope">
