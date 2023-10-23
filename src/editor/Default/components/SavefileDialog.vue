@@ -116,13 +116,13 @@ loadData()
             <el-table-column :label="t.action.operate" :width="90">
                 <template #default="scope">
                     <div style="display: flex; justify-content: right; align-items: center; column-gap: 5px">
-                        <el-icon :size="25" style="cursor: pointer" @click="() => {syncSave(scope.row)}">
-                            <IconRefresh/>
-                        </el-icon>
-                        <el-icon :size="25" style="cursor: pointer" @click="() => {loadSave(scope.row)}">
+                        <el-icon :size="25" style="cursor: pointer" @click="() => {syncSave(scope.row)}" title="保存">
                             <IconUpload/>
                         </el-icon>
-                        <el-icon :size="25" style="cursor: pointer" @click="() => {deleteSave(scope.row)}">
+                        <el-icon :size="25" style="cursor: pointer" @click="() => {loadSave(scope.row)}" title="读取">
+                            <IconDownload/>
+                        </el-icon>
+                        <el-icon :size="25" style="cursor: pointer" @click="() => {deleteSave(scope.row)}" title="删除">
                             <IconDelete/>
                         </el-icon>
                     </div>
