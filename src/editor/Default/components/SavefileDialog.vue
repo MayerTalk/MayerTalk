@@ -1,13 +1,13 @@
 <script setup>
-import { ref, inject, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { ensure, formatSize } from '@/lib/tool'
 import message from '@/lib/message'
 import Save from '@/lib/savefile'
+import { dialogWidth } from '@/lib/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
-const dialogWidth = inject('dialogWidth')
 
 const ifShowSavefile = computed({
     get () {

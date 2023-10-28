@@ -11,6 +11,7 @@ import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
+import ScreenshotHelper from './components/ScreenshotHelper.vue'
 
 import {
     downloadImage,
@@ -21,8 +22,8 @@ import {
 } from '@/lib/tool'
 import {
     windowWidth,
-    dialogWidth,
-    MobileView
+    MobileView,
+    IsIOS
 } from '@/lib/constance'
 import {
     chats,
@@ -49,6 +50,7 @@ const EditDialogue = ref(null)
 const AtRef = ref(null)
 const CreateOption = ref(null)
 const NavigationBarRef = ref(null)
+const ScreenshotHelperRef = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
@@ -87,11 +89,11 @@ const ifShowAbout = inject('ifShowAbout')
 const ifShowSettings = inject('ifShowSettings')
 const ifShowSavefile = ref(false)
 const ifShowCopy = ref(false)
+const ifShowScreenshotHelper = ref(false)
 const rendererSettings = ref({})
 const width = ref({})
 provide('rendererSettings', rendererSettings)
 provide('width', width)
-provide('dialogWidth', dialogWidth)
 
 const charDirection = computed(() => {
     const dict = chars.value
@@ -376,11 +378,14 @@ function screenshot (ensure = false) {
                     windowWidth: width.value.window + 20,
                     scale: rendererSettings.value.scale,
                     useCORS: true
-                }, () => {
+                }, (canvas) => {
                     preScreenshot.value = false
                     node.style.height = null
                     setTimeout(() => {
                         ResizeWindow.resize()
+                        if (IsIOS) {
+                            ScreenshotHelperRef.value.show(canvas)
+                        }
                     }, 50)
                 })
             }, 100)
@@ -404,6 +409,7 @@ function screenshot (ensure = false) {
                 <AtDialog ref="AtRef"/>
                 <CreateOptionDialog ref="CreateOption"/>
                 <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
+                <ScreenshotHelper v-model="ifShowScreenshotHelper" ref="ScreenshotHelperRef"/>
                 <SideBar
                     v-model="ifShowSideBar"
                     @showAnnounce="ifShowAnnouncement=true"
