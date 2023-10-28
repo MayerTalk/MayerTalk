@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { dialogWidth } from '@/lib/constance'
 import { t } from '@/lib/lang/translate'
+import { blob2base64 } from '@/lib/tool'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
@@ -16,9 +17,11 @@ const ifShowScreenshotHelper = computed({
     }
 })
 
-function show (canvas) {
-    ifShowScreenshotHelper.value = true
-    imageData.value = canvas.toDataURL('image/jpeg')
+function show (canvas, blob) {
+    blob2base64(blob, (b64) => {
+        ifShowScreenshotHelper.value = true
+        imageData.value = b64
+    })
 }
 
 defineExpose({
@@ -30,7 +33,7 @@ defineExpose({
     <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshotHelper">
         {{ t.tip.screenshotHelper }}
         <div style="width: 100%; margin-top: 15px; height: 400px; overflow:hidden;">
-                <img :src="imageData" alt="" style="width: 100%"/>
+            <img :src="imageData" alt="" style="width: 100%"/>
         </div>
     </el-dialog>
 </template>

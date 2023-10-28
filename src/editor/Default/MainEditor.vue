@@ -378,13 +378,13 @@ function screenshot (ensure = false) {
                     windowWidth: width.value.window + 20,
                     scale: rendererSettings.value.scale,
                     useCORS: true
-                }, (canvas) => {
+                }, (canvas, blob) => {
                     preScreenshot.value = false
                     node.style.height = null
                     setTimeout(() => {
                         ResizeWindow.resize()
                         if (IsIOS) {
-                            ScreenshotHelperRef.value.show(canvas)
+                            ScreenshotHelperRef.value.show(canvas, blob)
                         }
                     }, 50)
                 })
