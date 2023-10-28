@@ -16,9 +16,9 @@ const ifShowScreenshotHelper = computed({
     }
 })
 
-function show (canvas, url) {
+function show (canvas) {
     ifShowScreenshotHelper.value = true
-    imageData.value = url
+    imageData.value = canvas.toDataURL('image/jpeg').replace('image/jpeg', 'image/octet-stream')
 }
 
 defineExpose({
@@ -28,7 +28,7 @@ defineExpose({
 
 <template>
     <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshotHelper">
-        {{ t.tip.screenshotHelper}}
+        {{ t.tip.screenshotHelper }}
         <div style="width: 100%; margin-top: 15px">
             <el-scrollbar :max-height="400">
                 <img :src="imageData" alt="" style="width: 100%"/>
