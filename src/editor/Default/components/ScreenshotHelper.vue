@@ -1,11 +1,11 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { dialogWidth } from '@/lib/constance'
 import { t } from '@/lib/lang/translate'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
-let imageData = null
+const imageData = ref(null)
 
 const ifShowScreenshotHelper = computed({
     get () {
@@ -16,15 +16,9 @@ const ifShowScreenshotHelper = computed({
     }
 })
 
-function show (canvas) {
+function show (canvas, url) {
     ifShowScreenshotHelper.value = true
-    canvas.style.height = null
-    canvas.style.width = '100%'
-    imageData = canvas
-}
-
-function onShow () {
-    document.querySelector('#screenshotHelperContainer').appendChild(imageData)
+    imageData.value = url
 }
 
 defineExpose({
@@ -33,15 +27,11 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShowScreenshotHelper"
-               :width="dialogWidth"
-               :title="t.noun.screenshotHelper"
-               @open="onShow"
-               destroy-on-close>
-        {{ t.tip.screenshotHelper }}
+    <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshotHelper">
+        {{ t.tip.screenshotHelper}}
         <div style="width: 100%; margin-top: 15px">
             <el-scrollbar :max-height="400">
-                <div style="width: 100%; display: flex" id="screenshotHelperContainer"></div>
+                <img :src="imageData" alt="" style="width: 100%"/>
             </el-scrollbar>
         </div>
     </el-dialog>
