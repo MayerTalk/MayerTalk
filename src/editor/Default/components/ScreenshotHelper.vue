@@ -29,10 +29,8 @@ defineExpose({
 <template>
     <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshotHelper">
         {{ t.tip.screenshotHelper }}
-        <div style="width: 100%; margin-top: 15px">
-            <el-scrollbar :height="400">
+        <div style="width: 100%; margin-top: 15px; height: 400px; overflow:hidden;">
                 <img :src="imageData" alt="" style="width: 100%"/>
-            </el-scrollbar>
         </div>
     </el-dialog>
 </template>
