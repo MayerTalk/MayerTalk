@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue'
 import { dialogWidth } from '@/lib/constance'
 import { t } from '@/lib/lang/translate'
-import { blob2url } from '@/lib/tool'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
@@ -19,7 +18,7 @@ const ifShowScreenshotHelper = computed({
 
 function show (canvas, blob) {
     ifShowScreenshotHelper.value = true
-    imageData.value = blob2url(blob)
+    imageData.value = blob
 }
 
 defineExpose({
