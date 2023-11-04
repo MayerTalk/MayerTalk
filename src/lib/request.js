@@ -25,7 +25,7 @@ export default class Requests {
         }
 
         const config = {
-            url: this.host + url,
+            url: (options.host || this.host) + url,
             method,
             headers,
             cancelToken: new axios.CancelToken(cancel => {
