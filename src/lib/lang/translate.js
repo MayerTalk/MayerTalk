@@ -35,7 +35,6 @@ updateTranslation(config.lang, true)
 setTimeout(() => {
     if (translate.value.empty) {
         // retry
-        console.log('1')
         updateTranslation(config.lang, true)
     }
 }, 1000)

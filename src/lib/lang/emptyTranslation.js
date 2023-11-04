@@ -99,8 +99,7 @@ const emptyTranslation = {
         showCharacterName: '',
         storage: '',
         local: '',
-        warning: '',
-        screenshotHelper: ''
+        warning: ''
     },
     tip: {
         pool: [''],
@@ -113,8 +112,7 @@ const emptyTranslation = {
         importFailed: '',
         errorGuide: '',
         error: '',
-        unsafeImage: '',
-        screenshotHelper: ''
+        unsafeImage: ''
     },
     character: {
         doctor: '',
