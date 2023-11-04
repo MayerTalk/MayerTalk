@@ -27,7 +27,6 @@ const dialogWidth = Math.ceil(windowWidth * 0.9)
 const WindowHeight = window.innerHeight
 const MobileView = !(window.innerWidth - defaultWidth > 250)
 const IsMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
-const IsIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 
 export {
     StaticUrl,
@@ -37,6 +36,5 @@ export {
     dialogWidth,
     MobileView,
     WindowHeight,
-    IsMobile,
-    IsIOS
+    IsMobile
 }

@@ -47,7 +47,7 @@ function downloadImage (node, options, callback, seq = null) {
         canvas.toBlob(blob => {
             const url = blob2url(blob)
             download(url, 'mayertalk-' + (seq || Date.now()) + '.jpg')
-            callback && callback(canvas, url)
+            callback && callback()
         }, 'image/jpeg')
     }).catch(reason => {
         message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)

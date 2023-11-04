@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { saveData, getData } from '@/lib/tool'
 import { cacheRequest } from '@/lib/cacheRequest'
 import { emptyTranslation } from '@/lib/lang/constant'
+import { translationHost } from '@/lib/dev'
 import tipControl from '@/lib/tip'
 
 const cacheKey = 'cache.data.translation.'
@@ -27,7 +28,7 @@ function updateTranslation (lang, firstUpdate = false, retry = true) {
         }
         setTranslation(result.data)
         saveData(cacheKey + lang, result.data)
-    }, null, !getData(cacheKey + lang))
+    }, null, !getData(cacheKey + lang), translationHost)
 }
 
 updateTranslation(config.lang, true)
@@ -35,7 +36,6 @@ updateTranslation(config.lang, true)
 setTimeout(() => {
     if (translate.value.empty) {
         // retry
-        console.log('1')
         updateTranslation(config.lang, true)
     }
 }, 1000)

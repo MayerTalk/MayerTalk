@@ -4,6 +4,7 @@ import Request from '@/lib/request'
 import { cacheRequest } from '@/lib/cacheRequest'
 import { copy } from '@/lib/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
+import { characterHost } from '@/lib/dev'
 import { config } from '@/lib/data'
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
@@ -44,7 +45,7 @@ function loadChar (series) {
             data.series = series
             CharDict[charId] = data
         }
-    })
+    }, null, true, characterHost)
 }
 
 // const seriesSort = {
