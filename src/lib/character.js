@@ -27,7 +27,7 @@ function parseAvatarUrl (url, series, charId) {
 
 function parseCharData (data) {
     const names = {}
-    for (let i = 1; i < langOrder.length; i++) {
+    for (let i = 0; i < langOrder.length; i++) {
         if (data[0][i]) {
             names[langOrder[i]] = data[0][i]
         }
