@@ -21,7 +21,6 @@ import {
 } from '@/lib/tool'
 import {
     windowWidth,
-    dialogWidth,
     MobileView
 } from '@/lib/constance'
 import {
@@ -91,7 +90,6 @@ const rendererSettings = ref({})
 const width = ref({})
 provide('rendererSettings', rendererSettings)
 provide('width', width)
-provide('dialogWidth', dialogWidth)
 
 const charDirection = computed(() => {
     const dict = chars.value

@@ -1,12 +1,12 @@
 # -*- coding: UTF-8 -*-
 
-
 import os
 import sys
 import time
 import json
 import shutil
 import hashlib
+from datetime import datetime, timezone, timedelta
 
 time.timezone = -28800
 
@@ -51,6 +51,9 @@ with open(os.path.join('.github', 'publish.txt'), mode='rt', encoding='utf-8') a
 
 info = {
     'expire': expire,
+    'expireString': datetime.utcnow().replace(tzinfo=timezone.utc)
+    .astimezone(timezone(timedelta(hours=8)))
+    .strftime('%Y-%m-%d %H:%M (UTC+8)'),
     'build': int(time.time()),
     'message': argv('message') or 'Github Action 自动部署',
     'version': version,

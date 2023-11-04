@@ -4,6 +4,7 @@ import Request from '@/lib/request'
 import { cacheRequest } from '@/lib/cacheRequest'
 import { copy } from '@/lib/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
+import { characterHost } from '@/lib/dev'
 import { config } from '@/lib/data'
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
@@ -14,12 +15,28 @@ const Suffix = (navigator.userAgent.indexOf('Chrome') === -1 && navigator.userAg
     ? '.png'
     : '.webp'
 
+const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP']
+
 function parseAvatarUrl (url, series, charId) {
     // 生成可访问的头像url
     return 'avatar/' +
         encodeURIComponent(series) + '/' +
         encodeURIComponent(url.indexOf('id:') === 0 ? url.slice(3) : charId + url) +
         Suffix
+}
+
+function parseCharData (data) {
+    const names = {}
+    for (let i = 1; i < langOrder.length; i++) {
+        if (data[0][i]) {
+            names[langOrder[i]] = data[0][i]
+        }
+    }
+    return {
+        names,
+        avatars: data[1],
+        tags: data[2]
+    }
 }
 
 function loadChar (series) {
@@ -34,7 +51,7 @@ function loadChar (series) {
             if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
                 continue
             }
-            const data = resp.data[charId]
+            const data = parseCharData(resp.data[charId])
             for (const avatarId in data.avatars) {
                 if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
                     continue
@@ -44,7 +61,7 @@ function loadChar (series) {
             data.series = series
             CharDict[charId] = data
         }
-    })
+    }, null, true, characterHost)
 }
 
 // const seriesSort = {

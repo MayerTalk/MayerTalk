@@ -26,10 +26,7 @@ onMounted(() => {
     }
 })
 
-const invalidBrowser = navigator.userAgent.indexOf('UCBrowser') !== -1 ||
-    navigator.userAgent.indexOf('Quark') !== -1 ||
-    navigator.userAgent.indexOf('QQBrowser') !== -1 ||
-    navigator.userAgent.indexOf('baidu') !== -1
+const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu|^(.(?!Chrome))*Safari/.test(navigator.userAgent) // hope detect successfully
 
 const invalidBrowserTranslate = {
     zh_CN: [
