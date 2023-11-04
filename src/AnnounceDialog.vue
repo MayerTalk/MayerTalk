@@ -26,7 +26,7 @@ onMounted(() => {
     }
 })
 
-const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu|Safari/.test(navigator.userAgent)
+const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu|^(.(?!Chrome))*Safari/.test(navigator.userAgent) // hope detect successfully
 
 const invalidBrowserTranslate = {
     zh_CN: [

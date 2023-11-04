@@ -21,8 +21,7 @@ import {
 } from '@/lib/tool'
 import {
     windowWidth,
-    MobileView,
-    IsIOS
+    MobileView
 } from '@/lib/constance'
 import {
     chats,
