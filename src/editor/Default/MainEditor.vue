@@ -87,9 +87,9 @@ const ifShowSettings = inject('ifShowSettings')
 const ifShowSavefile = ref(false)
 const ifShowCopy = ref(false)
 const rendererSettings = ref({})
-const width = ref({})
+const rendererWidth = ref({})
 provide('rendererSettings', rendererSettings)
-provide('width', width)
+provide('rendererWidth', rendererWidth)
 
 const charDirection = computed(() => {
     const dict = chars.value
@@ -120,12 +120,12 @@ const ResizeWindow = {
     resize () {
         const max = rendererSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
         if (preScreenshot.value) {
-            width.value.window = max
-            width.value.image = rendererSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
+            rendererWidth.value.window = max
+            rendererWidth.value.image = rendererSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
             const w = Math.min(max, window.innerWidth)
-            width.value.window = w
+            rendererWidth.value.window = w
             if (w === max) {
                 this.time = 1
             } else {
@@ -134,7 +134,7 @@ const ResizeWindow = {
         }
         for (const key in this.size) {
             if (Object.prototype.hasOwnProperty.call(this.size, key)) {
-                width.value[key] = this.get(this.size[key])
+                rendererWidth.value[key] = this.get(this.size[key])
             }
         }
     }
@@ -351,7 +351,7 @@ function screenshot (ensure = false) {
                 node.style.height = node.scrollHeight - 30 + 'px'
                 setTimeout(() => {
                     downloadImage(node, {
-                        windowWidth: width.value.window + 20,
+                        windowWidth: rendererWidth.value.window + 20,
                         scale: rendererSettings.value.scale,
                         useCORS: true
                     }, () => {
@@ -371,7 +371,7 @@ function screenshot (ensure = false) {
             node.style.height = node.scrollHeight - 30 + 'px'
             setTimeout(() => {
                 downloadImage(node, {
-                    windowWidth: width.value.window + 20,
+                    windowWidth: rendererWidth.value.window + 20,
                     scale: rendererSettings.value.scale,
                     useCORS: true
                 }, () => {

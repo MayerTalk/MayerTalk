@@ -5,7 +5,7 @@ import Dialogue from './components/DialogueItem.vue'
 import plus1 from '@/lib/plus1'
 import { chats } from '@/lib/data'
 
-const width = inject('width')
+const rendererWidth = inject('rendererWidth')
 const rendererSettings = inject('rendererSettings')
 
 defineEmits(['edit', 'delete', 'plus1'])
@@ -13,7 +13,7 @@ defineEmits(['edit', 'delete', 'plus1'])
 
 <template>
     <div class="window" id="window"
-         :style="{width: width.window+'px', background: rendererSettings.background}"
+         :style="{width: rendererWidth.window+'px', background: rendererSettings.background}"
     >
         <Dialogue v-for="(dialogue, index) in chats"
                   @edit="args => $emit('edit',args)"
