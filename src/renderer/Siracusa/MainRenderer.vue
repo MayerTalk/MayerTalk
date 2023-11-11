@@ -12,7 +12,7 @@ defineEmits(['edit', 'delete', 'plus1'])
 </script>
 
 <template>
-    <div class="window" id="window"
+    <div class="renderer" id="renderer"
          :style="{width: rendererWidth.window+'px', background: rendererSettings.background}"
     >
         <Dialogue v-for="(dialogue, index) in chats"
@@ -22,7 +22,6 @@ defineEmits(['edit', 'delete', 'plus1'])
                   :data="chats[index]" :index="index" :key="dialogue.id" :plus1="plus1 === index"
                   style="position:relative"></Dialogue>
     </div>
-
 </template>
 
 <style src="./style/renderer.css" scoped/>

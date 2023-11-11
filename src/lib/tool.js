@@ -33,6 +33,22 @@ function getData (name) {
     }
 }
 
+function getCanvas (node, options, cb) {
+    html2canvas(node, options).then(canvas => {
+        cb(canvas)
+    }).catch(reason => {
+        message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)
+    })
+}
+
+function downloadCanvas (canvas, cb, seq = null, filename = null) {
+    canvas.toBlob((blob) => {
+        const url = blob2url(blob)
+        download(url, filename || 'mayertalk-' + (seq || Date.now()) + '.jpg')
+        cb && cb()
+    })
+}
+
 function download (url, filename) {
     const el = document.createElement('a')
     document.body.appendChild(el)
@@ -175,5 +191,7 @@ export {
     doAfterMounted,
     Textarea,
     formatSize,
-    bool
+    bool,
+    getCanvas,
+    downloadCanvas
 }

@@ -44,7 +44,7 @@ function handleNav () {
         lineno.value = 1
     }
     const chat = getDialogue(chats.value[lineno.value - 1].id)
-    if (document.getElementById('window').offsetHeight - chat.offsetTop < window.innerHeight) {
+    if (document.getElementById('renderer').offsetHeight - chat.offsetTop < window.innerHeight) {
         scroll.value.setScrollTop(chat.offsetTop)
     } else {
         scroll.value.setScrollTop(chat.offsetTop - window.innerHeight / 3)
