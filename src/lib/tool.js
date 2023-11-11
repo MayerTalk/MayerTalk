@@ -173,6 +173,27 @@ function bool (obj) {
     return true
 }
 
+function sync (dst, src1, src2) {
+    // target default variable
+    for (const key in src1) {
+        if (Object.prototype.hasOwnProperty.call(src1, key)) {
+            if (typeof src1[key] === 'object') {
+                dst[key] = {}
+                sync(dst[key], src1[key], src2[key] || {}, key)
+            } else {
+                dst[key] = src1[key]
+            }
+        }
+    }
+    for (const key in src2) {
+        if (Object.prototype.hasOwnProperty.call(src2, key)) {
+            if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === 'boolean')) {
+                dst[key] = src2[key]
+            }
+        }
+    }
+}
+
 export {
     md5,
     copy,
@@ -193,5 +214,6 @@ export {
     formatSize,
     bool,
     getCanvas,
-    downloadCanvas
+    downloadCanvas,
+    sync
 }

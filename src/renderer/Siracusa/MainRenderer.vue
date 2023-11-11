@@ -4,16 +4,16 @@ import Dialogue from './components/DialogueItem.vue'
 
 import plus1 from '@/lib/plus1'
 import { chats } from '@/lib/data'
+import { syncedSettings } from '@/lib/settings'
 
 const rendererWidth = inject('rendererWidth')
-const rendererSettings = inject('rendererSettings')
 
 defineEmits(['edit', 'delete', 'plus1'])
 </script>
 
 <template>
     <div class="renderer" id="renderer"
-         :style="{width: rendererWidth.window+'px', background: rendererSettings.background}"
+         :style="{width: rendererWidth.window+'px', background: syncedSettings.background}"
     >
         <Dialogue v-for="(dialogue, index) in chats"
                   @edit="args => $emit('edit',args)"

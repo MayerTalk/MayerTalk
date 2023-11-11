@@ -16,7 +16,6 @@ import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import {
     clickBySelector,
     getDialogue,
-    copy,
     Textarea
 } from '@/lib/tool'
 import {
@@ -24,13 +23,13 @@ import {
     MobileView
 } from '@/lib/constance'
 import {
-    chats,
     chars,
     config,
     avatars,
     currCharId,
     DataControl
 } from '@/lib/data'
+import { syncedSettings } from '@/lib/settings'
 import {
     textarea,
     createTextDialogue,
@@ -89,7 +88,6 @@ const ifShowSavefile = ref(false)
 const ifShowCopy = ref(false)
 const rendererSettings = ref({})
 const rendererWidth = ref({})
-provide('rendererSettings', rendererSettings)
 provide('rendererWidth', rendererWidth)
 
 const charDirection = computed(() => {
@@ -119,10 +117,10 @@ const ResizeWindow = {
         fontsize: 16
     },
     resize () {
-        const max = rendererSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
+        const max = syncedSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
         if (preScreenshot.value) {
             rendererWidth.value.window = max
-            rendererWidth.value.image = rendererSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
+            rendererWidth.value.image = syncedSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
             const w = Math.min(max, window.innerWidth)
@@ -148,7 +146,7 @@ watch(charDirection, () => {
     ResizeWindow.resize()
 })
 watch(() => {
-    return rendererSettings.value.width
+    return syncedSettings.value.width
 }, () => {
     ResizeWindow.resize()
 })
@@ -252,9 +250,9 @@ const ScreenshotStateControl = {
 </script>
 
 <template>
-    <div :class="rendererSettings.style">
+    <div :class="syncedSettings.style">
         <div class="renderer">
-            <div id="body" :style="{background: rendererSettings.background}">
+            <div id="body" :style="{background: syncedSettings.background}">
                 <ScreenshotHelper
                     ref="ScreenshotHelperRef"
                     @start="ScreenshotStateControl.start"
