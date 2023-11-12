@@ -21,12 +21,6 @@ const emit = defineEmits(['resizeWindow', 'showSavefile'])
 
 const ifShow = inject('ifShowSettings')
 
-const fake = ref({
-    width: settings.value.width || null,
-    scale: settings.value.scale || null,
-    maxHeight: settings.value.maxHeight || null
-})
-
 const ifShowEditShowCharName = ref(false)
 const showCharNameSettings = computed(() => {
     return syncedSettings.value.showCharNameSettings || {}
@@ -135,25 +129,28 @@ function checkClose (fn, ignore = []) {
                     <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br/>({{ t.tip.settings.dialogWidth }})</span>
                     </th>
                     <td>
-                        <el-input v-model="fake.width" :clearable="true"
+                        <el-input v-model="settings.width" :clearable="true"
+                                  type="number"
                                   :placeholder="'' + defaultSettings.width"
-                                  @input="settings.width=+fake.width"/>
+                                  @input="(v) => {if(v){settings.width= +v}else{delete settings.width}}"/>
                     </td>
                 </tr>
                 <tr>
                     <th>{{ t.noun.imageQuality }}</th>
                     <td>
-                        <el-input v-model="fake.scale" :clearable="true"
+                        <el-input v-model="settings.scale" :clearable="true"
+                                  type="number"
                                   :placeholder="'' + defaultSettings.scale"
-                                  @input="settings.scale=+fake.scale"/>
+                                  @input="(v) => {if(v){settings.scale= +v}else{delete settings.scale}}"/>
                     </td>
                 </tr>
                 <tr>
                     <th>{{ t.noun.screenshotMaxHeight }}</th>
                     <td>
-                        <el-input v-model="fake.maxHeight" :clearable="true"
+                        <el-input v-model="settings.maxHeight" :clearable="true"
+                                  type="number"
                                   :placeholder="'' + defaultSettings.maxHeight"
-                                  @input="settings.maxHeight=+fake.maxHeight"/>
+                                  @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"/>
                     </td>
                 </tr>
                 <tr>
