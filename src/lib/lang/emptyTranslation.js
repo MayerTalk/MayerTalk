@@ -96,11 +96,11 @@ const emptyTranslation = {
         background: '',
         dialogWidth: '',
         imageQuality: '',
-        screenshotMaxHeight: '',
         showCharacterName: '',
         storage: '',
         local: '',
-        warning: ''
+        warning: '',
+        autoCut: ''
     },
     tip: {
         pool: [
