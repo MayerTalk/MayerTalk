@@ -214,7 +214,7 @@ defineExpose({
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="syncedSettings.autoCut" style="transition: all ease-in-out .5s; padding-bottom: 10px">
+                <div v-show="syncedSettings.autoCut" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
                     <div class="column-display"
                          style="display: flex; align-items: center; padding-top: 5px">
                         <div style="width: 100%"> 最大长度
