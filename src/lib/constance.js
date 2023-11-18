@@ -12,12 +12,12 @@ const TypeDefault = {
 }
 
 const TypeSeries = {
-    chat: 'text',
-    monologue: 'text',
-    image: 'image',
-    option: 'option',
-    select: 'text',
-    title: 'text'
+    chat: 'Text',
+    monologue: 'Text',
+    image: 'Image',
+    option: 'TextArray',
+    select: 'Text',
+    title: 'Text'
 }
 
 const defaultWidth = 520
