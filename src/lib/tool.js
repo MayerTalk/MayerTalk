@@ -43,9 +43,13 @@ function getCanvas (node, options, cb) {
 
 function downloadCanvas (canvas, cb, seq = null, filename = null) {
     canvas.toBlob((blob) => {
-        const url = blob2url(blob)
-        download(url, filename || 'mayertalk-' + (seq || Date.now()) + '.jpg')
-        cb && cb()
+        try {
+            const url = blob2url(blob)
+            download(url, filename || 'mayertalk-' + (seq || Date.now()) + '.jpg')
+            cb && cb()
+        } catch (e) {
+            message.notify(t.value.notify.downloadCanvasFailed, message.error)
+        }
     })
 }
 

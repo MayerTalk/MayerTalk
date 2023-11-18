@@ -35,7 +35,8 @@ const emptyTranslation = {
         startToScreenshot: '',
         screenshottedSuccessfully: '',
         recoveredSuccessfully: '',
-        loadedSuccessfully: ''
+        loadedSuccessfully: '',
+        downloadCanvasFailed: ''
     },
     action: {
         add: '',
@@ -102,7 +103,9 @@ const emptyTranslation = {
         warning: ''
     },
     tip: {
-        pool: [''],
+        pool: [
+            ''
+        ],
         selectCharDialog: '',
         cutScreenshot: '',
         settings: {
