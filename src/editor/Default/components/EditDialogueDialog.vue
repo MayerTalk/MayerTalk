@@ -194,9 +194,4 @@ defineExpose({
     display: flex;
     flex-wrap: wrap;
 }
-
-.column-display {
-    display: flex;
-    column-gap: 5px;
-}
 </style>

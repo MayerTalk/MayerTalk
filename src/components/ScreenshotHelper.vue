@@ -6,6 +6,7 @@ import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
 import { chats, settings, DataControl } from '@/lib/data'
 import { defaultSettings, syncedSettings } from '@/lib/settings'
+import CollapseItem from '@/components/CollapseItem.vue'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'start', 'done'])
@@ -42,10 +43,15 @@ function getNode () {
     }
 }
 
+const realMaxHeight = computed(() => {
+    return syncedSettings.value.maxHeight / syncedSettings.value.scale - 30
+})
+
 function getScreenshotGroup () {
+    // 30 上下margin (20+10)
     const totalHeight = (screenshotNode.scrollHeight - 30)
     // 缩小比例后实际 maxHeight
-    let maxHeight = syncedSettings.value.maxHeight / syncedSettings.value.scale - 30
+    let maxHeight = realMaxHeight.value
     maxHeight = maxHeight < 0 ? 0 : maxHeight
     if (totalHeight < maxHeight || chats.value.length < 2) {
         // 无需裁分
@@ -125,7 +131,7 @@ function getScreenshotGroup () {
 function screenshot (ensure = false) {
     emit('start')
     const group = getScreenshotGroup()
-    if (group && syncedSettings.value.enableCut) {
+    if (group && syncedSettings.value.autoCut) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 screenshot(true)
@@ -184,6 +190,10 @@ function screenshot (ensure = false) {
 
 getNode()
 
+const expectCutNumber = computed(() => {
+    return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
+})
+
 defineExpose({
     screenshot
 })
@@ -203,21 +213,32 @@ defineExpose({
                     <div class="line-right"></div>
                 </div>
             </div>
-            <div> 最大宽度
-                <el-input
-                    v-model="settings.maxHeight" clearable type="number"
-                    style="width: 100px; margin-left: 10px" :disabled="!syncedSettings.autoCut"
-                    :placeholder="''+defaultSettings.maxHeight"
-                    @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"
-                />
-            </div>
+            <CollapseItem>
+                <div v-show="syncedSettings.autoCut" style="transition: all ease-in-out .5s; padding-bottom: 10px">
+                    <div class="column-display"
+                         style="display: flex; align-items: center; padding-top: 5px">
+                        <div style="width: 100%"> 最大长度
+                            <el-input
+                                v-model="settings.maxHeight" clearable type="number"
+                                style="width: 100px; margin-left: 10px"
+                                :placeholder="''+defaultSettings.maxHeight"
+                                @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"
+                            />
+                        </div>
+                        <div style="width: 100%">
+                            预计裁分: {{ expectCutNumber }}
+                        </div>
+                    </div>
+
+                </div>
+            </CollapseItem>
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
-        <el-button
-            @click="() => {DataControl.save(['settings']); screenshot(); ifShowScreenshotHelper=false}"
-            style="width: 30%"
-        >生成
-        </el-button>
+            <el-button
+                @click="() => {DataControl.save(['settings']); screenshot(); ifShowScreenshotHelper=false}"
+                style="width: 30%"
+            >生成
+            </el-button>
         </div>
 
     </el-dialog>
