@@ -47,7 +47,6 @@ const EditDialogue = ref(null)
 const AtRef = ref(null)
 const CreateOption = ref(null)
 const NavigationBarRef = ref(null)
-const ScreenshotHelperRef = ref(null)
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
@@ -86,7 +85,7 @@ const ifShowAbout = inject('ifShowAbout')
 const ifShowSettings = inject('ifShowSettings')
 const ifShowSavefile = ref(false)
 const ifShowCopy = ref(false)
-const rendererSettings = ref({})
+const ifShowScreenshotHelper = ref(false)
 const rendererWidth = ref({})
 provide('rendererWidth', rendererWidth)
 
@@ -254,7 +253,7 @@ const ScreenshotStateControl = {
         <div class="renderer">
             <div id="body" :style="{background: syncedSettings.background}">
                 <ScreenshotHelper
-                    ref="ScreenshotHelperRef"
+                    v-model="ifShowScreenshotHelper"
                     @start="ScreenshotStateControl.start"
                     @done="ScreenshotStateControl.done"
                 />
@@ -275,7 +274,7 @@ const ScreenshotStateControl = {
                     @showSettings="ifShowSettings=true"
                     @showAbout="ifShowAbout=true"
                     @showNavigation="() => {NavigationBarRef.open()}"
-                    @screenshot="() => {ScreenshotHelperRef.screenshot()}"
+                    @screenshot="ifShowScreenshotHelper=true"
                 />
                 <el-scrollbar :height="scrollHeight" ref="scroll">
                     <div class="body">

@@ -20,3 +20,8 @@
     --dialogue-background: #222222;
     --dialogue-color: #EEEEEE;
 }
+
+.column-display {
+    display: flex;
+    column-gap: 5px;
+}

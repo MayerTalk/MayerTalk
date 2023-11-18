@@ -145,10 +145,17 @@ function checkClose (fn, ignore = []) {
                     </td>
                 </tr>
                 <tr>
-                    <th>{{ t.noun.screenshotMaxHeight }}</th>
-                    <td>
+                    <th>{{ t.noun.autoCut }}</th>
+                    <td style="display: flex">
+                        <el-switch v-model="syncedSettings.autoCut" style="margin-right: 10px"
+                                   @change="(value) => {settings.autoCut=value}"></el-switch>
+                    </td>
+                </tr>
+                <tr v-if="syncedSettings.autoCut">
+                    <th>{{ t.noun.maxCutHeight }}</th>
+                    <td style="display: flex">
                         <el-input v-model="settings.maxHeight" :clearable="true"
-                                  type="number"
+                                  type="number" :disabled="!syncedSettings.autoCut"
                                   :placeholder="'' + defaultSettings.maxHeight"
                                   @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"/>
                     </td>

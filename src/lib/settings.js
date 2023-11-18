@@ -13,7 +13,8 @@ const defaultSettings = {
         monologue: true,
         image: true
     },
-    maxHeight: 16000
+    maxHeight: 16000,
+    autoCut: true
 }
 const syncedSettings = ref({})
 

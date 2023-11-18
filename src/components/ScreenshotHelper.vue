@@ -1,21 +1,31 @@
 <script setup>
-import { inject, nextTick } from 'vue'
+import { computed, inject, nextTick } from 'vue'
 import { getCanvas, downloadCanvas, copy, getDialogue } from '@/lib/tool'
+import { dialogWidth } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
-import { chats } from '@/lib/data'
+import { chats, settings, DataControl } from '@/lib/data'
+import { defaultSettings, syncedSettings } from '@/lib/settings'
+import CollapseItem from '@/components/CollapseItem.vue'
 
-const emit = defineEmits(['start', 'done'])
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue', 'start', 'done'])
 
+const ifShowScreenshotHelper = computed({
+    get () {
+        return props.modelValue
+    },
+    set (value) {
+        emit('update:modelValue', value)
+    }
+})
 let screenshotNode = null
-
 const rendererWidth = inject('rendererWidth')
-const rendererSettings = inject('rendererSettings')
 
 function downloadScreenshot (cb = null, options = {}) {
     getCanvas(options.screenshotNode || screenshotNode, {
         windowWidth: rendererWidth.value.window + 20,
-        scale: rendererSettings.value.scale,
+        scale: syncedSettings.value.scale,
         useCORS: true,
         ...(options.options || {})
     }, (canvas) => {
@@ -33,10 +43,15 @@ function getNode () {
     }
 }
 
+const realMaxHeight = computed(() => {
+    return syncedSettings.value.maxHeight / syncedSettings.value.scale - 30
+})
+
 function getScreenshotGroup () {
+    // 30 上下margin (20+10)
     const totalHeight = (screenshotNode.scrollHeight - 30)
     // 缩小比例后实际 maxHeight
-    let maxHeight = rendererSettings.value.maxHeight / rendererSettings.value.scale - 30
+    let maxHeight = realMaxHeight.value
     maxHeight = maxHeight < 0 ? 0 : maxHeight
     if (totalHeight < maxHeight || chats.value.length < 2) {
         // 无需裁分
@@ -116,7 +131,7 @@ function getScreenshotGroup () {
 function screenshot (ensure = false) {
     emit('start')
     const group = getScreenshotGroup()
-    if (group) {
+    if (group && syncedSettings.value.autoCut) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 screenshot(true)
@@ -175,11 +190,82 @@ function screenshot (ensure = false) {
 
 getNode()
 
+const expectCutNumber = computed(() => {
+    return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
+})
+
 defineExpose({
     screenshot
 })
 </script>
 
 <template>
+    <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="'截图'"
+               @closed="DataControl.save(['settings'])"
+    >
+        <div>
+            <div class="bar">
+                <div style="display: flex; align-items: center; width: 100%">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 0 10px 0 0">自动裁分</h2>
+                    <el-switch v-model="syncedSettings.autoCut"
+                               @change="(value) => {settings.autoCut=value}"></el-switch>
+                    <div class="line-right"></div>
+                </div>
+            </div>
+            <CollapseItem>
+                <div v-show="syncedSettings.autoCut" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
+                    <div class="column-display"
+                         style="display: flex; align-items: center; padding-top: 5px">
+                        <div style="width: 100%"> 最大长度
+                            <el-input
+                                v-model="settings.maxHeight" clearable type="number"
+                                style="width: 100px; margin-left: 10px"
+                                :placeholder="''+defaultSettings.maxHeight"
+                                @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"
+                            />
+                        </div>
+                        <div style="width: 100%">
+                            预计裁分: {{ expectCutNumber }}
+                        </div>
+                    </div>
 
+                </div>
+            </CollapseItem>
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end">
+            <el-button
+                @click="() => {DataControl.save(['settings']); screenshot(); ifShowScreenshotHelper=false}"
+                style="width: 30%"
+            >生成
+            </el-button>
+        </div>
+
+    </el-dialog>
 </template>
+
+<style>
+.bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.line-left {
+    margin-right: 10px;
+    height: 0;
+    border-top: lightgrey solid 1px;
+}
+
+.line-right {
+    margin-left: 10px;
+    flex-grow: 1;
+    height: 0;
+    border-top: lightgrey solid 1px;
+}
+
+.bar h2 {
+    display: inline;
+    margin: 0 10px 0 0;
+}
+</style>
