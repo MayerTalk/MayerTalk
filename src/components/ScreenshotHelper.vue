@@ -1,10 +1,10 @@
 <script setup>
 import { computed, inject, nextTick } from 'vue'
 import { getCanvas, downloadCanvas, copy, getDialogue } from '@/lib/tool'
-import { dialogWidth } from '@/lib/constance'
+import { dialogWidth, TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
-import { chats, settings, DataControl } from '@/lib/data'
+import { chats, chars, settings, DataControl } from '@/lib/data'
 import { defaultSettings, syncedSettings } from '@/lib/settings'
 import CollapseItem from '@/components/CollapseItem.vue'
 
@@ -194,6 +194,22 @@ const expectCutNumber = computed(() => {
     return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
 })
 
+const wordCount = computed(() => {
+    let count = 0
+    for (let i = 0; i < chats.value.length; i++) {
+        const chat = chats.value[i]
+        const type = TypeSeries[chat.type]
+        if (type === 'Text') {
+            count += chat.content.length
+        } else if (type === 'TextArray') {
+            for (let j = 0; j < chat.content.length; j++) {
+                count += chat.content[j][1].length
+            }
+        }
+    }
+    return count
+})
+
 defineExpose({
     screenshot
 })
@@ -232,6 +248,39 @@ defineExpose({
 
                 </div>
             </CollapseItem>
+            <div class="bar">
+                <div style="display: flex; align-items: center; width: 100%">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 0 10px 0 0">统计</h2>
+                    <div class="line-right"></div>
+                </div>
+            </div>
+            <div class="column-display" style="padding: 0 20px">
+                <div style="width: 100%">
+                    <table>
+                        <tr>
+                            <th>角色数:</th>
+                            <td>{{ Object.keys(chars).length }}</td>
+                        </tr>
+                        <tr>
+                            <th>对话数:</th>
+                            <td>{{ chats.length }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="width: 100%">
+                    <table>
+                        <tr>
+                            <th>文本量:</th>
+                            <td>{{ wordCount }}</td>
+                        </tr>
+                        <tr>
+                            <th>截图长度:</th>
+                            <td>{{ (screenshotNode.scrollHeight + expectCutNumber * 30) * syncedSettings.scale }}px</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
             <el-button
@@ -244,7 +293,7 @@ defineExpose({
     </el-dialog>
 </template>
 
-<style>
+<style scoped>
 .bar {
     display: flex;
     align-items: center;
@@ -267,5 +316,9 @@ defineExpose({
 .bar h2 {
     display: inline;
     margin: 0 10px 0 0;
+}
+
+table {
+    border-spacing: 5px;
 }
 </style>
