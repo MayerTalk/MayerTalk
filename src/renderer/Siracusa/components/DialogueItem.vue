@@ -8,6 +8,7 @@ import {
     avatars
 } from '@/lib/data'
 import { syncedSettings } from '@/lib/settings'
+import { Suffix } from '@/lib/character'
 
 const rendererWidth = inject('rendererWidth')
 const charDirection = inject('charDirection')
@@ -74,7 +75,7 @@ watch(charDirection, () => {
                 <template v-else>
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
-                            <img :src="StaticUrl + 'avatar-bg.webp'">
+                            <img :src="StaticUrl + 'avatar-bg' + Suffix">
                             <img :src="avatars[data.char]">
                         </div>
                     </div>
@@ -152,7 +153,7 @@ watch(charDirection, () => {
                     <!--Content End-->
                     <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                         <div v-if="right === true">
-                            <img :src="StaticUrl + '/avatar-bg.webp'">
+                            <img :src="StaticUrl + '/avatar-bg' + Suffix">
                             <img :src="avatars[data.char]">
                         </div>
                     </div>
