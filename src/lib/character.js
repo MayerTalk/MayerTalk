@@ -29,7 +29,7 @@ function parseCharData (data) {
     const names = {}
     for (let i = 0; i < langOrder.length; i++) {
         if (data[0][i]) {
-            names[langOrder[i]] = data[0][i]
+            names[langOrder[i]] = data[0][i].toLowerCase()
         }
     }
     return {
