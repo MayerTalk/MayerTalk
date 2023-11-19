@@ -1,6 +1,6 @@
 <script setup>
 import { computed, inject, nextTick, ref } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue } from '@/lib/tool'
+import { getCanvas, downloadCanvas, copy, getDialogue, checkFilename } from '@/lib/tool'
 import { dialogWidth, TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
@@ -38,9 +38,9 @@ function downloadScreenshot (cb = null, options = {}) {
             finalCanvas.height = options.watermarkCanvas.height + canvas.height
             ctx.drawImage(options.watermarkCanvas, 0, 0)
             ctx.drawImage(canvas, 0, options.watermarkCanvas.height)
-            downloadCanvas(finalCanvas, cb, options.seq, options.filename)
+            downloadCanvas(finalCanvas, cb, options)
         } else {
-            downloadCanvas(canvas, cb, options.seq, options.filename)
+            downloadCanvas(canvas, cb, options)
         }
     })
 }
@@ -151,6 +151,10 @@ function getScreenshotGroup () {
 
 function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
+    const options = {
+        watermarkCanvas,
+        title: title.value && checkFilename(title.value) ? title.value : Date.now()
+    }
     if (group && syncedSettings.value.autoCut) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
@@ -185,8 +189,8 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
                         message.notify(t.value.notify.screenshottedSuccessfully + ' [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
                         next(i + 1)
                     }, {
-                        seq: seq + (i + 1),
-                        watermarkCanvas
+                        ...options,
+                        title: options.title + '-' + (i + 1)
                     })
                 }, 100)
             }, 100)
@@ -202,9 +206,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
             downloadScreenshot(() => {
                 screenshotNode.style.height = null
                 emit('done')
-            }, {
-                watermarkCanvas
-            })
+            }, options)
         }, 100)
     }
 }
