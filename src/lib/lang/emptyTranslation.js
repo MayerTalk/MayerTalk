@@ -36,7 +36,8 @@ const emptyTranslation = {
         screenshottedSuccessfully: '',
         recoveredSuccessfully: '',
         loadedSuccessfully: '',
-        downloadCanvasFailed: ''
+        downloadCanvasFailed: '',
+        emptiedSuccessfully: ''
     },
     action: {
         add: '',
@@ -66,7 +67,8 @@ const emptyTranslation = {
         import: '',
         export: '',
         createSavefile: '',
-        load: ''
+        load: '',
+        generate: ''
     },
     noun: {
         character: '',
@@ -100,7 +102,19 @@ const emptyTranslation = {
         storage: '',
         local: '',
         warning: '',
-        autoCut: ''
+        autoCut: '',
+        maxCutLength: '',
+        maxLength: '',
+        screenshot: '',
+        watermark: '',
+        title: '',
+        author: '',
+        expectCutNumber: '',
+        stats: '',
+        characterCount: '',
+        chatCount: '',
+        wordCount: '',
+        screenshotLength: ''
     },
     tip: {
         pool: [
