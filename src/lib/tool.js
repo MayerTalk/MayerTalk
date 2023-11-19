@@ -41,11 +41,11 @@ function getCanvas (node, options, cb) {
     })
 }
 
-function downloadCanvas (canvas, cb, seq = null, filename = null) {
+function downloadCanvas (canvas, cb, options) {
     canvas.toBlob((blob) => {
         try {
             const url = blob2url(blob)
-            download(url, filename || 'mayertalk-' + (seq || Date.now()) + '.jpg')
+            download(url, options.filename || 'mayertalk-' + (options.title || Date.now()) + '.jpg')
             cb && cb()
         } catch (e) {
             message.notify(t.value.notify.downloadCanvasFailed, message.error)
@@ -186,6 +186,10 @@ function sync (dst, src1, src2) {
     }
 }
 
+function checkFilename (filename) {
+    return !/[\\/:*?"<>|]/.test(filename)
+}
+
 export {
     md5,
     copy,
@@ -206,5 +210,6 @@ export {
     bool,
     getCanvas,
     downloadCanvas,
-    sync
+    sync,
+    checkFilename
 }
