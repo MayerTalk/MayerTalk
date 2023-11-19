@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { saveData, getData } from './lib/tool'
 import { config } from '@/lib/data'
+import { IsSafari } from '@/lib/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'showGuide'])
@@ -26,7 +27,7 @@ onMounted(() => {
     }
 })
 
-const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu|^(.(?!Chrome))*Safari/.test(navigator.userAgent) // hope detect successfully
+const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu/.test(navigator.userAgent) // hope detect successfully
 
 const invalidBrowserTranslate = {
     zh_CN: [
@@ -65,28 +66,32 @@ const defaultTranslate = {
         develop: '开发阶段，功能尚不完善，还请谅解',
         quicklyStart: '快速上手 (首次使用推荐阅读)',
         community: '交流群：560295639',
-        reportBug: 'bug反馈'
-    },
-    en_US: {
-        announcement: 'Announcement',
-        develop: 'Development stage, the function is not perfect, please understand',
-        quicklyStart: 'Quick start (recommended for first-time use)',
-        community: 'Communication group: 560295639',
-        reportBug: 'bug feedback'
-    },
-    ja_JP: {
-        announcement: 'お知らせ',
-        develop: '開発段階、機能はまだ不完全です、ご了承ください',
-        quicklyStart: 'クイックスタート (初めて使う方におすすめ)',
-        community: '交流グループ：560295639',
-        reportBug: 'バグフィードバック'
+        reportBug: 'bug反馈',
+        safariWarning: '请注意，你所使用的Safari版本可能不支持下载文件，这会导致截图与导出数据失效。'
     },
     zh_TW: {
         announcement: '公告',
         develop: '開發階段，功能尚不完善，還請諒解',
         quicklyStart: '快速上手 (首次使用推薦閱讀)',
         community: '交流群：560295639',
-        reportBug: 'bug回饋'
+        reportBug: 'bug反饋',
+        safariWarning: '請注意，你所使用的Safari版本可能不支持下載文件，這會導致截圖與導出數據失效。'
+    },
+    en_US: {
+        announcement: 'Announcement',
+        develop: 'In development stage, the function is not perfect, please understand',
+        quicklyStart: 'Quick Start (Recommended for first-time users)',
+        community: 'Communication group: 560295639',
+        reportBug: 'Bug feedback',
+        safariWarning: 'Please note that the Safari version you are using may not support downloading files, which will cause screenshots and data export to fail.'
+    },
+    ja_JP: {
+        announcement: 'アナウンス',
+        develop: '開発段階、機能はまだ完全ではありません、ご理解ください',
+        quicklyStart: 'クイックスタート（初めての方におすすめ）',
+        community: 'コミュニケーショングループ：560295639',
+        reportBug: 'バグフィードバック',
+        safariWarning: 'ご注意ください、お使いのSafariバージョンはファイルのダウンロードをサポートしていない可能性があります。これによりスクリーンショットとデータのエクスポートが失敗する可能性があります。'
     }
 }
 
@@ -97,29 +102,9 @@ const announcementTranslate = {
             optimize: '优化',
             fix: '修复'
         },
-        feat: ['i18n (英文，日文，繁中)'],
-        optimize: ['优化角色数据缓存', '优化手机端输入连贯性'],
-        fix: ['支持函全宽拉丁（ＡＢＣ）']
-    },
-    en_US: {
-        key: {
-            feat: 'New',
-            optimize: 'Optimize',
-            fix: 'Fix'
-        },
-        feat: ['i18n (English, Japanese, Traditional Chinese)'],
-        optimize: ['Optimize character data cache', 'Optimize mobile input coherence'],
-        fix: ['Support full-width Latin (ＡＢＣ)']
-    },
-    ja_JP: {
-        key: {
-            feat: '新規',
-            optimize: '最適化',
-            fix: '修正'
-        },
-        feat: ['i18n (英語，日本語，繁体字)'],
-        optimize: ['キャラクターデータキャッシュの最適化', 'モバイル入力の一貫性の最適化'],
-        fix: ['全角ラテン文字（ＡＢＣ）に対応']
+        feat: ['一年的鏖战与守望', '数据统计', '水印'],
+        optimize: ['现在文件名可以自定义了(截图-标题)'],
+        fix: ['自动裁分长度计算错误', '无法搜索角色英文名', '无法搜索角色代号']
     },
     zh_TW: {
         key: {
@@ -127,9 +112,29 @@ const announcementTranslate = {
             optimize: '優化',
             fix: '修復'
         },
-        feat: ['i18n (英文，日文，繁中)'],
-        optimize: ['優化角色數據緩存', '優化手機端輸入連貫性'],
-        fix: ['支持函全寬拉丁（ＡＢＣ）']
+        feat: ['一年的鏖戰與守望', '數據統計', '水印'],
+        optimize: ['現在文件名可以自定義了(截圖-標題)'],
+        fix: ['自動裁分長度計算錯誤', '無法搜索角色英文名', '無法搜索角色代號']
+    },
+    en_US: {
+        key: {
+            feat: 'New',
+            optimize: 'Optimize',
+            fix: 'Fix'
+        },
+        feat: ['A year of fighting and waiting', 'Data statistics', 'Watermark'],
+        optimize: ['Now the filename can be customized (screenshot-title)'],
+        fix: ['Automatic cutting length calculation error', 'Cannot search for character English name', 'Cannot search for character code']
+    },
+    ja_JP: {
+        key: {
+            feat: '追加',
+            optimize: '最適化',
+            fix: '修正'
+        },
+        feat: ['1年間の戦いと待機', 'データ統計', 'ウォーターマーク'],
+        optimize: ['今、ファイル名をカスタマイズできます（スクリーンショット-タイトル）'],
+        fix: ['自動切り分け長さの計算エラー', 'キャラクターの英語名を検索できない', 'キャラクターコードを検索できない']
     }
 }
 
@@ -158,7 +163,7 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.1.9'
+const version = 'v0.2.0'
 
 </script>
 
@@ -176,6 +181,7 @@ const version = 'v0.1.9'
         <template v-else>
             <p>{{ t.default.develop }}</p>
             <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
+            <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
             <h3>
                 {{ version }}
             </h3>

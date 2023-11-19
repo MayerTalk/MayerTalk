@@ -33,6 +33,26 @@ function getData (name) {
     }
 }
 
+function getCanvas (node, options, cb) {
+    html2canvas(node, options).then(canvas => {
+        cb(canvas)
+    }).catch(reason => {
+        message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)
+    })
+}
+
+function downloadCanvas (canvas, cb, options) {
+    canvas.toBlob((blob) => {
+        try {
+            const url = blob2url(blob)
+            download(url, options.filename || 'mayertalk-' + (options.title || Date.now()) + '.jpg')
+            cb && cb()
+        } catch (e) {
+            message.notify(t.value.notify.downloadCanvasFailed, message.error)
+        }
+    })
+}
+
 function download (url, filename) {
     const el = document.createElement('a')
     document.body.appendChild(el)
@@ -40,18 +60,6 @@ function download (url, filename) {
     el.href = url
     el.click()
     el.remove()
-}
-
-function downloadImage (node, options, callback, seq = null) {
-    html2canvas(node, options).then(canvas => {
-        canvas.toBlob(blob => {
-            const url = blob2url(blob)
-            download(url, 'mayertalk-' + (seq || Date.now()) + '.jpg')
-            callback && callback()
-        }, 'image/jpeg')
-    }).catch(reason => {
-        message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)
-    })
 }
 
 function blob2url (blob) {
@@ -157,6 +165,31 @@ function bool (obj) {
     return true
 }
 
+function sync (dst, src1, src2) {
+    // target default variable
+    for (const key in src1) {
+        if (Object.prototype.hasOwnProperty.call(src1, key)) {
+            if (typeof src1[key] === 'object') {
+                dst[key] = {}
+                sync(dst[key], src1[key], src2[key] || {}, key)
+            } else {
+                dst[key] = src1[key]
+            }
+        }
+    }
+    for (const key in src2) {
+        if (Object.prototype.hasOwnProperty.call(src2, key)) {
+            if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === 'boolean')) {
+                dst[key] = src2[key]
+            }
+        }
+    }
+}
+
+function checkFilename (filename) {
+    return !/[\\/:*?"<>|]/.test(filename)
+}
+
 export {
     md5,
     copy,
@@ -164,7 +197,6 @@ export {
     saveData,
     getData,
     download,
-    downloadImage,
     blob2url,
     blob2base64,
     image2square,
@@ -175,5 +207,9 @@ export {
     doAfterMounted,
     Textarea,
     formatSize,
-    bool
+    bool,
+    getCanvas,
+    downloadCanvas,
+    sync,
+    checkFilename
 }

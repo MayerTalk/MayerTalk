@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, watch, computed } from 'vue'
+import { ref, inject, computed } from 'vue'
 import { t, updateTranslation } from '@/lib/lang/translate'
 import { supportLang, langShow } from '@/lib/lang/constant'
 import Editors from '@/editor'
@@ -15,59 +15,15 @@ import {
     settings,
     DataControl
 } from '@/lib/data'
+import { syncedSettings, defaultSettings, setSettings } from '@/lib/settings'
 
 const emit = defineEmits(['resizeWindow', 'showSavefile'])
 
-const defaultSettings = {
-    background: '#303030',
-    width: 400,
-    style: 'default',
-    scale: 1.5,
-    showCharName: false,
-    showCharNameSettings: {
-        chat: true,
-        monologue: true,
-        image: true
-    },
-    maxHeight: 10000
-}
-
 const ifShow = inject('ifShowSettings')
-const rendererSettings = inject('rendererSettings')
-
-function _sync (dst, src1, src2) {
-    for (const key in src1) {
-        if (Object.prototype.hasOwnProperty.call(src1, key)) {
-            if (typeof src1[key] === 'object') {
-                dst[key] = {}
-                _sync(dst[key], src1[key], src2[key] || {}, key)
-            } else {
-                dst[key] = src1[key]
-            }
-        }
-    }
-    for (const key in src2) {
-        if (Object.prototype.hasOwnProperty.call(src2, key)) {
-            if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === 'boolean')) {
-                dst[key] = src2[key]
-            }
-        }
-    }
-}
-
-function sync () {
-    _sync(rendererSettings.value, defaultSettings, settings.value)
-}
-
-const fake = ref({
-    width: settings.value.width || null,
-    scale: settings.value.scale || null,
-    maxHeight: settings.value.maxHeight || null
-})
 
 const ifShowEditShowCharName = ref(false)
 const showCharNameSettings = computed(() => {
-    return rendererSettings.value.showCharNameSettings || {}
+    return syncedSettings.value.showCharNameSettings || {}
 })
 
 function setShowCharNameSettings (type, value) {
@@ -116,10 +72,6 @@ function checkClose (fn, ignore = []) {
         fn()
     }
 }
-
-// 同步，否则加载延迟+++
-sync()
-watch(settings, () => sync(), { deep: true })
 </script>
 
 <template>
@@ -177,25 +129,35 @@ watch(settings, () => sync(), { deep: true })
                     <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br/>({{ t.tip.settings.dialogWidth }})</span>
                     </th>
                     <td>
-                        <el-input v-model="fake.width" :clearable="true"
+                        <el-input v-model="settings.width" :clearable="true"
+                                  type="number"
                                   :placeholder="'' + defaultSettings.width"
-                                  @input="settings.width=+fake.width"/>
+                                  @input="(v) => {{setSettings(+v,'width')}}"/>
                     </td>
                 </tr>
                 <tr>
                     <th>{{ t.noun.imageQuality }}</th>
                     <td>
-                        <el-input v-model="fake.scale" :clearable="true"
+                        <el-input v-model="settings.scale" :clearable="true"
+                                  type="number"
                                   :placeholder="'' + defaultSettings.scale"
-                                  @input="settings.scale=+fake.scale"/>
+                                  @input="(v) => {setSettings(+v,'scale')}"/>
                     </td>
                 </tr>
                 <tr>
-                    <th>{{ t.noun.screenshotMaxHeight }}</th>
-                    <td>
-                        <el-input v-model="fake.maxHeight" :clearable="true"
+                    <th>{{ t.noun.autoCut }}</th>
+                    <td style="display: flex">
+                        <el-switch v-model="syncedSettings.autoCut" style="margin-right: 10px"
+                                   @change="(value) => {settings.autoCut=value}"></el-switch>
+                    </td>
+                </tr>
+                <tr v-if="syncedSettings.autoCut">
+                    <th>{{ t.noun.maxCutLength }}</th>
+                    <td style="display: flex">
+                        <el-input v-model="settings.maxHeight" :clearable="true"
+                                  type="number" :disabled="!syncedSettings.autoCut"
                                   :placeholder="'' + defaultSettings.maxHeight"
-                                  @input="settings.maxHeight=+fake.maxHeight"/>
+                                  @input="(v) => {setSettings(+v,'maxHeight')}"/>
                     </td>
                 </tr>
                 <tr>

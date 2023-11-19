@@ -35,7 +35,9 @@ const emptyTranslation = {
         startToScreenshot: '',
         screenshottedSuccessfully: '',
         recoveredSuccessfully: '',
-        loadedSuccessfully: ''
+        loadedSuccessfully: '',
+        downloadCanvasFailed: '',
+        emptiedSuccessfully: ''
     },
     action: {
         add: '',
@@ -65,7 +67,8 @@ const emptyTranslation = {
         import: '',
         export: '',
         createSavefile: '',
-        load: ''
+        load: '',
+        generate: ''
     },
     noun: {
         character: '',
@@ -95,14 +98,28 @@ const emptyTranslation = {
         background: '',
         dialogWidth: '',
         imageQuality: '',
-        screenshotMaxHeight: '',
         showCharacterName: '',
         storage: '',
         local: '',
-        warning: ''
+        warning: '',
+        autoCut: '',
+        maxCutLength: '',
+        maxLength: '',
+        screenshot: '',
+        watermark: '',
+        title: '',
+        author: '',
+        expectCutNumber: '',
+        stats: '',
+        characterCount: '',
+        chatCount: '',
+        wordCount: '',
+        screenshotLength: ''
     },
     tip: {
-        pool: [''],
+        pool: [
+            ''
+        ],
         selectCharDialog: '',
         cutScreenshot: '',
         settings: {

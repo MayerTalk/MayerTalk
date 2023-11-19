@@ -28,7 +28,7 @@ function open (index) {
     dialogueData.value = currDialogueData.value
     currType = dialogueData.value.type
     ifShow.value = true
-    if (TypeSeries[dialogueData.value.type] === 'text' && !IsMobile) {
+    if (TypeSeries[dialogueData.value.type] === 'Text' && !IsMobile) {
         doAfterMounted(inputRef, (r) => {
             r.value.focus()
         })
@@ -193,10 +193,5 @@ defineExpose({
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-}
-
-.column-display {
-    display: flex;
-    column-gap: 5px;
 }
 </style>

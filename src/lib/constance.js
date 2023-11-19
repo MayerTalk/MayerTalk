@@ -12,12 +12,12 @@ const TypeDefault = {
 }
 
 const TypeSeries = {
-    chat: 'text',
-    monologue: 'text',
-    image: 'image',
-    option: 'option',
-    select: 'text',
-    title: 'text'
+    chat: 'Text',
+    monologue: 'Text',
+    image: 'Image',
+    option: 'TextArray',
+    select: 'Text',
+    title: 'Text'
 }
 
 const defaultWidth = 520
@@ -27,6 +27,7 @@ const dialogWidth = Math.ceil(windowWidth * 0.9)
 const WindowHeight = window.innerHeight
 const MobileView = !(window.innerWidth - defaultWidth > 250)
 const IsMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
+const IsSafari = /^(.(?!Chrome))*Safari/.test(navigator.userAgent) || true
 
 export {
     StaticUrl,
@@ -36,5 +37,6 @@ export {
     dialogWidth,
     MobileView,
     WindowHeight,
-    IsMobile
+    IsMobile,
+    IsSafari
 }

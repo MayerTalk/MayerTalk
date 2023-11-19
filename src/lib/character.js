@@ -6,16 +6,15 @@ import { copy } from '@/lib/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 import { characterHost } from '@/lib/dev'
 import { config } from '@/lib/data'
+import { IsSafari } from '@/lib/constance'
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 
 const CharDict = {}
 const loaded = []
-const Suffix = (navigator.userAgent.indexOf('Chrome') === -1 && navigator.userAgent.indexOf('Safari') !== -1)
-    ? '.png'
-    : '.webp'
+const Suffix = IsSafari ? '.png' : '.webp'
 
-const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP']
+const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP', 'code']
 
 function parseAvatarUrl (url, series, charId) {
     // 生成可访问的头像url
@@ -29,7 +28,7 @@ function parseCharData (data) {
     const names = {}
     for (let i = 0; i < langOrder.length; i++) {
         if (data[0][i]) {
-            names[langOrder[i]] = data[0][i]
+            names[langOrder[i]] = data[0][i].toLowerCase()
         }
     }
     return {

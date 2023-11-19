@@ -7,9 +7,10 @@ import {
     images,
     avatars
 } from '@/lib/data'
+import { syncedSettings } from '@/lib/settings'
+import { Suffix } from '@/lib/character'
 
-const rendererSettings = inject('rendererSettings')
-const width = inject('width')
+const rendererWidth = inject('rendererWidth')
 const charDirection = inject('charDirection')
 const preScreenshot = inject('preScreenshot')
 const props = defineProps(['data', 'index', 'plus1'])
@@ -38,7 +39,7 @@ function resizeImage () {
     }
 }
 
-watch(() => width.value.window, () => {
+watch(() => rendererWidth.value.window, () => {
     // window改变时调整图片大小
     resizeImage()
 })
@@ -49,14 +50,15 @@ watch(charDirection, () => {
 </script>
 
 <template>
-    <div :class="rendererSettings.style" :id="data.id">
+    <div :class="syncedSettings.style" :id="data.id">
         <div class="dialogue">
             <div style="display: flex; width: 100%; margin-bottom: 10px;"
                  @click="(event) => {$emit(event.ctrlKey ? 'delete' : 'edit', index)}"
                  :style="{justifyContent:(right?'flex-end':'flex-start')}">
                 <div v-if="data.type==='title'" style="flex-grow: 1">
-                    <div v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
-                         class="charName">{{char.name}}
+                    <div
+                        v-if="syncedSettings.showCharName && data.char && syncedSettings.showCharNameSettings[data.type]"
+                        class="charName">{{ char.name }}
                     </div>
                     <div class="title-box">
                         <div style="background: darkgrey; padding: 0 7px; font-size: 10px">DIALOGUE</div>
@@ -65,7 +67,7 @@ watch(charDirection, () => {
                             <div class="block" style="bottom: 0; left: 0"></div>
                             <div class="block" style="top: 0; right: 0"></div>
                             <div class="block" style="bottom: 0; right: 0"></div>
-                            <pre>{{data.content}}</pre>
+                            <pre>{{ data.content }}</pre>
                         </div>
                         <div class="line"></div>
                     </div>
@@ -73,14 +75,15 @@ watch(charDirection, () => {
                 <template v-else>
                     <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                         <div v-if="right === false">
-                            <img :src="StaticUrl + 'avatar-bg.webp'">
+                            <img :src="StaticUrl + 'avatar-bg' + Suffix">
                             <img :src="avatars[data.char]">
                         </div>
                     </div>
                     <!--Content Start-->
                     <div :style="{'flex-grow':data.type==='image'?0:1}">
-                        <div v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
-                             class="charName">{{char.name}}
+                        <div
+                            v-if="syncedSettings.showCharName && data.char && syncedSettings.showCharNameSettings[data.type]"
+                            class="charName">{{ char.name }}
                         </div>
                         <div v-if="data.type==='image'" class="box image-box" style="justify-self: flex-start">
                             <div v-if="data.char" :class="[right? 'right':'left']">
@@ -90,7 +93,7 @@ watch(charDirection, () => {
                             </div>
                             <img v-if="images[data.content]"
                                  :id="data.id" :key="id" :src="images[data.content].src"
-                                 :style="{width: preScreenshot?width.image:'100%'}"
+                                 :style="{width: preScreenshot?rendererWidth.image:'100%'}"
                             >
                             <span v-else>loading image...</span>
                         </div>
@@ -100,19 +103,19 @@ watch(charDirection, () => {
                                     <div class="tail">
                                         <div class="tail2"></div>
                                     </div>
-                                    <pre>{{data.content}}</pre>
+                                    <pre>{{ data.content }}</pre>
                                 </div>
                             </div>
                             <div v-else style="color: #CCCCCC" class="box">
-                                <pre>{{data.content}}</pre>
+                                <pre>{{ data.content }}</pre>
                             </div>
                         </template>
                         <template v-else-if="data.type==='monologue'">
                             <div v-if="data.char" class="box monologue-box">
-                                <pre>{{data.content}}</pre>
+                                <pre>{{ data.content }}</pre>
                             </div>
                             <div v-else style="color: #909090" class="box">
-                                <pre>{{data.content}}</pre>
+                                <pre>{{ data.content }}</pre>
                             </div>
                         </template>
                         <template v-else-if="data.type==='option'">
@@ -124,7 +127,7 @@ watch(charDirection, () => {
                                         <div class="triangle"></div>
                                     </div>
                                     <div class="text">
-                                        <pre>{{value[1]}}</pre>
+                                        <pre>{{ value[1] }}</pre>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +140,7 @@ watch(charDirection, () => {
                                     <div class="triangle"></div>
                                 </div>
                                 <div class="text">
-                                    <pre>{{data.content}}</pre>
+                                    <pre>{{ data.content }}</pre>
                                 </div>
                                 <div class="triangle-box" style="transform: rotate(180deg)">
                                     <div class="triangle" style="margin-left: 14px"></div>
@@ -150,7 +153,7 @@ watch(charDirection, () => {
                     <!--Content End-->
                     <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                         <div v-if="right === true">
-                            <img :src="StaticUrl + '/avatar-bg.webp'">
+                            <img :src="StaticUrl + '/avatar-bg' + Suffix">
                             <img :src="avatars[data.char]">
                         </div>
                     </div>
@@ -165,16 +168,16 @@ watch(charDirection, () => {
 <style src="../style/dialogue.css" scoped/>
 <style src="../style/plus1.css" scoped/>
 <style scoped>
-    .avatar {
-        width: v-bind('width.avatar');
-        height: v-bind('width.avatar');
-    }
+.avatar {
+    width: v-bind('rendererWidth.avatar');
+    height: v-bind('rendererWidth.avatar');
+}
 
-    .dialogue pre {
-        font-size: v-bind('width.fontsize');
-    }
+.dialogue pre {
+    font-size: v-bind('rendererWidth.fontsize');
+}
 
-    .charName {
-        text-align: v-bind("right?'right':'left'");
-    }
+.charName {
+    text-align: v-bind("right?'right':'left'");
+}
 </style>
