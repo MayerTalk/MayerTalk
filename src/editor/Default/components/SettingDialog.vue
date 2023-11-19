@@ -152,7 +152,7 @@ function checkClose (fn, ignore = []) {
                     </td>
                 </tr>
                 <tr v-if="syncedSettings.autoCut">
-                    <th>{{ t.noun.maxCutHeight }}</th>
+                    <th>{{ t.noun.maxCutLength }}</th>
                     <td style="display: flex">
                         <el-input v-model="settings.maxHeight" :clearable="true"
                                   type="number" :disabled="!syncedSettings.autoCut"
