@@ -57,15 +57,21 @@ function getNode () {
 }
 
 const realMaxHeight = computed(() => {
+    // -30 renderer上下padding (20+10)
+    // -10 watermark上下padding (5+5)
+    // +10 dialogue无效margin-bottom
     const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0)
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0) + 10
     return res > 0 ? res : 1
 })
 
+function offsetTop (el) {
+    // offsetTop 包含 renderer paddingTop 20px
+    return el.offsetTop - 20
+}
+
 function getScreenshotGroup () {
-    // 30 上下margin (20+10)
-    const totalHeight = (screenshotNode.scrollHeight - 30) -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0)
+    const totalHeight = screenshotNode.scrollHeight + (syncedSettings.value.watermark ? watermarkNode.scrollHeight : 0)
     // 缩小比例后实际 maxHeight
     const maxHeight = realMaxHeight.value
     if (totalHeight < maxHeight || chats.value.length < 2) {
@@ -82,13 +88,13 @@ function getScreenshotGroup () {
     if (totalHeight / maxHeight > 2) {
         for (let i = 1; i < chats.value.length; i++) {
             const dialogue = getDialogue(chats.value[i].id)
-            if (dialogue.offsetTop - croppedHeight > maxHeight) {
+            if (offsetTop(dialogue) - croppedHeight > maxHeight) {
                 if (i - 1 <= lastCrop) {
                     // 最小粒度 (1对话)
                     continue
                 }
                 points.push(i - 1)
-                croppedHeight = getDialogue(chats.value[i - 1].id).offsetTop
+                croppedHeight = offsetTop(getDialogue(chats.value[i - 1].id))
                 lastCrop = i - 1
                 if (totalHeight - croppedHeight < 2 * maxHeight) {
                     index = i
@@ -101,9 +107,9 @@ function getScreenshotGroup () {
     index = chats.value.length - Math.floor((chats.value.length - index) / 2)
     while (true) {
         const dialogue = getDialogue(chats.value[index].id)
-        if (dialogue.offsetTop - croppedHeight > maxHeight) {
+        if (offsetTop(dialogue) - croppedHeight > maxHeight) {
             // part1 过长
-            if (totalHeight - dialogue.offsetTop >= maxHeight) {
+            if (totalHeight - offsetTop(dialogue) >= maxHeight) {
                 // 同时part2过长
                 // 极端情况，此时三等分
                 const diff = Math.ceil((chats.value.length - index) / 3)
@@ -131,7 +137,7 @@ function getScreenshotGroup () {
             index--
             continue
         }
-        if (totalHeight - dialogue.offsetTop > maxHeight) {
+        if (totalHeight - offsetTop(dialogue) > maxHeight) {
             // part2过长，index后移
             index++
             continue
