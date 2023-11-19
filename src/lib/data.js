@@ -349,14 +349,14 @@ const DataControl = {
                 }
             }
             chats.value = []
-            message.notify('清空成功', message.success)
+            message.notify(t.value.notify.emptiedSuccessfully, message.success)
             this.save(['chats', 'images'])
         } else if (level === 1) {
             // 清空对话 + 角色
             chars.value = {}
             chats.value = []
             images.value = {}
-            message.notify('清空成功', message.success)
+            message.notify(t.value.notify.emptiedSuccessfully, message.success)
             this.save(['chars', 'chats', 'images'])
         } else if (level === 2) {
             // 清空本地数据

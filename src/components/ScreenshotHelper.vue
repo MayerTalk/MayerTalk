@@ -258,13 +258,13 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="'截图'"
+    <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshot"
                @closed="DataControl.save(['settings'])">
         <div>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
-                    <h2 style="margin: 0 10px 0 0">水印</h2>
+                    <h2 style="margin: 0 10px 0 0">{{ t.noun.watermark }}</h2>
                     <el-switch v-model="syncedSettings.watermark"
                                @change="(value) => {settings.watermark=value}"></el-switch>
                     <div class="line-right"></div>
@@ -274,13 +274,13 @@ defineExpose({
                 <div v-show="syncedSettings.watermark" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
                     <table>
                         <tr>
-                            <th>标题</th>
+                            <th>{{ t.noun.title }}</th>
                             <td>
                                 <el-input v-model="title" clearable></el-input>
                             </td>
                         </tr>
                         <tr>
-                            <th>作者</th>
+                            <th>{{ t.noun.author }}</th>
                             <td>
                                 <el-input v-model="syncedSettings.author" clearable
                                           @input="(v) => {setSettings(v,'author')}"></el-input>
@@ -292,7 +292,7 @@ defineExpose({
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
-                    <h2 style="margin: 0 10px 0 0">自动裁分</h2>
+                    <h2 style="margin: 0 10px 0 0">{{ t.noun.autoCut }}</h2>
                     <el-switch v-model="syncedSettings.autoCut"
                                @change="(value) => {settings.autoCut=value}"></el-switch>
                     <div class="line-right"></div>
@@ -302,7 +302,7 @@ defineExpose({
                 <div v-show="syncedSettings.autoCut" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
                     <div class="column-display"
                          style="display: flex; align-items: center; padding-top: 5px">
-                        <div style="width: 100%"> 最大长度
+                        <div style="width: 100%"> {{ t.noun.maxLength }}
                             <el-input
                                 v-model="settings.maxHeight" clearable type="number"
                                 style="width: 100px; margin-left: 10px"
@@ -311,7 +311,7 @@ defineExpose({
                             />
                         </div>
                         <div style="width: 100%">
-                            预计裁分: {{ expectCutNumber }}
+                            {{ t.noun.expectCutNumber }}: {{ expectCutNumber }}
                         </div>
                     </div>
                 </div>
@@ -319,7 +319,7 @@ defineExpose({
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
-                    <h2 style="margin: 0 10px 0 0">统计</h2>
+                    <h2 style="margin: 0 10px 0 0">{{ t.noun.stats }}</h2>
                     <div class="line-right"></div>
                 </div>
             </div>
@@ -327,11 +327,11 @@ defineExpose({
                 <div style="width: 100%">
                     <table>
                         <tr>
-                            <th>角色数:</th>
+                            <th>{{ t.noun.characterCount }}:</th>
                             <td>{{ Object.keys(chars).length }}</td>
                         </tr>
                         <tr>
-                            <th>对话数:</th>
+                            <th>{{ t.noun.chatCount }}:</th>
                             <td>{{ chats.length }}</td>
                         </tr>
                     </table>
@@ -339,11 +339,11 @@ defineExpose({
                 <div style="width: 100%">
                     <table>
                         <tr>
-                            <th>文本量:</th>
+                            <th>{{ t.noun.wordCount }}:</th>
                             <td>{{ wordCount }}</td>
                         </tr>
                         <tr>
-                            <th>截图长度:</th>
+                            <th>{{ t.noun.screenshotLength }}:</th>
                             <td>{{ (screenshotNode.scrollHeight + expectCutNumber * 30) * syncedSettings.scale }}px</td>
                         </tr>
                     </table>
@@ -354,7 +354,7 @@ defineExpose({
             <el-button
                 @click="() => {DataControl.save(['settings']); screenshot(); ifShowScreenshotHelper=false}"
                 style="width: 30%"
-            >生成
+            >{{ t.action.generate }}
             </el-button>
         </div>
 
@@ -365,8 +365,8 @@ defineExpose({
                  class="watermark-bar">
                 <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 5px 0; opacity: 1"><i>MayerTalk</i></h1>
                 <div>
-                    <p v-if="title" style="margin-bottom: 3px">标题: {{ title }}</p>
-                    <p v-if="syncedSettings.author">作者: {{ syncedSettings.author }}</p>
+                    <p v-if="title" style="margin-bottom: 3px">{{ t.noun.title }}: {{ title }}</p>
+                    <p v-if="syncedSettings.author">{{ t.noun.author }}: {{ syncedSettings.author }}</p>
                 </div>
             </div>
 

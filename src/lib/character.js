@@ -15,7 +15,7 @@ const Suffix = (navigator.userAgent.indexOf('Chrome') === -1 && navigator.userAg
     ? '.png'
     : '.webp'
 
-const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP']
+const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP', 'code']
 
 function parseAvatarUrl (url, series, charId) {
     // 生成可访问的头像url
@@ -29,7 +29,7 @@ function parseCharData (data) {
     const names = {}
     for (let i = 0; i < langOrder.length; i++) {
         if (data[0][i]) {
-            names[langOrder[i]] = data[0][i]
+            names[langOrder[i]] = data[0][i].toLowerCase()
         }
     }
     return {
