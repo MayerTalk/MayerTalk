@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { saveData, getData } from './lib/tool'
 import { config } from '@/lib/data'
+import { IsSafari } from '@/lib/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'showGuide'])
@@ -26,7 +27,7 @@ onMounted(() => {
     }
 })
 
-const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu|^(.(?!Chrome))*Safari/.test(navigator.userAgent) // hope detect successfully
+const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu/.test(navigator.userAgent) // hope detect successfully
 
 const invalidBrowserTranslate = {
     zh_CN: [
@@ -65,7 +66,8 @@ const defaultTranslate = {
         develop: '开发阶段，功能尚不完善，还请谅解',
         quicklyStart: '快速上手 (首次使用推荐阅读)',
         community: '交流群：560295639',
-        reportBug: 'bug反馈'
+        reportBug: 'bug反馈',
+        safariWarning: '请注意，你所使用的Safari版本可能不支持下载文件，这会导致截图与导出数据失效。'
     },
     en_US: {
         announcement: 'Announcement',
@@ -86,7 +88,24 @@ const defaultTranslate = {
         develop: '開發階段，功能尚不完善，還請諒解',
         quicklyStart: '快速上手 (首次使用推薦閱讀)',
         community: '交流群：560295639',
-        reportBug: 'bug回饋'
+        reportBug: 'bug反饋',
+        safariWarning: '請注意，你所使用的Safari版本可能不支持下載文件，這會導致截圖與導出數據失效。'
+    },
+    en_US: {
+        announcement: 'Announcement',
+        develop: 'In development stage, the function is not perfect, please understand',
+        quicklyStart: 'Quick Start (Recommended for first-time users)',
+        community: 'Communication group: 560295639',
+        reportBug: 'Bug feedback',
+        safariWarning: 'Please note that the Safari version you are using may not support downloading files, which will cause screenshots and data export to fail.'
+    },
+    ja_JP: {
+        announcement: 'アナウンス',
+        develop: '開発段階、機能はまだ完全ではありません、ご理解ください',
+        quicklyStart: 'クイックスタート（初めての方におすすめ）',
+        community: 'コミュニケーショングループ：560295639',
+        reportBug: 'バグフィードバック',
+        safariWarning: 'ご注意ください、お使いのSafariバージョンはファイルのダウンロードをサポートしていない可能性があります。これによりスクリーンショットとデータのエクスポートが失敗する可能性があります。'
     }
 }
 
@@ -176,6 +195,7 @@ const version = 'v0.1.9'
         <template v-else>
             <p>{{ t.default.develop }}</p>
             <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
+            <h3 v-if="IsSafari">{{ t.default.safariWarning}}</h3>
             <h3>
                 {{ version }}
             </h3>
