@@ -35,9 +35,9 @@ function downloadScreenshot (cb = null, options = {}) {
             const finalCanvas = document.createElement('canvas')
             const ctx = finalCanvas.getContext('2d')
             finalCanvas.width = canvas.width
-            finalCanvas.height = options.watermarkCanvas.height + canvas.height
+            finalCanvas.height = options.watermarkCanvas.height + canvas.height - 1
             ctx.drawImage(options.watermarkCanvas, 0, 0)
-            ctx.drawImage(canvas, 0, options.watermarkCanvas.height)
+            ctx.drawImage(canvas, 0, options.watermarkCanvas.height - 1)
             downloadCanvas(finalCanvas, cb, options)
         } else {
             downloadCanvas(canvas, cb, options)
@@ -362,16 +362,18 @@ defineExpose({
 
     </el-dialog>
     <Teleport to="body">
-        <div id="watermark" style="position: absolute; top: 0; z-index: -1; background: white">
-            <div :style="{width: rendererWidth.window+'px', background: syncedSettings.background}"
-                 class="watermark-bar">
-                <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 5px 0; opacity: 1"><i>MayerTalk</i></h1>
-                <div>
-                    <p v-if="title" style="margin-bottom: 3px">{{ t.noun.title }}: {{ title }}</p>
-                    <p v-if="syncedSettings.author">{{ t.noun.author }}: {{ syncedSettings.author }}</p>
+        <div style="position: absolute; top: 0;z-index: -1; overflow: hidden"
+             :style="{width: rendererWidth.window+'px'}">
+            <div id="watermark" style="position: absolute; top: 0; background: white">
+                <div :style="{width: rendererWidth.window+'px', background: syncedSettings.background}"
+                     class="watermark-bar">
+                    <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 6px 0; opacity: 1"><i>MayerTalk</i></h1>
+                    <div>
+                        <p v-if="title" style="margin-bottom: 3px">{{ t.noun.title }}: {{ title }}</p>
+                        <p v-if="syncedSettings.author">{{ t.noun.author }}: {{ syncedSettings.author }}</p>
+                    </div>
                 </div>
             </div>
-
         </div>
     </Teleport>
 </template>
