@@ -15,7 +15,7 @@ import {
     settings,
     DataControl
 } from '@/lib/data'
-import { syncedSettings, defaultSettings } from '@/lib/settings'
+import { syncedSettings, defaultSettings, setSettings } from '@/lib/settings'
 
 const emit = defineEmits(['resizeWindow', 'showSavefile'])
 
@@ -132,7 +132,7 @@ function checkClose (fn, ignore = []) {
                         <el-input v-model="settings.width" :clearable="true"
                                   type="number"
                                   :placeholder="'' + defaultSettings.width"
-                                  @input="(v) => {if(v){settings.width= +v}else{delete settings.width}}"/>
+                                  @input="(v) => {{setSettings(+v,'width')}}"/>
                     </td>
                 </tr>
                 <tr>
@@ -141,7 +141,7 @@ function checkClose (fn, ignore = []) {
                         <el-input v-model="settings.scale" :clearable="true"
                                   type="number"
                                   :placeholder="'' + defaultSettings.scale"
-                                  @input="(v) => {if(v){settings.scale= +v}else{delete settings.scale}}"/>
+                                  @input="(v) => {setSettings(+v,'scale')}"/>
                     </td>
                 </tr>
                 <tr>
@@ -157,7 +157,7 @@ function checkClose (fn, ignore = []) {
                         <el-input v-model="settings.maxHeight" :clearable="true"
                                   type="number" :disabled="!syncedSettings.autoCut"
                                   :placeholder="'' + defaultSettings.maxHeight"
-                                  @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"/>
+                                  @input="(v) => {setSettings(+v,'maxHeight')}"/>
                     </td>
                 </tr>
                 <tr>
