@@ -62,18 +62,6 @@ function download (url, filename) {
     el.remove()
 }
 
-function downloadImage (node, options, callback, seq = null) {
-    html2canvas(node, options).then(canvas => {
-        canvas.toBlob(blob => {
-            const url = blob2url(blob)
-            download(url, 'mayertalk-' + (seq || Date.now()) + '.jpg')
-            callback && callback()
-        }, 'image/jpeg')
-    }).catch(reason => {
-        message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)
-    })
-}
-
 function blob2url (blob) {
     let url = null
     if (window.createObjectURL !== undefined) {
@@ -205,7 +193,6 @@ export {
     saveData,
     getData,
     download,
-    downloadImage,
     blob2url,
     blob2base64,
     image2square,

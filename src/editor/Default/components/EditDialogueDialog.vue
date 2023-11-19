@@ -28,7 +28,7 @@ function open (index) {
     dialogueData.value = currDialogueData.value
     currType = dialogueData.value.type
     ifShow.value = true
-    if (TypeSeries[dialogueData.value.type] === 'text' && !IsMobile) {
+    if (TypeSeries[dialogueData.value.type] === 'Text' && !IsMobile) {
         doAfterMounted(inputRef, (r) => {
             r.value.focus()
         })

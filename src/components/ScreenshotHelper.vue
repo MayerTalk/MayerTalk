@@ -1,11 +1,11 @@
 <script setup>
-import { computed, inject, nextTick } from 'vue'
+import { computed, inject, nextTick, ref } from 'vue'
 import { getCanvas, downloadCanvas, copy, getDialogue } from '@/lib/tool'
-import { dialogWidth } from '@/lib/constance'
+import { dialogWidth, TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
-import { chats, settings, DataControl } from '@/lib/data'
-import { defaultSettings, syncedSettings } from '@/lib/settings'
+import { chats, chars, settings, DataControl } from '@/lib/data'
+import { defaultSettings, syncedSettings, setSettings } from '@/lib/settings'
 import CollapseItem from '@/components/CollapseItem.vue'
 
 const props = defineProps(['modelValue'])
@@ -20,7 +20,9 @@ const ifShowScreenshotHelper = computed({
     }
 })
 let screenshotNode = null
+let watermarkNode = null
 const rendererWidth = inject('rendererWidth')
+const title = ref('')
 
 function downloadScreenshot (cb = null, options = {}) {
     getCanvas(options.screenshotNode || screenshotNode, {
@@ -29,13 +31,24 @@ function downloadScreenshot (cb = null, options = {}) {
         useCORS: true,
         ...(options.options || {})
     }, (canvas) => {
-        downloadCanvas(canvas, cb, options.seq, options.filename)
+        if (options.watermarkCanvas) {
+            const finalCanvas = document.createElement('canvas')
+            const ctx = finalCanvas.getContext('2d')
+            finalCanvas.width = canvas.width
+            finalCanvas.height = options.watermarkCanvas.height + canvas.height
+            ctx.drawImage(options.watermarkCanvas, 0, 0)
+            ctx.drawImage(canvas, 0, options.watermarkCanvas.height)
+            downloadCanvas(finalCanvas, cb, options.seq, options.filename)
+        } else {
+            downloadCanvas(canvas, cb, options.seq, options.filename)
+        }
     })
 }
 
 function getNode () {
-    if (document.getElementById('renderer')) {
+    if (document.getElementById('renderer') && document.getElementById('watermark')) {
         screenshotNode = document.getElementById('renderer')
+        watermarkNode = document.getElementById('watermark')
     } else {
         setTimeout(() => {
             getNode()
@@ -44,15 +57,17 @@ function getNode () {
 }
 
 const realMaxHeight = computed(() => {
-    return syncedSettings.value.maxHeight / syncedSettings.value.scale - 30
+    const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0)
+    return res > 0 ? res : 1
 })
 
 function getScreenshotGroup () {
     // 30 上下margin (20+10)
-    const totalHeight = (screenshotNode.scrollHeight - 30)
+    const totalHeight = (screenshotNode.scrollHeight - 30) -
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0)
     // 缩小比例后实际 maxHeight
-    let maxHeight = realMaxHeight.value
-    maxHeight = maxHeight < 0 ? 0 : maxHeight
+    const maxHeight = realMaxHeight.value
     if (totalHeight < maxHeight || chats.value.length < 2) {
         // 无需裁分
         return false
@@ -128,13 +143,12 @@ function getScreenshotGroup () {
     return points
 }
 
-function screenshot (ensure = false) {
-    emit('start')
+function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
     if (group && syncedSettings.value.autoCut) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
-                screenshot(true)
+                _screenshot(true, watermarkCanvas)
             }, () => {
                 emit('done')
             })
@@ -165,7 +179,8 @@ function screenshot (ensure = false) {
                         message.notify(t.value.notify.screenshottedSuccessfully + ' [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
                         next(i + 1)
                     }, {
-                        seq: seq + (i + 1)
+                        seq: seq + (i + 1),
+                        watermarkCanvas
                     })
                 }, 100)
             }, 100)
@@ -182,9 +197,30 @@ function screenshot (ensure = false) {
                 downloadScreenshot(() => {
                     screenshotNode.style.height = null
                     emit('done')
+                }, {
+                    watermarkCanvas
                 })
             }, 100)
         })
+    }
+}
+
+function getWatermarkCanvas (cb) {
+    getCanvas(watermarkNode, {
+        windowWidth: rendererWidth.value.window + 20,
+        scale: syncedSettings.value.scale,
+        useCORS: true
+    }, cb)
+}
+
+function screenshot () {
+    emit('start')
+    if (syncedSettings.value.watermark) {
+        getWatermarkCanvas((canvas) => {
+            _screenshot(false, canvas)
+        })
+    } else {
+        _screenshot(false)
     }
 }
 
@@ -194,6 +230,22 @@ const expectCutNumber = computed(() => {
     return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
 })
 
+const wordCount = computed(() => {
+    let count = 0
+    for (let i = 0; i < chats.value.length; i++) {
+        const chat = chats.value[i]
+        const type = TypeSeries[chat.type]
+        if (type === 'Text') {
+            count += chat.content.length
+        } else if (type === 'TextArray') {
+            for (let j = 0; j < chat.content.length; j++) {
+                count += chat.content[j][1].length
+            }
+        }
+    }
+    return count
+})
+
 defineExpose({
     screenshot
 })
@@ -201,9 +253,36 @@ defineExpose({
 
 <template>
     <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="'截图'"
-               @closed="DataControl.save(['settings'])"
-    >
+               @closed="DataControl.save(['settings'])">
         <div>
+            <div class="bar">
+                <div style="display: flex; align-items: center; width: 100%">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 0 10px 0 0">水印</h2>
+                    <el-switch v-model="syncedSettings.watermark"
+                               @change="(value) => {settings.watermark=value}"></el-switch>
+                    <div class="line-right"></div>
+                </div>
+            </div>
+            <CollapseItem>
+                <div v-show="syncedSettings.watermark" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
+                    <table>
+                        <tr>
+                            <th>标题</th>
+                            <td>
+                                <el-input v-model="title" clearable></el-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>作者</th>
+                            <td>
+                                <el-input v-model="syncedSettings.author" clearable
+                                          @input="(v) => {setSettings(v,'author')}"></el-input>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </CollapseItem>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
@@ -222,16 +301,48 @@ defineExpose({
                                 v-model="settings.maxHeight" clearable type="number"
                                 style="width: 100px; margin-left: 10px"
                                 :placeholder="''+defaultSettings.maxHeight"
-                                @input="(v) => {if(v){settings.maxHeight= +v}else{delete settings.maxHeight}}"
+                                @input="(v) => {setSettings(+v,'maxHeight')}"
                             />
                         </div>
                         <div style="width: 100%">
                             预计裁分: {{ expectCutNumber }}
                         </div>
                     </div>
-
                 </div>
             </CollapseItem>
+            <div class="bar">
+                <div style="display: flex; align-items: center; width: 100%">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 0 10px 0 0">统计</h2>
+                    <div class="line-right"></div>
+                </div>
+            </div>
+            <div class="column-display" style="padding: 0 20px">
+                <div style="width: 100%">
+                    <table>
+                        <tr>
+                            <th>角色数:</th>
+                            <td>{{ Object.keys(chars).length }}</td>
+                        </tr>
+                        <tr>
+                            <th>对话数:</th>
+                            <td>{{ chats.length }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="width: 100%">
+                    <table>
+                        <tr>
+                            <th>文本量:</th>
+                            <td>{{ wordCount }}</td>
+                        </tr>
+                        <tr>
+                            <th>截图长度:</th>
+                            <td>{{ (screenshotNode.scrollHeight + expectCutNumber * 30) * syncedSettings.scale }}px</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
             <el-button
@@ -242,9 +353,22 @@ defineExpose({
         </div>
 
     </el-dialog>
+    <Teleport to="body">
+        <div id="watermark" style="position: absolute; top: 0; z-index: -1; background: white">
+            <div :style="{width: rendererWidth.window+'px', background: syncedSettings.background}"
+                 class="watermark-bar">
+                <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 5px 0; opacity: 1"><i>MayerTalk</i></h1>
+                <div>
+                    <p v-if="title" style="margin-bottom: 3px">标题: {{ title }}</p>
+                    <p v-if="syncedSettings.author">作者: {{ syncedSettings.author }}</p>
+                </div>
+            </div>
+
+        </div>
+    </Teleport>
 </template>
 
-<style>
+<style scoped>
 .bar {
     display: flex;
     align-items: center;
@@ -267,5 +391,22 @@ defineExpose({
 .bar h2 {
     display: inline;
     margin: 0 10px 0 0;
+}
+
+table {
+    border-spacing: 5px;
+}
+
+.watermark-bar {
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    color: white;
+    padding: 5px 10px;
+    font-size: 16px;
+}
+
+.watermark-bar p {
+    margin: 0;
 }
 </style>
