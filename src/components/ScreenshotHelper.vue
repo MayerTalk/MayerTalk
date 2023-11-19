@@ -196,18 +196,16 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
             next(0)
         }, 500)
     } else {
-        nextTick(() => {
-            // 将height定为整数，防止截图下方出现白条
-            screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
-            setTimeout(() => {
-                downloadScreenshot(() => {
-                    screenshotNode.style.height = null
-                    emit('done')
-                }, {
-                    watermarkCanvas
-                })
-            }, 100)
-        })
+        // 将height定为整数，防止截图下方出现白条
+        screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
+        setTimeout(() => {
+            downloadScreenshot(() => {
+                screenshotNode.style.height = null
+                emit('done')
+            }, {
+                watermarkCanvas
+            })
+        }, 100)
     }
 }
 
@@ -221,13 +219,15 @@ function getWatermarkCanvas (cb) {
 
 function screenshot () {
     emit('start')
-    if (syncedSettings.value.watermark) {
-        getWatermarkCanvas((canvas) => {
-            _screenshot(false, canvas)
-        })
-    } else {
-        _screenshot(false)
-    }
+    nextTick(() => {
+        if (syncedSettings.value.watermark) {
+            getWatermarkCanvas((canvas) => {
+                _screenshot(false, canvas)
+            })
+        } else {
+            _screenshot(false)
+        }
+    })
 }
 
 getNode()
