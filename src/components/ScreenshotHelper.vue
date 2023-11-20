@@ -79,7 +79,7 @@ function getScreenshotGroup () {
         // 无需裁分
         return false
     }
-    // 裁分点
+    // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
     // 已裁分Height
     let croppedHeight = 0
@@ -104,8 +104,14 @@ function getScreenshotGroup () {
             }
         }
     }
+    if (
+        chats.value.length === index || // 小于一份
+        totalHeight - croppedHeight < maxHeight // 剩下的分少于一倍maxHeight
+    ) {
+        return points
+    }
     // totalHeight - croppedHeight < 2 * maxHeight 二分
-    index = chats.value.length - Math.floor((chats.value.length - index) / 2)
+    index = chats.value.length - Math.floor((chats.value.length - lastCrop) / 2)
     while (true) {
         const dialogue = getDialogue(chats.value[index].id)
         if (offsetTop(dialogue) - croppedHeight > maxHeight) {
