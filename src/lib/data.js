@@ -224,8 +224,30 @@ const DataControl = {
     storage: {},
     version: [],
     index: -1,
-    switchHook: null,
-    updateHook: null,
+    switchHooks: [],
+    updateHooks: [],
+    callUpdateHook () {
+        this.updateHooks.forEach((fn) => {
+            fn()
+        })
+    },
+    callSwitchHook () {
+        this.switchHooks.forEach((fn) => {
+            fn()
+        })
+    },
+    onUpdate (fn) {
+        // 内容更新
+        this.updateHooks.push(fn)
+    },
+    onSwitch (fn) {
+        // withdraw or redo
+        this.switchHooks.push(fn)
+    },
+    onChange (fn) {
+        this.onUpdate(fn)
+        this.onSwitch(fn)
+    },
     update (update) {
         if (typeof update === 'string') {
             if (Object.prototype.hasOwnProperty.call(this.storage, update)) {
@@ -262,7 +284,7 @@ const DataControl = {
         if (operator.length > 0) {
             this.version.unshift(operator)
             // 因为只有save才会作将数据为一个节点保存在本地，所以在此处调用hook
-            this.updateHook()
+            this.callUpdateHook()
         }
     },
     genCharSrc () {
@@ -304,7 +326,7 @@ const DataControl = {
                 this.storage[key].update = true
             }
         }
-        this.updateHook && this.updateHook()
+        this.callUpdateHook()
         this.genCharSrc()
     },
     withdraw () {
@@ -320,7 +342,7 @@ const DataControl = {
                     }
                 }
             }
-            this.switchHook && this.switchHook(true, this.index)
+            this.callSwitchHook()
         }
     },
     redo () {
@@ -336,7 +358,7 @@ const DataControl = {
                     }
                 }
             }
-            this.switchHook && this.switchHook(false, this.index)
+            this.callSwitchHook()
         }
     },
     clear (level) {
@@ -438,11 +460,11 @@ document.addEventListener('keydown', event => {
     }
 })
 
-DataControl.switchHook = () => {
+DataControl.onSwitch(() => {
     if (!Object.prototype.hasOwnProperty.call(chars.value, currCharId.value)) {
         DataControl.curr.setChar('', true)
     }
-}
+})
 
 export {
     config,

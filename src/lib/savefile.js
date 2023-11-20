@@ -19,9 +19,9 @@ const Save = class Save {
             }
         })
         this.saved = false
-        DataControl.updateHook = () => {
+        DataControl.onUpdate(() => {
             this.saved = false
-        }
+        })
     }
 
     new (name, callback) {
