@@ -59,10 +59,9 @@ function getNode () {
 
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
-    // -10 watermark上下padding (5+5)
     // +10 dialogue无效margin-bottom
     const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0) + 10
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight : 0) + 10
     return res > 0 ? res : 1
 })
 
@@ -72,7 +71,8 @@ function offsetTop (el) {
 }
 
 function getScreenshotGroup () {
-    const totalHeight = screenshotNode.scrollHeight + (syncedSettings.value.watermark ? watermarkNode.scrollHeight : 0)
+    // -30 renderer上下padding (20+10)
+    const totalHeight = screenshotNode.scrollHeight - 30
     // 缩小比例后实际 maxHeight
     const maxHeight = realMaxHeight.value
     if (totalHeight < maxHeight || chats.value.length < 2) {
@@ -242,13 +242,14 @@ getNode()
 
 const expectCutNumber = computed(() => {
     if (syncedSettings.value.autoCut) {
-        if (screenshotNode.scrollHeight / realMaxHeight.value > chats.value.length) {
+        if ((screenshotNode.scrollHeight - 30) / realMaxHeight.value > chats.value.length) {
             return chats.value.length
         } else {
-            return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
+            return Math.ceil((screenshotNode.scrollHeight - 30) / realMaxHeight.value)
         }
+    } else {
+        return 1
     }
-    return 1
 })
 
 const ExpectLength = {
