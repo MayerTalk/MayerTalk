@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, nextTick, ref } from 'vue'
+import { computed, inject, nextTick, ref, watch } from 'vue'
 import { getCanvas, downloadCanvas, copy, getDialogue, checkFilename } from '@/lib/tool'
 import { dialogWidth, TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
@@ -49,6 +49,7 @@ function getNode () {
     if (document.getElementById('renderer') && document.getElementById('watermark')) {
         screenshotNode = document.getElementById('renderer')
         watermarkNode = document.getElementById('watermark')
+        ExpectLength.calc()
     } else {
         setTimeout(() => {
             getNode()
@@ -164,7 +165,6 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
             })
             return
         }
-        const seq = Date.now() + '-'
         const chatsData = copy(chats.value)
         const next = (i) => {
             if (i > group.length) {
@@ -235,8 +235,47 @@ function screenshot () {
 getNode()
 
 const expectCutNumber = computed(() => {
-    return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
+    if (syncedSettings.value.autoCut) {
+        if (screenshotNode.scrollHeight / realMaxHeight.value > chats.value.length) {
+            return chats.value.length
+        } else {
+            return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
+        }
+    }
+    return 1
 })
+
+const ExpectLength = {
+    calc () {
+        this.result.value = Math.ceil((screenshotNode.scrollHeight +
+                (30 * (expectCutNumber.value - 1)) +
+                (syncedSettings.value.watermark ? (watermarkNode.scrollHeight - 1) * expectCutNumber.value : 0)) *
+            syncedSettings.value.scale)
+    },
+    mount () {
+        DataControl.onChange(() => {
+            nextTick(
+                () => {
+                    this.calc()
+                }
+            )
+        })
+        watch(
+            () => {
+                return [
+                    syncedSettings.value.autoCut,
+                    syncedSettings.value.watermark,
+                    syncedSettings.value.maxHeight
+                ]
+            },
+            () => {
+                this.calc()
+            }
+        )
+    },
+    result: ref(0)
+}
+ExpectLength.mount()
 
 const wordCount = computed(() => {
     let count = 0
@@ -346,7 +385,7 @@ defineExpose({
                         </tr>
                         <tr>
                             <th>{{ t.noun.screenshotLength }}:</th>
-                            <td>{{ (screenshotNode.scrollHeight + expectCutNumber * 30) * syncedSettings.scale }}px</td>
+                            <td>{{ ExpectLength.result }}px</td>
                         </tr>
                     </table>
                 </div>
