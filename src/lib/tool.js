@@ -36,8 +36,9 @@ function getData (name) {
 function getCanvas (node, options, cb) {
     html2canvas(node, options).then(canvas => {
         cb(canvas)
-    }).catch(reason => {
-        message.confirm(reason + t.value.tip.errorGuide, t.value.tip.error)
+    }).catch(err => {
+        message.confirm(err + t.value.tip.errorGuide, t.value.tip.error)
+        throw err
     })
 }
 
