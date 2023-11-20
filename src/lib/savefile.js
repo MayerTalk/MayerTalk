@@ -19,7 +19,7 @@ const Save = class Save {
             }
         })
         this.saved = false
-        DataControl.onUpdate(() => {
+        DataControl.onChange(() => {
             this.saved = false
         })
     }
