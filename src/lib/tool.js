@@ -51,7 +51,7 @@ function downloadCanvas (canvas, cb, options) {
         } catch (e) {
             message.notify(t.value.notify.downloadCanvasFailed, message.error)
         }
-    })
+    }, 'image/jpeg')
 }
 
 function download (url, filename) {
