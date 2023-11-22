@@ -61,7 +61,7 @@ const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
     // +10 dialogue无效margin-bottom
     const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight : 0) + 10
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) + 10
     return res > 0 ? res : 1
 })
 
