@@ -1,6 +1,6 @@
 <script setup>
 import { computed, inject, nextTick, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, checkFilename } from '@/lib/tool'
+import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename } from '@/lib/tool'
 import { dialogWidth, TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
@@ -160,7 +160,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
     const options = {
         watermarkCanvas,
-        title: title.value && checkFilename(title.value) ? title.value : Date.now()
+        title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
     }
     if (group && syncedSettings.value.autoCut) {
         if (group.length > 10 && !ensure) {

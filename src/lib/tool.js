@@ -186,9 +186,10 @@ function sync (dst, src1, src2) {
         }
     }
 }
-
-function checkFilename (filename) {
-    return !/[\\/:*?"<>|]/.test(filename)
+function parseFilename (filename) {
+    // 检查文件名，去除非法字符，并缩减长度
+    const newFilename = filename.replace(/[\\/:*?"<>|]/, '')
+    return newFilename.length <= 64 ? newFilename : newFilename.slice(0, 64)
 }
 
 export {
@@ -212,5 +213,5 @@ export {
     getCanvas,
     downloadCanvas,
     sync,
-    checkFilename
+    parseFilename
 }
