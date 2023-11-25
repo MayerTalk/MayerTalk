@@ -249,25 +249,27 @@ const ScreenshotStateControl = {
 </script>
 
 <template>
+    <!--Editor components start-->
+    <ScreenshotHelper
+        v-model="ifShowScreenshotHelper"
+        @start="ScreenshotStateControl.start"
+        @done="ScreenshotStateControl.done"
+    />
+    <NavigationBar ref="NavigationBarRef"/>
+    <Settings
+        @resizeWindow="() => {ResizeWindow.resize()}"
+        @showSavefile="ifShowSavefile=true"
+    />
+    <Savefile v-model="ifShowSavefile"/>
+    <EditCharDialog ref="EditChar"/>
+    <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
+    <AtDialog ref="AtRef"/>
+    <CreateOptionDialog ref="CreateOption"/>
+    <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
+    <!--Editor components end-->
     <div :class="syncedSettings.style">
         <div class="renderer">
             <div id="body" :style="{background: syncedSettings.background}">
-                <ScreenshotHelper
-                    v-model="ifShowScreenshotHelper"
-                    @start="ScreenshotStateControl.start"
-                    @done="ScreenshotStateControl.done"
-                />
-                <NavigationBar ref="NavigationBarRef"/>
-                <Settings
-                    @resizeWindow="() => {ResizeWindow.resize()}"
-                    @showSavefile="ifShowSavefile=true"
-                />
-                <Savefile v-model="ifShowSavefile"/>
-                <EditCharDialog ref="EditChar"/>
-                <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
-                <AtDialog ref="AtRef"/>
-                <CreateOptionDialog ref="CreateOption"/>
-                <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
                 <SideBar
                     v-model="ifShowSideBar"
                     @showAnnounce="ifShowAnnouncement=true"
