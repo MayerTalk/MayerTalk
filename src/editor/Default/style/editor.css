@@ -5,6 +5,9 @@
     height: 100vh;
     background: #303030;
     transition: background-color ease 1s;
+    display: flex;
+    position: relative;
+    overflow: hidden;
 }
 
 .body {

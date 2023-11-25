@@ -2,7 +2,7 @@
 import { ref, inject, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { chats } from '@/lib/data'
-import { getDialogue, doAfterMounted } from '@/lib/tool'
+import { getDialogue, doAfterRefMounted } from '@/lib/tool'
 import { dialogWidth } from '@/lib/constance'
 import message from '@/lib/message'
 
@@ -13,7 +13,7 @@ const scroll = inject('scroll')
 
 function open () {
     ifShow.value = true
-    doAfterMounted(input, (r) => {
+    doAfterRefMounted(input, (r) => {
         r.value.focus()
     })
 }

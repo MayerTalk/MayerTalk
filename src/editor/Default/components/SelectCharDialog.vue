@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { StaticUrl, dialogWidth, IsMobile } from '@/lib/constance'
 import { searchCharHandler, searchResult, loadChar, CharDict, Suffix } from '@/lib/character'
-import { doAfterMounted } from '@/lib/tool'
+import { doAfterRefMounted } from '@/lib/tool'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'select'])
@@ -40,7 +40,7 @@ function initSearchChar () {
 
 function autoFocus () {
     if (!IsMobile) {
-        doAfterMounted(inputRef, (r) => {
+        doAfterRefMounted(inputRef, (r) => {
             setTimeout(() => {
                 r.value.focus()
             }, 0)
