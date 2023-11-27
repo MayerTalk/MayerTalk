@@ -1,12 +1,13 @@
 <script setup>
 import { computed, inject, nextTick, ref, watch } from 'vue'
 import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/tool'
-import { dialogWidth, TypeSeries } from '@/lib/constance'
+import { TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
 import { chats, chars, settings, DataControl } from '@/lib/data'
 import { defaultSettings, syncedSettings, setSettings } from '@/lib/settings'
 import CollapseItem from '@/components/CollapseItem.vue'
+import { dialogWidth } from '@/lib/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'start', 'done'])

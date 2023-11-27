@@ -6,7 +6,8 @@ import CharSelector from './CharSelector.vue'
 import { textarea } from '@/lib/dialogue'
 import { chars } from '@/lib/data'
 import { doAfterRefMounted } from '@/lib/tool'
-import { dialogWidth } from '@/lib/constance'
+
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 const atWho = ref('')

@@ -5,7 +5,7 @@ import OptionDialog from '../type/OptionDialog.vue'
 
 import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/tool'
 import { createDialogue } from '@/lib/dialogue'
-import { dialogWidth } from '@/lib/constance'
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 const options = ref({})

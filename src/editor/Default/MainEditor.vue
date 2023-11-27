@@ -12,15 +12,13 @@ import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
+import WindowResize from '@/lib/windowResize'
 
 import {
     clickBySelector,
     getDialogue,
     Textarea
 } from '@/lib/tool'
-import {
-    windowWidth
-} from '@/lib/constance'
 import {
     chars,
     config,
@@ -40,6 +38,7 @@ import {
 } from '@/lib/dialogue'
 import message from '@/lib/message'
 import tipControl from '@/lib/tip'
+import { windowWidth } from '@/lib/width'
 
 const EditChar = ref(null)
 const EditDialogue = ref(null)
@@ -201,10 +200,10 @@ function resizeScroll (offset = 0) {
 watch(textarea, () => {
     resizeScroll()
 })
-window.onresize = () => {
+onUnmounted(WindowResize.onResize(() => {
     resizeScroll()
     resizeBody()
-}
+}))
 tipControl.hook = () => {
     nextTick(() => {
         resizeScroll()

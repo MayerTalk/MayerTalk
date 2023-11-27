@@ -3,10 +3,11 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import SelectCharDialog from './SelectCharDialog.vue'
 
-import { dialogWidth, StaticUrl, IsMobile } from '@/lib/constance'
+import { StaticUrl, IsMobile } from '@/lib/constance'
 import { DataControl, images, currCharId, currCharData } from '@/lib/data'
 import message from '@/lib/message'
 import { blob2url, image2square, doAfterRefMounted } from '@/lib/tool'
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 

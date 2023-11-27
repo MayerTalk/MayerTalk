@@ -3,8 +3,8 @@ import { ref, inject, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { chats } from '@/lib/data'
 import { getDialogue, doAfterRefMounted } from '@/lib/tool'
-import { dialogWidth } from '@/lib/constance'
 import message from '@/lib/message'
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 const lineno = ref(null)

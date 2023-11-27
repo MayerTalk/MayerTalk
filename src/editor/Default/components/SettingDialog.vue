@@ -9,13 +9,13 @@ import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
 import { downloadData, uploadData } from '@/lib/versionControl'
 
-import { dialogWidth } from '@/lib/constance'
 import {
     config,
     settings,
     DataControl
 } from '@/lib/data'
 import { syncedSettings, defaultSettings, setSettings } from '@/lib/settings'
+import { dialogWidth } from '@/lib/width'
 
 const emit = defineEmits(['resizeWindow', 'showSavefile'])
 

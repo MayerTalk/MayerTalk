@@ -4,7 +4,7 @@ import { t } from '@/lib/lang/translate'
 import { ensure, formatSize } from '@/lib/tool'
 import message from '@/lib/message'
 import Save from '@/lib/savefile'
-import { dialogWidth } from '@/lib/constance'
+import { dialogWidth } from '@/lib/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])
