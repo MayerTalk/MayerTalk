@@ -1,10 +1,12 @@
 <script setup>
-import { computed, ref, nextTick } from 'vue'
+import { computed, ref, nextTick, watch } from 'vue'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/message'
 import { DataControl } from '@/lib/data'
-import { dialogWidth, defaultWindowWidth } from '@/lib/constance'
+import { defaultWindowWidth } from '@/lib/constance'
 import { doAfter } from '@/lib/tool'
+import { dialogWidth } from '@/lib/width'
+import WindowResize from '@/lib/windowResize'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits([
@@ -24,7 +26,7 @@ const ifShow = computed({
     }
 })
 
-let sidebarNode = null
+let sidebarNode = {}
 const sidebarWidth = ref(0)
 const initialized = ref(false)
 
@@ -33,8 +35,31 @@ function getSidebarWidth () {
     return sidebarNode.scrollWidth + 1 || 80
 }
 
-const mobileView = computed(() => {
-    return window.innerWidth - defaultWindowWidth - sidebarWidth.value < 0
+DataControl.onUpdate(() => {
+    // language改变时，sidebar宽度也有可能改变
+    sidebarWidth.value = getSidebarWidth()
+})
+
+const mobileView = ref(false)
+
+function refreshMobileView () {
+    mobileView.value = window.innerWidth - defaultWindowWidth - getSidebarWidth() < 0
+}
+
+refreshMobileView()
+watch(sidebarWidth, refreshMobileView)
+WindowResize.onResize(refreshMobileView)
+
+watch(mobileView, () => {
+    if (mobileView.value) {
+        if (ifShow.value) {
+            ifShow.value = false
+        }
+    } else {
+        if (!ifShow.value) {
+            ifShow.value = true
+        }
+    }
 })
 
 ifShow.value = !mobileView.value
