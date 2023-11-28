@@ -1,12 +1,13 @@
 <script setup>
 import { computed, inject, nextTick, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename } from '@/lib/tool'
-import { dialogWidth, TypeSeries } from '@/lib/constance'
+import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/tool'
+import { TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
 import { chats, chars, settings, DataControl } from '@/lib/data'
 import { defaultSettings, syncedSettings, setSettings } from '@/lib/settings'
 import CollapseItem from '@/components/CollapseItem.vue'
+import { dialogWidth } from '@/lib/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'start', 'done'])
@@ -45,17 +46,13 @@ function downloadScreenshot (cb = null, options = {}) {
     })
 }
 
-function getNode () {
-    if (document.getElementById('renderer') && document.getElementById('watermark')) {
-        screenshotNode = document.getElementById('renderer')
-        watermarkNode = document.getElementById('watermark')
-        ExpectLength.calc()
-    } else {
-        setTimeout(() => {
-            getNode()
-        }, 10)
-    }
-}
+doAfter(() => {
+    return document.getElementById('renderer') && document.getElementById('watermark')
+}, () => {
+    screenshotNode = document.getElementById('renderer')
+    watermarkNode = document.getElementById('watermark')
+    ExpectLength.calc()
+}, 10)
 
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
@@ -237,8 +234,6 @@ function screenshot () {
         }
     })
 }
-
-getNode()
 
 const expectCutNumber = computed(() => {
     if (syncedSettings.value.autoCut) {

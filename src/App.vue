@@ -17,12 +17,12 @@ provide('ifShowAbout', ifShowAbout)
 </script>
 
 <template>
-    <div>
-        <Announce v-model="ifShowAnnouncement"/>
-        <About v-model="ifShowAbout"/>
-        <component :is="Editors[config.editor]"/>
-        <FileDragger/>
-    </div>
+    <!--main components start-->
+    <Announce v-model="ifShowAnnouncement"/>
+    <About v-model="ifShowAbout"/>
+    <FileDragger/>
+    <!--main components end-->
+    <component :is="Editors[config.editor]"/>
 </template>
 
 <style src="./font.css"></style>

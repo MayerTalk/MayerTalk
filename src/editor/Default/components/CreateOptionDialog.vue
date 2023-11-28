@@ -3,16 +3,16 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import OptionDialog from '../type/OptionDialog.vue'
 
-import { copy, uuid, ensureClose, doAfterMounted } from '@/lib/tool'
+import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/tool'
 import { createDialogue } from '@/lib/dialogue'
-import { dialogWidth } from '@/lib/constance'
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 const options = ref({})
 function open () {
     options.value = [[uuid(), '']]
     ifShow.value = true
-    doAfterMounted(dialogRef, (r) => {
+    doAfterRefMounted(dialogRef, (r) => {
         r.value.focusFirst()
     })
 }

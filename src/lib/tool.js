@@ -125,14 +125,20 @@ function getDialogue (id) {
     return document.querySelector(selector)
 }
 
-function doAfterMounted (ref, callback) {
-    if (ref.value) {
-        callback(ref)
+function doAfter (fn, callback, cd = 0) {
+    if (fn()) {
+        callback(fn())
     } else {
         setTimeout(() => {
-            doAfterMounted(ref, callback)
-        }, 0)
+            doAfter(fn, callback, cd)
+        }, cd)
     }
+}
+
+function doAfterRefMounted (ref, callback) {
+    doAfter(() => {
+        return ref.value
+    }, callback, 0)
 }
 
 const SizeUnit = ['B', 'KB', 'MB', 'GB', 'TB']
@@ -186,6 +192,7 @@ function sync (dst, src1, src2) {
         }
     }
 }
+
 function parseFilename (filename) {
     // 检查文件名，去除非法字符，并缩减长度
     const newFilename = filename.replace(/[\\/:*?"<>|]/, '')
@@ -206,7 +213,8 @@ export {
     ensureClose,
     clickBySelector,
     getDialogue,
-    doAfterMounted,
+    doAfter,
+    doAfterRefMounted,
     Textarea,
     formatSize,
     bool,

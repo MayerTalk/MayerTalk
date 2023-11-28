@@ -5,7 +5,6 @@ import { sync } from '@/lib/tool'
 const defaultSettings = {
     background: '#303030',
     width: 400,
-    style: 'default',
     scale: 1.5,
     showCharName: false,
     showCharNameSettings: {

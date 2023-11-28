@@ -5,8 +5,9 @@ import CharSelector from './CharSelector.vue'
 
 import { textarea } from '@/lib/dialogue'
 import { chars } from '@/lib/data'
-import { doAfterMounted } from '@/lib/tool'
-import { dialogWidth } from '@/lib/constance'
+import { doAfterRefMounted } from '@/lib/tool'
+
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 const atWho = ref('')
@@ -34,7 +35,7 @@ function handleAt (id) {
 
 function open () {
     // @提示框显示后聚焦输入
-    doAfterMounted(atWhoSelRef, (ref) => {
+    doAfterRefMounted(atWhoSelRef, (ref) => {
         // 等待动画结束
         setTimeout(() => {
             ref.value.focus()
