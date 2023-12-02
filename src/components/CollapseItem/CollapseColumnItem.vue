@@ -69,7 +69,16 @@ const on = {
 </script>
 
 <template>
-    <transition v-on="on">
+    <transition v-on="on" name="collapse-column">
         <slot/>
     </transition>
 </template>
+
+<style scoped>
+.collapse-column-enter-active,
+.collapse-column-leave-active {
+    transition: max-height ease-in-out 0.5s,
+    padding-top ease-in-out 0.5s,
+    padding-bottom 0.5s ease-in-out;
+}
+</style>

@@ -1,12 +1,12 @@
 <script setup>
-import { computed, ref, nextTick, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/message'
 import { DataControl } from '@/lib/data'
-import { defaultWindowWidth } from '@/lib/constance'
-import { doAfter } from '@/lib/tool'
 import { dialogWidth } from '@/lib/width'
-import WindowResize from '@/lib/windowResize'
+import CollapseItem from '@/components/CollapseItem'
+import { mobileView } from '@/editor/Default/lib/width'
+import { IsMobile } from '@/lib/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits([
@@ -26,71 +26,32 @@ const ifShow = computed({
     }
 })
 
-let sidebarNode = {}
-const sidebarWidth = ref(0)
-const initialized = ref(false)
-
-function getSidebarWidth () {
-    // +1 border
-    return sidebarNode.scrollWidth + 1 || 80
-}
-
-DataControl.onUpdate(() => {
-    // language改变时，sidebar宽度也有可能改变
-    sidebarWidth.value = getSidebarWidth()
-})
-
-const mobileView = ref(false)
-
-function refreshMobileView () {
-    mobileView.value = window.innerWidth - defaultWindowWidth - getSidebarWidth() < 0
-}
-
-refreshMobileView()
-watch(sidebarWidth, refreshMobileView)
-WindowResize.onResize(refreshMobileView)
+const sidebarContainerStyle = ref(mobileView.value ? 'fixed' : 'relative')
 
 watch(mobileView, () => {
     if (mobileView.value) {
         if (ifShow.value) {
             ifShow.value = false
+            if (IsMobile) {
+                // 区分手机(转动)/PC(窗口缩放)
+                sidebarContainerStyle.value = 'fixed'
+            } else {
+                setTimeout(() => {
+                    if (mobileView.value) {
+                        // 防止中途mobileView值改变
+                        sidebarContainerStyle.value = 'fixed'
+                    }
+                }, 500)
+            }
+        } else {
+            sidebarContainerStyle.value = 'fixed'
         }
     } else {
         if (!ifShow.value) {
             ifShow.value = true
         }
+        sidebarContainerStyle.value = 'relative'
     }
-})
-
-ifShow.value = !mobileView.value
-
-doAfter(() => {
-    return document.getElementById('sidebar') && document.getElementById('sidebar.placeholder')
-}, () => {
-    sidebarNode = document.getElementById('sidebar')
-    const placeholder = document.getElementById('sidebar.placeholder')
-    // placeholder width为0时 移出流
-    placeholder.style.position = 'absolute'
-    // 同步width
-    sidebarWidth.value = getSidebarWidth()
-    nextTick(() => {
-        // 二次同步 ifShow (防止第一次sidebarWidth预估错)
-        ifShow.value = !mobileView.value
-        // 初始style设置完毕后设置transition，防止设途中出现动画
-        sidebarNode.style.transition = 'right ease 0.6s'
-        // 将sidebar移出流
-        sidebarNode.style.position = 'fixed'
-        // 将placeholder添加进流，替代sidebar
-        placeholder.style.position = 'relative'
-        doAfter(() => {
-            // 知道placeholder width与sidebarWidth相同或不显示sidebar，transition
-            return placeholder.scrollWidth === sidebarWidth.value || !ifShow.value
-        }, () => {
-            placeholder.style.transition = 'width ease 0.6s'
-            // 设置同步完成 (placeholder)
-            initialized.value = true
-        })
-    })
 })
 
 function toGuide () {
@@ -123,92 +84,131 @@ function clearAll () {
         }
     )
 }
-
-defineExpose({
-    sidebarWidth
-})
 </script>
 
 <template>
-    <div id="sidebar.placeholder" :style="{width:(ifShow && !mobileView?sidebarWidth+'px':'0')}" style="flex-shrink: 0">
-        <!--sidebar placeholder-->
-    </div>
-    <div class="drawer" id="sidebar"
-         :style="{right:(ifShow?'0':(-sidebarWidth || -1000) + 'px'), position:(initialized?'fixed':(mobileView?'fixed':'relative'))}">
-        <div class="bar" @click="$emit('screenshot')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCrop/>
-            </el-icon>
-            {{ t.action.screenshot }}
-        </div>
-        <div class="bar" @click="$emit('showAnnounce')">
-            <el-icon color="lightgrey" :size="35">
-                <IconNotification/>
-            </el-icon>
-            {{ t.noun.announcement }}
-        </div>
-        <div class="bar" @click="toGuide">
-            <el-icon :size="35">
-                <IconNotebook/>
-            </el-icon>
-            {{ t.noun.guide }}
-        </div>
-        <div class="bar" @click="ifShowClear=true">
-            <el-icon color="lightgrey" :size="35">
-                <IconDelete/>
-            </el-icon>
-            {{ t.action.empty }}
-        </div>
-        <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
-            <div style="display: flex; column-gap: 5px">
-                <el-button size="large" style="width: 100%;" @click="clearChats">{{ t.noun.chat }}</el-button>
-                <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{ t.noun.all }}</el-button>
+    <CollapseItem row>
+        <div v-show="ifShow" class="drawer-container" id="sidebar-container" :style="{position: sidebarContainerStyle}">
+            <div class="drawer" id="sidebar">
+                <div class="bar" @click="$emit('screenshot')">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconCrop/>
+                    </el-icon>
+                    {{ t.action.screenshot }}
+                </div>
+                <div class="bar" @click="$emit('showAnnounce')">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconNotification/>
+                    </el-icon>
+                    {{ t.noun.announcement }}
+                </div>
+                <div class="bar" @click="toGuide">
+                    <el-icon :size="35">
+                        <IconNotebook/>
+                    </el-icon>
+                    {{ t.noun.guide }}
+                </div>
+                <div class="bar" @click="ifShowClear=true">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconDelete/>
+                    </el-icon>
+                    {{ t.action.empty }}
+                </div>
+                <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
+                    <div style="display: flex; column-gap: 5px">
+                        <el-button size="large" style="width: 100%;" @click="clearChats">{{ t.noun.chat }}</el-button>
+                        <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{
+                                t.noun.all
+                            }}
+                        </el-button>
+                    </div>
+                </el-dialog>
+                <div class="bar" @click="DataControl.withdraw">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconBack/>
+                    </el-icon>
+                    {{ t.action.withdraw }}
+                </div>
+                <div class="bar" @click="DataControl.redo">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconRight/>
+                    </el-icon>
+                    {{ t.action.redo }}
+                </div>
+                <div class="bar" @click="$emit('showNavigation')">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconCompass/>
+                    </el-icon>
+                    {{ t.action.goto }}
+                </div>
+                <div class="bar" @click="$emit('showSettings')">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconSetting/>
+                    </el-icon>
+                    {{ t.noun.settings }}
+                </div>
+                <div class="bar" @click="$emit('showAbout')">
+                    <el-icon color="lightgrey" :size="35">
+                        <IconCoffeeCup/>
+                    </el-icon>
+                    {{ t.noun.about }}
+                </div>
             </div>
-        </el-dialog>
-        <div class="bar" @click="DataControl.withdraw">
-            <el-icon color="lightgrey" :size="35">
-                <IconBack/>
-            </el-icon>
-            {{ t.action.withdraw }}
         </div>
-        <div class="bar" @click="DataControl.redo">
-            <el-icon color="lightgrey" :size="35">
-                <IconRight/>
-            </el-icon>
-            {{ t.action.redo }}
-        </div>
-        <div class="bar" @click="$emit('showNavigation')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCompass/>
-            </el-icon>
-            {{ t.action.goto }}
-        </div>
-        <div class="bar" @click="$emit('showSettings')">
-            <el-icon color="lightgrey" :size="35">
-                <IconSetting/>
-            </el-icon>
-            {{ t.noun.settings }}
-        </div>
-        <div class="bar" @click="$emit('showAbout')">
-            <el-icon color="lightgrey" :size="35">
-                <IconCoffeeCup/>
-            </el-icon>
-            {{ t.noun.about }}
-        </div>
-    </div>
+    </CollapseItem>
     <Transition name="fade">
         <div v-if="ifShow && mobileView" @click="ifShow=false" class="drawer-mask"></div>
     </Transition>
+    <div id="sidebar-placeholder" class="drawer-placeholder">
+        <!--sidebar占位符，用于在sidebar隐藏时计算sidebar width-->
+        <div class="bar">
+            <el-icon :size="35">
+                <IconCoffeeCup/>
+            </el-icon>
+            <div>
+                <p v-for="key in ['screenshot','empty', 'withdraw','redo','goto']" :key="key"> {{
+                        t.action[key]
+                    }}</p>
+                <p v-for="key in ['announcement','guide','settings','about']" :key="key"> {{ t.noun[key] }}</p>
+            </div>
+        </div>
+    </div>
+
 </template>
 
 <style scoped>
+.drawer-container {
+    flex-shrink: 0;
+    right: 0;
+    z-index: 404;
+    height: 100%;
+    transition: all ease 0.6s;
+}
+
+.drawer-placeholder {
+    position: absolute;
+    right: -100%;
+    display: flex;
+    padding: 2px 5px;
+    min-width: 80px;
+}
+
+.drawer-placeholder p {
+    margin: 0;
+}
+
+.drawer-placeholder .bar {
+    display: flex;
+}
+
 .drawer {
+    flex-shrink: 0;
+    padding: 2px 5px;
+    width: max-content;
     min-width: 80px;
     height: 100%;
     background: #606060;
     border-left: grey solid 1px;
-    z-index: 404;
-    padding: 0 5px;
     user-select: none;
 }
 
@@ -237,15 +237,5 @@ defineExpose({
     background: black;
     z-index: 100;
     opacity: 0.5;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.6s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
 }
 </style>
