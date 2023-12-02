@@ -137,7 +137,7 @@ function doAfter (fn, callback, cd = 0) {
 
 function doAfterRefMounted (ref, callback) {
     doAfter(() => {
-        return ref.value
+        return ref.value && ref
     }, callback, 0)
 }
 
