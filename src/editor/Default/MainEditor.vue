@@ -13,6 +13,7 @@ import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import WindowResize from '@/lib/windowResize'
+import { mobileView } from '@/editor/Default/lib/width'
 
 import {
     clickBySelector,
@@ -77,7 +78,7 @@ onUnmounted(() => {
     controller.abort()
 })
 
-const ifShowSideBar = ref(false)
+const ifShowSideBar = ref(!mobileView.value)
 const ifShowAnnouncement = inject('ifShowAnnouncement')
 const ifShowAbout = inject('ifShowAbout')
 const ifShowSettings = inject('ifShowSettings')
