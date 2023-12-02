@@ -90,69 +90,74 @@ function clearAll () {
     <CollapseItem row>
         <div v-show="ifShow" class="drawer-container" id="sidebar-container" :style="{position: sidebarContainerStyle}">
             <div class="drawer" id="sidebar">
-                <div class="bar" @click="$emit('screenshot')">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconCrop/>
-                    </el-icon>
-                    {{ t.action.screenshot }}
-                </div>
-                <div class="bar" @click="$emit('showAnnounce')">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconNotification/>
-                    </el-icon>
-                    {{ t.noun.announcement }}
-                </div>
-                <div class="bar" @click="toGuide">
-                    <el-icon :size="35">
-                        <IconNotebook/>
-                    </el-icon>
-                    {{ t.noun.guide }}
-                </div>
-                <div class="bar" @click="ifShowClear=true">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconDelete/>
-                    </el-icon>
-                    {{ t.action.empty }}
-                </div>
-                <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
-                    <div style="display: flex; column-gap: 5px">
-                        <el-button size="large" style="width: 100%;" @click="clearChats">{{ t.noun.chat }}</el-button>
-                        <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{
-                                t.noun.all
-                            }}
-                        </el-button>
+                <el-scrollbar>
+                    <div class="bar" @click="$emit('screenshot')">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconCrop/>
+                        </el-icon>
+                        {{ t.action.screenshot }}
                     </div>
-                </el-dialog>
-                <div class="bar" @click="DataControl.withdraw">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconBack/>
-                    </el-icon>
-                    {{ t.action.withdraw }}
-                </div>
-                <div class="bar" @click="DataControl.redo">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconRight/>
-                    </el-icon>
-                    {{ t.action.redo }}
-                </div>
-                <div class="bar" @click="$emit('showNavigation')">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconCompass/>
-                    </el-icon>
-                    {{ t.action.goto }}
-                </div>
-                <div class="bar" @click="$emit('showSettings')">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconSetting/>
-                    </el-icon>
-                    {{ t.noun.settings }}
-                </div>
-                <div class="bar" @click="$emit('showAbout')">
-                    <el-icon color="lightgrey" :size="35">
-                        <IconCoffeeCup/>
-                    </el-icon>
-                    {{ t.noun.about }}
-                </div>
+                    <div class="bar" @click="$emit('showAnnounce')">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconNotification/>
+                        </el-icon>
+                        {{ t.noun.announcement }}
+                    </div>
+                    <div class="bar" @click="toGuide">
+                        <el-icon :size="35">
+                            <IconNotebook/>
+                        </el-icon>
+                        {{ t.noun.guide }}
+                    </div>
+                    <div class="bar" @click="ifShowClear=true">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconDelete/>
+                        </el-icon>
+                        {{ t.action.empty }}
+                    </div>
+                    <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
+                        <div style="display: flex; column-gap: 5px">
+                            <el-button size="large" style="width: 100%;" @click="clearChats">{{
+                                    t.noun.chat
+                                }}
+                            </el-button>
+                            <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{
+                                    t.noun.all
+                                }}
+                            </el-button>
+                        </div>
+                    </el-dialog>
+                    <div class="bar" @click="DataControl.withdraw">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconBack/>
+                        </el-icon>
+                        {{ t.action.withdraw }}
+                    </div>
+                    <div class="bar" @click="DataControl.redo">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconRight/>
+                        </el-icon>
+                        {{ t.action.redo }}
+                    </div>
+                    <div class="bar" @click="$emit('showNavigation')">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconCompass/>
+                        </el-icon>
+                        {{ t.action.goto }}
+                    </div>
+                    <div class="bar" @click="$emit('showSettings')">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconSetting/>
+                        </el-icon>
+                        {{ t.noun.settings }}
+                    </div>
+                    <div class="bar" @click="$emit('showAbout')">
+                        <el-icon color="lightgrey" :size="35">
+                            <IconCoffeeCup/>
+                        </el-icon>
+                        {{ t.noun.about }}
+                    </div>
+                </el-scrollbar>
             </div>
         </div>
     </CollapseItem>
