@@ -33,8 +33,6 @@ refreshMobileView()
 watch(sidebarWidth, refreshMobileView)
 WindowResize.onResize(refreshMobileView)
 
-console.log(mobileView.value)
-
 export {
     mobileView,
     sidebarWidth
