@@ -224,21 +224,21 @@ const DataControl = {
     storage: {},
     version: [],
     index: -1,
-    switchHooks: [],
     updateHooks: [],
     callUpdateHook () {
         this.updateHooks.forEach((fn) => {
             fn()
         })
     },
+    onUpdate (fn) {
+        // 内容更新
+        this.updateHooks.push(fn)
+    },
+    switchHooks: [],
     callSwitchHook () {
         this.switchHooks.forEach((fn) => {
             fn()
         })
-    },
-    onUpdate (fn) {
-        // 内容更新
-        this.updateHooks.push(fn)
     },
     onSwitch (fn) {
         // withdraw or redo
@@ -247,6 +247,24 @@ const DataControl = {
     onChange (fn) {
         this.onUpdate(fn)
         this.onSwitch(fn)
+    },
+    clearHooks: [],
+    callClearHook (level) {
+        this.clearHooks.forEach((fn) => {
+            fn(level)
+        })
+    },
+    onClear (fn) {
+        this.clearHooks.push(fn)
+    },
+    changeSavefileHooks: [],
+    onChangeSavefile (fn) {
+        this.changeSavefileHooks.push(fn)
+    },
+    callChangeSavefileHook () {
+        this.changeSavefileHooks.forEach((fn) => {
+            fn()
+        })
     },
     update (update) {
         if (typeof update === 'string') {
@@ -362,6 +380,7 @@ const DataControl = {
         }
     },
     clear (level) {
+        this.callClearHook(level)
         if (level === 0) {
             // 清空对话
             for (let i = 0; i < chats.value.length; i++) {
