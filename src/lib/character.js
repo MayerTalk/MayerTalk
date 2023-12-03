@@ -144,21 +144,17 @@ function sortChar (list, lang) {
         })
 }
 
-const searchResult = ref(false)
-const AliasAddition = ref([])
-
-let searchResultFullShow = 0
-
-const SearchManager = class SearchManager {
+const Search = class Search {
     // 管理单次搜索
-    constructor (search, t, list, lang = 'zh_CN') {
+    constructor (searchManager, search, t, list, lang = 'zh_CN') {
+        this.searchManager = searchManager
         this.search = search
         this.t = t
         // raw list 用于溯源
         this.raw_list = copy(list)
         this.list = list
         // 继承上一次别名搜索结果，避免闪烁出现
-        for (const charId of AliasAddition.value) {
+        for (const charId of this.searchManager.aliasAddition) {
             if (this.list.indexOf(charId) === -1) {
                 this.list.push(charId)
             }
@@ -192,27 +188,27 @@ const SearchManager = class SearchManager {
             // 优化：延迟输出
             // TODO use virtual list
             if (this.res.length > 400) {
-                searchResult.value = this.res.slice(0, 40)
+                this.searchManager.result.value = this.res.slice(0, 40)
                 setTimeout(() => {
-                    if (searchResultFullShow === this.t) {
-                        searchResult.value = this.res
+                    if (this.searchManager.searchResultFullShow === this.t) {
+                        this.searchManager.result.value = this.res
                     }
                     this.showed = true
                 }, 1000)
             } else if (this.res.length > 40) {
-                searchResult.value = this.res.slice(0, 40)
+                this.searchManager.result.value = this.res.slice(0, 40)
                 setTimeout(() => {
-                    if (searchResultFullShow === this.t) {
-                        searchResult.value = this.res
+                    if (this.searchManager.searchResultFullShow === this.t) {
+                        this.searchManager.result.value = this.res
                     }
                     this.showed = true
                 }, 200)
             } else {
-                searchResult.value = this.res
+                this.searchManager.result.value = this.res
                 this.showed = true
             }
         } else {
-            searchResult.value = false
+            this.searchManager.result.value = []
             this.showed = true
         }
     }
@@ -244,12 +240,12 @@ const SearchManager = class SearchManager {
     aliasHandler (callback) {
         return (response) => {
             this.list = this.raw_list
-            AliasAddition.value = []
+            this.searchManager.aliasAddition = []
             callback && callback(response)
             this.sort()
             this.gen()
-            if (this.showed && this.t === searchResultFullShow && this.res.length) {
-                searchResult.value = this.res
+            if (this.showed && this.t === this.searchManager.searchResultFullShow && this.res.length) {
+                this.searchManager.result.value = this.res
             }
         }
     }
@@ -265,7 +261,7 @@ const SearchManager = class SearchManager {
                     if (this.list.indexOf(charId) === -1) {
                         this.list.push(charId)
                     }
-                    AliasAddition.value.push(charId)
+                    this.searchManager.aliasAddition.push(charId)
                 }
             }
         }), this.aliasHandler())
@@ -273,44 +269,55 @@ const SearchManager = class SearchManager {
 }
 
 // 处理搜索文本
-function parseSearch (search) {
+function parseSearch (param) {
     // TODO i18n 根据lang决定是否处理
     // 部分输入法拼音输入阶段会携带” ' “，导致拼音搜索失效
-    search = search.replaceAll('\'', '')
+    param = param.replaceAll('\'', '')
     // “6/MSP” 不清楚此字符为何，但出现在部分输入法拼音输入阶段
-    search = search.replaceAll(' ', '')
+    param = param.replaceAll(' ', '')
     // 全宽拉丁处理
-    search = fullWidth2HalfLatin(search)
-    return search
+    param = fullWidth2HalfLatin(param)
+    return param
 }
 
-// 搜索函数
-function searchCharHandler (search) {
-    search = parseSearch(search)
-    // 用于避免延时输出干扰后续搜索
-    const t = Date.now()
-    searchResultFullShow = t
-    if (search) {
-        const searchLower = search.toLowerCase()
-        const list = []
-        for (const charId in CharDict) {
-            if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
-                const char = CharDict[charId]
-                for (const lang in char.names) {
-                    if (Object.prototype.hasOwnProperty.call(char.names, lang)) {
-                        if (char.names[lang].indexOf(searchLower) !== -1) {
-                            list.push(charId)
-                            break
+const SearchManager = class SearchManager {
+    constructor () {
+        this.result = ref(null)
+        this.aliasAddition = []
+        this.searchResultFullShow = 0
+    }
+
+    search (param) {
+        if (!param) {
+            this.result.value = null
+            return
+        }
+        param = parseSearch(param)
+        // 用于避免延时输出干扰后续搜索
+        const t = Date.now()
+        this.searchResultFullShow = t
+        if (param) {
+            const searchLower = param.toLowerCase()
+            const list = []
+            for (const charId in CharDict) {
+                if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
+                    const char = CharDict[charId]
+                    for (const lang in char.names) {
+                        if (Object.prototype.hasOwnProperty.call(char.names, lang)) {
+                            if (char.names[lang].indexOf(searchLower) !== -1) {
+                                list.push(charId)
+                                break
+                            }
                         }
                     }
                 }
             }
+            const manager = new Search(this, param, t, list, config.value.lang)
+            manager.run()
+        } else {
+            this.aliasAddition = []
+            this.result.value = []
         }
-        const manager = new SearchManager(search, t, list, config.value.lang)
-        manager.run()
-    } else {
-        AliasAddition.value = []
-        searchResult.value = []
     }
 }
 
@@ -319,6 +326,5 @@ export {
     CharDict,
     loadChar,
     sortChar,
-    searchResult,
-    searchCharHandler
+    SearchManager
 }

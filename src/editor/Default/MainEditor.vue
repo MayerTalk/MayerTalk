@@ -12,6 +12,7 @@ import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
+import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
 import WindowResize from '@/lib/windowResize'
 import { mobileView } from '@/editor/Default/lib/width'
 
@@ -41,7 +42,7 @@ import message from '@/lib/message'
 import tipControl from '@/lib/tip'
 import { windowWidth } from '@/lib/width'
 
-const EditChar = ref(null)
+const EditCharRef = ref(null)
 const EditDialogue = ref(null)
 const AtRef = ref(null)
 const CreateOption = ref(null)
@@ -53,7 +54,7 @@ document.addEventListener('keydown', event => {
         if (event.code === 'KeyC') {
             if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
                 event.preventDefault()
-                EditChar.value.open(true)
+                EditCharRef.value.open(true)
             }
         } else if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
             event.preventDefault()
@@ -62,7 +63,7 @@ document.addEventListener('keydown', event => {
             if (index < list.length) {
                 DataControl.curr.setChar(list[index][0])
             } else {
-                EditChar.value.open(true)
+                EditCharRef.value.open(true)
             }
         } else if (event.code === 'KeyE') {
             event.preventDefault()
@@ -70,7 +71,7 @@ document.addEventListener('keydown', event => {
                 message.notify(t.value.notify.pleaseSelectCharacter, message.warning)
                 return
             }
-            EditChar.value.open(false)
+            EditCharRef.value.open(false)
         }
     }
 }, { signal: controller.signal })
@@ -259,13 +260,14 @@ const ScreenshotStateControl = {
         @showSavefile="ifShowSavefile=true"
     />
     <Savefile v-model="ifShowSavefile"/>
-    <EditCharDialog ref="EditChar"/>
+    <EditCharDialog ref="EditCharRef"/>
     <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
     <AtDialog ref="AtRef"/>
     <CreateOptionDialog ref="CreateOption"/>
     <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
     <!--Editor components end-->
     <div id="body" :style="{background: syncedSettings.background}">
+        <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s">
             <el-scrollbar :height="scrollHeight" ref="scroll">
                 <div class="body">
@@ -340,7 +342,7 @@ const ScreenshotStateControl = {
                                     </div>
                                     <div class="option"
                                          style="background: #686868; position:relative; width: 51px; height: 51px; margin: 3px"
-                                         @click="EditChar.open(true)">
+                                         @click="EditCharRef.open(true)">
                                         <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                              data-v-029747aa="" style="background: #707070">
                                             <path fill="#858585"
@@ -352,7 +354,7 @@ const ScreenshotStateControl = {
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <div class="option edit" style="height: 80%">
                                     <div v-if="currCharId" style="width: 40px; height: 40px"
-                                         @click="EditChar.open(false)">
+                                         @click="EditCharRef.open(false)">
                                         <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
                                              data-v-029747aa="">
                                             <path fill="#606060"

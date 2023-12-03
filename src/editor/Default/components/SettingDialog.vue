@@ -114,6 +114,20 @@ function checkClose (fn, ignore = []) {
             </table>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
+                <h2 style="margin: 10px 0">{{ t.noun.editor }}</h2>
+                <div class="line-right"></div>
+            </div>
+            <table>
+                <tr>
+                    <th>{{ t.noun.characterSelectorPermanent }}<span style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
+                    <td>
+                        <el-switch v-model="syncedSettings.characterSelectorPermanent" style="margin-left: 10px"
+                                   @change="(value) => {settings.characterSelectorPermanent=value}"></el-switch>
+                    </td>
+                </tr>
+            </table>
+            <div style="display: flex; align-items: center">
+                <div class="line-left" style="width: 20px;"></div>
                 <h2 style="margin: 10px 0">{{ t.noun.renderer }}</h2>
                 <div class="line-right"></div>
             </div>

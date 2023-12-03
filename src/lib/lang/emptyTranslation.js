@@ -114,7 +114,8 @@ const emptyTranslation = {
         characterCount: '',
         chatCount: '',
         wordCount: '',
-        screenshotLength: ''
+        screenshotLength: '',
+        characterSelectorPermanent: ''
     },
     tip: {
         pool: [
@@ -123,7 +124,8 @@ const emptyTranslation = {
         selectCharDialog: '',
         cutScreenshot: '',
         settings: {
-            dialogWidth: ''
+            dialogWidth: '',
+            characterSelectorPermanent: ''
         },
         emptyData: '',
         importFailed: '',

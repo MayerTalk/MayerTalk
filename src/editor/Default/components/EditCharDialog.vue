@@ -18,11 +18,15 @@ const inputRef = ref(null)
 
 const ifShowSelectChar = ref(false)
 
-function open (create) {
+function open (create, data) {
     // 启动角色编辑 create:是否创建角色
     createChar.value = create
     if (create) {
-        charData.value = { name: '' }
+        if (data) {
+            charData.value = { name: data[1], avatar: data[0] }
+        } else {
+            charData.value = { name: '' }
+        }
     } else if (currCharId.value) {
         charData.value = currCharData.value
     } else {
