@@ -24,6 +24,6 @@ const ifShow = computed({
     <el-dialog v-model="ifShow" :title="t.action.selectChar" :width="dialogWidth" top="10vh"
                @open="loadChar('arknights');selector.autoFocus()"
                @closed="selector.search=''">
-        <SelectCharInstance ref="selector" @select="(v) => {$emit('select',v);ifShow=false}"/>
+        <SelectCharInstance max-height="60vh" ref="selector" @select="(v) => {$emit('select',v);ifShow=false}"/>
     </el-dialog>
 </template>

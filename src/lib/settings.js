@@ -15,7 +15,8 @@ const defaultSettings = {
     maxHeight: 16000,
     autoCut: true,
     watermark: true,
-    author: ''
+    author: '',
+    characterSelectorPermanent: true
 }
 const syncedSettings = ref({})
 

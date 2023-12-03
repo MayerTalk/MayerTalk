@@ -1,12 +1,21 @@
-import { ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { doAfter } from '@/lib/tool'
 import { DataControl } from '@/lib/data'
 import { defaultWindowWidth } from '@/lib/constance'
+import { syncedSettings } from '@/lib/settings'
 import WindowResize from '@/lib/windowResize'
+
+const validSpace = ref(0)
+
+function refreshValidSpace () {
+    validSpace.value = window.innerWidth - defaultWindowWidth
+}
+
+refreshValidSpace()
+WindowResize.onResize(refreshValidSpace)
 
 let sidebarPlaceholderNode = {}
 const sidebarWidth = ref(0)
-const mobileView = ref(false)
 
 function getSidebarWidth () {
     // +1 border
@@ -25,15 +34,16 @@ DataControl.onUpdate(() => {
     sidebarWidth.value = getSidebarWidth()
 })
 
-function refreshMobileView () {
-    mobileView.value = window.innerWidth - defaultWindowWidth - getSidebarWidth() < 0
-}
+const ifShowPermanentSelectChar = computed(() => {
+    return syncedSettings.value.characterSelectorPermanent && validSpace.value - sidebarWidth.value - 421 > 0
+})
 
-refreshMobileView()
-watch(sidebarWidth, refreshMobileView)
-WindowResize.onResize(refreshMobileView)
+const mobileView = computed(() => {
+    return validSpace.value - sidebarWidth.value < 0
+})
 
 export {
     mobileView,
-    sidebarWidth
+    sidebarWidth,
+    ifShowPermanentSelectChar
 }
