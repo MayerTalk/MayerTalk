@@ -25,6 +25,13 @@ let watermarkNode = null
 const rendererWidth = inject('rendererWidth')
 const title = ref('')
 
+DataControl.onClear((level) => {
+    title.value = ''
+})
+DataControl.onChangeSavefile(() => {
+    title.value = ''
+})
+
 function downloadScreenshot (cb = null, options = {}) {
     getCanvas(options.screenshotNode || screenshotNode, {
         windowWidth: rendererWidth.value.window + 20,
@@ -153,6 +160,11 @@ function getScreenshotGroup () {
     return points
 }
 
+function done () {
+    title.value = ''
+    emit('done')
+}
+
 function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
     const options = {
@@ -164,7 +176,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 _screenshot(true, watermarkCanvas)
             }, () => {
-                emit('done')
+                done()
             })
             return
         }
@@ -172,7 +184,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         const next = (i) => {
             if (i > group.length) {
                 message.notify(t.value.notify.screenshottedCompletely, message.success)
-                emit('done')
+                done()
                 screenshotNode.style.height = null
                 setTimeout(() => {
                     chats.value = chatsData
@@ -208,7 +220,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         setTimeout(() => {
             downloadScreenshot(() => {
                 screenshotNode.style.height = null
-                emit('done')
+                done()
             }, options)
         }, 100)
     }
