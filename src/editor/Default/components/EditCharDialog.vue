@@ -3,10 +3,11 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import SelectCharDialog from './SelectCharDialog.vue'
 
-import { dialogWidth, StaticUrl, IsMobile } from '@/lib/constance'
+import { StaticUrl, IsMobile } from '@/lib/constance'
 import { DataControl, images, currCharId, currCharData } from '@/lib/data'
 import message from '@/lib/message'
-import { blob2url, image2square, doAfterMounted } from '@/lib/tool'
+import { blob2url, image2square, doAfterRefMounted } from '@/lib/tool'
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 
@@ -17,11 +18,15 @@ const inputRef = ref(null)
 
 const ifShowSelectChar = ref(false)
 
-function open (create) {
+function open (create, data) {
     // 启动角色编辑 create:是否创建角色
     createChar.value = create
     if (create) {
-        charData.value = { name: '' }
+        if (data) {
+            charData.value = { name: data[1], avatar: data[0] }
+        } else {
+            charData.value = { name: '' }
+        }
     } else if (currCharId.value) {
         charData.value = currCharData.value
     } else {
@@ -30,7 +35,7 @@ function open (create) {
     }
     ifShow.value = true
     if (!IsMobile) {
-        doAfterMounted(inputRef, (r) => {
+        doAfterRefMounted(inputRef, (r) => {
             r.value.focus()
         })
     }

@@ -102,9 +102,9 @@ const announcementTranslate = {
             optimize: '优化',
             fix: '修复'
         },
-        feat: ['一年的鏖战与守望', '数据统计', '水印'],
-        optimize: ['现在文件名可以自定义了(截图-标题)'],
-        fix: ['自动裁分长度计算错误', '无法搜索角色英文名', '无法搜索角色代号']
+        feat: ['增加宽屏角色选择栏'],
+        optimize: ['截图的标题会在 切换存档/清空/完成截图 时清除', '侧边栏动效'],
+        fix: ['部分浏览器对话框显示不完全', '统计数据错误']
     },
     zh_TW: {
         key: {
@@ -163,7 +163,7 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.2.0'
+const version = 'v0.2.1'
 
 </script>
 

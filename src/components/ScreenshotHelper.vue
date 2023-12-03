@@ -1,12 +1,13 @@
 <script setup>
 import { computed, inject, nextTick, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, checkFilename } from '@/lib/tool'
-import { dialogWidth, TypeSeries } from '@/lib/constance'
+import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/tool'
+import { TypeSeries } from '@/lib/constance'
 import message from '@/lib/message'
 import { t } from '@/lib/lang/translate'
 import { chats, chars, settings, DataControl } from '@/lib/data'
 import { defaultSettings, syncedSettings, setSettings } from '@/lib/settings'
-import CollapseItem from '@/components/CollapseItem.vue'
+import CollapseItem from '@/components/CollapseItem'
+import { dialogWidth } from '@/lib/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'start', 'done'])
@@ -23,6 +24,13 @@ let screenshotNode = null
 let watermarkNode = null
 const rendererWidth = inject('rendererWidth')
 const title = ref('')
+
+DataControl.onClear((level) => {
+    title.value = ''
+})
+DataControl.onChangeSavefile(() => {
+    title.value = ''
+})
 
 function downloadScreenshot (cb = null, options = {}) {
     getCanvas(options.screenshotNode || screenshotNode, {
@@ -45,24 +53,19 @@ function downloadScreenshot (cb = null, options = {}) {
     })
 }
 
-function getNode () {
-    if (document.getElementById('renderer') && document.getElementById('watermark')) {
-        screenshotNode = document.getElementById('renderer')
-        watermarkNode = document.getElementById('watermark')
-        ExpectLength.calc()
-    } else {
-        setTimeout(() => {
-            getNode()
-        }, 10)
-    }
-}
+doAfter(() => {
+    return document.getElementById('renderer') && document.getElementById('watermark')
+}, () => {
+    screenshotNode = document.getElementById('renderer')
+    watermarkNode = document.getElementById('watermark')
+    ExpectLength.calc()
+}, 10)
 
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
-    // -10 watermark上下padding (5+5)
     // +10 dialogue无效margin-bottom
     const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight + 10 : 0) + 10
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) + 10
     return res > 0 ? res : 1
 })
 
@@ -72,14 +75,15 @@ function offsetTop (el) {
 }
 
 function getScreenshotGroup () {
-    const totalHeight = screenshotNode.scrollHeight + (syncedSettings.value.watermark ? watermarkNode.scrollHeight : 0)
+    // -30 renderer上下padding (20+10)
+    const totalHeight = screenshotNode.scrollHeight - 30
     // 缩小比例后实际 maxHeight
     const maxHeight = realMaxHeight.value
     if (totalHeight < maxHeight || chats.value.length < 2) {
         // 无需裁分
         return false
     }
-    // 裁分点
+    // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
     // 已裁分Height
     let croppedHeight = 0
@@ -104,8 +108,14 @@ function getScreenshotGroup () {
             }
         }
     }
+    if (
+        chats.value.length === index || // 小于一份
+        totalHeight - croppedHeight < maxHeight // 剩下的分少于一倍maxHeight
+    ) {
+        return points
+    }
     // totalHeight - croppedHeight < 2 * maxHeight 二分
-    index = chats.value.length - Math.floor((chats.value.length - index) / 2)
+    index = chats.value.length - Math.floor((chats.value.length - lastCrop) / 2)
     while (true) {
         const dialogue = getDialogue(chats.value[index].id)
         if (offsetTop(dialogue) - croppedHeight > maxHeight) {
@@ -150,18 +160,23 @@ function getScreenshotGroup () {
     return points
 }
 
+function done () {
+    title.value = ''
+    emit('done')
+}
+
 function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
     const options = {
         watermarkCanvas,
-        title: title.value && checkFilename(title.value) ? title.value : Date.now()
+        title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
     }
     if (group && syncedSettings.value.autoCut) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 _screenshot(true, watermarkCanvas)
             }, () => {
-                emit('done')
+                done()
             })
             return
         }
@@ -169,7 +184,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         const next = (i) => {
             if (i > group.length) {
                 message.notify(t.value.notify.screenshottedCompletely, message.success)
-                emit('done')
+                done()
                 screenshotNode.style.height = null
                 setTimeout(() => {
                     chats.value = chatsData
@@ -205,7 +220,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         setTimeout(() => {
             downloadScreenshot(() => {
                 screenshotNode.style.height = null
-                emit('done')
+                done()
             }, options)
         }, 100)
     }
@@ -232,17 +247,16 @@ function screenshot () {
     })
 }
 
-getNode()
-
 const expectCutNumber = computed(() => {
     if (syncedSettings.value.autoCut) {
-        if (screenshotNode.scrollHeight / realMaxHeight.value > chats.value.length) {
+        if ((screenshotNode.scrollHeight - 30) / realMaxHeight.value > chats.value.length) {
             return chats.value.length
         } else {
-            return Math.ceil(screenshotNode.scrollHeight / realMaxHeight.value)
+            return Math.ceil((screenshotNode.scrollHeight - 30) / realMaxHeight.value)
         }
+    } else {
+        return 1
     }
-    return 1
 })
 
 const ExpectLength = {
@@ -312,7 +326,7 @@ defineExpose({
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="syncedSettings.watermark" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
+                <div v-show="syncedSettings.watermark" style="padding: 0 0 10px 10px">
                     <table>
                         <tr>
                             <th>{{ t.noun.title }}</th>
@@ -340,7 +354,7 @@ defineExpose({
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="syncedSettings.autoCut" style="transition: all ease-in-out .5s; padding: 0 0 10px 10px">
+                <div v-show="syncedSettings.autoCut" style="padding: 0 0 10px 10px">
                     <div class="column-display"
                          style="display: flex; align-items: center; padding-top: 5px">
                         <div style="width: 100%"> {{ t.noun.maxLength }}

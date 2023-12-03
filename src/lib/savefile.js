@@ -56,6 +56,7 @@ const Save = class Save {
             DataControl.set(data, true)
             DataControl.save()
             this.saved = true
+            DataControl.callChangeSavefileHook()
             callback && (callback(event))
         }
     }

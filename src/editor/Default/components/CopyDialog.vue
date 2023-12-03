@@ -6,7 +6,7 @@ import CharSelector from './CharSelector.vue'
 import message from '@/lib/message'
 import { copyDialogue } from '@/lib/dialogue'
 import { currDialogueIndex } from '@/lib/data'
-import { dialogWidth } from '@/lib/constance'
+import { dialogWidth } from '@/lib/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'coped'])

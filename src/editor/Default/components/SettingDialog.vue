@@ -9,13 +9,13 @@ import { ensure, formatSize, clickBySelector } from '@/lib/tool'
 import Save from '@/lib/savefile'
 import { downloadData, uploadData } from '@/lib/versionControl'
 
-import { dialogWidth } from '@/lib/constance'
 import {
     config,
     settings,
     DataControl
 } from '@/lib/data'
 import { syncedSettings, defaultSettings, setSettings } from '@/lib/settings'
+import { dialogWidth } from '@/lib/width'
 
 const emit = defineEmits(['resizeWindow', 'showSavefile'])
 
@@ -109,6 +109,20 @@ function checkClose (fn, ignore = []) {
                         <el-select v-model="config.lang" @change="(lang) => updateTranslation(lang)">
                             <el-option v-for="lang in supportLang" :key="lang" :value="lang" :label="langShow[lang]"/>
                         </el-select>
+                    </td>
+                </tr>
+            </table>
+            <div style="display: flex; align-items: center">
+                <div class="line-left" style="width: 20px;"></div>
+                <h2 style="margin: 10px 0">{{ t.noun.editor }}</h2>
+                <div class="line-right"></div>
+            </div>
+            <table>
+                <tr>
+                    <th>{{ t.noun.characterSelectorPermanent }}<span style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
+                    <td>
+                        <el-switch v-model="syncedSettings.characterSelectorPermanent" style="margin-left: 10px"
+                                   @change="(value) => {settings.characterSelectorPermanent=value}"></el-switch>
                     </td>
                 </tr>
             </table>

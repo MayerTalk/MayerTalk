@@ -5,8 +5,9 @@ import CharSelector from './CharSelector.vue'
 
 import { textarea } from '@/lib/dialogue'
 import { chars } from '@/lib/data'
-import { doAfterMounted } from '@/lib/tool'
-import { dialogWidth } from '@/lib/constance'
+import { doAfterRefMounted } from '@/lib/tool'
+
+import { dialogWidth } from '@/lib/width'
 
 const ifShow = ref(false)
 const atWho = ref('')
@@ -16,16 +17,16 @@ let insertAt = 0
 function handleAt (id) {
     // 被@角色刷入文本框
     textarea.value = textarea.value.slice(0, insertAt) +
-        chars.value[id].name +
-        ' ' +
-        textarea.value.slice(insertAt)
+      chars.value[id].name +
+      ' ' +
+      textarea.value.slice(insertAt)
     atWho.value = ''
     if (atWhoSelRef.value) {
         atWhoSelRef.value.blur()
     }
     ifShow.value = false
     setTimeout(() => {
-        const el = document.querySelector('#textarea')
+        const el = document.getElementById('textarea')
         const range = insertAt + chars.value[id].name.length + 1
         el.focus()
         el.setSelectionRange(range, range)
@@ -34,8 +35,8 @@ function handleAt (id) {
 
 function open () {
     // @提示框显示后聚焦输入
-    doAfterMounted(atWhoSelRef, (ref) => {
-        // 等待动画结束
+    doAfterRefMounted(atWhoSelRef, (ref) => {
+    // 等待动画结束
         setTimeout(() => {
             ref.value.focus()
         }, 150)
@@ -62,12 +63,12 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :width="dialogWidth"
-               :title="t.notify.wantToAtWhichCharacter"
-               :modal="false">
-        <CharSelector v-model="atWho"
-                      v-model:select="atWhoSelRef"
-                      style="width: 100%"
-                      @change="handleAt" @visible-change="(visible) => {if (!visible) {ifShow=false}}"/>
-    </el-dialog>
+  <el-dialog v-model="ifShow" :width="dialogWidth"
+             :title="t.notify.wantToAtWhichCharacter"
+             :modal="false">
+    <CharSelector v-model="atWho"
+                  v-model:select="atWhoSelRef"
+                  style="width: 100%"
+                  @change="handleAt" @visible-change="(visible) => {if (!visible) {ifShow=false}}"/>
+  </el-dialog>
 </template>
