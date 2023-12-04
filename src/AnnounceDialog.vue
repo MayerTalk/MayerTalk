@@ -102,7 +102,7 @@ const announcementTranslate = {
             optimize: '优化',
             fix: '修复'
         },
-        feat: ['增加宽屏角色选择栏'],
+        feat: ['增加宽屏角色选择栏(可在设置中关闭)'],
         optimize: ['截图的标题会在 切换存档/清空/完成截图 时清除', '侧边栏动效'],
         fix: ['部分浏览器对话框显示不完全', '统计数据错误']
     },
@@ -112,19 +112,19 @@ const announcementTranslate = {
             optimize: '優化',
             fix: '修復'
         },
-        feat: ['一年的鏖戰與守望', '數據統計', '水印'],
-        optimize: ['現在文件名可以自定義了(截圖-標題)'],
-        fix: ['自動裁分長度計算錯誤', '無法搜索角色英文名', '無法搜索角色代號']
+        feat: ['增加寬屏角色選擇欄(可在設置中關閉)'],
+        optimize: ['截圖的標題會在 切換存檔/清空/完成截圖 時清除', '側邊欄動效'],
+        fix: ['部分瀏覽器對話框顯示不完全', '統計數據錯誤']
     },
     en_US: {
         key: {
-            feat: 'New',
+            feat: 'Add',
             optimize: 'Optimize',
             fix: 'Fix'
         },
-        feat: ['A year of fighting and waiting', 'Data statistics', 'Watermark'],
-        optimize: ['Now the filename can be customized (screenshot-title)'],
-        fix: ['Automatic cutting length calculation error', 'Cannot search for character English name', 'Cannot search for character code']
+        feat: ['Add widescreen character selection bar (can be turned off in settings)'],
+        optimize: ['The title of the screenshot will be cleared when switching archives/clearing/completing screenshots', 'Sidebar animation'],
+        fix: ['Partial browser dialog box is not fully displayed', 'Statistical data error']
     },
     ja_JP: {
         key: {
@@ -132,9 +132,9 @@ const announcementTranslate = {
             optimize: '最適化',
             fix: '修正'
         },
-        feat: ['1年間の戦いと待機', 'データ統計', 'ウォーターマーク'],
-        optimize: ['今、ファイル名をカスタマイズできます（スクリーンショット-タイトル）'],
-        fix: ['自動切り分け長さの計算エラー', 'キャラクターの英語名を検索できない', 'キャラクターコードを検索できない']
+        feat: ['ワイドスクリーンキャラクターセレクトバーを追加（設定でオフにできます）'],
+        optimize: ['スクリーンショットのタイトルは、アーカイブの切り替え/クリア/スクリーンショットの完了時にクリアされます', 'サイドバーアニメーション'],
+        fix: ['一部のブラウザダイアログボックスが完全に表示されない', '統計データエラー']
     }
 }
 
@@ -163,7 +163,7 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.2.1'
+const version = 'v0.2.1 '
 
 </script>
 
