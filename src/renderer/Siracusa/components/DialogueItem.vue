@@ -50,7 +50,7 @@ watch(charDirection, () => {
 </script>
 
 <template>
-    <div class="dialogue">
+    <div class="dialogue" :id="data.id">
         <div style="display: flex; width: 100%; margin-bottom: 10px;"
              @click="(event) => {$emit(event.ctrlKey ? 'delete' : 'edit', index)}"
              :style="{justifyContent:(right?'flex-end':'flex-start')}">
