@@ -116,13 +116,7 @@ function clickBySelector (selector) {
 }
 
 function getDialogue (id) {
-    let selector
-    if (id.search(/^\d/) === 0) {
-        selector = '#\\3' + id.slice(0, 1) + ' ' + id.slice(1)
-    } else {
-        selector = '#' + id
-    }
-    return document.querySelector(selector)
+    return document.getElementById(id)
 }
 
 function doAfter (fn, callback, cd = 0) {
