@@ -16,6 +16,7 @@ import {
     Back,
     Right,
     ArrowUp,
+    ArrowRight,
     Operation,
     Edit,
     Close,
@@ -41,6 +42,7 @@ app.component('IconDownload', Download)
 app.component('IconBack', Back)
 app.component('IconRight', Right)
 app.component('IconArrowUp', ArrowUp)
+app.component('IconArrowRight', ArrowRight)
 app.component('IconOperation', Operation)
 app.component('IconEdit', Edit)
 app.component('IconClose', Close)

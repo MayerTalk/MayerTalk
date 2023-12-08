@@ -35,7 +35,7 @@ DataControl.onUpdate(() => {
 })
 
 const ifShowPermanentSelectChar = computed(() => {
-    return syncedSettings.value.characterSelectorPermanent && validSpace.value - sidebarWidth.value - 421 > 0
+    return syncedSettings.value.characterSelectorPermanent && validSpace.value - sidebarWidth.value - (421 + 22 * 2) > 0
 })
 
 const mobileView = computed(() => {
