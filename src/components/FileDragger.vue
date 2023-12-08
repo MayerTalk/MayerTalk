@@ -31,9 +31,11 @@ document.body.addEventListener('dragover', loga)
 <style scoped>
 .container {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10;
+    z-index: 405;
     opacity: 0.5;
     background: white;
     color: grey;
