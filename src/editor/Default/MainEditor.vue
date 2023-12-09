@@ -41,6 +41,7 @@ import {
 import message from '@/lib/message'
 import tipControl from '@/lib/tip'
 import { windowWidth } from '@/lib/width'
+import Input from '@/lib/input'
 
 const EditCharRef = ref(null)
 const EditDialogue = ref(null)
@@ -245,6 +246,18 @@ const ScreenshotStateControl = {
         })
     }
 }
+
+let currScrollTop = 0
+currScrollTop++
+
+Input.onInput((status, diff) => {
+    const scrollValue = currScrollTop
+    if (document.activeElement === Textarea.el) {
+        setTimeout(() => {
+            scroll.value.setScrollTop(scrollValue + diff)
+        }, 0)
+    }
+})
 </script>
 
 <template>
@@ -269,7 +282,7 @@ const ScreenshotStateControl = {
     <div id="body" :style="{background: syncedSettings.background}">
         <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s">
-            <el-scrollbar :height="scrollHeight" ref="scroll">
+            <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => {currScrollTop=v.scrollTop}">
                 <div class="body">
                     <component :is="Renderers[config.renderer]"
                                @edit="(index) => {EditDialogue.open(index)}"
