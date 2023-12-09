@@ -3,7 +3,8 @@ import { v4 as uuid } from 'uuid'
 import md5 from 'blueimp-md5'
 import html2canvas from 'html2canvas'
 import message from './message'
-import { WindowHeight, IsMobile } from '@/lib/constance'
+import { IsMobile } from '@/lib/constance'
+import Input from '@/lib/input'
 
 function copy (obj) {
     return JSON.parse(JSON.stringify(obj))
@@ -146,14 +147,21 @@ function formatSize (size, unit = SizeUnit[0]) {
 }
 
 const Textarea = {
+    el: null,
     focus () {
         // message.notify(Date.now() - this.lastFocusout)
-        if (!IsMobile || WindowHeight - window.innerHeight > 100) {
+        if (!IsMobile || Input.inputting()) {
             // 非手机(自动focus) or 输入法唤起状态(保持输入法唤起)
-            document.getElementById('textarea').focus()
+            this.el.focus()
         }
     }
 }
+doAfter(() => {
+    return document.getElementById('textarea')
+},
+(el) => {
+    Textarea.el = el
+})
 
 function bool (obj) {
     if (!obj) {
