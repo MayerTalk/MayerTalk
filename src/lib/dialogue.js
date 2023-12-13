@@ -18,7 +18,8 @@ function createDialogue (data, config = {}) {
         content: data.content,
         type: data.type,
         char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
-        id: data.id || uuid()
+        id: data.id || uuid(),
+        data: {}
     }
     chats.value.push(data)
     DataControl.save('chats')

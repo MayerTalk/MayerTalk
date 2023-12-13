@@ -44,7 +44,7 @@ function clearDialogueData () {
     if (!editDialogue.value && dialogueData.value.type === 'image') {
         DataControl.image.delete(dialogueData.value.content)
     }
-    dialogueData.value = {}
+    dialogueData.value = { data: {} }
 }
 
 function handleClose () {
@@ -157,11 +157,19 @@ defineExpose({
                     />
                 </el-select>
             </div>
-            <div
-                style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
+            <div class="divider"></div>
+            <div style="display: flex; align-items: center">
+                在下方裁分
+                <el-switch v-model="dialogueData.data.cutPoint" style="margin-left: 5px"
+                           @change="(v) => {!v && delete dialogueData.data.cutPoint}"/>
+            </div>
+            <div class="divider"></div>
             <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
                 <el-button style="width: 100%" @click="delDialogue">{{ t.action.delete }}</el-button>
-                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">{{ t.action.repeat }}</el-button>
+                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">{{
+                        t.action.repeat
+                    }}
+                </el-button>
                 <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">{{ t.action.insertUp }}
                 </el-button>
             </div>
@@ -194,5 +202,12 @@ defineExpose({
     width: 100%;
     display: flex;
     flex-wrap: wrap;
+}
+
+.divider {
+    width: 100%;
+    height: 5px;
+    margin: 2px 0;
+    border-bottom: var(--el-border-color) dashed 1px
 }
 </style>

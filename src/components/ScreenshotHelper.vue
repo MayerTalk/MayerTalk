@@ -63,43 +63,49 @@ doAfter(() => {
 
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
-    // +10 dialogue无效margin-bottom
+    // -10 dialogue margin-bottom
     const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) + 10
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) - 10
     return res > 0 ? res : 1
 })
 
-function offsetTop (el) {
+function dialogueOffsetTop (el) {
     // offsetTop 包含 renderer paddingTop 20px
     return el.offsetTop - 20
 }
 
-function getScreenshotGroup () {
-    // -30 renderer上下padding (20+10)
-    const totalHeight = screenshotNode.scrollHeight - 30
-    // 缩小比例后实际 maxHeight
-    const maxHeight = realMaxHeight.value
-    if (totalHeight < maxHeight || chats.value.length < 2) {
+function getAutoCutGroup (start, end, maxHeight) {
+    const chatsData = end ? chats.value.slice(start, end) : chats.value.slice(start)
+    const offset = dialogueOffsetTop(getDialogue(chatsData[0].id))
+    const totalHeight = end
+        ? dialogueOffsetTop(getDialogue(chats.value[end].id)) - dialogueOffsetTop(getDialogue(chatsData[0].id))
+        : screenshotNode.scrollHeight - 30 - offset
+
+    function offsetTop (el) {
+        return dialogueOffsetTop(el) - offset
+    }
+
+    if (totalHeight < maxHeight || chatsData.length < 2) {
         // 无需裁分
-        return false
+        return []
     }
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
     // 已裁分Height
-    let croppedHeight = 0
+    let croppedHeight = 10
     // 最后一次裁分index
     let index = 0
     let lastCrop = 0
     if (totalHeight / maxHeight > 2) {
-        for (let i = 1; i < chats.value.length; i++) {
-            const dialogue = getDialogue(chats.value[i].id)
+        for (let i = 1; i < chatsData.length; i++) {
+            const dialogue = getDialogue(chatsData[i].id)
             if (offsetTop(dialogue) - croppedHeight > maxHeight) {
                 if (i - 1 <= lastCrop) {
                     // 最小粒度 (1对话)
                     continue
                 }
                 points.push(i - 1)
-                croppedHeight = offsetTop(getDialogue(chats.value[i - 1].id))
+                croppedHeight = offsetTop(getDialogue(chatsData[i - 1].id)) + 10
                 lastCrop = i - 1
                 if (totalHeight - croppedHeight < 2 * maxHeight) {
                     index = i
@@ -109,28 +115,28 @@ function getScreenshotGroup () {
         }
     }
     if (
-        chats.value.length === index || // 小于一份
+        chatsData.length === index || // 小于一份
         totalHeight - croppedHeight < maxHeight // 剩下的分少于一倍maxHeight
     ) {
         return points
     }
     // totalHeight - croppedHeight < 2 * maxHeight 二分
-    index = chats.value.length - Math.floor((chats.value.length - lastCrop) / 2)
+    index = chatsData.length - Math.floor((chatsData.length - lastCrop) / 2)
     while (true) {
-        const dialogue = getDialogue(chats.value[index].id)
+        const dialogue = getDialogue(chatsData[index].id)
         if (offsetTop(dialogue) - croppedHeight > maxHeight) {
             // part1 过长
             if (totalHeight - offsetTop(dialogue) >= maxHeight) {
                 // 同时part2过长
                 // 极端情况，此时三等分
-                const diff = Math.ceil((chats.value.length - index) / 3)
+                const diff = Math.ceil((chatsData.length - index) / 3)
                 const i1 = index - diff
                 if (i1 > points[points.length - 1]) {
-                    if (i1 < chats.value.length) {
+                    if (i1 < chatsData.length) {
                         // 确保最小粒度 (1对话)
                         points.push(i1)
                     }
-                } else if (i1 + 1 < chats.value.length) {
+                } else if (i1 + 1 < chatsData.length) {
                     points.push(i1 + 1)
                 }
                 const i2 = index + diff
@@ -157,6 +163,26 @@ function getScreenshotGroup () {
         points.push(index)
         break
     }
+    return points
+}
+
+function getScreenshotGroup () {
+    const maxHeight = realMaxHeight.value
+    let lastCut = 0
+    // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
+    const points = []
+    for (let i = 0; i < chats.value.length - 1; i++) {
+        if (chats.value[i].data.cutPoint) {
+            getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
+                points.push(point + lastCut)
+            })
+            points.push(i + 1)
+            lastCut = i + 1
+        }
+    }
+    getAutoCutGroup(lastCut, null, maxHeight).forEach((point) => {
+        points.push(point + lastCut)
+    })
     return points
 }
 
