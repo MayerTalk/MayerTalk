@@ -1,6 +1,6 @@
 import { ref } from 'vue'
-import { chats, DataControl } from '@/lib/data'
-import { copyDialogueHook, createDialogueHook } from '@/lib/dialogue'
+import { chats, DataControl } from '@/lib/data/data'
+import { copyDialogueHook, createDialogueHook } from '@/lib/function/dialogue'
 
 const plus1 = ref(-1)
 

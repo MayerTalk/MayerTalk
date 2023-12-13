@@ -1,12 +1,12 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { t } from '@/lib/lang/translate'
-import message from '@/lib/message'
-import { DataControl } from '@/lib/data'
-import { dialogWidth } from '@/lib/width'
+import message from '@/lib/utils/message'
+import { DataControl } from '@/lib/data/data'
+import { dialogWidth } from '@/lib/data/width'
 import CollapseItem from '@/components/CollapseItem'
 import { mobileView } from '@/editor/Default/lib/width'
-import { IsMobile } from '@/lib/constance'
+import { IsMobile } from '@/lib/data/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits([

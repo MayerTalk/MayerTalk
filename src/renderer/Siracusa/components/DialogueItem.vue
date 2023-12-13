@@ -1,14 +1,14 @@
 <script setup>
 import { ref, inject, computed, watch } from 'vue'
-import { uuid } from '@/lib/tool'
-import { StaticUrl } from '@/lib/constance'
+import { uuid } from '@/lib/utils/tool'
+import { StaticUrl } from '@/lib/data/constance'
 import {
     chars,
     images,
     avatars
-} from '@/lib/data'
-import { syncedSettings } from '@/lib/settings'
-import { Suffix } from '@/lib/character'
+} from '@/lib/data/data'
+import { syncedSettings } from '@/lib/data/settings'
+import { Suffix } from '@/lib/data/character'
 
 const rendererWidth = inject('rendererWidth')
 const charDirection = inject('charDirection')

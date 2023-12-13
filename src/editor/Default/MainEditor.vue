@@ -13,22 +13,22 @@ import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
-import WindowResize from '@/lib/windowResize'
+import WindowResize from '@/lib/utils/windowResize'
 import { mobileView } from '@/editor/Default/lib/width'
 
 import {
     clickBySelector,
     getDialogue,
     Textarea
-} from '@/lib/tool'
+} from '@/lib/utils/tool'
 import {
     chars,
     config,
     avatars,
     currCharId,
     DataControl
-} from '@/lib/data'
-import { syncedSettings } from '@/lib/settings'
+} from '@/lib/data/data'
+import { syncedSettings } from '@/lib/data/settings'
 import {
     textarea,
     createTextDialogue,
@@ -37,11 +37,11 @@ import {
     deleteDialogue,
     createDialogueHook,
     copyDialogueHook
-} from '@/lib/dialogue'
-import message from '@/lib/message'
-import tipControl from '@/lib/tip'
-import { windowWidth } from '@/lib/width'
-import Input from '@/lib/input'
+} from '@/lib/function/dialogue'
+import message from '@/lib/utils/message'
+import tipControl from '@/lib/function/tip'
+import { windowWidth } from '@/lib/data/width'
+import Input from '@/lib/function/input'
 
 const EditCharRef = ref(null)
 const EditDialogue = ref(null)

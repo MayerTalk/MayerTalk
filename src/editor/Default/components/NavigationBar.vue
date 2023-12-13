@@ -1,10 +1,10 @@
 <script setup>
 import { ref, inject, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { chats } from '@/lib/data'
-import { getDialogue, doAfterRefMounted } from '@/lib/tool'
-import message from '@/lib/message'
-import { dialogWidth } from '@/lib/width'
+import { chats } from '@/lib/data/data'
+import { getDialogue, doAfterRefMounted } from '@/lib/utils/tool'
+import message from '@/lib/utils/message'
+import { dialogWidth } from '@/lib/data/width'
 
 const ifShow = ref(false)
 const lineno = ref(null)

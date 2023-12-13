@@ -3,11 +3,11 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 
-import { textarea } from '@/lib/dialogue'
-import { chars } from '@/lib/data'
-import { doAfterRefMounted } from '@/lib/tool'
+import { textarea } from '@/lib/function/dialogue'
+import { chars } from '@/lib/data/data'
+import { doAfterRefMounted } from '@/lib/utils/tool'
 
-import { dialogWidth } from '@/lib/width'
+import { dialogWidth } from '@/lib/data/width'
 
 const ifShow = ref(false)
 const atWho = ref('')

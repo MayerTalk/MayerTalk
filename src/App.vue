@@ -1,11 +1,11 @@
 <script setup>
-import '@/lib/versionControl'
+import '@/lib/data/versionControl'
 import { ref, provide } from 'vue'
 import Editors from './editor'
 import Announce from './AnnounceDialog.vue'
 import About from './AboutDialog.vue'
 import FileDragger from '@/components/FileDragger.vue'
-import { config } from '@/lib/data'
+import { config } from '@/lib/data/data'
 
 const ifShowAnnouncement = ref(false)
 const ifShowSettings = ref(false)

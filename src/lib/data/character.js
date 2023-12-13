@@ -1,12 +1,12 @@
 import { ref } from 'vue'
 
-import Request from '@/lib/request'
-import { cacheRequest } from '@/lib/cacheRequest'
-import { copy } from '@/lib/tool'
+import Request from '@/lib/utils/request'
+import { cacheRequest } from '@/lib/utils/cacheRequest'
+import { copy } from '@/lib/utils/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 import { characterHost } from '@/lib/dev'
-import { config } from '@/lib/data'
-import { IsSafari } from '@/lib/constance'
+import { config } from '@/lib/data/data'
+import { IsSafari } from '@/lib/data/constance'
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 

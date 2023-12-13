@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { ensure, formatSize } from '@/lib/tool'
-import message from '@/lib/message'
-import Save from '@/lib/savefile'
-import { dialogWidth } from '@/lib/width'
+import { ensure, formatSize } from '@/lib/utils/tool'
+import message from '@/lib/utils/message'
+import Save from '@/lib/function/savefile'
+import { dialogWidth } from '@/lib/data/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])

@@ -1,10 +1,10 @@
-import { DataControl } from './data'
-import DataBase from './db'
+import { DataControl } from '../data/data'
+import DataBase from '../utils/db'
 import {
     getDataJson,
     switchVersion
-} from './versionControl'
-import { uuid } from '@/lib/tool'
+} from '../data/versionControl'
+import { uuid } from '@/lib/utils/tool'
 
 const Save = class Save {
     constructor (db = 'savefile') {

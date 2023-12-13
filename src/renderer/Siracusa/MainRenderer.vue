@@ -2,9 +2,9 @@
 import { inject } from 'vue'
 import Dialogue from './components/DialogueItem.vue'
 
-import plus1 from '@/lib/plus1'
-import { chats } from '@/lib/data'
-import { syncedSettings } from '@/lib/settings'
+import plus1 from '@/lib/function/plus1'
+import { chats } from '@/lib/data/data'
+import { syncedSettings } from '@/lib/data/settings'
 
 const rendererWidth = inject('rendererWidth')
 

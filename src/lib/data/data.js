@@ -1,10 +1,10 @@
 import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { defaultLang } from '@/lib/lang/detect'
-import { StaticUrl } from '@/lib/constance'
-import message from '@/lib/message'
-import { copy, blob2base64, md5, uuid, Textarea, bool } from '@/lib/tool'
-import DataBase from './db'
+import { StaticUrl } from '@/lib/data/constance'
+import message from '@/lib/utils/message'
+import { copy, blob2base64, md5, uuid, Textarea, bool } from '@/lib/utils/tool'
+import DataBase from '../utils/db'
 
 const config = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
 const settings = ref({})

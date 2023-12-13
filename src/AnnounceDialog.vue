@@ -1,8 +1,8 @@
 <script setup>
 import { computed, onMounted } from 'vue'
-import { saveData, getData } from './lib/tool'
-import { config } from '@/lib/data'
-import { IsSafari } from '@/lib/constance'
+import { saveData, getData } from './lib/utils/tool'
+import { config } from '@/lib/data/data'
+import { IsSafari } from '@/lib/data/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'showGuide'])

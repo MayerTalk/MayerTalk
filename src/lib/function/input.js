@@ -1,5 +1,5 @@
-import { IsMobile } from '@/lib/constance'
-import WindowResize from '@/lib/windowResize'
+import { IsMobile } from '@/lib/data/constance'
+import WindowResize from '@/lib/utils/windowResize'
 
 const Input = {
     height: window.innerHeight,

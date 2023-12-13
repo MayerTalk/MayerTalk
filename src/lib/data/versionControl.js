@@ -1,7 +1,7 @@
 import { t } from '@/lib/lang/translate'
 import { defaultLang } from '@/lib/lang/detect'
-import { getData, saveData, blob2url, download, md5, copy } from '@/lib/tool'
-import message from '@/lib/message'
+import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
+import message from '@/lib/utils/message'
 import {
     config,
     chats,
@@ -9,7 +9,7 @@ import {
     images,
     settings,
     DataControl
-} from '@/lib/data'
+} from '@/lib/data/data'
 
 const latestVersion = 'f'
 const initialVersion = 'a'

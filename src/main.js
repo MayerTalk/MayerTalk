@@ -1,4 +1,4 @@
-import './lib/redirectSSL'
+import './lib/utils/redirectSSL'
 import { createApp } from 'vue'
 import App from './App.vue'
 

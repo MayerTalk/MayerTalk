@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { loadChar } from '@/lib/character'
+import { loadChar } from '@/lib/data/character'
 import SelectCharInstance from '@/editor/Default/components/SelectCharInstance.vue'
 import { ifShowPermanentSelectChar } from '@/editor/Default/lib/width'
 import CollapseItem from '@/components/CollapseItem'

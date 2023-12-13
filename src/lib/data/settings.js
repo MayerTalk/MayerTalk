@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
-import { settings } from '@/lib/data'
-import { setKeyFalseDelete, sync } from '@/lib/tool'
+import { settings } from '@/lib/data/data'
+import { setKeyFalseDelete, sync } from '@/lib/utils/tool'
 
 const defaultSettings = {
     background: '#303030',

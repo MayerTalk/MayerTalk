@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { copy } from '@/lib/tool'
+import { copy } from '@/lib/utils/tool'
 
 const tipControl = {
     tip: ref(''),
