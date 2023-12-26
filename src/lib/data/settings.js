@@ -14,6 +14,7 @@ const defaultSettings = {
     },
     maxHeight: 16000,
     autoCut: true,
+    manualCut: true,
     watermark: true,
     author: '',
     characterSelectorPermanent: true

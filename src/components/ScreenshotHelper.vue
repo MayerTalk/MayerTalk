@@ -8,6 +8,8 @@ import { chats, chars, settings, DataControl } from '@/lib/data/data'
 import { defaultSettings, syncedSettings, setSettings } from '@/lib/data/settings'
 import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
+import { cutPointViewMode, sortedCutPoints } from '@/components/ManualCutPoint/control'
+import { currEditorRef } from '@/lib/data/stats'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'start', 'done'])
@@ -262,6 +264,7 @@ function getWatermarkCanvas (cb) {
 
 function screenshot () {
     emit('start')
+    cutPointViewMode.value = false
     nextTick(() => {
         if (syncedSettings.value.watermark) {
             getWatermarkCanvas((canvas) => {
@@ -333,6 +336,12 @@ const wordCount = computed(() => {
     return count
 })
 
+function enableCutPointView () {
+    ifShowScreenshotHelper.value = false
+    cutPointViewMode.value = true
+    currEditorRef.value.clearViewport()
+}
+
 defineExpose({
     screenshot
 })
@@ -368,6 +377,28 @@ defineExpose({
                             </td>
                         </tr>
                     </table>
+                </div>
+            </CollapseItem>
+            <div class="bar">
+                <div style="display: flex; align-items: center; width: 100%">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 0 10px 0 0">手动裁分</h2>
+                    <el-switch v-model="syncedSettings.manualCut"
+                               @change="(value) => {settings.manualCut=value}"></el-switch>
+                    <div class="line-right"></div>
+                </div>
+            </div>
+            <CollapseItem>
+                <div v-show="syncedSettings.manualCut" style="padding: 0 0 10px 10px">
+                    <div class="column-display"
+                         style="display: flex; align-items: center; padding-top: 5px">
+                        <div style="width: 100%">
+                            裁分点数量：{{ sortedCutPoints.length }}
+                        </div>
+                        <div style="width: 100%">
+                            <el-button @click="enableCutPointView">查看裁分点</el-button>
+                        </div>
+                    </div>
                 </div>
             </CollapseItem>
             <div class="bar">

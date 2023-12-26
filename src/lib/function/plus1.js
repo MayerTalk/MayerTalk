@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { chats, DataControl } from '@/lib/data/data'
-import { copyDialogueHook, createDialogueHook } from '@/lib/function/dialogue'
+import { copyDialogueHook, DialogueHook } from '@/lib/function/dialogue'
 
 const plus1 = ref(-1)
 
@@ -18,10 +18,9 @@ function plus1Hook (index) {
     }
 }
 
-createDialogueHook.push(() => {
+DialogueHook.onCreate(() => {
     plus1Hook(chats.value.length - 1)
 })
-
 copyDialogueHook.push((index, data, config) => {
     if (Object.prototype.hasOwnProperty.call(config, 'save') ? config.save : true) {
         DataControl.save('chats')

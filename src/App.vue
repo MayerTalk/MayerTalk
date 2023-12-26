@@ -6,6 +6,7 @@ import Announce from './AnnounceDialog.vue'
 import About from './AboutDialog.vue'
 import FileDragger from '@/components/FileDragger.vue'
 import { config } from '@/lib/data/data'
+import { currEditorRef } from '@/lib/data/stats'
 
 const ifShowAnnouncement = ref(false)
 const ifShowSettings = ref(false)
@@ -22,7 +23,7 @@ provide('ifShowAbout', ifShowAbout)
     <About v-model="ifShowAbout"/>
     <FileDragger/>
     <!--main components end-->
-    <component :is="Editors[config.editor]"/>
+    <component :is="Editors[config.editor]" ref="currEditorRef"/>
 </template>
 
 <style src="./font.css"></style>

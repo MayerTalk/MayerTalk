@@ -8,7 +8,7 @@ import { TypeDefault, TypeSeries, IsMobile } from '@/lib/data/constance'
 import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data/data'
 import message from '@/lib/utils/message'
 import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
-import { uploadImage, deleteDialogue } from '@/lib/function/dialogue'
+import { uploadImage, deleteDialogue, DialogueHook } from '@/lib/function/dialogue'
 import { dialogWidth } from '@/lib/data/width'
 
 defineEmits(['showCopy'])
@@ -48,6 +48,7 @@ function clearDialogueData () {
 }
 
 function handleClose () {
+    DialogueHook.callUpdateHook(currDialogueData.value, currDialogueIndex.value)
     clearDialogueData()
     editDialogue.value = false
     DataControl.curr.setDialogue(-1)
@@ -67,7 +68,7 @@ function switchEdit (edit) {
     if (edit) {
         dialogueData.value = currDialogueData.value
     } else {
-        dialogueData.value = { type: 'chat' }
+        dialogueData.value = { type: 'chat', data: {} }
     }
     currType = dialogueData.value.type
 }

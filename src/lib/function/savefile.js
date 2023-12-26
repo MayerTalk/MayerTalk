@@ -19,7 +19,10 @@ const Save = class Save {
             }
         })
         this.saved = false
-        DataControl.onChange(() => {
+        DataControl.onSwitch(() => {
+            this.saved = false
+        })
+        DataControl.onUpdate(() => {
             this.saved = false
         })
     }

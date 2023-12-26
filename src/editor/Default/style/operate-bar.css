@@ -1,13 +1,13 @@
 /*class: editor*/
 
-.operateBar {
-    width: var(--witdh);
-    z-index: 5;
-    position: fixed;
+.operate-bar {
     display: flex;
+    flex-flow: column;
+    justify-content: center;
+    position: fixed;
     bottom: 0;
-    flex-wrap: wrap;
-    align-items: flex-end;
+    z-index: 5;
+
     border-radius: 10px 10px 0 0;
     overflow: hidden;
     border: white solid 1px;

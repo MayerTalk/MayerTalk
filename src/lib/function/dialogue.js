@@ -11,7 +11,26 @@ import {
 
 const textarea = ref('')
 
-const createDialogueHook = []
+const DialogueHook = {
+    createHooks: [],
+    onCreate (fn) {
+        this.createHooks.push(fn)
+    },
+    callCreateHook (data, config) {
+        this.createHooks.forEach((fn) => {
+            fn(data, config)
+        })
+    },
+    updateHooks: [],
+    onUpdate (fn) {
+        this.updateHooks.push(fn)
+    },
+    callUpdateHook (data, index) {
+        this.updateHooks.forEach((fn) => {
+            fn(data, index)
+        })
+    }
+}
 
 function createDialogue (data, config = {}) {
     data = {
@@ -23,9 +42,7 @@ function createDialogue (data, config = {}) {
     }
     chats.value.push(data)
     DataControl.save('chats')
-    createDialogueHook.forEach((hook) => {
-        hook(data, config)
-    })
+    DialogueHook.callCreateHook(data, config)
 }
 
 const copyDialogueHook = []
@@ -91,8 +108,8 @@ function deleteDialogue (index, config = {}) {
 }
 
 export {
+    DialogueHook,
     createDialogue,
-    createDialogueHook,
     createTextDialogue,
     createImageDialogue,
     copyDialogue,

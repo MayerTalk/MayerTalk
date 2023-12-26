@@ -247,6 +247,8 @@ const DataControl = {
     onChange (fn) {
         this.onUpdate(fn)
         this.onSwitch(fn)
+        this.onChangeSavefile(fn)
+        this.onClear(fn)
     },
     clearHooks: [],
     callClearHook (level) {
