@@ -77,6 +77,9 @@ function dialogueOffsetTop (el) {
 }
 
 function getAutoCutGroup (start, end, maxHeight) {
+    if (!syncedSettings.value.autoCut) {
+        return []
+    }
     const chatsData = end ? chats.value.slice(start, end) : chats.value.slice(start)
     const offset = dialogueOffsetTop(getDialogue(chatsData[0].id))
     const totalHeight = end
@@ -173,13 +176,15 @@ function getScreenshotGroup () {
     let lastCut = 0
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
-    for (let i = 0; i < chats.value.length - 1; i++) {
-        if (chats.value[i].data.cutPoint) {
-            getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
-                points.push(point + lastCut)
-            })
-            points.push(i + 1)
-            lastCut = i + 1
+    if (syncedSettings.value.manualCut) {
+        for (let i = 0; i < chats.value.length - 1; i++) {
+            if (chats.value[i].data.cutPoint) {
+                getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
+                    points.push(point + lastCut)
+                })
+                points.push(i + 1)
+                lastCut = i + 1
+            }
         }
     }
     getAutoCutGroup(lastCut, null, maxHeight).forEach((point) => {
@@ -199,7 +204,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         watermarkCanvas,
         title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
     }
-    if (group && syncedSettings.value.autoCut) {
+    if (group.length > 1) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 _screenshot(true, watermarkCanvas)
