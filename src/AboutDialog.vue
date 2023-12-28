@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { config } from '@/lib/data'
+import { config } from '@/lib/data/data'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue'])

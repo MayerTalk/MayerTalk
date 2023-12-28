@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
-import { settings } from '@/lib/data'
-import { sync } from '@/lib/tool'
+import { settings } from '@/lib/data/data'
+import { setKeyFalseDelete, sync } from '@/lib/utils/tool'
 
 const defaultSettings = {
     background: '#303030',
@@ -14,6 +14,7 @@ const defaultSettings = {
     },
     maxHeight: 16000,
     autoCut: true,
+    manualCut: true,
     watermark: true,
     author: '',
     characterSelectorPermanent: true
@@ -24,11 +25,7 @@ sync(syncedSettings.value, defaultSettings, settings.value)
 watch(settings, () => sync(syncedSettings.value, defaultSettings, settings.value), { deep: true })
 
 function setSettings (value, key) {
-    if (value) {
-        settings.value[key] = value
-    } else {
-        delete settings.value[key]
-    }
+    setKeyFalseDelete(settings.value, key, value)
 }
 
 export {

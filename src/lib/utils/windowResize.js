@@ -1,4 +1,4 @@
-import { uuid } from '@/lib/tool'
+import { uuid } from '@/lib/utils/tool'
 
 const WindowResize = {
     listeners: {},

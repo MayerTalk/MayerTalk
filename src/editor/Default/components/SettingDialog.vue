@@ -4,18 +4,18 @@ import { t, updateTranslation } from '@/lib/lang/translate'
 import { supportLang, langShow } from '@/lib/lang/constant'
 import Editors from '@/editor'
 import Renderers from '@/renderer'
-import message from '@/lib/message'
-import { ensure, formatSize, clickBySelector } from '@/lib/tool'
-import Save from '@/lib/savefile'
-import { downloadData, uploadData } from '@/lib/versionControl'
+import message from '@/lib/utils/message'
+import { ensure, formatSize, clickBySelector } from '@/lib/utils/tool'
+import Save from '@/lib/function/savefile'
+import { downloadData, uploadData } from '@/lib/data/versionControl'
 
 import {
     config,
     settings,
     DataControl
-} from '@/lib/data'
-import { syncedSettings, defaultSettings, setSettings } from '@/lib/settings'
-import { dialogWidth } from '@/lib/width'
+} from '@/lib/data/data'
+import { syncedSettings, defaultSettings, setSettings } from '@/lib/data/settings'
+import { dialogWidth } from '@/lib/data/width'
 
 const emit = defineEmits(['resizeWindow', 'showSavefile'])
 

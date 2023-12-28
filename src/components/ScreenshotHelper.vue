@@ -1,13 +1,15 @@
 <script setup>
 import { computed, inject, nextTick, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/tool'
-import { TypeSeries } from '@/lib/constance'
-import message from '@/lib/message'
+import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/utils/tool'
+import { TypeSeries } from '@/lib/data/constance'
+import message from '@/lib/utils/message'
 import { t } from '@/lib/lang/translate'
-import { chats, chars, settings, DataControl } from '@/lib/data'
-import { defaultSettings, syncedSettings, setSettings } from '@/lib/settings'
+import { chats, chars, settings, DataControl } from '@/lib/data/data'
+import { defaultSettings, syncedSettings, setSettings } from '@/lib/data/settings'
 import CollapseItem from '@/components/CollapseItem'
-import { dialogWidth } from '@/lib/width'
+import { dialogWidth } from '@/lib/data/width'
+import { cutPointViewMode, sortedCutPoints } from '@/components/ManualCutPoint/control'
+import { currEditorRef } from '@/lib/data/stats'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'start', 'done'])
@@ -63,43 +65,52 @@ doAfter(() => {
 
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
-    // +10 dialogue无效margin-bottom
+    // -10 dialogue margin-bottom
     const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) + 10
+        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) - 10
     return res > 0 ? res : 1
 })
 
-function offsetTop (el) {
+function dialogueOffsetTop (el) {
     // offsetTop 包含 renderer paddingTop 20px
     return el.offsetTop - 20
 }
 
-function getScreenshotGroup () {
-    // -30 renderer上下padding (20+10)
-    const totalHeight = screenshotNode.scrollHeight - 30
-    // 缩小比例后实际 maxHeight
-    const maxHeight = realMaxHeight.value
-    if (totalHeight < maxHeight || chats.value.length < 2) {
+function getAutoCutGroup (start, end, maxHeight) {
+    if (!syncedSettings.value.autoCut) {
+        return []
+    }
+    const chatsData = end ? chats.value.slice(start, end) : chats.value.slice(start)
+    const offset = dialogueOffsetTop(getDialogue(chatsData[0].id))
+    const totalHeight = end
+        ? dialogueOffsetTop(getDialogue(chats.value[end].id)) - dialogueOffsetTop(getDialogue(chatsData[0].id))
+        : screenshotNode.scrollHeight - 30 - offset
+
+    function offsetTop (el) {
+        return dialogueOffsetTop(el) - offset
+    }
+
+    if (totalHeight < maxHeight || chatsData.length < 2) {
         // 无需裁分
-        return false
+        return []
     }
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
     // 已裁分Height
-    let croppedHeight = 0
+    let croppedHeight = 10
     // 最后一次裁分index
     let index = 0
     let lastCrop = 0
     if (totalHeight / maxHeight > 2) {
-        for (let i = 1; i < chats.value.length; i++) {
-            const dialogue = getDialogue(chats.value[i].id)
+        for (let i = 1; i < chatsData.length; i++) {
+            const dialogue = getDialogue(chatsData[i].id)
             if (offsetTop(dialogue) - croppedHeight > maxHeight) {
                 if (i - 1 <= lastCrop) {
                     // 最小粒度 (1对话)
                     continue
                 }
                 points.push(i - 1)
-                croppedHeight = offsetTop(getDialogue(chats.value[i - 1].id))
+                croppedHeight = offsetTop(getDialogue(chatsData[i - 1].id)) + 10
                 lastCrop = i - 1
                 if (totalHeight - croppedHeight < 2 * maxHeight) {
                     index = i
@@ -109,28 +120,28 @@ function getScreenshotGroup () {
         }
     }
     if (
-        chats.value.length === index || // 小于一份
+        chatsData.length === index || // 小于一份
         totalHeight - croppedHeight < maxHeight // 剩下的分少于一倍maxHeight
     ) {
         return points
     }
     // totalHeight - croppedHeight < 2 * maxHeight 二分
-    index = chats.value.length - Math.floor((chats.value.length - lastCrop) / 2)
+    index = chatsData.length - Math.floor((chatsData.length - lastCrop) / 2)
     while (true) {
-        const dialogue = getDialogue(chats.value[index].id)
+        const dialogue = getDialogue(chatsData[index].id)
         if (offsetTop(dialogue) - croppedHeight > maxHeight) {
             // part1 过长
             if (totalHeight - offsetTop(dialogue) >= maxHeight) {
                 // 同时part2过长
                 // 极端情况，此时三等分
-                const diff = Math.ceil((chats.value.length - index) / 3)
+                const diff = Math.ceil((chatsData.length - index) / 3)
                 const i1 = index - diff
                 if (i1 > points[points.length - 1]) {
-                    if (i1 < chats.value.length) {
+                    if (i1 < chatsData.length) {
                         // 确保最小粒度 (1对话)
                         points.push(i1)
                     }
-                } else if (i1 + 1 < chats.value.length) {
+                } else if (i1 + 1 < chatsData.length) {
                     points.push(i1 + 1)
                 }
                 const i2 = index + diff
@@ -160,6 +171,28 @@ function getScreenshotGroup () {
     return points
 }
 
+function getScreenshotGroup () {
+    const maxHeight = realMaxHeight.value
+    let lastCut = 0
+    // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
+    const points = []
+    if (syncedSettings.value.manualCut) {
+        for (let i = 0; i < chats.value.length - 1; i++) {
+            if (chats.value[i].data.cutPoint) {
+                getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
+                    points.push(point + lastCut)
+                })
+                points.push(i + 1)
+                lastCut = i + 1
+            }
+        }
+    }
+    getAutoCutGroup(lastCut, null, maxHeight).forEach((point) => {
+        points.push(point + lastCut)
+    })
+    return points
+}
+
 function done () {
     title.value = ''
     emit('done')
@@ -171,7 +204,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         watermarkCanvas,
         title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
     }
-    if (group && syncedSettings.value.autoCut) {
+    if (group.length > 1) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 _screenshot(true, watermarkCanvas)
@@ -236,6 +269,7 @@ function getWatermarkCanvas (cb) {
 
 function screenshot () {
     emit('start')
+    cutPointViewMode.value = false
     nextTick(() => {
         if (syncedSettings.value.watermark) {
             getWatermarkCanvas((canvas) => {
@@ -307,6 +341,12 @@ const wordCount = computed(() => {
     return count
 })
 
+function enableCutPointView () {
+    ifShowScreenshotHelper.value = false
+    cutPointViewMode.value = true
+    currEditorRef.value.clearViewport()
+}
+
 defineExpose({
     screenshot
 })
@@ -342,6 +382,28 @@ defineExpose({
                             </td>
                         </tr>
                     </table>
+                </div>
+            </CollapseItem>
+            <div class="bar">
+                <div style="display: flex; align-items: center; width: 100%">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 0 10px 0 0">手动裁分</h2>
+                    <el-switch v-model="syncedSettings.manualCut"
+                               @change="(value) => {settings.manualCut=value}"></el-switch>
+                    <div class="line-right"></div>
+                </div>
+            </div>
+            <CollapseItem>
+                <div v-show="syncedSettings.manualCut" style="padding: 0 0 10px 10px">
+                    <div class="column-display"
+                         style="display: flex; align-items: center; padding-top: 5px">
+                        <div style="width: 100%">
+                            裁分点数量：{{ sortedCutPoints.length }}
+                        </div>
+                        <div style="width: 100%">
+                            <el-button @click="enableCutPointView">查看裁分点</el-button>
+                        </div>
+                    </div>
                 </div>
             </CollapseItem>
             <div class="bar">

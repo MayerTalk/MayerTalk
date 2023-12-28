@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { uploadData } from '@/lib/versionControl'
+import { uploadData } from '@/lib/data/versionControl'
 
 const ifShow = ref(false)
 let dragStatus = false

@@ -1,19 +1,20 @@
 <script setup>
 import { ref, inject, computed, watch } from 'vue'
-import { uuid } from '@/lib/tool'
-import { StaticUrl } from '@/lib/constance'
+import { uuid } from '@/lib/utils/tool'
+import { StaticUrl } from '@/lib/data/constance'
 import {
     chars,
     images,
     avatars
-} from '@/lib/data'
-import { syncedSettings } from '@/lib/settings'
-import { Suffix } from '@/lib/character'
+} from '@/lib/data/data'
+import { syncedSettings } from '@/lib/data/settings'
+import { Suffix } from '@/lib/data/character'
+import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
 
 const rendererWidth = inject('rendererWidth')
 const charDirection = inject('charDirection')
 const preScreenshot = inject('preScreenshot')
-const props = defineProps(['data', 'index', 'plus1'])
+const props = defineProps(['data', 'index', 'plus1', 'cutPoint', 'cutPointActive'])
 defineEmits(['edit', 'delete', 'plus1'])
 
 const data = computed(() => props.data)
@@ -158,9 +159,10 @@ watch(charDirection, () => {
                 </div>
             </template>
         </div>
-        <div v-if="props.plus1 && !preScreenshot" class="plus1" @click="$emit('plus1',index)">
+        <div v-if="plus1 && !preScreenshot" class="plus1" @click="$emit('plus1',index)">
             <p>+1</p>
         </div>
+        <CutPointDialogueWrapper v-if="cutPoint" :active="cutPointActive"/>
     </div>
 </template>
 <style src="../style/dialogue.css" scoped/>

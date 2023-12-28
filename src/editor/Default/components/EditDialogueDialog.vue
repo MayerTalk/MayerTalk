@@ -4,12 +4,12 @@ import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
 
-import { TypeDefault, TypeSeries, IsMobile } from '@/lib/constance'
-import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data'
-import message from '@/lib/message'
-import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/tool'
-import { uploadImage, deleteDialogue } from '@/lib/dialogue'
-import { dialogWidth } from '@/lib/width'
+import { TypeDefault, TypeSeries, IsMobile } from '@/lib/data/constance'
+import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data/data'
+import message from '@/lib/utils/message'
+import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
+import { uploadImage, deleteDialogue, DialogueHook } from '@/lib/function/dialogue'
+import { dialogWidth } from '@/lib/data/width'
 
 defineEmits(['showCopy'])
 
@@ -44,10 +44,11 @@ function clearDialogueData () {
     if (!editDialogue.value && dialogueData.value.type === 'image') {
         DataControl.image.delete(dialogueData.value.content)
     }
-    dialogueData.value = {}
+    dialogueData.value = { data: {} }
 }
 
 function handleClose () {
+    DialogueHook.callUpdateHook(currDialogueData.value, currDialogueIndex.value)
     clearDialogueData()
     editDialogue.value = false
     DataControl.curr.setDialogue(-1)
@@ -67,7 +68,7 @@ function switchEdit (edit) {
     if (edit) {
         dialogueData.value = currDialogueData.value
     } else {
-        dialogueData.value = { type: 'chat' }
+        dialogueData.value = { type: 'chat', data: {} }
     }
     currType = dialogueData.value.type
 }
@@ -157,11 +158,19 @@ defineExpose({
                     />
                 </el-select>
             </div>
-            <div
-                style="width: 100%;height: 5px; margin: 2px 0; border-bottom: var(--el-border-color) dashed 1px"></div>
+            <div class="divider"></div>
+            <div style="display: flex; align-items: center">
+                在下方裁分
+                <el-switch v-model="dialogueData.data.cutPoint" style="margin-left: 5px"
+                           @change="(v) => {!v && delete dialogueData.data.cutPoint}"/>
+            </div>
+            <div class="divider"></div>
             <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
                 <el-button style="width: 100%" @click="delDialogue">{{ t.action.delete }}</el-button>
-                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">{{ t.action.repeat }}</el-button>
+                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">{{
+                        t.action.repeat
+                    }}
+                </el-button>
                 <el-button style="width: 100%; margin-left: 0" @click="switchEdit(false)">{{ t.action.insertUp }}
                 </el-button>
             </div>
@@ -194,5 +203,12 @@ defineExpose({
     width: 100%;
     display: flex;
     flex-wrap: wrap;
+}
+
+.divider {
+    width: 100%;
+    height: 5px;
+    margin: 2px 0;
+    border-bottom: var(--el-border-color) dashed 1px
 }
 </style>

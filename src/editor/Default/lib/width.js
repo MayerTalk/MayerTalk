@@ -1,9 +1,9 @@
 import { computed, ref } from 'vue'
-import { doAfter } from '@/lib/tool'
-import { DataControl } from '@/lib/data'
-import { defaultWindowWidth } from '@/lib/constance'
-import { syncedSettings } from '@/lib/settings'
-import WindowResize from '@/lib/windowResize'
+import { doAfter } from '@/lib/utils/tool'
+import { DataControl } from '@/lib/data/data'
+import { defaultWindowWidth } from '@/lib/data/constance'
+import { syncedSettings } from '@/lib/data/settings'
+import WindowResize from '@/lib/utils/windowResize'
 
 const validSpace = ref(0)
 

@@ -3,10 +3,10 @@ import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 
-import message from '@/lib/message'
-import { copyDialogue } from '@/lib/dialogue'
-import { currDialogueIndex } from '@/lib/data'
-import { dialogWidth } from '@/lib/width'
+import message from '@/lib/utils/message'
+import { copyDialogue } from '@/lib/function/dialogue'
+import { currDialogueIndex } from '@/lib/data/data'
+import { dialogWidth } from '@/lib/data/width'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'coped'])

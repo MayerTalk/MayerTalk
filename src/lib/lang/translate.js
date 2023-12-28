@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 
-import { saveData, getData } from '@/lib/tool'
-import { cacheRequest } from '@/lib/cacheRequest'
+import { saveData, getData } from '@/lib/utils/tool'
+import { cacheRequest } from '@/lib/utils/cacheRequest'
 import { emptyTranslation } from '@/lib/lang/constant'
 import { translationHost } from '@/lib/dev'
-import tipControl from '@/lib/tip'
+import tipControl from '@/lib/function/tip'
 
 const cacheKey = 'cache.data.translation.'
 const config = getData('data.config') || { lang: 'zh_CN' }

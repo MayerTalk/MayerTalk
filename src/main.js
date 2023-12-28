@@ -1,4 +1,4 @@
-import './lib/redirectSSL'
+import './lib/utils/redirectSSL'
 import { createApp } from 'vue'
 import App from './App.vue'
 
@@ -24,7 +24,9 @@ import {
     Collection,
     Refresh,
     CoffeeCup,
-    Notebook
+    Notebook,
+    Top,
+    Bottom
 } from '@element-plus/icons-vue'
 
 const app = createApp(App)
@@ -51,6 +53,8 @@ app.component('IconCollection', Collection)
 app.component('IconRefresh', Refresh)
 app.component('IconCoffeeCup', CoffeeCup)
 app.component('IconNotebook', Notebook)
+app.component('IconTop', Top)
+app.component('IconBottom', Bottom)
 
 app.provide('avatarsJs', 'avatar.js?v=78319d24')
 

@@ -30,6 +30,3 @@ __pycache__
 *.njsproj
 *.sln
 *.sw?
-
-.scoped.css
-.global.css

@@ -3,9 +3,9 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import OptionDialog from '../type/OptionDialog.vue'
 
-import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/tool'
-import { createDialogue } from '@/lib/dialogue'
-import { dialogWidth } from '@/lib/width'
+import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
+import { createDialogue } from '@/lib/function/dialogue'
+import { dialogWidth } from '@/lib/data/width'
 
 const ifShow = ref(false)
 const options = ref({})

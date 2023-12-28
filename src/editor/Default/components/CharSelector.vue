@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { chars, avatars } from '@/lib/data'
+import { chars, avatars } from '@/lib/data/data'
 
 const props = defineProps({
     modelValue: null,

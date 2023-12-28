@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { loadChar } from '@/lib/character'
-import { dialogWidth } from '@/lib/width'
+import { loadChar } from '@/lib/data/character'
+import { dialogWidth } from '@/lib/data/width'
 import SelectCharInstance from './SelectCharInstance.vue'
 
 const props = defineProps(['modelValue'])
