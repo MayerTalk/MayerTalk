@@ -48,7 +48,7 @@ import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.v
 import CollapseItem from '@/components/CollapseItem/CollapseItem.vue'
 
 const EditCharRef = ref(null)
-const EditDialogue = ref(null)
+const EditDialogueRef = ref(null)
 const AtRef = ref(null)
 const CreateOption = ref(null)
 const NavigationBarRef = ref(null)
@@ -298,7 +298,7 @@ function handleEditDialogue (index) {
         DialogueHook.callUpdateHook(chats.value[index])
         DataControl.save('chats')
     } else {
-        EditCharRef.value.open(index)
+        EditDialogueRef.value.open(index)
     }
 }
 
@@ -323,10 +323,10 @@ defineExpose({
     />
     <Savefile v-model="ifShowSavefile"/>
     <EditCharDialog ref="EditCharRef"/>
-    <EditDialogueDialog ref="EditDialogue" @showCopy="ifShowCopy=true"/>
+    <EditDialogueDialog ref="EditDialogueRef" @showCopy="ifShowCopy=true"/>
     <AtDialog ref="AtRef"/>
     <CreateOptionDialog ref="CreateOption"/>
-    <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogue.close()}"/>
+    <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogueRef.close()}"/>
     <!--Editor components end-->
     <div id="body" :style="{background: syncedSettings.background}">
         <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>

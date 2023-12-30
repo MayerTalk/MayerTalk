@@ -198,6 +198,10 @@ function done () {
     emit('done')
 }
 
+const longScreenshot = computed(() => {
+    return chats.value.length > 200
+})
+
 function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
     const options = {
@@ -216,13 +220,13 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         const chatsData = copy(chats.value)
         const next = (i) => {
             if (i > group.length) {
-                message.notify(t.value.notify.screenshottedCompletely, message.success)
+                longScreenshot.value && message.notify(t.value.notify.screenshottedCompletely, message.success)
                 done()
                 screenshotNode.style.height = null
                 setTimeout(() => {
                     chats.value = chatsData
                     setTimeout(() => {
-                        message.notify(t.value.notify.recoveredSuccessfully, message.success)
+                        longScreenshot.value ? message.notify(t.value.notify.recoveredSuccessfully, message.success) : message.notify('多截图完成', message.success)
                     }, 50)
                 }, 500)
                 // 截图结束
@@ -243,7 +247,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
                 }, 100)
             }, 100)
         }
-        message.notify(t.value.notify.startToScreenshot, message.warning)
+        longScreenshot.value ? message.notify(t.value.notify.startToScreenshot, message.warning) : message.notify('多截图开始', message.warning)
         setTimeout(() => {
             next(0)
         }, 500)
@@ -282,14 +286,36 @@ function screenshot () {
 }
 
 const expectCutNumber = computed(() => {
-    if (syncedSettings.value.autoCut) {
-        if ((screenshotNode.scrollHeight - 30) / realMaxHeight.value > chats.value.length) {
-            return chats.value.length
-        } else {
-            return Math.ceil((screenshotNode.scrollHeight - 30) / realMaxHeight.value)
+    const heights = []
+    if (syncedSettings.value.manualCut && sortedCutPoints.value.length) {
+        const parts = []
+        for (let i = 0; i < sortedCutPoints.value.length; i++) {
+            const el = getDialogue(sortedCutPoints.value[i].id)
+            parts.push(dialogueOffsetTop(el) + el.offsetHeight)
+        }
+        heights.push(parts[0])
+        for (let i = 1; i < parts.length; i++) {
+            heights.push(parts[i] - parts[i - 1] - 10)
+        }
+        const remainHeight = screenshotNode.scrollHeight - parts[parts.length - 1] - 40
+        if (remainHeight > 0) {
+            heights.push(remainHeight)
         }
     } else {
-        return 1
+        heights.push(screenshotNode.scrollHeight - 30)
+    }
+    if (syncedSettings.value.autoCut) {
+        let cutNumber = 0
+        for (let i = 0; i < heights.length; i++) {
+            cutNumber += Math.ceil(heights[i] / realMaxHeight.value)
+        }
+        if (cutNumber > chats.value.length) {
+            return chats.value.length
+        } else {
+            return cutNumber
+        }
+    } else {
+        return heights.length
     }
 })
 
