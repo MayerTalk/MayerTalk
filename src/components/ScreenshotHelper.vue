@@ -282,14 +282,36 @@ function screenshot () {
 }
 
 const expectCutNumber = computed(() => {
-    if (syncedSettings.value.autoCut) {
-        if ((screenshotNode.scrollHeight - 30) / realMaxHeight.value > chats.value.length) {
-            return chats.value.length
-        } else {
-            return Math.ceil((screenshotNode.scrollHeight - 30) / realMaxHeight.value)
+    const heights = []
+    if (syncedSettings.value.manualCut && sortedCutPoints.value.length) {
+        const parts = []
+        for (let i = 0; i < sortedCutPoints.value.length; i++) {
+            const el = getDialogue(sortedCutPoints.value[i].id)
+            parts.push(dialogueOffsetTop(el) + el.offsetHeight)
+        }
+        heights.push(parts[0])
+        for (let i = 1; i < parts.length; i++) {
+            heights.push(parts[i] - parts[i - 1] - 10)
+        }
+        const remainHeight = screenshotNode.scrollHeight - parts[parts.length - 1] - 40
+        if (remainHeight > 0) {
+            heights.push(remainHeight)
         }
     } else {
-        return 1
+        heights.push(screenshotNode.scrollHeight - 30)
+    }
+    if (syncedSettings.value.autoCut) {
+        let cutNumber = 0
+        for (let i = 0; i < heights.length; i++) {
+            cutNumber += Math.ceil(heights[i] / realMaxHeight.value)
+        }
+        if (cutNumber > chats.value.length) {
+            return chats.value.length
+        } else {
+            return cutNumber
+        }
+    } else {
+        return heights.length
     }
 })
 
