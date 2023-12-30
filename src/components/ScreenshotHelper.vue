@@ -198,6 +198,10 @@ function done () {
     emit('done')
 }
 
+const longScreenshot = computed(() => {
+    return chats.value.length > 200
+})
+
 function _screenshot (ensure = false, watermarkCanvas = null) {
     const group = getScreenshotGroup()
     const options = {
@@ -216,13 +220,13 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         const chatsData = copy(chats.value)
         const next = (i) => {
             if (i > group.length) {
-                message.notify(t.value.notify.screenshottedCompletely, message.success)
+                longScreenshot.value && message.notify(t.value.notify.screenshottedCompletely, message.success)
                 done()
                 screenshotNode.style.height = null
                 setTimeout(() => {
                     chats.value = chatsData
                     setTimeout(() => {
-                        message.notify(t.value.notify.recoveredSuccessfully, message.success)
+                        longScreenshot.value ? message.notify(t.value.notify.recoveredSuccessfully, message.success) : message.notify('多截图完成', message.success)
                     }, 50)
                 }, 500)
                 // 截图结束
@@ -243,7 +247,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
                 }, 100)
             }, 100)
         }
-        message.notify(t.value.notify.startToScreenshot, message.warning)
+        longScreenshot.value ? message.notify(t.value.notify.startToScreenshot, message.warning) : message.notify('多截图开始', message.warning)
         setTimeout(() => {
             next(0)
         }, 500)
