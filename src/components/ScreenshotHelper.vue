@@ -226,7 +226,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
                 setTimeout(() => {
                     chats.value = chatsData
                     setTimeout(() => {
-                        longScreenshot.value ? message.notify(t.value.notify.recoveredSuccessfully, message.success) : message.notify('多截图完成', message.success)
+                        longScreenshot.value ? message.notify(t.value.notify.recoveredSuccessfully, message.success) : message.notify(t.value.notify.multiScreenshotEnd, message.success)
                     }, 50)
                 }, 500)
                 // 截图结束
@@ -247,7 +247,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
                 }, 100)
             }, 100)
         }
-        longScreenshot.value ? message.notify(t.value.notify.startToScreenshot, message.warning) : message.notify('多截图开始', message.warning)
+        longScreenshot.value ? message.notify(t.value.notify.startToScreenshot, message.warning) : message.notify(t.value.notify.multiScreenshotStart, message.warning)
         setTimeout(() => {
             next(0)
         }, 500)
@@ -413,7 +413,7 @@ defineExpose({
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
-                    <h2 style="margin: 0 10px 0 0">手动裁分</h2>
+                    <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
                     <el-switch v-model="syncedSettings.manualCut"
                                @change="(value) => {settings.manualCut=value}"></el-switch>
                     <div class="line-right"></div>
@@ -424,10 +424,10 @@ defineExpose({
                     <div class="column-display"
                          style="display: flex; align-items: center; padding-top: 5px">
                         <div style="width: 100%">
-                            裁分点数量：{{ sortedCutPoints.length }}
+                            {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
                         </div>
                         <div style="width: 100%">
-                            <el-button @click="enableCutPointView">查看裁分点</el-button>
+                            <el-button @click="enableCutPointView">{{ t.action.viewCuttingPoint }}</el-button>
                         </div>
                     </div>
                 </div>
