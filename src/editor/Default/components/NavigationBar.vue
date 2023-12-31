@@ -31,7 +31,6 @@ onMounted(() => {
         }
     }, { signal: controller.signal })
     onUnmounted(() => {
-        console.log('2')
         controller.abort()
     })
 })
