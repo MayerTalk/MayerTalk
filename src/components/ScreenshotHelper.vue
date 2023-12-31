@@ -208,7 +208,7 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
         watermarkCanvas,
         title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
     }
-    if (group.length > 1) {
+    if (group.length > 0) {
         if (group.length > 10 && !ensure) {
             message.confirm(t.value.notify.screenshotExceeds10, t.value.noun.hint, () => {
                 _screenshot(true, watermarkCanvas)
