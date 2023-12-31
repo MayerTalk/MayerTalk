@@ -1,30 +1,48 @@
 import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { Textarea, uuid } from '@/lib/tool'
-import message from '@/lib/message'
-import tipControl from '@/lib/tip'
+import { Textarea, uuid } from '@/lib/utils/tool'
+import message from '@/lib/utils/message'
+import tipControl from '@/lib/function/tip'
 import {
     chats,
     currCharId,
     DataControl
-} from '@/lib/data'
+} from '@/lib/data/data'
 
 const textarea = ref('')
 
-const createDialogueHook = []
+const DialogueHook = {
+    createHooks: [],
+    onCreate (fn) {
+        this.createHooks.push(fn)
+    },
+    callCreateHook (data, config) {
+        this.createHooks.forEach((fn) => {
+            fn(data, config)
+        })
+    },
+    updateHooks: [],
+    onUpdate (fn) {
+        this.updateHooks.push(fn)
+    },
+    callUpdateHook (data, index) {
+        this.updateHooks.forEach((fn) => {
+            fn(data, index)
+        })
+    }
+}
 
 function createDialogue (data, config = {}) {
     data = {
         content: data.content,
         type: data.type,
         char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
-        id: data.id || uuid()
+        id: data.id || uuid(),
+        data: {}
     }
     chats.value.push(data)
     DataControl.save('chats')
-    createDialogueHook.forEach((hook) => {
-        hook(data, config)
-    })
+    DialogueHook.callCreateHook(data, config)
 }
 
 const copyDialogueHook = []
@@ -90,8 +108,8 @@ function deleteDialogue (index, config = {}) {
 }
 
 export {
+    DialogueHook,
     createDialogue,
-    createDialogueHook,
     createTextDialogue,
     createImageDialogue,
     copyDialogue,

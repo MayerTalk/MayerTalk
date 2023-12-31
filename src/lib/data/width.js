@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
-import WindowResize from '@/lib/windowResize'
-import { defaultWindowWidth } from '@/lib/constance'
+import WindowResize from '@/lib/utils/windowResize'
+import { defaultWindowWidth } from '@/lib/data/constance'
 
 const windowWidth = ref(Math.min(defaultWindowWidth, window.innerWidth))
 WindowResize.onResize(() => {

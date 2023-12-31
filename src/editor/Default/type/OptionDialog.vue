@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, nextTick } from 'vue'
 import { t } from '@/lib/lang/translate'
-import message from '@/lib/message'
-import { uuid } from '@/lib/tool'
+import message from '@/lib/utils/message'
+import { uuid } from '@/lib/utils/tool'
 
 const props = defineProps({
     modelValue: {

@@ -1,10 +1,10 @@
 <script setup>
-import { ref, inject, onUnmounted } from 'vue'
+import { ref, inject, onMounted, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { chats } from '@/lib/data'
-import { getDialogue, doAfterRefMounted } from '@/lib/tool'
-import message from '@/lib/message'
-import { dialogWidth } from '@/lib/width'
+import { chats } from '@/lib/data/data'
+import { getDialogue, doAfterRefMounted } from '@/lib/utils/tool'
+import message from '@/lib/utils/message'
+import { dialogWidth } from '@/lib/data/width'
 
 const ifShow = ref(false)
 const lineno = ref(null)
@@ -13,22 +13,26 @@ const scroll = inject('scroll')
 
 function open () {
     ifShow.value = true
-    doAfterRefMounted(input, (r) => {
-        r.value.focus()
+    setTimeout(() => {
+        doAfterRefMounted(input, (r) => {
+            r.value.focus()
+        })
     })
 }
 
-const controller = new AbortController()
-document.addEventListener('keydown', event => {
-    if (event.ctrlKey) {
-        if (event.code === 'KeyG') {
-            open()
-            event.preventDefault()
+onMounted(() => {
+    const controller = new AbortController()
+    document.addEventListener('keydown', event => {
+        if (event.ctrlKey) {
+            if (event.code === 'KeyG') {
+                open()
+                event.preventDefault()
+            }
         }
-    }
-}, { signal: controller.signal })
-onUnmounted(() => {
-    controller.abort()
+    }, { signal: controller.signal })
+    onUnmounted(() => {
+        controller.abort()
+    })
 })
 
 function handleNav () {

@@ -1,6 +1,6 @@
-import { getData, saveData } from '@/lib/tool'
-import Request from '@/lib/request'
-import { StaticUrl } from '@/lib/constance'
+import { getData, saveData } from '@/lib/utils/tool'
+import Request from '@/lib/utils/request'
+import { StaticUrl } from '@/lib/data/constance'
 
 const staticApi = new Request({ host: StaticUrl })
 

@@ -1,10 +1,10 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { StaticUrl, IsMobile } from '@/lib/constance'
-import { SearchManager, CharDict, Suffix } from '@/lib/character'
-import { doAfterRefMounted } from '@/lib/tool'
-import { dialogWidth } from '@/lib/width'
+import { StaticUrl, IsMobile } from '@/lib/data/constance'
+import { SearchManager, CharDict, Suffix } from '@/lib/data/character'
+import { doAfterRefMounted } from '@/lib/utils/tool'
+import { dialogWidth } from '@/lib/data/width'
 
 const { maxHeight } = defineProps({
     maxHeight: {

@@ -37,7 +37,9 @@ const emptyTranslation = {
         recoveredSuccessfully: '',
         loadedSuccessfully: '',
         downloadCanvasFailed: '',
-        emptiedSuccessfully: ''
+        emptiedSuccessfully: '',
+        multiScreenshotStart: '',
+        multiScreenshotEnd: ''
     },
     action: {
         add: '',
@@ -68,7 +70,12 @@ const emptyTranslation = {
         export: '',
         createSavefile: '',
         load: '',
-        generate: ''
+        generate: '',
+        previous: '',
+        next: '',
+        importFile: '',
+        viewCuttingPoint: '',
+        cutBelow: ''
     },
     noun: {
         character: '',
@@ -115,7 +122,10 @@ const emptyTranslation = {
         chatCount: '',
         wordCount: '',
         screenshotLength: '',
-        characterSelectorPermanent: ''
+        characterSelectorPermanent: '',
+        quickEdit: '',
+        manualCutting: '',
+        numberOfCuttingPoints: ''
     },
     tip: {
         pool: [

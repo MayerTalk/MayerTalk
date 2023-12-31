@@ -1,8 +1,8 @@
 <script setup>
-import { computed, onMounted } from 'vue'
-import { saveData, getData } from './lib/tool'
-import { config } from '@/lib/data'
-import { IsSafari } from '@/lib/constance'
+import { computed, onMounted, ref } from 'vue'
+import { saveData, getData } from './lib/utils/tool'
+import { config } from '@/lib/data/data'
+import { IsSafari } from '@/lib/data/constance'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'showGuide'])
@@ -102,9 +102,9 @@ const announcementTranslate = {
             optimize: '优化',
             fix: '修复'
         },
-        feat: ['增加宽屏角色选择栏(可在设置中关闭)'],
-        optimize: ['截图的标题会在 切换存档/清空/完成截图 时清除', '侧边栏动效'],
-        fix: ['部分浏览器对话框显示不完全', '统计数据错误']
+        feat: ['手动裁分'],
+        optimize: ['现在可以快捷隐藏常驻角色栏了', '优化对手机输入法的适配'],
+        fix: ['拖拽上传显示错误']
     },
     zh_TW: {
         key: {
@@ -112,9 +112,9 @@ const announcementTranslate = {
             optimize: '優化',
             fix: '修復'
         },
-        feat: ['增加寬屏角色選擇欄(可在設置中關閉)'],
-        optimize: ['截圖的標題會在 切換存檔/清空/完成截圖 時清除', '側邊欄動效'],
-        fix: ['部分瀏覽器對話框顯示不完全', '統計數據錯誤']
+        feat: ['手動裁分'],
+        optimize: ['現在可以快捷隱藏常駐角色欄了', '優化對手機輸入法的適配'],
+        fix: ['拖拽上傳顯示錯誤']
     },
     en_US: {
         key: {
@@ -122,9 +122,9 @@ const announcementTranslate = {
             optimize: 'Optimize',
             fix: 'Fix'
         },
-        feat: ['Add widescreen character selection bar (can be turned off in settings)'],
-        optimize: ['The title of the screenshot will be cleared when switching archives/clearing/completing screenshots', 'Sidebar animation'],
-        fix: ['Partial browser dialog box is not fully displayed', 'Statistical data error']
+        feat: ['Manual cutting'],
+        optimize: ['Now you can quickly hide the resident character bar', 'Optimize the adaptation to the mobile input method'],
+        fix: ['Drag and upload display error']
     },
     ja_JP: {
         key: {
@@ -132,9 +132,9 @@ const announcementTranslate = {
             optimize: '最適化',
             fix: '修正'
         },
-        feat: ['ワイドスクリーンキャラクターセレクトバーを追加（設定でオフにできます）'],
-        optimize: ['スクリーンショットのタイトルは、アーカイブの切り替え/クリア/スクリーンショットの完了時にクリアされます', 'サイドバーアニメーション'],
-        fix: ['一部のブラウザダイアログボックスが完全に表示されない', '統計データエラー']
+        feat: ['手動でカット'],
+        optimize: ['今すぐ常駐キャラクターバーを非表示にすることができます', '携帯電話の入力方法への適応を最適化'],
+        fix: ['ドラッグアンドアップロード表示エラー']
     }
 }
 
@@ -163,8 +163,14 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.2.1 '
+const version = 'v0.2.2'
 
+const newYearTranslation = {
+    zh_CN: '新年快乐！',
+    zh_TW: '新年快樂！',
+    en_US: 'Happy New Year!',
+    ja_JP: '新年あけましておめでとうございます！'
+}
 </script>
 
 <template>
@@ -179,6 +185,7 @@ const version = 'v0.2.1 '
             </template>
         </template>
         <template v-else>
+            <h2 style="color: orangered">{{ newYearTranslation[config.lang || 'en_US'] }}</h2>
             <p>{{ t.default.develop }}</p>
             <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
             <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>

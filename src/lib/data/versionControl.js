@@ -1,7 +1,7 @@
 import { t } from '@/lib/lang/translate'
 import { defaultLang } from '@/lib/lang/detect'
-import { getData, saveData, blob2url, download, md5, copy } from '@/lib/tool'
-import message from '@/lib/message'
+import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
+import message from '@/lib/utils/message'
 import {
     config,
     chats,
@@ -9,9 +9,9 @@ import {
     images,
     settings,
     DataControl
-} from '@/lib/data'
+} from '@/lib/data/data'
 
-const latestVersion = 'e'
+const latestVersion = 'f'
 const initialVersion = 'a'
 let currVersion = getData('data.version') || initialVersion
 const versionSwitcher = {
@@ -94,6 +94,17 @@ const versionSwitcher = {
             saveData('data.config', data.config)
         }
         return 'e'
+    },
+    e: (data, opt) => {
+        // v0.2.1 -> v0.2.2 / e -> f
+        // dialogue.data
+        data.chats.forEach((chatData) => {
+            chatData.data = {}
+        })
+        if (opt.load) {
+            saveData('data.chats', data.chats)
+        }
+        return 'f'
     }
 }
 

@@ -1,4 +1,4 @@
-import { uuid } from '@/lib/tool'
+import { uuid } from '@/lib/utils/tool'
 
 const StaticUrl = 'https://static.mayertalk.top/'
 
@@ -21,7 +21,6 @@ const TypeSeries = {
 }
 
 const defaultWindowWidth = 520
-const WindowHeight = window.innerHeight
 const IsMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent)
 const IsSafari = /^(.(?!Chrome))*Safari/.test(navigator.userAgent)
 
@@ -30,7 +29,6 @@ export {
     TypeDefault,
     TypeSeries,
     defaultWindowWidth,
-    WindowHeight,
     IsMobile,
     IsSafari
 }
