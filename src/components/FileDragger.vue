@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { uploadData } from '@/lib/data/versionControl'
+import { t } from '../lib/lang/translate'
 
 const ifShow = ref(false)
 let dragStatus = false
@@ -45,7 +46,7 @@ document.body.addEventListener('dragover', loga)
 <template>
     <teleport to="#app">
         <div v-show="ifShow" class="container">
-            <h2>导入文件</h2>
+            <h2>{{ t.action.importFile }}</h2>
         </div>
     </teleport>
 </template>

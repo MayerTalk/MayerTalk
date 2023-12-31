@@ -160,7 +160,7 @@ defineExpose({
             </div>
             <div class="divider"></div>
             <div style="display: flex; align-items: center">
-                在下方裁分
+                {{ t.action.cutBelow }}
                 <el-switch v-model="dialogueData.data.cutPoint" style="margin-left: 5px"
                            @change="(v) => {!v && delete dialogueData.data.cutPoint}"/>
             </div>

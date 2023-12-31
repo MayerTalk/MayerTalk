@@ -10,6 +10,7 @@ import {
     prev,
     next
 } from '@/components/ManualCutPoint/control'
+import { t } from '@/lib/lang/translate'
 
 onMounted(() => {
     setCurrCutPoint(sortedCutPoints.value.length && (getClosetCutPoint() + 1))
@@ -30,21 +31,21 @@ onUnmounted(() => {
                 {{ currCutPointIndex }}/{{ sortedCutPoints.length }}
             </div>
             <div style="width: 100%; display: flex; justify-content: center">
-                <el-icon :color="cutPointQuickEditMode?'#B6E4F2':'white'" :size="35" title="快速编辑"
+                <el-icon :color="cutPointQuickEditMode?'#B6E4F2':'white'" :size="35" :title="t.noun.quickEdit"
                          @click="cutPointQuickEditMode=!cutPointQuickEditMode">
                     <IconEdit/>
                 </el-icon>
-                <el-icon color="white" :size="35" style="margin-left: 5%" title="上一个"
+                <el-icon color="white" :size="35" style="margin-left: 5%" :title="t.action.previous"
                          @click="prev">
                     <IconTop/>
                 </el-icon>
-                <el-icon color="white" :size="35" style="margin-left: 5%" title="下一个"
+                <el-icon color="white" :size="35" style="margin-left: 5%" :title="t.action.next"
                          @click="next">
                     <IconBottom/>
                 </el-icon>
             </div>
             <div style="width: 100%; text-align: center" @click="cutPointViewMode=false">
-                返回
+                {{ t.action.return }}
             </div>
         </div>
     </div>
