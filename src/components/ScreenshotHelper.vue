@@ -291,6 +291,12 @@ const expectCutNumber = computed(() => {
         const parts = []
         for (let i = 0; i < sortedCutPoints.value.length; i++) {
             const el = getDialogue(sortedCutPoints.value[i].id)
+            if (!el) {
+                // 多截图导致realMaxHeight变动，而此时部分dialogue被移出，无法获取
+                // 返回最后可用值
+                // TODO 获取是否正在截图 / 优化截图流程
+                return expectCutNumber.value
+            }
             parts.push(dialogueOffsetTop(el) + el.offsetHeight)
         }
         heights.push(parts[0])

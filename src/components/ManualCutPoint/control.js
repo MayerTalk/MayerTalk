@@ -12,21 +12,30 @@ const cutPointViewMode = ref(false)
 const cutPoints = ref({})
 const sortedCutPoints = ref([])
 const cutPointQuickEditMode = ref(false)
+let lastUpdate = ''
 
 function reloadCutPoint () {
-    cutPoints.value = {}
-    sortedCutPoints.value = []
-    let index = 0
+    const arrayPoints = []
+    const dictPoints = {}
+    let update = ''
     chats.value.forEach((data) => {
         if (data.data.cutPoint) {
-            index++
-            cutPoints.value[data.id] = data
-            sortedCutPoints.value.push(data)
-            if (data.id === currCutPoint.value) {
-                currCutPointIndex.value = index
-            }
+            dictPoints[data.id] = data
+            arrayPoints.push(data)
+            update += data.id
         }
     })
+    if (update === lastUpdate) {
+        return
+    }
+    lastUpdate = update
+    arrayPoints.forEach((data, index) => {
+        if (data.id === currCutPoint.value) {
+            currCutPointIndex.value = index + 1
+        }
+    })
+    sortedCutPoints.value = arrayPoints
+    cutPoints.value = dictPoints
 }
 
 reloadCutPoint()
