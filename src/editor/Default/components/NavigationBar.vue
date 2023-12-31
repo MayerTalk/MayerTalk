@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, onUnmounted } from 'vue'
+import { ref, inject, onMounted, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { chats } from '@/lib/data/data'
 import { getDialogue, doAfterRefMounted } from '@/lib/utils/tool'
@@ -13,22 +13,27 @@ const scroll = inject('scroll')
 
 function open () {
     ifShow.value = true
-    doAfterRefMounted(input, (r) => {
-        r.value.focus()
+    setTimeout(() => {
+        doAfterRefMounted(input, (r) => {
+            r.value.focus()
+        })
     })
 }
 
-const controller = new AbortController()
-document.addEventListener('keydown', event => {
-    if (event.ctrlKey) {
-        if (event.code === 'KeyG') {
-            open()
-            event.preventDefault()
+onMounted(() => {
+    const controller = new AbortController()
+    document.addEventListener('keydown', event => {
+        if (event.ctrlKey) {
+            if (event.code === 'KeyG') {
+                open()
+                event.preventDefault()
+            }
         }
-    }
-}, { signal: controller.signal })
-onUnmounted(() => {
-    controller.abort()
+    }, { signal: controller.signal })
+    onUnmounted(() => {
+        console.log('2')
+        controller.abort()
+    })
 })
 
 function handleNav () {
