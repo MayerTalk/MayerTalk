@@ -104,7 +104,7 @@ const announcementTranslate = {
         },
         feat: ['手动裁分'],
         optimize: ['现在可以快捷隐藏常驻角色栏了', '优化对手机输入法的适配'],
-        fix: ['拖拽上传显示错误']
+        fix: ['拖拽上传显示错误', '无法查看裁分点']
     },
     zh_TW: {
         key: {
@@ -114,7 +114,7 @@ const announcementTranslate = {
         },
         feat: ['手動裁分'],
         optimize: ['現在可以快捷隱藏常駐角色欄了', '優化對手機輸入法的適配'],
-        fix: ['拖拽上傳顯示錯誤']
+        fix: ['拖拽上傳顯示錯誤', '無法查看裁分點']
     },
     en_US: {
         key: {
@@ -124,7 +124,7 @@ const announcementTranslate = {
         },
         feat: ['Manual cutting'],
         optimize: ['Now you can quickly hide the resident character bar', 'Optimize the adaptation to the mobile input method'],
-        fix: ['Drag and upload display error']
+        fix: ['Drag and upload display error', 'Unable to view scoring points']
     },
     ja_JP: {
         key: {
@@ -134,7 +134,7 @@ const announcementTranslate = {
         },
         feat: ['手動でカット'],
         optimize: ['今すぐ常駐キャラクターバーを非表示にすることができます', '携帯電話の入力方法への適応を最適化'],
-        fix: ['ドラッグアンドアップロード表示エラー']
+        fix: ['ドラッグアンドアップロード表示エラー', 'スコアリングポイントを表示できません']
     }
 }
 
@@ -163,7 +163,7 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.2.2'
+const version = 'v0.2.2-fix1'
 
 const newYearTranslation = {
     zh_CN: '新年快乐！',
@@ -174,54 +174,54 @@ const newYearTranslation = {
 </script>
 
 <template>
-    <el-dialog v-model="ifShowAnnouncement" :title="t.default.announcement + ' ' + version" :width="dialogWidth">
-        <h2 style="display: inline">MayerTalk(beta)</h2>
-        <template v-if="invalidBrowser">
-            <template v-for="(translation, index) in t.invalid" :key="index">
-                <h2 v-if="index===0" style="color: red">
-                    {{ translation }}
-                </h2>
-                <h3 v-else> {{ translation }}</h3>
-            </template>
+  <el-dialog v-model="ifShowAnnouncement" :title="t.default.announcement + ' ' + version" :width="dialogWidth">
+    <h2 style="display: inline">MayerTalk(beta)</h2>
+    <template v-if="invalidBrowser">
+      <template v-for="(translation, index) in t.invalid" :key="index">
+        <h2 v-if="index===0" style="color: red">
+          {{ translation }}
+        </h2>
+        <h3 v-else> {{ translation }}</h3>
+      </template>
+    </template>
+    <template v-else>
+      <h2 style="color: orangered">{{ newYearTranslation[config.lang || 'en_US'] }}</h2>
+      <p>{{ t.default.develop }}</p>
+      <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
+      <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
+      <h3>
+        {{ version }}
+      </h3>
+      <template v-for="key in ['feat','optimize','fix']" :key="key">
+        <template v-if="announcementTranslate.zh_CN[key]">
+          <b>{{ t.announcement.key[key] }}</b>
+          <ul>
+            <li v-for="(item,index) in t.announcement[key]" :key="index">{{ item }}</li>
+          </ul>
         </template>
-        <template v-else>
-            <h2 style="color: orangered">{{ newYearTranslation[config.lang || 'en_US'] }}</h2>
-            <p>{{ t.default.develop }}</p>
-            <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
-            <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
-            <h3>
-                {{ version }}
-            </h3>
-            <template v-for="key in ['feat','optimize','fix']" :key="key">
-                <template v-if="announcementTranslate.zh_CN[key]">
-                    <b>{{ t.announcement.key[key] }}</b>
-                    <ul>
-                        <li v-for="(item,index) in t.announcement[key]" :key="index">{{ item }}</li>
-                    </ul>
-                </template>
-            </template>
-        </template>
-        <div style="display: flex; margin-top: 10px">
-            <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px"
-                     target="_blank">
-                {{ t.default.community }}
-            </el-link>
-            <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;"
-                     target="_blank">
-                Github
-            </el-link>
-            <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="/docs/guide/report_bug.html" type="primary" style="margin-left: 5px;"
-                     target="_blank">{{ t.default.reportBug }}
-            </el-link>
-        </div>
-        <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
-    </el-dialog>
+      </template>
+    </template>
+    <div style="display: flex; margin-top: 10px">
+      <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px"
+               target="_blank">
+        {{ t.default.community }}
+      </el-link>
+      <span style="border-left: solid 1px darkgrey"></span>
+      <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;"
+               target="_blank">
+        Github
+      </el-link>
+      <span style="border-left: solid 1px darkgrey"></span>
+      <el-link href="/docs/guide/report_bug.html" type="primary" style="margin-left: 5px;"
+               target="_blank">{{ t.default.reportBug }}
+      </el-link>
+    </div>
+    <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
+  </el-dialog>
 </template>
 
 <style scoped>
 ul {
-    margin: 5px 0;
+  margin: 5px 0;
 }
 </style>
