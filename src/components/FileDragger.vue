@@ -12,10 +12,11 @@ function open () {
 }
 
 function close () {
-    if (dragStatus || ifShow.value) {
+    if (dragStatus && ifShow.value) {
         dragStatus = false
         setTimeout(() => {
             if (!dragStatus) {
+                dragStatus = false
                 ifShow.value = false
             }
         }, 10)
