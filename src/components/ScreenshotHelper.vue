@@ -344,6 +344,7 @@ const ExpectLength = {
             () => {
                 return [
                     syncedSettings.value.autoCut,
+                    syncedSettings.value.manualCut,
                     syncedSettings.value.watermark,
                     syncedSettings.value.maxHeight
                 ]
