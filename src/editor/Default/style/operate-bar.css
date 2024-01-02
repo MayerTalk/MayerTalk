@@ -88,6 +88,14 @@
     justify-content: center;
 }
 
+.add {
+    background: #686868;
+    position: relative;
+    width: 51px;
+    height: 51px;
+    margin: 3px
+}
+
 .textarea {
     border-radius: 0;
     outline: none;
