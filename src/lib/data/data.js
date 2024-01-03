@@ -232,10 +232,10 @@ const DataControl = {
         changeSavefile: new Hook(),
         change: new Hook((self, fn) => {
             const cancel = [
-                this.update.on(fn),
-                this.switch.on(fn),
-                this.clear.on(fn),
-                this.changeSavefile.on(fn)
+                DataControl.hook.update.on(fn),
+                DataControl.hook.switch.on(fn),
+                DataControl.hook.clear.on(fn),
+                DataControl.hook.changeSavefile.on(fn)
             ]
             return () => {
                 cancel.forEach((x) => {
