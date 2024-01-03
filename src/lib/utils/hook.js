@@ -1,8 +1,14 @@
 import { uuid } from '@/lib/utils/tool'
 
 class Hook {
-    constructor () {
+    constructor (onFunction = null, callFunction = null) {
         this.hooks = {}
+        if (onFunction) {
+            this.on = (fn) => onFunction(this, fn)
+        }
+        if (callFunction) {
+            this.call = (params) => callFunction(this, params)
+        }
     }
 
     on (fn) {

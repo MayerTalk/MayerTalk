@@ -38,7 +38,7 @@ import {
     createImageDialogue,
     copyDialogue,
     deleteDialogue,
-    copyDialogueHook, DialogueHook
+    DialogueHook
 } from '@/lib/function/dialogue'
 import message from '@/lib/utils/message'
 import tipControl from '@/lib/function/tip'
@@ -220,25 +220,25 @@ tipControl.hook = () => {
     })
 }
 
-DialogueHook.onCreate((data, config) => {
+onUnmounted(DialogueHook.create.on((params) => {
     nextTick(() => {
         resizeScroll()
-        if (!Object.prototype.hasOwnProperty.call(config, 'locate') || config.locate) {
-            const el = getDialogue(data.id)
+        if (!Object.prototype.hasOwnProperty.call(params.config, 'locate') || paramsconfig.locate) {
+            const el = getDialogue(params.data.id)
             scroll.value.setScrollTop(el.offsetTop)
         }
     })
-})
+}))
 
-copyDialogueHook.push((index, data, config) => {
+onUnmounted(DialogueHook.copy.on((params) => {
     nextTick(() => {
         resizeScroll()
-        if (Object.prototype.hasOwnProperty.call(config, 'locate') ? config.locate : true) {
-            const el = getDialogue(data.id)
+        if (Object.prototype.hasOwnProperty.call(params.config, 'locate') ? params.config.locate : true) {
+            const el = getDialogue(params.data.id)
             scroll.value.setScrollTop(el.offsetTop)
         }
     })
-})
+}))
 
 const scrollHeight = ref(window.innerHeight - 90 + 'px')
 
@@ -257,14 +257,14 @@ const ScreenshotStateControl = {
 
 const currScrollTop = ref(0)
 
-Input.onInput((status, diff) => {
+onUnmounted(Input.hook.on((params) => {
     const scrollValue = currScrollTop.value
     if (document.activeElement === Textarea.el) {
         setTimeout(() => {
-            scroll.value.setScrollTop(scrollValue + diff)
+            scroll.value.setScrollTop(scrollValue + params.diff)
         }, 0)
     }
-})
+}))
 
 watch(cutPointViewMode, () => {
     // setTimeout(() => {
@@ -298,7 +298,10 @@ function handleEditDialogue (index) {
         } else {
             data.cutPoint = true
         }
-        DialogueHook.callUpdateHook(chats.value[index])
+        DialogueHook.update.call({
+            data: chats.value[index],
+            index
+        })
         DataControl.save('chats')
     } else {
         EditDialogueRef.value.open(index)

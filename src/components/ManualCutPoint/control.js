@@ -40,20 +40,20 @@ function reloadCutPoint () {
 
 reloadCutPoint()
 
-DialogueHook.onCreate((data, config) => {
+DialogueHook.create.on(() => {
     reloadCutPoint()
 })
-DialogueHook.onUpdate((data, index) => {
-    if (Object.prototype.hasOwnProperty.call(cutPoints.value, data.id) &&
-        !Object.prototype.hasOwnProperty.call(data.data, 'cutPoint') &&
-        data.id === currCutPoint.value) {
+DialogueHook.update.on((params) => {
+    if (Object.prototype.hasOwnProperty.call(cutPoints.value, params.data.id) &&
+        !Object.prototype.hasOwnProperty.call(params.data.data, 'cutPoint') &&
+        params.data.id === currCutPoint.value) {
         currCutPoint.value = ''
         currCutPointIndex.value = '~'
     }
     reloadCutPoint()
 })
 
-DataControl.onChange(() => {
+DataControl.hook.change.on(() => {
     reloadCutPoint()
 })
 

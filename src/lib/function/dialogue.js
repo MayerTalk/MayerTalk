@@ -8,28 +8,14 @@ import {
     currCharId,
     DataControl
 } from '@/lib/data/data'
+import Hook from '@/lib/utils/hook'
 
 const textarea = ref('')
 
 const DialogueHook = {
-    createHooks: [],
-    onCreate (fn) {
-        this.createHooks.push(fn)
-    },
-    callCreateHook (data, config) {
-        this.createHooks.forEach((fn) => {
-            fn(data, config)
-        })
-    },
-    updateHooks: [],
-    onUpdate (fn) {
-        this.updateHooks.push(fn)
-    },
-    callUpdateHook (data, index) {
-        this.updateHooks.forEach((fn) => {
-            fn(data, index)
-        })
-    }
+    create: new Hook(),
+    update: new Hook(),
+    copy: new Hook()
 }
 
 function createDialogue (data, config = {}) {
@@ -42,10 +28,8 @@ function createDialogue (data, config = {}) {
     }
     chats.value.push(data)
     DataControl.save('chats')
-    DialogueHook.callCreateHook(data, config)
+    DialogueHook.create.call({ data, config })
 }
-
-const copyDialogueHook = []
 
 function copyDialogue (index, data = {}, config = {}) {
     data = {
@@ -58,8 +42,10 @@ function copyDialogue (index, data = {}, config = {}) {
         DataControl.image.count(data.content)
     }
     chats.value.push(data)
-    copyDialogueHook.forEach((hook) => {
-        hook(index, data, config)
+    DialogueHook.copy.call({
+        data,
+        index,
+        config
     })
 }
 
@@ -114,7 +100,6 @@ export {
     createImageDialogue,
     copyDialogue,
     deleteDialogue,
-    copyDialogueHook,
     uploadImage,
     textarea
 }

@@ -5,6 +5,7 @@ import { StaticUrl } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { copy, blob2base64, md5, uuid, Textarea, bool } from '@/lib/utils/tool'
 import DataBase from '../utils/db'
+import Hook from '@/lib/utils/hook'
 
 const config = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
 const settings = ref({})
@@ -224,48 +225,23 @@ const DataControl = {
     storage: {},
     version: [],
     index: -1,
-    updateHooks: [],
-    callUpdateHook () {
-        this.updateHooks.forEach((fn) => {
-            fn()
-        })
-    },
-    onUpdate (fn) {
-        // 内容更新
-        this.updateHooks.push(fn)
-    },
-    switchHooks: [],
-    callSwitchHook () {
-        this.switchHooks.forEach((fn) => {
-            fn()
-        })
-    },
-    onSwitch (fn) {
-        // withdraw or redo
-        this.switchHooks.push(fn)
-    },
-    onChange (fn) {
-        this.onUpdate(fn)
-        this.onSwitch(fn)
-        this.onChangeSavefile(fn)
-        this.onClear(fn)
-    },
-    clearHooks: [],
-    callClearHook (level) {
-        this.clearHooks.forEach((fn) => {
-            fn(level)
-        })
-    },
-    onClear (fn) {
-        this.clearHooks.push(fn)
-    },
-    changeSavefileHooks: [],
-    onChangeSavefile (fn) {
-        this.changeSavefileHooks.push(fn)
-    },
-    callChangeSavefileHook () {
-        this.changeSavefileHooks.forEach((fn) => {
-            fn()
+    hook: {
+        update: new Hook(),
+        switch: new Hook(),
+        clear: new Hook(),
+        changeSavefile: new Hook(),
+        change: new Hook((self, fn) => {
+            const cancel = [
+                this.update.on(fn),
+                this.switch.on(fn),
+                this.clear.on(fn),
+                this.changeSavefile.on(fn)
+            ]
+            return () => {
+                cancel.forEach((x) => {
+                    x()
+                })
+            }
         })
     },
     update (update) {
@@ -304,7 +280,7 @@ const DataControl = {
         if (operator.length > 0) {
             this.version.unshift(operator)
             // 因为只有save才会作将数据为一个节点保存在本地，所以在此处调用hook
-            this.callUpdateHook()
+            this.hook.update.call()
         }
     },
     genCharSrc () {
@@ -346,7 +322,7 @@ const DataControl = {
                 this.storage[key].update = true
             }
         }
-        this.callUpdateHook()
+        this.hook.update.call()
         this.genCharSrc()
     },
     withdraw () {
@@ -362,7 +338,7 @@ const DataControl = {
                     }
                 }
             }
-            this.callSwitchHook()
+            this.hook.switch.call()
         }
     },
     redo () {
@@ -378,11 +354,11 @@ const DataControl = {
                     }
                 }
             }
-            this.callSwitchHook()
+            this.hook.switch.call()
         }
     },
     clear (level) {
-        this.callClearHook(level)
+        this.hook.clear.call(level)
         if (level === 0) {
             // 清空对话
             for (let i = 0; i < chats.value.length; i++) {
@@ -481,7 +457,7 @@ document.addEventListener('keydown', event => {
     }
 })
 
-DataControl.onSwitch(() => {
+DataControl.hook.switch.on(() => {
     if (!Object.prototype.hasOwnProperty.call(chars.value, currCharId.value)) {
         DataControl.curr.setChar('', true)
     }
