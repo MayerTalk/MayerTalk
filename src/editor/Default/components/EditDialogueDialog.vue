@@ -48,7 +48,10 @@ function clearDialogueData () {
 }
 
 function handleClose () {
-    DialogueHook.callUpdateHook(currDialogueData.value, currDialogueIndex.value)
+    DialogueHook.update.call({
+        data: currDialogueData,
+        index: currDialogueIndex.value
+    })
     clearDialogueData()
     editDialogue.value = false
     DataControl.curr.setDialogue(-1)

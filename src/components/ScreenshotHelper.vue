@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, nextTick, ref, watch } from 'vue'
+import { computed, inject, nextTick, onUnmounted, ref, watch } from 'vue'
 import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/utils/tool'
 import { TypeSeries } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
@@ -27,12 +27,12 @@ let watermarkNode = null
 const rendererWidth = inject('rendererWidth')
 const title = ref('')
 
-DataControl.onClear((level) => {
+onUnmounted(DataControl.hook.clear.on(() => {
     title.value = ''
-})
-DataControl.onChangeSavefile(() => {
+}))
+onUnmounted(DataControl.hook.changeSavefile.on(() => {
     title.value = ''
-})
+}))
 
 function downloadScreenshot (cb = null, options = {}) {
     getCanvas(options.screenshotNode || screenshotNode, {
@@ -333,13 +333,13 @@ const ExpectLength = {
             syncedSettings.value.scale)
     },
     mount () {
-        DataControl.onChange(() => {
+        onUnmounted(DataControl.hook.change.on(() => {
             nextTick(
                 () => {
                     this.calc()
                 }
             )
-        })
+        }))
         watch(
             () => {
                 return [

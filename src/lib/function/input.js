@@ -1,5 +1,6 @@
 import { IsMobile } from '@/lib/data/constance'
 import WindowResize from '@/lib/utils/windowResize'
+import Hook from '@/lib/utils/hook'
 
 const Input = {
     height: window.innerHeight,
@@ -10,10 +11,7 @@ const Input = {
             return this.height - window.innerHeight
         }
     },
-    onInputHooks: [],
-    onInput (fn) {
-        this.onInputHooks.push(fn)
-    }
+    hook: new Hook()
 }
 
 let lastHeight = window.innerHeight
@@ -25,8 +23,9 @@ if (IsMobile) {
                 Input.height = window.innerHeight
                 Input.width = window.innerWidth
             } else {
-                Input.onInputHooks.forEach((fn) => {
-                    fn(window.innerHeight < lastHeight, lastHeight - window.innerHeight)
+                Input.hook.call({
+                    status: window.innerHeight < lastHeight,
+                    diff: lastHeight - window.innerHeight
                 })
             }
         }

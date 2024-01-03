@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import { chats, DataControl } from '@/lib/data/data'
-import { copyDialogueHook, DialogueHook } from '@/lib/function/dialogue'
+import { DialogueHook } from '@/lib/function/dialogue'
 
 const plus1 = ref(-1)
 
-function plus1Hook (index) {
+function handlePlus1 (index) {
     if (index > 0) {
         const c1 = chats.value[index]
         const c2 = chats.value[index - 1]
@@ -18,13 +18,13 @@ function plus1Hook (index) {
     }
 }
 
-DialogueHook.onCreate(() => {
-    plus1Hook(chats.value.length - 1)
+DialogueHook.create.on(() => {
+    handlePlus1(chats.value.length - 1)
 })
-copyDialogueHook.push((index, data, config) => {
-    if (Object.prototype.hasOwnProperty.call(config, 'save') ? config.save : true) {
+DialogueHook.copy.on((params) => {
+    if (Object.prototype.hasOwnProperty.call(params.config, 'save') ? params.config.save : true) {
         DataControl.save('chats')
-        plus1Hook(chats.value.length - 1)
+        handlePlus1(chats.value.length - 1)
     }
 })
 
