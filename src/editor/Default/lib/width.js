@@ -29,7 +29,7 @@ doAfter(() => {
     sidebarWidth.value = getSidebarWidth()
 })
 
-DataControl.onUpdate(() => {
+DataControl.hook.update.on(() => {
     // language改变时，sidebar宽度也有可能改变
     sidebarWidth.value = getSidebarWidth()
 })

@@ -66,7 +66,7 @@ const defaultTranslate = {
         develop: '开发阶段，功能尚不完善，还请谅解',
         quicklyStart: '快速上手 (首次使用推荐阅读)',
         community: '交流群：560295639',
-        reportBug: 'bug反馈',
+        feedback: '反馈',
         safariWarning: '请注意，你所使用的Safari版本可能不支持下载文件，这会导致截图与导出数据失效。'
     },
     zh_TW: {
@@ -74,7 +74,7 @@ const defaultTranslate = {
         develop: '開發階段，功能尚不完善，還請諒解',
         quicklyStart: '快速上手 (首次使用推薦閱讀)',
         community: '交流群：560295639',
-        reportBug: 'bug反饋',
+        feedback: '反饋',
         safariWarning: '請注意，你所使用的Safari版本可能不支持下載文件，這會導致截圖與導出數據失效。'
     },
     en_US: {
@@ -82,7 +82,7 @@ const defaultTranslate = {
         develop: 'In development stage, the function is not perfect, please understand',
         quicklyStart: 'Quick Start (Recommended for first-time users)',
         community: 'Communication group: 560295639',
-        reportBug: 'Bug feedback',
+        feedback: 'Feedback',
         safariWarning: 'Please note that the Safari version you are using may not support downloading files, which will cause screenshots and data export to fail.'
     },
     ja_JP: {
@@ -90,7 +90,7 @@ const defaultTranslate = {
         develop: '開発段階、機能はまだ完全ではありません、ご理解ください',
         quicklyStart: 'クイックスタート（初めての方におすすめ）',
         community: 'コミュニケーショングループ：560295639',
-        reportBug: 'バグフィードバック',
+        feedback: 'フィードバック',
         safariWarning: 'ご注意ください、お使いのSafariバージョンはファイルのダウンロードをサポートしていない可能性があります。これによりスクリーンショットとデータのエクスポートが失敗する可能性があります。'
     }
 }
@@ -104,7 +104,7 @@ const announcementTranslate = {
         },
         feat: ['手动裁分'],
         optimize: ['现在可以快捷隐藏常驻角色栏了', '优化对手机输入法的适配'],
-        fix: ['拖拽上传显示错误', '无法查看裁分点']
+        fix: ['拖拽上传显示错误', '无法查看裁分点', '复制对话后编辑器无法加载']
     },
     zh_TW: {
         key: {
@@ -114,7 +114,7 @@ const announcementTranslate = {
         },
         feat: ['手動裁分'],
         optimize: ['現在可以快捷隱藏常駐角色欄了', '優化對手機輸入法的適配'],
-        fix: ['拖拽上傳顯示錯誤', '無法查看裁分點']
+        fix: ['拖拽上傳顯示錯誤', '無法查看裁分點', '複製對話後編輯器無法加載']
     },
     en_US: {
         key: {
@@ -124,7 +124,7 @@ const announcementTranslate = {
         },
         feat: ['Manual cutting'],
         optimize: ['Now you can quickly hide the resident character bar', 'Optimize the adaptation to the mobile input method'],
-        fix: ['Drag and upload display error', 'Unable to view scoring points']
+        fix: ['Drag and upload display error', 'Unable to view scoring points', 'Editor cannot load after copying dialogue']
     },
     ja_JP: {
         key: {
@@ -134,7 +134,7 @@ const announcementTranslate = {
         },
         feat: ['手動でカット'],
         optimize: ['今すぐ常駐キャラクターバーを非表示にすることができます', '携帯電話の入力方法への適応を最適化'],
-        fix: ['ドラッグアンドアップロード表示エラー', 'スコアリングポイントを表示できません']
+        fix: ['ドラッグアンドアップロード表示エラー', 'スコアリングポイントを表示できません', 'ダイアログをコピーした後、エディターが読み込めません']
     }
 }
 
@@ -163,7 +163,7 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.2.2-fix1'
+const version = 'v0.2.2-fix2'
 
 const newYearTranslation = {
     zh_CN: '新年快乐！',
@@ -212,8 +212,8 @@ const newYearTranslation = {
         Github
       </el-link>
       <span style="border-left: solid 1px darkgrey"></span>
-      <el-link href="/docs/guide/report_bug.html" type="primary" style="margin-left: 5px;"
-               target="_blank">{{ t.default.reportBug }}
+      <el-link href="https://wj.qq.com/s2/13987607/3993/" type="primary" style="margin-left: 5px;"
+               target="_blank">{{ t.default.feedback }}
       </el-link>
     </div>
     <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>

@@ -19,10 +19,10 @@ const Save = class Save {
             }
         })
         this.saved = false
-        DataControl.onSwitch(() => {
+        DataControl.hook.switch.on(() => {
             this.saved = false
         })
-        DataControl.onUpdate(() => {
+        DataControl.hook.update.on(() => {
             this.saved = false
         })
     }
@@ -59,7 +59,7 @@ const Save = class Save {
             DataControl.set(data, true)
             DataControl.save()
             this.saved = true
-            DataControl.callChangeSavefileHook()
+            DataControl.hook.changeSavefile.call(id)
             callback && (callback(event))
         }
     }
