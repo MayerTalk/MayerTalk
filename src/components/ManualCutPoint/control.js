@@ -19,6 +19,9 @@ function reloadCutPoint () {
     const dictPoints = {}
     let update = ''
     chats.value.forEach((data) => {
+        if (!Object.prototype.hasOwnProperty.call(data, 'data')) {
+            data.data = {}
+        }
         if (data.data.cutPoint) {
             dictPoints[data.id] = data
             arrayPoints.push(data)
