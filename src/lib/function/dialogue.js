@@ -33,8 +33,8 @@ function createDialogue (data, config = {}) {
 
 function copyDialogue (index, data = {}, config = {}) {
     data = {
-        content: data.content || chats.value[index].content,
-        type: data.type || chats.value[index].type,
+        ...chats.value[index],
+        ...data,
         char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
         id: data.id || uuid()
     }
