@@ -217,7 +217,7 @@ function checkClose (fn, ignore = []) {
                     >
                     </el-upload>
                 </el-button>
-                <el-button @click="() => {mainShow.settings.value=false; mainShow.savefile.value=true}"
+                <el-button @click="() => {mainShow.settings.value=false}"
                            style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
                         <IconCollection/>
