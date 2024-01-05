@@ -89,7 +89,7 @@ loadData()
 
 <template>
     <el-dialog v-model="mainShow.savefile.value" :width="dialogWidth" :title="t.noun.savefile"
-               @close="ifSave=false;mainShow.settings.value=true">
+               @close="ifSave=false">
         <div style="display: flex; column-gap: 5px">
             <template v-if="ifSave">
                 <el-input v-model="savefileName" :placeholder="t.noun.savefileName"></el-input>

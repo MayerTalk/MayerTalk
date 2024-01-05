@@ -3,8 +3,6 @@ import { ref, computed, watch, provide, nextTick, onMounted, onUnmounted } from 
 import { t } from '@/lib/lang/translate'
 import Renderers from '@/renderer'
 import SideBar from './components/SideBar.vue'
-import Settings from './components/SettingsDialog.vue'
-import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
 import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
@@ -149,6 +147,7 @@ watch(() => {
 }, () => {
     ResizeWindow.resize()
 })
+DataControl.hook.changeSavefile.on(ResizeWindow.resize)
 
 function resizeBody (offset = 0) {
     const el = document.getElementById('body')
@@ -317,8 +316,6 @@ defineExpose({
         @done="ScreenshotStateControl.done"
     />
     <NavigationBar ref="NavigationBarRef"/>
-    <Settings @resizeWindow="() => {ResizeWindow.resize()}"/>
-    <Savefile/>
     <EditCharDialog ref="EditCharRef"/>
     <EditDialogueDialog ref="EditDialogueRef" @showCopy="defaultShow.copy.value=true"/>
     <AtDialog ref="AtRef"/>

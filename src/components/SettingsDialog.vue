@@ -18,8 +18,6 @@ import {
 import { syncedSettings, defaultSettings, setSettings } from '@/lib/data/settings'
 import { dialogWidth } from '@/lib/data/width'
 
-const emit = defineEmits(['resizeWindow'])
-
 const ifShowEditShowCharName = ref(false)
 const showCharNameSettings = computed(() => {
     return syncedSettings.value.showCharNameSettings || {}
@@ -212,12 +210,12 @@ function checkClose (fn, ignore = []) {
                         action="#"
                         :show-file-list="false"
                         accept="application/json"
-                        :before-upload="(file) => uploadData(file, () => {emit('resizeWindow'); mainShow.settings.value=false})"
+                        :before-upload="(file) => uploadData(file, () => { mainShow.settings.value=false})"
                         style="position: absolute" hidden
                     >
                     </el-upload>
                 </el-button>
-                <el-button @click="() => {mainShow.settings.value=false}"
+                <el-button @click="() => {mainShow.settings.value=false;mainShow.savefile.value=true}"
                            style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
                         <IconCollection/>
