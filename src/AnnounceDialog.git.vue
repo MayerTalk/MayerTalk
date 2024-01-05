@@ -1,28 +1,19 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import info from './info.dev'
+import { mainShow } from '@/lib/data/showControl'
 
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue', 'showGuide'])
-
-const ifShowAnnouncement = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
+defineEmits(['showGuide'])
 
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
-    ifShowAnnouncement.value = true
+    mainShow.announcement.value = true
 })
 </script>R
 
 <template>
-    <el-dialog v-model="ifShowAnnouncement" :title="'DevSite ' + info.tag" :width="dialogWidth">
+    <el-dialog v-model="mainShow.announcement.value" :title="'DevSite ' + info.tag" :width="dialogWidth">
         <h2 style="display: inline">MayerTalk(dev)</h2>
         <p>您正处于开发站点，如有bug请加入交流群反馈</p>
         <p>Github Action 自动部署版本</p>

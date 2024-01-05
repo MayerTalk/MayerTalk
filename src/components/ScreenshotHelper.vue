@@ -10,18 +10,10 @@ import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
 import { cutPointViewMode, sortedCutPoints } from '@/components/ManualCutPoint/control'
 import { currEditorRef } from '@/lib/data/stats'
+import { mainShow } from '@/lib/data/showControl'
 
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue', 'start', 'done'])
+const emit = defineEmits(['start', 'done'])
 
-const ifShowScreenshotHelper = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
 let screenshotNode = null
 let watermarkNode = null
 const rendererWidth = inject('rendererWidth')
@@ -375,7 +367,7 @@ const wordCount = computed(() => {
 })
 
 function enableCutPointView () {
-    ifShowScreenshotHelper.value = false
+    mainShow.screenshotHelper.value = false
     cutPointViewMode.value = true
     currEditorRef.value.clearViewport()
 }
@@ -386,7 +378,7 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshot"
+    <el-dialog v-model="mainShow.screenshotHelper.value" :width="dialogWidth" :title="t.noun.screenshot"
                @closed="DataControl.save(['settings'])">
         <div>
             <div class="bar">
@@ -502,7 +494,7 @@ defineExpose({
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
             <el-button
-                @click="() => {DataControl.save(['settings']); screenshot(); ifShowScreenshotHelper=false}"
+                @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"
                 style="width: 30%"
             >{{ t.action.generate }}
             </el-button>

@@ -1,18 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { config } from '@/lib/data/data'
-
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue'])
-
-const ifShowAbout = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
+import { mainShow } from '@/lib/data/showControl'
 
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
@@ -62,7 +51,7 @@ const t = computed(() => {
 </script>
 
 <template>
-    <el-dialog v-model="ifShowAbout" :title="t.title" :width="dialogWidth">
+    <el-dialog v-model="mainShow.about.value" :title="t.title" :width="dialogWidth">
         <h2 style="display: inline">MayerTalk(beta)</h2><br/>
         <p>{{ t.about }}</p>
         <p style="display: flex; align-items: center">Github:

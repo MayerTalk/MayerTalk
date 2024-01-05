@@ -10,8 +10,7 @@ import message from '@/lib/utils/message'
 import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
 import { uploadImage, deleteDialogue, DialogueHook } from '@/lib/function/dialogue'
 import { dialogWidth } from '@/lib/data/width'
-
-defineEmits(['showCopy'])
+import { defaultShow } from '@/editor/Default/lib/showControl'
 
 const ifShow = ref(false)
 
@@ -170,7 +169,7 @@ defineExpose({
             <div class="divider"></div>
             <div v-if="editDialogue" class="column-display" style="width: 100%; margin-top: 5px">
                 <el-button style="width: 100%" @click="delDialogue">{{ t.action.delete }}</el-button>
-                <el-button style="width: 100%; margin-left: 0" @click="$emit('showCopy',true)">{{
+                <el-button style="width: 100%; margin-left: 0" @click="defaultShow.copy.value=true">{{
                         t.action.repeat
                     }}
                 </el-button>

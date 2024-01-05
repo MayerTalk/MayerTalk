@@ -1,20 +1,11 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { saveData, getData } from './lib/utils/tool'
 import { config } from '@/lib/data/data'
 import { IsSafari } from '@/lib/data/constance'
+import { mainShow } from '@/lib/data/showControl'
 
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue', 'showGuide'])
-
-const ifShowAnnouncement = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
+const emit = defineEmits(['showGuide'])
 
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
@@ -174,54 +165,54 @@ const newYearTranslation = {
 </script>
 
 <template>
-  <el-dialog v-model="ifShowAnnouncement" :title="t.default.announcement + ' ' + version" :width="dialogWidth">
-    <h2 style="display: inline">MayerTalk(beta)</h2>
-    <template v-if="invalidBrowser">
-      <template v-for="(translation, index) in t.invalid" :key="index">
-        <h2 v-if="index===0" style="color: red">
-          {{ translation }}
-        </h2>
-        <h3 v-else> {{ translation }}</h3>
-      </template>
-    </template>
-    <template v-else>
-      <h2 style="color: orangered">{{ newYearTranslation[config.lang || 'en_US'] }}</h2>
-      <p>{{ t.default.develop }}</p>
-      <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
-      <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
-      <h3>
-        {{ version }}
-      </h3>
-      <template v-for="key in ['feat','optimize','fix']" :key="key">
-        <template v-if="announcementTranslate.zh_CN[key]">
-          <b>{{ t.announcement.key[key] }}</b>
-          <ul>
-            <li v-for="(item,index) in t.announcement[key]" :key="index">{{ item }}</li>
-          </ul>
+    <el-dialog v-model="mainShow.announcement.value" :title="t.default.announcement + ' ' + version" :width="dialogWidth">
+        <h2 style="display: inline">MayerTalk(beta)</h2>
+        <template v-if="invalidBrowser">
+            <template v-for="(translation, index) in t.invalid" :key="index">
+                <h2 v-if="index===0" style="color: red">
+                    {{ translation }}
+                </h2>
+                <h3 v-else> {{ translation }}</h3>
+            </template>
         </template>
-      </template>
-    </template>
-    <div style="display: flex; margin-top: 10px">
-      <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px"
-               target="_blank">
-        {{ t.default.community }}
-      </el-link>
-      <span style="border-left: solid 1px darkgrey"></span>
-      <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;"
-               target="_blank">
-        Github
-      </el-link>
-      <span style="border-left: solid 1px darkgrey"></span>
-      <el-link href="https://wj.qq.com/s2/13987607/3993/" type="primary" style="margin-left: 5px;"
-               target="_blank">{{ t.default.feedback }}
-      </el-link>
-    </div>
-    <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
-  </el-dialog>
+        <template v-else>
+            <h2 style="color: orangered">{{ newYearTranslation[config.lang || 'en_US'] }}</h2>
+            <p>{{ t.default.develop }}</p>
+            <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
+            <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
+            <h3>
+                {{ version }}
+            </h3>
+            <template v-for="key in ['feat','optimize','fix']" :key="key">
+                <template v-if="announcementTranslate.zh_CN[key]">
+                    <b>{{ t.announcement.key[key] }}</b>
+                    <ul>
+                        <li v-for="(item,index) in t.announcement[key]" :key="index">{{ item }}</li>
+                    </ul>
+                </template>
+            </template>
+        </template>
+        <div style="display: flex; margin-top: 10px">
+            <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px"
+                     target="_blank">
+                {{ t.default.community }}
+            </el-link>
+            <span style="border-left: solid 1px darkgrey"></span>
+            <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;"
+                     target="_blank">
+                Github
+            </el-link>
+            <span style="border-left: solid 1px darkgrey"></span>
+            <el-link href="https://wj.qq.com/s2/13987607/3993/" type="primary" style="margin-left: 5px;"
+                     target="_blank">{{ t.default.feedback }}
+            </el-link>
+        </div>
+        <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
+    </el-dialog>
 </template>
 
 <style scoped>
 ul {
-  margin: 5px 0;
+    margin: 5px 0;
 }
 </style>
