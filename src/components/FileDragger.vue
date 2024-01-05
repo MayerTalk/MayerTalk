@@ -23,7 +23,7 @@ function close () {
     }
 }
 
-function loga (event) {
+function handleEvent (event) {
     event.preventDefault()
     if (event.type === 'drop') {
         uploadData(event.dataTransfer.files[0])
@@ -37,10 +37,10 @@ function loga (event) {
     }
 }
 
-document.body.addEventListener('dragenter', loga)
-document.body.addEventListener('drop', loga)
-document.body.addEventListener('dragleave', loga)
-document.body.addEventListener('dragover', loga)
+document.body.addEventListener('dragenter', handleEvent)
+document.body.addEventListener('drop', handleEvent)
+document.body.addEventListener('dragleave', handleEvent)
+document.body.addEventListener('dragover', handleEvent)
 
 </script>
 
