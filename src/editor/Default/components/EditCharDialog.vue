@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import SelectCharDialog from './SelectCharDialog.vue'
 
@@ -8,8 +8,15 @@ import { DataControl, images, currCharId, currCharData } from '@/lib/data/data'
 import message from '@/lib/utils/message'
 import { blob2url, image2square, doAfterRefMounted } from '@/lib/utils/tool'
 import { dialogWidth } from '@/lib/data/width'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const ifShow = ref(false)
+
+onUnmounted(closeShowHook.on(() => {
+    if (ifShow.value) {
+        ifShow.value = false
+    }
+}))
 
 const charData = ref({})
 const createChar = ref(false)

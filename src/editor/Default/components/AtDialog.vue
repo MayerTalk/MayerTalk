@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
+import { closeShowHook } from '@/lib/data/showControl'
 
 import { textarea } from '@/lib/function/dialogue'
 import { chars } from '@/lib/data/data'
@@ -13,6 +14,12 @@ const ifShow = ref(false)
 const atWho = ref('')
 const atWhoSelRef = ref(null)
 let insertAt = 0
+
+onUnmounted(closeShowHook.on(() => {
+    if (ifShow.value) {
+        ifShow.value = false
+    }
+}))
 
 function handleAt (id) {
     // 被@角色刷入文本框

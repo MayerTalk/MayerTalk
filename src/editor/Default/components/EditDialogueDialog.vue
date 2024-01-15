@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 import OptionDialog from '../type/OptionDialog.vue'
@@ -11,8 +11,15 @@ import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
 import { uploadImage, deleteDialogue, DialogueHook } from '@/lib/function/dialogue'
 import { dialogWidth } from '@/lib/data/width'
 import { defaultShow } from '@/editor/Default/lib/showControl'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const ifShow = ref(false)
+
+onUnmounted(closeShowHook.on(() => {
+    if (ifShow.value) {
+        ifShow.value = false
+    }
+}))
 
 const dialogueData = ref({})
 const editDialogue = ref(false)

@@ -278,12 +278,6 @@ onUnmounted(cutPointFocusHook.on((id) => {
     scroll.value.setScrollTop(getDialogue(id).offsetTop - window.innerHeight / 2 + getDialogue(id).offsetHeight)
 }))
 
-function clearViewport () {
-    if (mobileView.value) {
-        defaultShow.sidebar.value = false
-    }
-}
-
 function handleEditDialogue (index) {
     if (cutPointViewMode.value && cutPointQuickEditMode.value) {
         const data = chats.value[index].data
@@ -304,8 +298,7 @@ function handleEditDialogue (index) {
 
 defineExpose({
     scroll,
-    currScrollTop,
-    clearViewport
+    currScrollTop
 })
 </script>
 

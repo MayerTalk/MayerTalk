@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { chars, avatars } from '@/lib/data/data'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const props = defineProps({
     modelValue: null,
@@ -30,6 +31,12 @@ const modelValue = computed({
     }
 })
 
+onUnmounted(closeShowHook.on(() => {
+    if (modelValue.value) {
+        modelValue.value = false
+    }
+}))
+
 onMounted(() => {
     emit('update:select', selectRef.value)
 })
@@ -38,18 +45,18 @@ onMounted(() => {
 
 <template>
     <el-select
-            v-model="modelValue"
-            ref="selectRef"
-            style="flex-grow: 1;"
-            :placeholder="props.placeholder || t.noun.character"
-            filterable>
+        v-model="modelValue"
+        ref="selectRef"
+        style="flex-grow: 1;"
+        :placeholder="props.placeholder || t.noun.character"
+        filterable>
         <el-option
-                v-for="(char, id) in chars"
-                :key="id"
-                :label="char.name"
-                :value="id"
+            v-for="(char, id) in chars"
+            :key="id"
+            :label="char.name"
+            :value="id"
         >
-            {{char.name}}
+            {{ char.name }}
             <div style="display: flex; align-items: center; height: 100%; float: right">
                 <img :src="avatars[id]"
                      style="height: 80%; display: inline"/>

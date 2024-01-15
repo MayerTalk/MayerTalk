@@ -9,8 +9,7 @@ import { defaultSettings, syncedSettings, setSettings } from '@/lib/data/setting
 import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
 import { cutPointViewMode, sortedCutPoints } from '@/components/ManualCutPoint/control'
-import { currEditorRef } from '@/lib/data/stats'
-import { mainShow } from '@/lib/data/showControl'
+import { closeShowHook, mainShow } from '@/lib/data/showControl'
 
 const emit = defineEmits(['start', 'done'])
 
@@ -367,9 +366,8 @@ const wordCount = computed(() => {
 })
 
 function enableCutPointView () {
-    mainShow.screenshotHelper.value = false
+    closeShowHook.call()
     cutPointViewMode.value = true
-    currEditorRef.value.clearViewport()
 }
 
 defineExpose({

@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { loadChar } from '@/lib/data/character'
 import { dialogWidth } from '@/lib/data/width'
 import SelectCharInstance from './SelectCharInstance.vue'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'select'])
@@ -17,6 +18,12 @@ const ifShow = computed({
         emit('update:modelValue', value)
     }
 })
+
+onUnmounted(closeShowHook.on(() => {
+    if (ifShow.value) {
+        ifShow.value = false
+    }
+}))
 
 </script>
 
