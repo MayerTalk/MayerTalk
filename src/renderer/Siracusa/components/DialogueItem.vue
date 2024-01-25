@@ -7,7 +7,7 @@ import {
     images,
     avatars
 } from '@/lib/data/data'
-import { syncedSettings } from '@/lib/data/settings'
+import { rendererSettings } from '@/lib/data/settings'
 import { Suffix } from '@/lib/data/character'
 import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
 
@@ -57,7 +57,7 @@ watch(charDirection, () => {
              :style="{justifyContent:(right?'flex-end':'flex-start')}">
             <div v-if="data.type==='title'" style="flex-grow: 1">
                 <div
-                    v-if="syncedSettings.showCharName && data.char && syncedSettings.showCharNameSettings[data.type]"
+                    v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
                     class="charName">{{ char.name }}
                 </div>
                 <div class="title-box">
@@ -82,7 +82,7 @@ watch(charDirection, () => {
                 <!--Content Start-->
                 <div :style="{'flex-grow':data.type==='image'?0:1}">
                     <div
-                        v-if="syncedSettings.showCharName && data.char && syncedSettings.showCharNameSettings[data.type]"
+                        v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
                         class="charName">{{ char.name }}
                     </div>
                     <div v-if="data.type==='image'" class="box image-box" style="justify-self: flex-start">

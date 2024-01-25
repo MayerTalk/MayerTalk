@@ -56,6 +56,4 @@ app.component('IconNotebook', Notebook)
 app.component('IconTop', Top)
 app.component('IconBottom', Bottom)
 
-app.provide('avatarsJs', 'avatar.js?v=78319d24')
-
 app.mount('#app')

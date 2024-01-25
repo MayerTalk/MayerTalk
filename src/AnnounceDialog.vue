@@ -5,16 +5,14 @@ import { config } from '@/lib/data/data'
 import { IsSafari } from '@/lib/data/constance'
 import { mainShow } from '@/lib/data/showControl'
 
-const emit = defineEmits(['showGuide'])
-
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
 onMounted(() => {
     if (getData('cache.announcementVersion') !== version) {
-        emit('update:modelValue', true)
+        mainShow.announcement.value = true
         saveData('cache.announcementVersion', version)
     } else if (invalidBrowser) {
-        emit('update:modelValue', true)
+        mainShow.announcement.value = true
     }
 })
 
@@ -165,7 +163,8 @@ const newYearTranslation = {
 </script>
 
 <template>
-    <el-dialog v-model="mainShow.announcement.value" :title="t.default.announcement + ' ' + version" :width="dialogWidth">
+    <el-dialog v-model="mainShow.announcement.value" :title="t.default.announcement + ' ' + version"
+               :width="dialogWidth">
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <template v-if="invalidBrowser">
             <template v-for="(translation, index) in t.invalid" :key="index">

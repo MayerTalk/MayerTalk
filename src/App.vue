@@ -21,7 +21,7 @@ import { currEditorRef } from '@/lib/data/stats'
     <component :is="Editors[config.editor]" ref="currEditorRef"/>
 </template>
 
-<style src="./font.css"></style>
+<style src="./style/font.css"></style>
 <style>
 body, html {
     margin: 0;

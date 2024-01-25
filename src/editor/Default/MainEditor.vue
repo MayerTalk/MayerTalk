@@ -9,10 +9,10 @@ import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
 import WindowResize from '@/lib/utils/windowResize'
-import { mobileView } from '@/editor/Default/lib/width'
 import { cutPointViewMode, cutPointFocusHook, cutPointQuickEditMode } from '@/components/ManualCutPoint/control'
 import { currRendererRef } from '@/lib/data/stats'
 import { defaultShow } from '@/editor/Default/lib/showControl'
@@ -27,10 +27,11 @@ import {
     chars,
     config,
     avatars,
+    settings,
     currCharId,
     DataControl
 } from '@/lib/data/data'
-import { syncedSettings } from '@/lib/data/settings'
+import { commonSettings, editorSettings, enableSettingSync, rendererSettings } from '@/lib/data/settings'
 import {
     textarea,
     createTextDialogue,
@@ -114,10 +115,10 @@ const ResizeWindow = {
         fontsize: 16
     },
     resize () {
-        const max = syncedSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
+        const max = commonSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
         if (preScreenshot.value) {
             rendererWidth.value.window = max
-            rendererWidth.value.image = syncedSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
+            rendererWidth.value.image = commonSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
             const w = Math.min(max, window.innerWidth)
@@ -143,7 +144,7 @@ watch(charDirection, () => {
     ResizeWindow.resize()
 })
 watch(() => {
-    return syncedSettings.value.width
+    return commonSettings.value.width
 }, () => {
     ResizeWindow.resize()
 })
@@ -296,9 +297,17 @@ function handleEditDialogue (index) {
     }
 }
 
+const defaultSettings = {
+    characterSelectorPermanent: true
+}
+enableSettingSync(editorSettings.value, defaultSettings, () => {
+    return settings.value.editor.Default
+})
+
 defineExpose({
     scroll,
-    currScrollTop
+    currScrollTop,
+    SettingsDialog
 })
 </script>
 
@@ -315,7 +324,7 @@ defineExpose({
     <CreateOptionDialog ref="CreateOption"/>
     <CopyDialog @coped="() => {EditDialogueRef.close()}"/>
     <!--Editor components end-->
-    <div id="body" :style="{background: syncedSettings.background}">
+    <div id="body" :style="{background: rendererSettings.background}">
         <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s;position: relative">
             <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => {currScrollTop=v.scrollTop}">
