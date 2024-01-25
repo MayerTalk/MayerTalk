@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { t, updateTranslation } from '@/lib/lang/translate'
 import { supportLang, langShow } from '@/lib/lang/constant'
 import Editors from '@/editor'
@@ -8,6 +8,7 @@ import message from '@/lib/utils/message'
 import { ensure, formatSize, clickBySelector } from '@/lib/utils/tool'
 import Save from '@/lib/function/savefile'
 import { downloadData, uploadData } from '@/lib/data/versionControl'
+import { mainShow } from '@/lib/data/showControl'
 
 import {
     config,
@@ -16,10 +17,6 @@ import {
 } from '@/lib/data/data'
 import { syncedSettings, defaultSettings, setSettings } from '@/lib/data/settings'
 import { dialogWidth } from '@/lib/data/width'
-
-const emit = defineEmits(['resizeWindow', 'showSavefile'])
-
-const ifShow = inject('ifShowSettings')
 
 const ifShowEditShowCharName = ref(false)
 const showCharNameSettings = computed(() => {
@@ -75,7 +72,7 @@ function checkClose (fn, ignore = []) {
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :title="t.noun.settings" :width="dialogWidth"
+    <el-dialog v-model="mainShow.settings.value" :title="t.noun.settings" :width="dialogWidth"
                :before-close="checkClose"
                @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
         <div id="settings">
@@ -119,7 +116,8 @@ function checkClose (fn, ignore = []) {
             </div>
             <table>
                 <tr>
-                    <th>{{ t.noun.characterSelectorPermanent }}<span style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
+                    <th>{{ t.noun.characterSelectorPermanent }}<span
+                        style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
                     <td>
                         <el-switch v-model="syncedSettings.characterSelectorPermanent" style="margin-left: 10px"
                                    @change="(value) => {settings.characterSelectorPermanent=value}"></el-switch>
@@ -183,7 +181,7 @@ function checkClose (fn, ignore = []) {
                                 style="--el-switch-on-color: #79bbff;">
                             </el-switch>
                             <el-icon :size="35" color="#707070" style="margin-left: 10px; cursor: pointer"
-                                     @click="ifShowEditShowCharName=true">
+                                     @click="mainShow.settings.value=true">
                                 <IconOperation/>
                             </el-icon>
                         </div>
@@ -212,12 +210,13 @@ function checkClose (fn, ignore = []) {
                         action="#"
                         :show-file-list="false"
                         accept="application/json"
-                        :before-upload="(file) => uploadData(file, () => {emit('resizeWindow'); ifShow=false})"
+                        :before-upload="(file) => uploadData(file, () => { mainShow.settings.value=false})"
                         style="position: absolute" hidden
                     >
                     </el-upload>
                 </el-button>
-                <el-button @click="() => {ifShow=false; $emit('showSavefile')}" style="margin: 0 0 5px 10px">
+                <el-button @click="() => {mainShow.settings.value=false;mainShow.savefile.value=true}"
+                           style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
                         <IconCollection/>
                     </el-icon>

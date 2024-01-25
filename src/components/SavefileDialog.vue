@@ -1,22 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { ensure, formatSize } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import Save from '@/lib/function/savefile'
 import { dialogWidth } from '@/lib/data/width'
-
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue'])
-
-const ifShowSavefile = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
+import { mainShow } from '@/lib/data/showControl'
 
 const tableData = ref([])
 
@@ -99,7 +88,8 @@ loadData()
 </script>
 
 <template>
-    <el-dialog v-model="ifShowSavefile" :width="dialogWidth" :title="t.noun.savefile" @closed="ifSave=false">
+    <el-dialog v-model="mainShow.savefile.value" :width="dialogWidth" :title="t.noun.savefile"
+               @close="ifSave=false">
         <div style="display: flex; column-gap: 5px">
             <template v-if="ifSave">
                 <el-input v-model="savefileName" :placeholder="t.noun.savefileName"></el-input>

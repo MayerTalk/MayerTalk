@@ -153,6 +153,7 @@ function uploadData (uploadFile, callback) {
             DataControl.set(data, false)
             DataControl.save()
             message.notify(t.value.notify.importedSuccessfully, message.success)
+            DataControl.hook.changeSavefile.call()
             callback && callback()
         } catch (e) {
             console.log(e)

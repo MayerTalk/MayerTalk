@@ -5,11 +5,18 @@ import { chats } from '@/lib/data/data'
 import { getDialogue, doAfterRefMounted } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import { dialogWidth } from '@/lib/data/width'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const ifShow = ref(false)
 const lineno = ref(null)
 const input = ref(null)
 const scroll = inject('scroll')
+
+onUnmounted(closeShowHook.on(() => {
+    if (ifShow.value) {
+        ifShow.value = false
+    }
+}))
 
 function open () {
     ifShow.value = true

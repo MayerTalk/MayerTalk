@@ -4,6 +4,7 @@ import { DialogueHook } from '@/lib/function/dialogue'
 import Hook from '@/lib/utils/hook'
 import { getDialogue } from '@/lib/utils/tool'
 import { currEditorRef } from '@/lib/data/stats'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const currCutPoint = ref(null)
 const currCutPointIndex = ref(0)
@@ -13,6 +14,12 @@ const cutPoints = ref({})
 const sortedCutPoints = ref([])
 const cutPointQuickEditMode = ref(false)
 let lastUpdate = ''
+
+closeShowHook.on(() => {
+    if (cutPointViewMode.value) {
+        cutPointViewMode.value = false
+    }
+})
 
 function reloadCutPoint () {
     const arrayPoints = []
