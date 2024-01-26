@@ -1,21 +1,39 @@
 <script setup>
 import { inject } from 'vue'
 import Dialogue from './components/DialogueItem.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
 
 import plus1 from '@/lib/function/plus1'
-import { chats } from '@/lib/data/data'
-import { syncedSettings } from '@/lib/data/settings'
+import { chats, settings } from '@/lib/data/data'
+import { enableSettingSync, rendererSettings } from '@/lib/data/settings'
 import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/control'
+
+defineEmits(['edit', 'delete', 'plus1'])
 
 const rendererWidth = inject('rendererWidth')
 
-defineEmits(['edit', 'delete', 'plus1'])
+const defaultSettings = {
+    background: '#303030',
+    showCharName: false,
+    showCharNameSettings: {
+        chat: true,
+        monologue: true,
+        image: true
+    }
+}
+enableSettingSync(rendererSettings.value, defaultSettings, () => {
+    return settings.value.renderer.Siracusa
+})
+
+defineExpose({
+    SettingsDialog,
+    defaultSettings
+})
 </script>
 
 <template>
     <div class="renderer" id="renderer"
-         :style="{width: rendererWidth.window+'px', background: syncedSettings.background}"
-    >
+         :style="{width: rendererWidth.window+'px', background: rendererSettings.background}">
         <Dialogue v-for="(dialogue, index) in chats"
                   :data="chats[index]"
                   :key="dialogue.id"

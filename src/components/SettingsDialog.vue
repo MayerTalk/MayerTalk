@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { t, updateTranslation } from '@/lib/lang/translate'
 import { supportLang, langShow } from '@/lib/lang/constant'
 import Editors from '@/editor'
@@ -9,26 +9,18 @@ import { ensure, formatSize, clickBySelector } from '@/lib/utils/tool'
 import Save from '@/lib/function/savefile'
 import { downloadData, uploadData } from '@/lib/data/versionControl'
 import { mainShow } from '@/lib/data/showControl'
+import { currEditorRef, currRendererRef } from '@/lib/data/stats'
 
 import {
     config,
     settings,
     DataControl
 } from '@/lib/data/data'
-import { syncedSettings, defaultSettings, setSettings } from '@/lib/data/settings'
+import {
+    setCommonSettings,
+    defaultSettings
+} from '@/lib/data/settings'
 import { dialogWidth } from '@/lib/data/width'
-
-const ifShowEditShowCharName = ref(false)
-const showCharNameSettings = computed(() => {
-    return syncedSettings.value.showCharNameSettings || {}
-})
-
-function setShowCharNameSettings (type, value) {
-    if (!Object.prototype.hasOwnProperty.call(settings.value, 'showCharNameSettings')) {
-        settings.value.showCharNameSettings = {}
-    }
-    settings.value.showCharNameSettings[type] = value
-}
 
 const storageSize = ref(t.value.notify.calculating + '...')
 
@@ -58,24 +50,13 @@ function clearStorage () {
     }, 500)
 }
 
-function checkClose (fn, ignore = []) {
-    if (Object.prototype.hasOwnProperty.call(settings.value, 'maxHeight') &&
-        settings.value.maxHeight < 1000 && settings.value.maxHeight !== 0 &&
-        ignore.indexOf(1) === -1) {
-        message.confirm(t.value.tip.cutScreenshot, t.value.noun.hint, () => {
-            checkClose(fn, [...ignore, 1])
-        })
-    } else {
-        fn()
-    }
-}
 </script>
 
 <template>
     <el-dialog v-model="mainShow.settings.value" :title="t.noun.settings" :width="dialogWidth"
-               :before-close="checkClose"
                @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
         <div id="settings">
+            <!--Common Settings-->
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
                 <h2 style="margin: 10px 0">{{ t.noun.common }}</h2>
@@ -108,91 +89,45 @@ function checkClose (fn, ignore = []) {
                         </el-select>
                     </td>
                 </tr>
-            </table>
-            <div style="display: flex; align-items: center">
-                <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">{{ t.noun.editor }}</h2>
-                <div class="line-right"></div>
-            </div>
-            <table>
                 <tr>
-                    <th>{{ t.noun.characterSelectorPermanent }}<span
-                        style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
+                    <th>{{ t.noun.imageQuality }}</th>
                     <td>
-                        <el-switch v-model="syncedSettings.characterSelectorPermanent" style="margin-left: 10px"
-                                   @change="(value) => {settings.characterSelectorPermanent=value}"></el-switch>
-                    </td>
-                </tr>
-            </table>
-            <div style="display: flex; align-items: center">
-                <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">{{ t.noun.renderer }}</h2>
-                <div class="line-right"></div>
-            </div>
-            <table>
-                <tr>
-                    <th>{{ t.noun.background }}</th>
-                    <td>
-                        <el-input v-model="settings.background" :clearable="true"
-                                  :placeholder="'' + defaultSettings.background"/>
+                        <el-input v-model="settings.common.imageQuality" :clearable="true"
+                                  @change="(v) => {setCommonSettings('imageQuality',+v,(v) => v > 0)}"
+                                  @clear="setCommonSettings('imageQuality',false)"
+                                  :placeholder="'' + defaultSettings.imageQuality"/>
                     </td>
                 </tr>
                 <tr>
                     <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br/>({{ t.tip.settings.dialogWidth }})</span>
                     </th>
                     <td>
-                        <el-input v-model="settings.width" :clearable="true"
-                                  type="number"
-                                  :placeholder="'' + defaultSettings.width"
-                                  @input="(v) => {{setSettings(+v,'width')}}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.imageQuality }}</th>
-                    <td>
-                        <el-input v-model="settings.scale" :clearable="true"
-                                  type="number"
-                                  :placeholder="'' + defaultSettings.scale"
-                                  @input="(v) => {setSettings(+v,'scale')}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.autoCut }}</th>
-                    <td style="display: flex">
-                        <el-switch v-model="syncedSettings.autoCut" style="margin-right: 10px"
-                                   @change="(value) => {settings.autoCut=value}"></el-switch>
-                    </td>
-                </tr>
-                <tr v-if="syncedSettings.autoCut">
-                    <th>{{ t.noun.maxCutLength }}</th>
-                    <td style="display: flex">
-                        <el-input v-model="settings.maxHeight" :clearable="true"
-                                  type="number" :disabled="!syncedSettings.autoCut"
-                                  :placeholder="'' + defaultSettings.maxHeight"
-                                  @input="(v) => {setSettings(+v,'maxHeight')}"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.showCharacterName }}</th>
-                    <td>
-                        <div style="display: flex; align-items: center">
-                            <el-switch
-                                v-model="settings.showCharName"
-                                style="--el-switch-on-color: #79bbff;">
-                            </el-switch>
-                            <el-icon :size="35" color="#707070" style="margin-left: 10px; cursor: pointer"
-                                     @click="mainShow.settings.value=true">
-                                <IconOperation/>
-                            </el-icon>
-                        </div>
+                        <el-input :model-value="settings.common.width" :clearable="true"
+                                  @update:model-value="(v) => {{setCommonSettings('width',+v,(v) => v > 0)}}"
+                                  :placeholder="'' + defaultSettings.width"/>
                     </td>
                 </tr>
             </table>
+            <!--Editor Settings-->
+            <div style="display: flex; align-items: center">
+                <div class="line-left" style="width: 20px;"></div>
+                <h2 style="margin: 10px 0">{{ t.noun.editor }}</h2>
+                <div class="line-right"></div>
+            </div>
+            <component :is="currEditorRef.SettingsDialog"/>
+            <!--Renderer Settings-->
+            <div style="display: flex; align-items: center">
+                <div class="line-left" style="width: 20px;"></div>
+                <h2 style="margin: 10px 0">{{ t.noun.renderer }}</h2>
+                <div class="line-right"></div>
+            </div>
+            <component :is="currRendererRef.SettingsDialog"/>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
                 <h2 style="margin: 10px 0">{{ t.noun.storage }}</h2>
                 <div class="line-right"></div>
             </div>
+            <!--Storage-->
             <div style="margin: 5px 0 10px 10px">
                 <el-button @click="downloadData" style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
@@ -236,42 +171,7 @@ function checkClose (fn, ignore = []) {
             </table>
         </div>
     </el-dialog>
-    <el-dialog v-model="ifShowEditShowCharName" :title="t.action.pleaseSelectTypeOfCharacterToShow" :width="dialogWidth"
-               @closed="DataControl.save('settings')">
-        <table>
-            <tr v-for="(text, type) in t.name.typeDict" :key="type">
-                <th>{{ text }}</th>
-                <td>
-                    <el-switch
-                        v-model="showCharNameSettings[type]"
-                        style="--el-switch-on-color: #79bbff; margin-left: 10px"
-                        @change="(value) => {setShowCharNameSettings(type,value)}"
-                    >
-                    </el-switch>
-                </td>
-            </tr>
-        </table>
-
-    </el-dialog>
 
 </template>
 
-<style scoped>
-table {
-    padding-left: 10px;
-    border-spacing: 5px;
-}
-
-.line-left {
-    margin-right: 10px;
-    height: 0;
-    border-top: lightgrey solid 1px;
-}
-
-.line-right {
-    margin-left: 10px;
-    flex-grow: 1;
-    height: 0;
-    border-top: lightgrey solid 1px;
-}
-</style>
+<style scoped src="@/style/settings.css"/>

@@ -1,17 +1,10 @@
-import { ref, watch } from 'vue'
-import { settings } from '@/lib/data/data'
+import { computed, ref, watch } from 'vue'
+import { config, settings } from '@/lib/data/data'
 import { setKeyFalseDelete, sync } from '@/lib/utils/tool'
 
 const defaultSettings = {
-    background: '#303030',
     width: 400,
-    scale: 1.5,
-    showCharName: false,
-    showCharNameSettings: {
-        chat: true,
-        monologue: true,
-        image: true
-    },
+    imageQuality: 1,
     maxHeight: 16000,
     autoCut: true,
     manualCut: true,
@@ -19,17 +12,47 @@ const defaultSettings = {
     author: '',
     characterSelectorPermanent: true
 }
-const syncedSettings = ref({})
 
-sync(syncedSettings.value, defaultSettings, settings.value)
-watch(settings, () => sync(syncedSettings.value, defaultSettings, settings.value), { deep: true })
+const commonSettings = ref({})
+const editorSettings = ref({})
+const rendererSettings = ref({})
 
-function setSettings (value, key) {
-    setKeyFalseDelete(settings.value, key, value)
+const rawEditorSettings = computed(() => settings.value.editor[config.value.editor])
+const rawRendererSettings = computed(() => settings.value.renderer[config.value.renderer])
+
+function setCommonSettings (key, value, falseCheck = null) {
+    setKeyFalseDelete(settings.value.common, key, value, falseCheck)
 }
+
+function setEditorSettings (key, value, falseCheck = null) {
+    setKeyFalseDelete(rawEditorSettings.value, key, value, falseCheck)
+}
+
+function setRendererSettings (key, value, falseCheck = null) {
+    setKeyFalseDelete(rawRendererSettings.value, key, value, falseCheck)
+}
+
+function enableSettingSync (dst, srcDefault, targetFn) {
+    const _sync = () => {
+        sync(dst, srcDefault, targetFn())
+    }
+    _sync()
+    watch(targetFn, _sync, { deep: true })
+}
+
+enableSettingSync(commonSettings.value, defaultSettings, () => {
+    return settings.value.common
+})
 
 export {
     defaultSettings,
-    syncedSettings,
-    setSettings
+    commonSettings,
+    editorSettings,
+    rendererSettings,
+    rawEditorSettings,
+    rawRendererSettings,
+    setCommonSettings,
+    setEditorSettings,
+    setRendererSettings,
+    enableSettingSync
 }
