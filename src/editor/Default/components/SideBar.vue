@@ -3,12 +3,12 @@ import { ref, watch } from 'vue'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { DataControl } from '@/lib/data/data'
-import { dialogWidth } from '@/lib/data/width'
 import CollapseItem from '@/components/CollapseItem'
 import { mobileView } from '@/editor/Default/lib/width'
 import { IsMobile } from '@/lib/data/constance'
 import { defaultShow } from '@/editor/Default/lib/showControl'
 import { mainShow } from '@/lib/data/showControl'
+import ClearDialog from '@/components/ClearDialog.vue'
 
 defineEmits(['showNavigation'])
 
@@ -109,18 +109,7 @@ function openOtherDialog (show) {
                         </el-icon>
                         {{ t.action.empty }}
                     </div>
-                    <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
-                        <div style="display: flex; column-gap: 5px">
-                            <el-button size="large" style="width: 100%;" @click="clearChats">{{
-                                    t.noun.chat
-                                }}
-                            </el-button>
-                            <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{
-                                    t.noun.all
-                                }}
-                            </el-button>
-                        </div>
-                    </el-dialog>
+                    <ClearDialog v-model="ifShowClear"/>
                     <div class="bar" @click="DataControl.withdraw">
                         <el-icon color="lightgrey" :size="35">
                             <IconBack/>
@@ -172,7 +161,6 @@ function openOtherDialog (show) {
             </div>
         </div>
     </div>
-
 </template>
 
 <style scoped>

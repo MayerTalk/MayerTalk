@@ -43,7 +43,7 @@ function getStorageSize () {
 }
 
 function clearStorage () {
-    DataControl.clear(2)
+    DataControl.reset()
     message.notify(t.value.notify.clearedSuccessfullyAndReloading, message.success)
     setTimeout(() => {
         location.reload()
@@ -164,7 +164,7 @@ function clearStorage () {
                     <th>{{ t.noun.local }}</th>
                     <td>{{ storageSize }}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,t.tip.emptyData)">{{ t.action.empty }}
+                        <el-button @click="ensure(clearStorage,t.tip.emptyData)">{{ t.action.reset }}
                         </el-button>
                     </td>
                 </tr>
