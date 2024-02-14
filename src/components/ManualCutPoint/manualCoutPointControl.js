@@ -1,10 +1,10 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { DataControl, chats } from '@/lib/data/data'
 import { DialogueHook } from '@/lib/function/dialogue'
 import Hook from '@/lib/utils/hook'
 import { getDialogue } from '@/lib/utils/tool'
-import { currEditorRef } from '@/lib/data/stats'
-import { closeShowHook } from '@/lib/data/showControl'
+import { currEditorRef, ModeChange } from '@/lib/data/state'
+import { closeShowHook, mainShow } from '@/lib/data/showControl'
 
 const currCutPoint = ref(null)
 const currCutPointIndex = ref(0)
@@ -15,11 +15,30 @@ const sortedCutPoints = ref([])
 const cutPointQuickEditMode = ref(false)
 let lastUpdate = ''
 
+watch(cutPointViewMode, () => {
+    ModeChange.call({
+        target: cutPointViewMode,
+        height: 45
+    })
+})
+
 closeShowHook.on(() => {
     if (cutPointViewMode.value) {
         cutPointViewMode.value = false
     }
 })
+
+function enableCutPointView () {
+    closeShowHook.call()
+    cutPointViewMode.value = true
+}
+
+function disableCutPointView () {
+    cutPointViewMode.value = false
+    setTimeout(() => {
+        mainShow.screenshotHelper.value = true
+    }, 250)
+}
 
 function reloadCutPoint () {
     const arrayPoints = []
@@ -130,6 +149,8 @@ export {
     cutPointFocusHook,
     cutPointQuickEditMode,
     getClosetCutPoint,
+    enableCutPointView,
+    disableCutPointView,
     prev,
     next
 }

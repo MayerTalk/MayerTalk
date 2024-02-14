@@ -9,7 +9,7 @@ import { ensure, formatSize, clickBySelector } from '@/lib/utils/tool'
 import Save from '@/lib/function/savefile'
 import { downloadData, uploadData } from '@/lib/data/versionControl'
 import { mainShow } from '@/lib/data/showControl'
-import { currEditorRef, currRendererRef } from '@/lib/data/stats'
+import { currEditorRef, currRendererRef } from '@/lib/data/state'
 
 import {
     config,

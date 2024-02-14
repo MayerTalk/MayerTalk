@@ -8,8 +8,10 @@ import { chats, chars, settings, DataControl } from '@/lib/data/data'
 import { defaultSettings, commonSettings, setCommonSettings, rendererSettings } from '@/lib/data/settings'
 import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
-import { cutPointViewMode, sortedCutPoints } from '@/components/ManualCutPoint/control'
-import { closeShowHook, mainShow } from '@/lib/data/showControl'
+import { cutPointViewMode, sortedCutPoints, enableCutPointView } from '@/components/ManualCutPoint/manualCoutPointControl'
+import { enablePartialScreenshotView, duringPartialScreenshot } from '@/components/PartialScreenshot/partialScreenshotControl'
+import { mainShow } from '@/lib/data/showControl'
+import { duringScreenshot } from '@/lib/data/state'
 
 const emit = defineEmits(['start', 'done'])
 
@@ -170,7 +172,7 @@ function getScreenshotGroup () {
     let lastCut = 0
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
-    if (commonSettings.value.manualCut) {
+    if (commonSettings.value.manualCut && !duringPartialScreenshot.value) {
         for (let i = 0; i < chats.value.length - 1; i++) {
             if (chats.value[i].data.cutPoint) {
                 getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
@@ -188,6 +190,10 @@ function getScreenshotGroup () {
 }
 
 function done () {
+    duringScreenshot.value = false
+    if (duringPartialScreenshot.value) {
+        duringPartialScreenshot.value = false
+    }
     title.value = ''
     emit('done')
 }
@@ -266,6 +272,7 @@ function getWatermarkCanvas (cb) {
 }
 
 function screenshot () {
+    duringScreenshot.value = true
     emit('start')
     cutPointViewMode.value = false
     nextTick(() => {
@@ -281,7 +288,7 @@ function screenshot () {
 
 const expectCutNumber = computed(() => {
     const heights = []
-    if (commonSettings.value.manualCut && sortedCutPoints.value.length) {
+    if (commonSettings.value.manualCut && sortedCutPoints.value.length && !duringPartialScreenshot.value) {
         const parts = []
         for (let i = 0; i < sortedCutPoints.value.length; i++) {
             const el = getDialogue(sortedCutPoints.value[i].id)
@@ -347,6 +354,11 @@ const ExpectLength = {
                 this.calc()
             }
         )
+        watch(duringPartialScreenshot, () => {
+            nextTick(() => {
+                this.calc()
+            })
+        })
     },
     result: ref(0)
 }
@@ -368,9 +380,11 @@ const wordCount = computed(() => {
     return count
 })
 
-function enableCutPointView () {
-    closeShowHook.call()
-    cutPointViewMode.value = true
+function handleClose () {
+    if (!duringScreenshot.value && duringPartialScreenshot.value) {
+        duringPartialScreenshot.value = false
+    }
+    DataControl.save(['settings'])
 }
 
 defineExpose({
@@ -380,7 +394,7 @@ defineExpose({
 
 <template>
     <el-dialog v-model="mainShow.screenshotHelper.value" :width="dialogWidth" :title="t.noun.screenshot"
-               @closed="DataControl.save(['settings'])">
+               @close="handleClose">
         <div>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
@@ -410,28 +424,30 @@ defineExpose({
                     </table>
                 </div>
             </CollapseItem>
-            <div class="bar">
-                <div style="display: flex; align-items: center; width: 100%">
-                    <div class="line-left" style="width: 20px;"></div>
-                    <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
-                    <el-switch :model-value="commonSettings.manualCut"
-                               @update:model-value="(v) => setCommonSettings('manualCutting',v,(v) => !v)"></el-switch>
-                    <div class="line-right"></div>
-                </div>
-            </div>
-            <CollapseItem>
-                <div v-show="commonSettings.manualCut" style="padding: 0 0 10px 10px">
-                    <div class="column-display"
-                         style="display: flex; align-items: center; padding-top: 5px">
-                        <div style="width: 100%">
-                            {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
-                        </div>
-                        <div style="width: 100%">
-                            <el-button @click="enableCutPointView">{{ t.action.viewCuttingPoint }}</el-button>
-                        </div>
+            <template v-if="!duringPartialScreenshot">
+                <div class="bar">
+                    <div style="display: flex; align-items: center; width: 100%">
+                        <div class="line-left" style="width: 20px;"></div>
+                        <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
+                        <el-switch :model-value="commonSettings.manualCut"
+                                   @update:model-value="(v) => setCommonSettings('manualCut',v,(v) => !v)"></el-switch>
+                        <div class="line-right"></div>
                     </div>
                 </div>
-            </CollapseItem>
+                <CollapseItem>
+                    <div v-show="commonSettings.manualCut" style="padding: 0 0 10px 10px">
+                        <div class="column-display"
+                             style="display: flex; align-items: center; padding-top: 5px">
+                            <div style="width: 100%">
+                                {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
+                            </div>
+                            <div style="width: 100%">
+                                <el-button @click="enableCutPointView">{{ t.action.viewCuttingPoint }}</el-button>
+                            </div>
+                        </div>
+                    </div>
+                </CollapseItem>
+            </template>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
@@ -494,6 +510,12 @@ defineExpose({
             </div>
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
+            <el-button
+                @click="() => {DataControl.save(['settings']); enablePartialScreenshotView()}"
+                :disabled="duringPartialScreenshot"
+                style="width: 30%"
+            >部分截图
+            </el-button>
             <el-button
                 @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"
                 style="width: 30%"

@@ -7,7 +7,7 @@ import FileDragger from '@/components/FileDragger.vue'
 import SettingsDialog from '@/components/SettingsDialog.vue'
 import SavefileDialog from '@/components/SavefileDialog.vue'
 import { config } from '@/lib/data/data'
-import { currEditorRef } from '@/lib/data/stats'
+import { currEditorRef } from '@/lib/data/state'
 </script>
 
 <template>
