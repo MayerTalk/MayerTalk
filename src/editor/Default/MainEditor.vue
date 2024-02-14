@@ -13,10 +13,17 @@ import SettingsDialog from './components/SettingsDialog.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
 import WindowResize from '@/lib/utils/windowResize'
-import { cutPointViewMode, cutPointFocusHook, cutPointQuickEditMode } from '@/components/ManualCutPoint/manualCoutPointControl'
+import {
+    cutPointViewMode,
+    cutPointFocusHook,
+    cutPointQuickEditMode
+} from '@/components/ManualCutPoint/manualCoutPointControl'
 import { currRendererRef, duringScreenshot, ModeChange } from '@/lib/data/state'
 import { defaultShow } from '@/editor/Default/lib/showControl'
-import { duringPartialScreenshot, partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
+import {
+    duringPartialScreenshot,
+    partialScreenshotViewMode
+} from '@/components/PartialScreenshot/partialScreenshotControl'
 import { clickBySelector, getDialogue, Textarea } from '@/lib/utils/tool'
 import {
     chats,
@@ -294,7 +301,7 @@ const defaultSettings = {
     characterSelectorPermanent: true
 }
 enableSettingSync(editorSettings.value, defaultSettings, () => {
-    return settings.value.editor.Default
+    return settings.value.editor?.Default || {}
 })
 
 defineExpose({
