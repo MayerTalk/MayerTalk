@@ -514,7 +514,7 @@ defineExpose({
                 @click="() => {DataControl.save(['settings']); enablePartialScreenshotView()}"
                 :disabled="duringPartialScreenshot"
                 style="width: 30%"
-            >部分截图
+            >{{t.action.partialScreenshot}}
             </el-button>
             <el-button
                 @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"

@@ -77,7 +77,9 @@ const emptyTranslation = {
         importFile: '',
         viewCuttingPoint: '',
         cutBelow: '',
-        reset: ''
+        reset: '',
+        multiSelect: '',
+        partialScreenshot: ''
     },
     noun: {
         character: '',
@@ -128,7 +130,8 @@ const emptyTranslation = {
         quickEdit: '',
         manualCutting: '',
         numberOfCuttingPoints: '',
-        char: ''
+        char: '',
+        cutPoint: ''
     },
     tip: {
         pool: [

@@ -61,7 +61,7 @@ function clear () {
             <el-checkbox label="settings" style="width: 50%;margin: 0"> {{ t.noun.settings }}</el-checkbox>
             <el-checkbox label="chars" style="width: 50%;margin: 0"> {{ t.noun.char }}</el-checkbox>
             <el-checkbox label="savefile" style="width: 50%;margin: 0"> {{ t.noun.savefile }}</el-checkbox>
-            <el-checkbox label="cutPoint" style="width: 50%;margin: 0">裁分点</el-checkbox>
+            <el-checkbox label="cutPoint" style="width: 50%;margin: 0">{{t.noun.cutPoint}}</el-checkbox>
         </el-checkbox-group>
         <div class="column-display" style="margin-top: 10px; display: flex; justify-content: flex-end">
             <el-button style="width: 20%" @click="ifShow=false">{{ t.action.cancel }}</el-button>
