@@ -130,11 +130,11 @@ function getIndex () {
 }
 
 function prev () {
-    setCurrCutPoint(checkIndex(getIndex() - 1))
+    if (cutPoints.value.length) { setCurrCutPoint(checkIndex(getIndex() - 1)) }
 }
 
 function next () {
-    setCurrCutPoint(checkIndex(getIndex() + 1))
+    if (cutPoints.value.length) { setCurrCutPoint(checkIndex(getIndex() + 1)) }
 }
 
 const cutPointFocusHook = new Hook()
