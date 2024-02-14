@@ -1,9 +1,10 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { DataControl, chats } from '@/lib/data/data'
 import { DialogueHook } from '@/lib/function/dialogue'
 import Hook from '@/lib/utils/hook'
 import { getDialogue } from '@/lib/utils/tool'
-import { currEditorRef } from '@/lib/data/stats'
+import { currEditorRef, ModeChange } from '@/lib/data/state'
+import { closeShowHook, mainShow } from '@/lib/data/showControl'
 
 const currCutPoint = ref(null)
 const currCutPointIndex = ref(0)
@@ -14,14 +15,49 @@ const sortedCutPoints = ref([])
 const cutPointQuickEditMode = ref(false)
 let lastUpdate = ''
 
+watch(cutPointViewMode, () => {
+    ModeChange.call({
+        target: cutPointViewMode,
+        height: 45
+    })
+})
+
+closeShowHook.on(() => {
+    if (cutPointViewMode.value) {
+        cutPointViewMode.value = false
+    }
+})
+
+DataControl.hook.clear.on((params) => {
+    if (params.indexOf('cutPoint') !== -1) {
+        sortedCutPoints.value = []
+        cutPoints.value = {}
+        currCutPointIndex.value = 0
+        chats.value.forEach((data) => {
+            if (data.data.cutPoint) {
+                delete data.data.cutPoint
+            }
+        })
+    }
+})
+
+function enableCutPointView () {
+    closeShowHook.call()
+    cutPointViewMode.value = true
+}
+
+function disableCutPointView () {
+    cutPointViewMode.value = false
+    setTimeout(() => {
+        mainShow.screenshotHelper.value = true
+    }, 250)
+}
+
 function reloadCutPoint () {
     const arrayPoints = []
     const dictPoints = {}
     let update = ''
     chats.value.forEach((data) => {
-        if (!Object.prototype.hasOwnProperty.call(data, 'data')) {
-            data.data = {}
-        }
         if (data.data.cutPoint) {
             dictPoints[data.id] = data
             arrayPoints.push(data)
@@ -104,11 +140,11 @@ function getIndex () {
 }
 
 function prev () {
-    setCurrCutPoint(checkIndex(getIndex() - 1))
+    if (cutPoints.value.length) { setCurrCutPoint(checkIndex(getIndex() - 1)) }
 }
 
 function next () {
-    setCurrCutPoint(checkIndex(getIndex() + 1))
+    if (cutPoints.value.length) { setCurrCutPoint(checkIndex(getIndex() + 1)) }
 }
 
 const cutPointFocusHook = new Hook()
@@ -123,6 +159,8 @@ export {
     cutPointFocusHook,
     cutPointQuickEditMode,
     getClosetCutPoint,
+    enableCutPointView,
+    disableCutPointView,
     prev,
     next
 }

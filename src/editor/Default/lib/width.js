@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { doAfter } from '@/lib/utils/tool'
 import { DataControl } from '@/lib/data/data'
 import { defaultWindowWidth } from '@/lib/data/constance'
-import { syncedSettings } from '@/lib/data/settings'
+import { editorSettings } from '@/lib/data/settings'
 import WindowResize from '@/lib/utils/windowResize'
 
 const validSpace = ref(0)
@@ -35,7 +35,7 @@ DataControl.hook.update.on(() => {
 })
 
 const ifShowPermanentSelectChar = computed(() => {
-    return syncedSettings.value.characterSelectorPermanent && validSpace.value - sidebarWidth.value - (421 + 22 * 2) > 0
+    return editorSettings.value.characterSelectorPermanent && validSpace.value - sidebarWidth.value - (421 + 22 * 2) > 0
 })
 
 const mobileView = computed(() => {

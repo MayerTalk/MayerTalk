@@ -6,6 +6,7 @@ const emptyTranslation = {
         pleaseEnterTextHere: '',
         pleaseSelectAtLeastOneCharacter: '',
         pleaseSelectTheCharToRepeat: '',
+        aboutToClear: '',
         aboutToClearAllChats: '',
         aboutToClearAllCharactersAndChats: '',
         pleaseSelectTheTypeToClear: '',
@@ -75,7 +76,10 @@ const emptyTranslation = {
         next: '',
         importFile: '',
         viewCuttingPoint: '',
-        cutBelow: ''
+        cutBelow: '',
+        reset: '',
+        multiSelect: '',
+        partialScreenshot: ''
     },
     noun: {
         character: '',
@@ -125,7 +129,9 @@ const emptyTranslation = {
         characterSelectorPermanent: '',
         quickEdit: '',
         manualCutting: '',
-        numberOfCuttingPoints: ''
+        numberOfCuttingPoints: '',
+        char: '',
+        cutPoint: ''
     },
     tip: {
         pool: [

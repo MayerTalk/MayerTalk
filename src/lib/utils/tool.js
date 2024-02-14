@@ -164,8 +164,8 @@ doAfter(() => {
 })
 
 function bool (obj) {
-    if (!obj) {
-        return false
+    if (['string', 'number', 'boolean'].indexOf(typeof obj) !== -1) {
+        return Boolean(obj)
     } else if (obj.length === 0) {
         return false
     } else if (Object.keys(obj).length === 0) {
@@ -174,22 +174,22 @@ function bool (obj) {
     return true
 }
 
-function sync (dst, src1, src2) {
+function sync (dst, srcDefault, srcTarget) {
     // target default variable
-    for (const key in src1) {
-        if (Object.prototype.hasOwnProperty.call(src1, key)) {
-            if (typeof src1[key] === 'object') {
+    for (const key in srcDefault) {
+        if (Object.prototype.hasOwnProperty.call(srcDefault, key)) {
+            if (typeof srcDefault[key] === 'object') {
                 dst[key] = {}
-                sync(dst[key], src1[key], src2[key] || {}, key)
+                sync(dst[key], srcDefault[key], srcTarget[key] || {}, key)
             } else {
-                dst[key] = src1[key]
+                dst[key] = srcDefault[key]
             }
         }
     }
-    for (const key in src2) {
-        if (Object.prototype.hasOwnProperty.call(src2, key)) {
-            if (typeof src2[key] !== 'object' && (src2[key] || typeof src2[key] === 'boolean')) {
-                dst[key] = src2[key]
+    for (const key in srcTarget) {
+        if (Object.prototype.hasOwnProperty.call(srcTarget, key)) {
+            if (typeof srcTarget[key] !== 'object' && (srcTarget[key] || typeof srcTarget[key] === 'boolean')) {
+                dst[key] = srcTarget[key]
             }
         }
     }
@@ -201,9 +201,11 @@ function parseFilename (filename) {
     return newFilename.length <= 64 ? newFilename : newFilename.slice(0, 64)
 }
 
-function setKeyFalseDelete (obj, key, value) {
-    if (!value && Object.prototype.hasOwnProperty.call(obj, key)) {
-        delete obj[key]
+function setKeyFalseDelete (obj, key, value, falseCheck = null) {
+    if (!(falseCheck || bool)(value)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            delete obj[key]
+        }
     } else {
         obj[key] = value
     }

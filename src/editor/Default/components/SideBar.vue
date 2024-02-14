@@ -1,37 +1,23 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { DataControl } from '@/lib/data/data'
-import { dialogWidth } from '@/lib/data/width'
 import CollapseItem from '@/components/CollapseItem'
 import { mobileView } from '@/editor/Default/lib/width'
 import { IsMobile } from '@/lib/data/constance'
+import { defaultShow } from '@/editor/Default/lib/showControl'
+import { mainShow } from '@/lib/data/showControl'
+import ClearDialog from '@/components/ClearDialog.vue'
 
-const props = defineProps(['modelValue'])
-const emit = defineEmits([
-    'showAnnounce',
-    'showSettings',
-    'showAbout',
-    'showNavigation',
-    'screenshot',
-    'update:modelValue'
-])
-const ifShow = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
+defineEmits(['showNavigation'])
 
 const sidebarContainerStyle = ref(mobileView.value ? 'fixed' : 'relative')
 
 watch(mobileView, () => {
     if (mobileView.value) {
-        if (ifShow.value) {
-            ifShow.value = false
+        if (defaultShow.sidebar.value) {
+            defaultShow.sidebar.value = false
             if (IsMobile) {
                 // 区分手机(转动)/PC(窗口缩放)
                 sidebarContainerStyle.value = 'fixed'
@@ -47,8 +33,8 @@ watch(mobileView, () => {
             sidebarContainerStyle.value = 'fixed'
         }
     } else {
-        if (!ifShow.value) {
-            ifShow.value = true
+        if (!defaultShow.sidebar.value) {
+            defaultShow.sidebar.value = true
         }
         sidebarContainerStyle.value = 'relative'
     }
@@ -84,20 +70,28 @@ function clearAll () {
         }
     )
 }
+
+function openOtherDialog (show) {
+    show.value = true
+    if (mobileView.value && defaultShow.sidebar.value) {
+        defaultShow.sidebar.value = false
+    }
+}
+
 </script>
 
 <template>
     <CollapseItem row>
-        <div v-show="ifShow" class="drawer-container" id="sidebar-container" :style="{position: sidebarContainerStyle}">
+        <div v-show="defaultShow.sidebar.value" class="drawer-container" id="sidebar-container" :style="{position: sidebarContainerStyle}">
             <div class="drawer" id="sidebar">
                 <el-scrollbar>
-                    <div class="bar" @click="$emit('screenshot')">
+                    <div class="bar" @click="openOtherDialog(mainShow.screenshotHelper)">
                         <el-icon color="lightgrey" :size="35">
                             <IconCrop/>
                         </el-icon>
                         {{ t.action.screenshot }}
                     </div>
-                    <div class="bar" @click="$emit('showAnnounce')">
+                    <div class="bar" @click="openOtherDialog(mainShow.announcement)">
                         <el-icon color="lightgrey" :size="35">
                             <IconNotification/>
                         </el-icon>
@@ -115,18 +109,7 @@ function clearAll () {
                         </el-icon>
                         {{ t.action.empty }}
                     </div>
-                    <el-dialog v-model="ifShowClear" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth">
-                        <div style="display: flex; column-gap: 5px">
-                            <el-button size="large" style="width: 100%;" @click="clearChats">{{
-                                    t.noun.chat
-                                }}
-                            </el-button>
-                            <el-button size="large" style="width:100%; margin: 0" @click="clearAll">{{
-                                    t.noun.all
-                                }}
-                            </el-button>
-                        </div>
-                    </el-dialog>
+                    <ClearDialog v-model="ifShowClear"/>
                     <div class="bar" @click="DataControl.withdraw">
                         <el-icon color="lightgrey" :size="35">
                             <IconBack/>
@@ -139,19 +122,19 @@ function clearAll () {
                         </el-icon>
                         {{ t.action.redo }}
                     </div>
-                    <div class="bar" @click="$emit('showNavigation')">
+                    <div class="bar" @click="$emit('showNavigation');openOtherDialog({})">
                         <el-icon color="lightgrey" :size="35">
                             <IconCompass/>
                         </el-icon>
                         {{ t.action.goto }}
                     </div>
-                    <div class="bar" @click="$emit('showSettings')">
+                    <div class="bar" @click="openOtherDialog(mainShow.settings)">
                         <el-icon color="lightgrey" :size="35">
                             <IconSetting/>
                         </el-icon>
                         {{ t.noun.settings }}
                     </div>
-                    <div class="bar" @click="$emit('showAbout')">
+                    <div class="bar" @click="openOtherDialog(mainShow.about)">
                         <el-icon color="lightgrey" :size="35">
                             <IconCoffeeCup/>
                         </el-icon>
@@ -162,7 +145,7 @@ function clearAll () {
         </div>
     </CollapseItem>
     <Transition name="fade">
-        <div v-if="ifShow && mobileView" @click="ifShow=false" class="drawer-mask"></div>
+        <div v-if="defaultShow.sidebar.value && mobileView" @click="defaultShow.sidebar.value=false" class="drawer-mask"></div>
     </Transition>
     <div id="sidebar-placeholder" class="drawer-placeholder">
         <!--sidebar占位符，用于在sidebar隐藏时计算sidebar width-->
@@ -178,7 +161,6 @@ function clearAll () {
             </div>
         </div>
     </div>
-
 </template>
 
 <style scoped>

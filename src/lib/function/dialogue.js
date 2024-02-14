@@ -15,7 +15,8 @@ const textarea = ref('')
 const DialogueHook = {
     create: new Hook(),
     update: new Hook(),
-    copy: new Hook()
+    copy: new Hook(),
+    click: new Hook()
 }
 
 function createDialogue (data, config = {}) {
@@ -93,6 +94,26 @@ function deleteDialogue (index, config = {}) {
     }
 }
 
+function findDialoguesById (id1, id2) {
+    const dialogues = []
+    let select = false
+    for (let i = 0; i < chats.value.length; i++) {
+        const data = chats.value[i]
+        if (select) {
+            dialogues.push(data.id)
+        }
+        if (data.id === id1 || data.id === id2) {
+            if (select) {
+                break
+            } else {
+                dialogues.push(data.id)
+                select = true
+            }
+        }
+    }
+    return dialogues
+}
+
 export {
     DialogueHook,
     createDialogue,
@@ -101,5 +122,6 @@ export {
     copyDialogue,
     deleteDialogue,
     uploadImage,
-    textarea
+    textarea,
+    findDialoguesById
 }

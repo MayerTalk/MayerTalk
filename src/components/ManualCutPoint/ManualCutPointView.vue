@@ -4,12 +4,12 @@ import {
     sortedCutPoints,
     setCurrCutPoint,
     currCutPointIndex,
-    cutPointViewMode,
     cutPointQuickEditMode,
     getClosetCutPoint,
+    disableCutPointView,
     prev,
     next
-} from '@/components/ManualCutPoint/control'
+} from '@/components/ManualCutPoint/manualCoutPointControl'
 import { t } from '@/lib/lang/translate'
 
 onMounted(() => {
@@ -44,7 +44,7 @@ onUnmounted(() => {
                     <IconBottom/>
                 </el-icon>
             </div>
-            <div style="width: 100%; text-align: center" @click="cutPointViewMode=false">
+            <div style="width: 100%; text-align: center" @click="disableCutPointView">
                 {{ t.action.return }}
             </div>
         </div>

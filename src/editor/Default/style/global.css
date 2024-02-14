@@ -16,6 +16,8 @@
 }
 
 .dialogue {
+    user-focus: none;
+    user-select: none;
     --dialogue-border-color: #666666;
     --dialogue-background: #222222;
     --dialogue-color: #EEEEEE;

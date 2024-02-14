@@ -1,32 +1,27 @@
 <script setup>
 import '@/lib/data/versionControl'
-import { ref, provide } from 'vue'
 import Editors from './editor'
 import Announce from './AnnounceDialog.vue'
 import About from './AboutDialog.vue'
 import FileDragger from '@/components/FileDragger.vue'
+import SettingsDialog from '@/components/SettingsDialog.vue'
+import SavefileDialog from '@/components/SavefileDialog.vue'
 import { config } from '@/lib/data/data'
-import { currEditorRef } from '@/lib/data/stats'
-
-const ifShowAnnouncement = ref(false)
-const ifShowSettings = ref(false)
-const ifShowAbout = ref(false)
-
-provide('ifShowAnnouncement', ifShowAnnouncement)
-provide('ifShowSettings', ifShowSettings)
-provide('ifShowAbout', ifShowAbout)
+import { currEditorRef } from '@/lib/data/state'
 </script>
 
 <template>
     <!--main components start-->
-    <Announce v-model="ifShowAnnouncement"/>
-    <About v-model="ifShowAbout"/>
+    <Announce/>
+    <About/>
     <FileDragger/>
+    <SettingsDialog/>
+    <SavefileDialog/>
     <!--main components end-->
     <component :is="Editors[config.editor]" ref="currEditorRef"/>
 </template>
 
-<style src="./font.css"></style>
+<style src="./style/font.css"></style>
 <style>
 body, html {
     margin: 0;

@@ -1,37 +1,33 @@
 <script setup>
-import { ref, computed, watch, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, provide, nextTick, onMounted, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import Renderers from '@/renderer'
 import SideBar from './components/SideBar.vue'
-import Settings from './components/SettingDialog.vue'
-import Savefile from './components/SavefileDialog.vue'
 import EditCharDialog from './components/EditCharDialog.vue'
 import EditDialogueDialog from './components/EditDialogueDialog.vue'
 import AtDialog from './components/AtDialog.vue'
 import CopyDialog from './components/CopyDialog.vue'
 import CreateOptionDialog from './components/CreateOptionDialog.vue'
 import NavigationBar from './components/NavigationBar.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
 import WindowResize from '@/lib/utils/windowResize'
-import { mobileView } from '@/editor/Default/lib/width'
-import { cutPointViewMode, cutPointFocusHook, cutPointQuickEditMode } from '@/components/ManualCutPoint/control'
-import { currRendererRef } from '@/lib/data/stats'
-
-import {
-    clickBySelector,
-    getDialogue,
-    Textarea
-} from '@/lib/utils/tool'
+import { cutPointViewMode, cutPointFocusHook, cutPointQuickEditMode } from '@/components/ManualCutPoint/manualCoutPointControl'
+import { currRendererRef, duringScreenshot, ModeChange } from '@/lib/data/state'
+import { defaultShow } from '@/editor/Default/lib/showControl'
+import { duringPartialScreenshot, partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
+import { clickBySelector, getDialogue, Textarea } from '@/lib/utils/tool'
 import {
     chats,
     chars,
     config,
     avatars,
+    settings,
     currCharId,
     DataControl
 } from '@/lib/data/data'
-import { syncedSettings } from '@/lib/data/settings'
+import { commonSettings, editorSettings, enableSettingSync, rendererSettings } from '@/lib/data/settings'
 import {
     textarea,
     createTextDialogue,
@@ -46,6 +42,7 @@ import { windowWidth } from '@/lib/data/width'
 import Input from '@/lib/function/input'
 import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.vue'
 import CollapseItem from '@/components/CollapseItem/CollapseItem.vue'
+import PartialScreenshotView from '@/components/PartialScreenshot/PartialScreenshotView.vue'
 
 const EditCharRef = ref(null)
 const EditDialogueRef = ref(null)
@@ -84,13 +81,6 @@ onUnmounted(() => {
     controller.abort()
 })
 
-const ifShowSideBar = ref(!mobileView.value)
-const ifShowAnnouncement = inject('ifShowAnnouncement')
-const ifShowAbout = inject('ifShowAbout')
-const ifShowSettings = inject('ifShowSettings')
-const ifShowSavefile = ref(false)
-const ifShowCopy = ref(false)
-const ifShowScreenshotHelper = ref(false)
 const rendererWidth = ref({})
 provide('rendererWidth', rendererWidth)
 
@@ -121,10 +111,10 @@ const ResizeWindow = {
         fontsize: 16
     },
     resize () {
-        const max = syncedSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
-        if (preScreenshot.value) {
+        const max = commonSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
+        if (duringScreenshot.value) {
             rendererWidth.value.window = max
-            rendererWidth.value.image = syncedSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
+            rendererWidth.value.image = commonSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
             const w = Math.min(max, window.innerWidth)
@@ -150,10 +140,11 @@ watch(charDirection, () => {
     ResizeWindow.resize()
 })
 watch(() => {
-    return syncedSettings.value.width
+    return commonSettings.value.width
 }, () => {
     ResizeWindow.resize()
 })
+DataControl.hook.changeSavefile.on(ResizeWindow.resize)
 
 function resizeBody (offset = 0) {
     const el = document.getElementById('body')
@@ -170,11 +161,9 @@ onMounted(() => {
 })
 
 const scroll = ref()
-const preScreenshot = ref(false)
 const ifShowMoreType = ref(false)
 const arrowStyle = ref({})
 provide('scroll', scroll)
-provide('preScreenshot', preScreenshot)
 
 function roll360 () {
     if (ifShowMoreType.value) {
@@ -242,18 +231,9 @@ onUnmounted(DialogueHook.copy.on((params) => {
 
 const scrollHeight = ref(window.innerHeight - 90 + 'px')
 
-const ScreenshotStateControl = {
-    start () {
-        preScreenshot.value = true
-        ResizeWindow.resize()
-    },
-    done () {
-        preScreenshot.value = false
-        setTimeout(() => {
-            ResizeWindow.resize()
-        })
-    }
-}
+watch(duringScreenshot, () => {
+    ResizeWindow.resize()
+})
 
 const currScrollTop = ref(0)
 
@@ -266,29 +246,19 @@ onUnmounted(Input.hook.on((params) => {
     }
 }))
 
-watch(cutPointViewMode, () => {
-    // setTimeout(() => {
-    //     resizeScroll()
-    // }, 500)
-    nextTick(() => {
-        resizeScroll()
-    })
-    if (cutPointViewMode.value === false) {
+ModeChange.on((event) => {
+    if (event.target.value === true) {
+        resizeScroll(document.querySelector('#operate-bar > div').scrollHeight - event.height)
+    } else {
         setTimeout(() => {
-            ifShowScreenshotHelper.value = true
-        }, 250)
+            resizeScroll()
+        }, 500)
     }
 })
 
 onUnmounted(cutPointFocusHook.on((id) => {
     scroll.value.setScrollTop(getDialogue(id).offsetTop - window.innerHeight / 2 + getDialogue(id).offsetHeight)
 }))
-
-function clearViewport () {
-    if (mobileView.value) {
-        ifShowSideBar.value = false
-    }
-}
 
 function handleEditDialogue (index) {
     if (cutPointViewMode.value && cutPointQuickEditMode.value) {
@@ -308,33 +278,43 @@ function handleEditDialogue (index) {
     }
 }
 
+let beforePartialScreenshotScrollTop = 0
+watch(duringPartialScreenshot, (value) => {
+    // 保持部分截图前后scrollTop仍一致
+    if (value) {
+        beforePartialScreenshotScrollTop = currScrollTop.value
+    } else {
+        nextTick(() => {
+            scroll.value.setScrollTop(beforePartialScreenshotScrollTop)
+        })
+    }
+})
+
+const defaultSettings = {
+    characterSelectorPermanent: true
+}
+enableSettingSync(editorSettings.value, defaultSettings, () => {
+    return settings.value.editor.Default
+})
+
 defineExpose({
     scroll,
     currScrollTop,
-    clearViewport
+    SettingsDialog
 })
 </script>
 
 <template>
     <!--Editor components start-->
-    <ScreenshotHelper
-        v-model="ifShowScreenshotHelper"
-        @start="ScreenshotStateControl.start"
-        @done="ScreenshotStateControl.done"
-    />
+    <ScreenshotHelper/>
     <NavigationBar ref="NavigationBarRef"/>
-    <Settings
-        @resizeWindow="() => {ResizeWindow.resize()}"
-        @showSavefile="ifShowSavefile=true"
-    />
-    <Savefile v-model="ifShowSavefile"/>
     <EditCharDialog ref="EditCharRef"/>
-    <EditDialogueDialog ref="EditDialogueRef" @showCopy="ifShowCopy=true"/>
+    <EditDialogueDialog ref="EditDialogueRef" @showCopy="defaultShow.copy.value=true"/>
     <AtDialog ref="AtRef"/>
     <CreateOptionDialog ref="CreateOption"/>
-    <CopyDialog v-model="ifShowCopy" @coped="() => {EditDialogueRef.close()}"/>
+    <CopyDialog @coped="() => {EditDialogueRef.close()}"/>
     <!--Editor components end-->
-    <div id="body" :style="{background: syncedSettings.background}">
+    <div id="body" :style="{background: rendererSettings.background}">
         <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s;position: relative">
             <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => {currScrollTop=v.scrollTop}">
@@ -349,6 +329,7 @@ defineExpose({
                 <div id="operate-bar" class="operate-bar" :style="{width: windowWidth + 'px'}">
                     <CollapseItem mode="">
                         <ManualCutPointView v-if="cutPointViewMode"/>
+                        <PartialScreenshotView v-else-if="partialScreenshotViewMode"/>
                         <div v-else style="display: flex; flex-wrap: wrap;align-items: flex-end">
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35"
@@ -436,7 +417,8 @@ defineExpose({
                                                       d="M600.704 64a32 32 0 0 1 30.464 22.208l35.2 109.376c14.784 7.232 28.928 15.36 42.432 24.512l112.384-24.192a32 32 0 0 1 34.432 15.36L944.32 364.8a32 32 0 0 1-4.032 37.504l-77.12 85.12a357.12 357.12 0 0 1 0 49.024l77.12 85.248a32 32 0 0 1 4.032 37.504l-88.704 153.6a32 32 0 0 1-34.432 15.296L708.8 803.904c-13.44 9.088-27.648 17.28-42.368 24.512l-35.264 109.376A32 32 0 0 1 600.704 960H423.296a32 32 0 0 1-30.464-22.208L357.696 828.48a351.616 351.616 0 0 1-42.56-24.64l-112.32 24.256a32 32 0 0 1-34.432-15.36L79.68 659.2a32 32 0 0 1 4.032-37.504l77.12-85.248a357.12 357.12 0 0 1 0-48.896l-77.12-85.248A32 32 0 0 1 79.68 364.8l88.704-153.6a32 32 0 0 1 34.432-15.296l112.32 24.256c13.568-9.152 27.776-17.408 42.56-24.64l35.2-109.312A32 32 0 0 1 423.232 64H600.64zm-23.424 64H446.72l-36.352 113.088-24.512 11.968a294.113 294.113 0 0 0-34.816 20.096l-22.656 15.36-116.224-25.088-65.28 113.152 79.68 88.192-1.92 27.136a293.12 293.12 0 0 0 0 40.192l1.92 27.136-79.808 88.192 65.344 113.152 116.224-25.024 22.656 15.296a294.113 294.113 0 0 0 34.816 20.096l24.512 11.968L446.72 896h130.688l36.48-113.152 24.448-11.904a288.282 288.282 0 0 0 34.752-20.096l22.592-15.296 116.288 25.024 65.28-113.152-79.744-88.192 1.92-27.136a293.12 293.12 0 0 0 0-40.256l-1.92-27.136 79.808-88.128-65.344-113.152-116.288 24.96-22.592-15.232a287.616 287.616 0 0 0-34.752-20.096l-24.448-11.904L577.344 128zM512 320a192 192 0 1 1 0 384 192 192 0 0 1 0-384zm0 64a128 128 0 1 0 0 256 128 128 0 0 0 0-256z"></path>
                                             </svg>
                                         </div>
-                                        <div v-else class="scale" @click="ifShowSideBar=!ifShowSideBar">
+                                        <div v-else class="scale"
+                                             @click="defaultShow.sidebar.value=!defaultShow.sidebar.value">
                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                  viewBox="0 0 16 16" focusable="false"
                                                  style="stroke: #606060">
@@ -452,14 +434,7 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <SideBar
-            v-model="ifShowSideBar"
-            @showAnnounce="ifShowAnnouncement=true"
-            @showSettings="ifShowSettings=true"
-            @showAbout="ifShowAbout=true"
-            @showNavigation="() => {NavigationBarRef.open()}"
-            @screenshot="ifShowScreenshotHelper=true"
-        />
+        <SideBar @showNavigation="() => {NavigationBarRef.open()}"/>
     </div>
 </template>
 

@@ -5,27 +5,23 @@ import { TypeSeries } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { t } from '@/lib/lang/translate'
 import { chats, chars, settings, DataControl } from '@/lib/data/data'
-import { defaultSettings, syncedSettings, setSettings } from '@/lib/data/settings'
+import { defaultSettings, commonSettings, setCommonSettings, rendererSettings } from '@/lib/data/settings'
 import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
-import { cutPointViewMode, sortedCutPoints } from '@/components/ManualCutPoint/control'
-import { currEditorRef } from '@/lib/data/stats'
+import { cutPointViewMode, sortedCutPoints, enableCutPointView } from '@/components/ManualCutPoint/manualCoutPointControl'
+import { enablePartialScreenshotView, duringPartialScreenshot } from '@/components/PartialScreenshot/partialScreenshotControl'
+import { mainShow } from '@/lib/data/showControl'
+import { duringScreenshot } from '@/lib/data/state'
 
-const props = defineProps(['modelValue'])
-const emit = defineEmits(['update:modelValue', 'start', 'done'])
+const emit = defineEmits(['start', 'done'])
 
-const ifShowScreenshotHelper = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
 let screenshotNode = null
 let watermarkNode = null
 const rendererWidth = inject('rendererWidth')
 const title = ref('')
+const realScale = computed(() => {
+    return commonSettings.value.imageQuality * 1.5
+})
 
 onUnmounted(DataControl.hook.clear.on(() => {
     title.value = ''
@@ -37,7 +33,7 @@ onUnmounted(DataControl.hook.changeSavefile.on(() => {
 function downloadScreenshot (cb = null, options = {}) {
     getCanvas(options.screenshotNode || screenshotNode, {
         windowWidth: rendererWidth.value.window + 20,
-        scale: syncedSettings.value.scale,
+        scale: realScale.value,
         useCORS: true,
         ...(options.options || {})
     }, (canvas) => {
@@ -66,8 +62,8 @@ doAfter(() => {
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
     // -10 dialogue margin-bottom
-    const res = Math.floor(syncedSettings.value.maxHeight / syncedSettings.value.scale) - 30 -
-        (syncedSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) - 10
+    const res = Math.floor(commonSettings.value.maxHeight / realScale.value) - 30 -
+        (commonSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) - 10
     return res > 0 ? res : 1
 })
 
@@ -77,7 +73,7 @@ function dialogueOffsetTop (el) {
 }
 
 function getAutoCutGroup (start, end, maxHeight) {
-    if (!syncedSettings.value.autoCut) {
+    if (!commonSettings.value.autoCut) {
         return []
     }
     const chatsData = end ? chats.value.slice(start, end) : chats.value.slice(start)
@@ -176,7 +172,7 @@ function getScreenshotGroup () {
     let lastCut = 0
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
     const points = []
-    if (syncedSettings.value.manualCut) {
+    if (commonSettings.value.manualCut && !duringPartialScreenshot.value) {
         for (let i = 0; i < chats.value.length - 1; i++) {
             if (chats.value[i].data.cutPoint) {
                 getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
@@ -194,6 +190,10 @@ function getScreenshotGroup () {
 }
 
 function done () {
+    duringScreenshot.value = false
+    if (duringPartialScreenshot.value) {
+        duringPartialScreenshot.value = false
+    }
     title.value = ''
     emit('done')
 }
@@ -266,16 +266,17 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
 function getWatermarkCanvas (cb) {
     getCanvas(watermarkNode, {
         windowWidth: rendererWidth.value.window + 20,
-        scale: syncedSettings.value.scale,
+        scale: realScale.value,
         useCORS: true
     }, cb)
 }
 
 function screenshot () {
+    duringScreenshot.value = true
     emit('start')
     cutPointViewMode.value = false
     nextTick(() => {
-        if (syncedSettings.value.watermark) {
+        if (commonSettings.value.watermark) {
             getWatermarkCanvas((canvas) => {
                 _screenshot(false, canvas)
             })
@@ -287,7 +288,7 @@ function screenshot () {
 
 const expectCutNumber = computed(() => {
     const heights = []
-    if (syncedSettings.value.manualCut && sortedCutPoints.value.length) {
+    if (commonSettings.value.manualCut && sortedCutPoints.value.length && !duringPartialScreenshot.value) {
         const parts = []
         for (let i = 0; i < sortedCutPoints.value.length; i++) {
             const el = getDialogue(sortedCutPoints.value[i].id)
@@ -310,7 +311,7 @@ const expectCutNumber = computed(() => {
     } else {
         heights.push(screenshotNode.scrollHeight - 30)
     }
-    if (syncedSettings.value.autoCut) {
+    if (commonSettings.value.autoCut) {
         let cutNumber = 0
         for (let i = 0; i < heights.length; i++) {
             cutNumber += Math.ceil(heights[i] / realMaxHeight.value)
@@ -329,8 +330,8 @@ const ExpectLength = {
     calc () {
         this.result.value = Math.ceil((screenshotNode.scrollHeight +
                 (30 * (expectCutNumber.value - 1)) +
-                (syncedSettings.value.watermark ? (watermarkNode.scrollHeight - 1) * expectCutNumber.value : 0)) *
-            syncedSettings.value.scale)
+                (commonSettings.value.watermark ? (watermarkNode.scrollHeight - 1) * expectCutNumber.value : 0)) *
+            realScale.value)
     },
     mount () {
         onUnmounted(DataControl.hook.change.on(() => {
@@ -343,16 +344,21 @@ const ExpectLength = {
         watch(
             () => {
                 return [
-                    syncedSettings.value.autoCut,
-                    syncedSettings.value.manualCut,
-                    syncedSettings.value.watermark,
-                    syncedSettings.value.maxHeight
+                    commonSettings.value.autoCut,
+                    commonSettings.value.manualCut,
+                    commonSettings.value.watermark,
+                    commonSettings.value.maxHeight
                 ]
             },
             () => {
                 this.calc()
             }
         )
+        watch(duringPartialScreenshot, () => {
+            nextTick(() => {
+                this.calc()
+            })
+        })
     },
     result: ref(0)
 }
@@ -374,10 +380,11 @@ const wordCount = computed(() => {
     return count
 })
 
-function enableCutPointView () {
-    ifShowScreenshotHelper.value = false
-    cutPointViewMode.value = true
-    currEditorRef.value.clearViewport()
+function handleClose () {
+    if (!duringScreenshot.value && duringPartialScreenshot.value) {
+        duringPartialScreenshot.value = false
+    }
+    DataControl.save(['settings'])
 }
 
 defineExpose({
@@ -386,20 +393,20 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShowScreenshotHelper" :width="dialogWidth" :title="t.noun.screenshot"
-               @closed="DataControl.save(['settings'])">
+    <el-dialog v-model="mainShow.screenshotHelper.value" :width="dialogWidth" :title="t.noun.screenshot"
+               @close="handleClose">
         <div>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
                     <h2 style="margin: 0 10px 0 0">{{ t.noun.watermark }}</h2>
-                    <el-switch v-model="syncedSettings.watermark"
-                               @change="(value) => {settings.watermark=value}"></el-switch>
+                    <el-switch :model-value="commonSettings.watermark"
+                               @update:model-value="(v) => setCommonSettings('watermark',v,(v) => !v)"></el-switch>
                     <div class="line-right"></div>
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="syncedSettings.watermark" style="padding: 0 0 10px 10px">
+                <div v-show="commonSettings.watermark" style="padding: 0 0 10px 10px">
                     <table>
                         <tr>
                             <th>{{ t.noun.title }}</th>
@@ -410,54 +417,56 @@ defineExpose({
                         <tr>
                             <th>{{ t.noun.author }}</th>
                             <td>
-                                <el-input v-model="syncedSettings.author" clearable
-                                          @input="(v) => {setSettings(v,'author')}"></el-input>
+                                <el-input :model-value="settings.common.author" clearable
+                                          @update:model-value="(v) => setCommonSettings('author',v)"></el-input>
                             </td>
                         </tr>
                     </table>
                 </div>
             </CollapseItem>
-            <div class="bar">
-                <div style="display: flex; align-items: center; width: 100%">
-                    <div class="line-left" style="width: 20px;"></div>
-                    <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
-                    <el-switch v-model="syncedSettings.manualCut"
-                               @change="(value) => {settings.manualCut=value}"></el-switch>
-                    <div class="line-right"></div>
-                </div>
-            </div>
-            <CollapseItem>
-                <div v-show="syncedSettings.manualCut" style="padding: 0 0 10px 10px">
-                    <div class="column-display"
-                         style="display: flex; align-items: center; padding-top: 5px">
-                        <div style="width: 100%">
-                            {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
-                        </div>
-                        <div style="width: 100%">
-                            <el-button @click="enableCutPointView">{{ t.action.viewCuttingPoint }}</el-button>
-                        </div>
+            <template v-if="!duringPartialScreenshot">
+                <div class="bar">
+                    <div style="display: flex; align-items: center; width: 100%">
+                        <div class="line-left" style="width: 20px;"></div>
+                        <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
+                        <el-switch :model-value="commonSettings.manualCut"
+                                   @update:model-value="(v) => setCommonSettings('manualCut',v,(v) => !v)"></el-switch>
+                        <div class="line-right"></div>
                     </div>
                 </div>
-            </CollapseItem>
+                <CollapseItem>
+                    <div v-show="commonSettings.manualCut" style="padding: 0 0 10px 10px">
+                        <div class="column-display"
+                             style="display: flex; align-items: center; padding-top: 5px">
+                            <div style="width: 100%">
+                                {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
+                            </div>
+                            <div style="width: 100%">
+                                <el-button @click="enableCutPointView">{{ t.action.viewCuttingPoint }}</el-button>
+                            </div>
+                        </div>
+                    </div>
+                </CollapseItem>
+            </template>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
                     <h2 style="margin: 0 10px 0 0">{{ t.noun.autoCut }}</h2>
-                    <el-switch v-model="syncedSettings.autoCut"
-                               @change="(value) => {settings.autoCut=value}"></el-switch>
+                    <el-switch :model-value="commonSettings.autoCut"
+                               @update:model-value="(v) => setCommonSettings('autoCut',v,(v) => !v)"></el-switch>
                     <div class="line-right"></div>
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="syncedSettings.autoCut" style="padding: 0 0 10px 10px">
+                <div v-show="commonSettings.autoCut" style="padding: 0 0 10px 10px">
                     <div class="column-display"
                          style="display: flex; align-items: center; padding-top: 5px">
                         <div style="width: 100%"> {{ t.noun.maxLength }}
                             <el-input
-                                v-model="settings.maxHeight" clearable type="number"
+                                :model-value="settings.common.maxHeight" clearable
+                                @update:model-value="(v) => setCommonSettings('maxHeight',+v,(v) => v > 0)"
                                 style="width: 100px; margin-left: 10px"
                                 :placeholder="''+defaultSettings.maxHeight"
-                                @input="(v) => {setSettings(+v,'maxHeight')}"
                             />
                         </div>
                         <div style="width: 100%">
@@ -502,7 +511,13 @@ defineExpose({
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
             <el-button
-                @click="() => {DataControl.save(['settings']); screenshot(); ifShowScreenshotHelper=false}"
+                @click="() => {DataControl.save(['settings']); enablePartialScreenshotView()}"
+                :disabled="duringPartialScreenshot"
+                style="width: 30%"
+            >{{t.action.partialScreenshot}}
+            </el-button>
+            <el-button
+                @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"
                 style="width: 30%"
             >{{ t.action.generate }}
             </el-button>
@@ -513,12 +528,12 @@ defineExpose({
         <div style="position: absolute; top: 0;z-index: -1; overflow: hidden"
              :style="{width: rendererWidth.window+'px'}">
             <div id="watermark" style="position: absolute; top: 0; background: white">
-                <div :style="{width: rendererWidth.window+'px', background: syncedSettings.background}"
+                <div :style="{width: rendererWidth.window+'px', background: rendererSettings.background}"
                      class="watermark-bar">
                     <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 6px 0; opacity: 1"><i>MayerTalk</i></h1>
                     <div>
                         <p v-if="title" style="margin-bottom: 3px">{{ t.noun.title }}: {{ title }}</p>
-                        <p v-if="syncedSettings.author">{{ t.noun.author }}: {{ syncedSettings.author }}</p>
+                        <p v-if="commonSettings.author">{{ t.noun.author }}: {{ commonSettings.author }}</p>
                     </div>
                 </div>
             </div>

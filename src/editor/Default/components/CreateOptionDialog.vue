@@ -1,14 +1,22 @@
 <script setup>
-import { ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import OptionDialog from '../type/OptionDialog.vue'
 
 import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
 import { createDialogue } from '@/lib/function/dialogue'
 import { dialogWidth } from '@/lib/data/width'
+import { closeShowHook } from '@/lib/data/showControl'
 
 const ifShow = ref(false)
 const options = ref({})
+
+onUnmounted(closeShowHook.on(() => {
+    if (ifShow.value) {
+        ifShow.value = false
+    }
+}))
+
 function open () {
     options.value = [[uuid(), '']]
     ifShow.value = true
@@ -16,6 +24,7 @@ function open () {
         r.value.focusFirst()
     })
 }
+
 const dialogRef = ref(null)
 
 function createOptionDialogue () {

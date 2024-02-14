@@ -3,6 +3,7 @@ import { defaultLang } from '@/lib/lang/detect'
 import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import {
+    defaultSettings,
     config,
     chats,
     chars,
@@ -11,7 +12,7 @@ import {
     DataControl
 } from '@/lib/data/data'
 
-const latestVersion = 'f'
+const latestVersion = 'g'
 const initialVersion = 'a'
 let currVersion = getData('data.version') || initialVersion
 const versionSwitcher = {
@@ -105,6 +106,35 @@ const versionSwitcher = {
             saveData('data.chats', data.chats)
         }
         return 'f'
+    },
+    f: (data, opt) => {
+        // v0.2.2 -> v0.2.3 / f -> g
+        // settings
+        const oldSettings = copy(data.settings)
+        const newSettings = copy(defaultSettings)
+        const commonKey = ['maxHeight', 'autoCut', 'manualCut', 'watermark', 'author', 'width']
+        const editorKey = ['characterSelectorPermanent']
+        const rendererKey = ['background', 'showCharName', 'showCharNameSettings']
+        const group = [
+            [commonKey, newSettings.common],
+            [editorKey, newSettings.editor.Default],
+            [rendererKey, newSettings.renderer.Siracusa]
+        ]
+        for (const key in oldSettings) {
+            for (let i = 0; i < group.length; i++) {
+                if (group[i][0].indexOf(key) !== -1) {
+                    group[i][1][key] = oldSettings[key]
+                }
+            }
+        }
+        if (Object.prototype.hasOwnProperty.call(oldSettings, 'scale')) {
+            newSettings.common.imageQuality = +(oldSettings.scale / 1.5).toFixed(2)
+        }
+        data.settings = newSettings
+        if (opt.load) {
+            saveData('data.settings', data.settings)
+        }
+        return 'g'
     }
 }
 
@@ -153,6 +183,7 @@ function uploadData (uploadFile, callback) {
             DataControl.set(data, false)
             DataControl.save()
             message.notify(t.value.notify.importedSuccessfully, message.success)
+            DataControl.hook.changeSavefile.call()
             callback && callback()
         } catch (e) {
             console.log(e)

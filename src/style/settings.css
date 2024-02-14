@@ -1,0 +1,17 @@
+table {
+    padding-left: 10px;
+    border-spacing: 5px;
+}
+
+.line-left {
+    margin-right: 10px;
+    height: 0;
+    border-top: lightgrey solid 1px;
+}
+
+.line-right {
+    margin-left: 10px;
+    flex-grow: 1;
+    height: 0;
+    border-top: lightgrey solid 1px;
+}
