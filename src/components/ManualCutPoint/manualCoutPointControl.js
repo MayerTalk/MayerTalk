@@ -28,6 +28,19 @@ closeShowHook.on(() => {
     }
 })
 
+DataControl.hook.clear.on((params) => {
+    if (params.indexOf('cutPoint') !== -1) {
+        sortedCutPoints.value = []
+        cutPoints.value = {}
+        currCutPointIndex.value = 0
+        chats.value.forEach((data) => {
+            if (data.data.cutPoint) {
+                delete data.data.cutPoint
+            }
+        })
+    }
+})
+
 function enableCutPointView () {
     closeShowHook.call()
     cutPointViewMode.value = true
@@ -45,9 +58,6 @@ function reloadCutPoint () {
     const dictPoints = {}
     let update = ''
     chats.value.forEach((data) => {
-        if (!Object.prototype.hasOwnProperty.call(data, 'data')) {
-            data.data = {}
-        }
         if (data.data.cutPoint) {
             dictPoints[data.id] = data
             arrayPoints.push(data)
