@@ -91,9 +91,9 @@ const announcementTranslate = {
             optimize: '优化',
             fix: '修复'
         },
-        feat: ['手动裁分'],
-        optimize: ['现在可以快捷隐藏常驻角色栏了', '优化对手机输入法的适配'],
-        fix: ['拖拽上传显示错误', '无法查看裁分点', '复制对话后编辑器无法加载']
+        feat: ['部分截图'],
+        optimize: ['细化了清空，现在可分别清空 对话/角色/设置/存档/裁分点'],
+        fix: ['清空未删除图片储存']
     },
     zh_TW: {
         key: {
@@ -101,9 +101,9 @@ const announcementTranslate = {
             optimize: '優化',
             fix: '修復'
         },
-        feat: ['手動裁分'],
-        optimize: ['現在可以快捷隱藏常駐角色欄了', '優化對手機輸入法的適配'],
-        fix: ['拖拽上傳顯示錯誤', '無法查看裁分點', '複製對話後編輯器無法加載']
+        feat: ['部分截圖'],
+        optimize: ['細化了清空，現在可分別清空 對話/角色/設置/存檔/裁分點'],
+        fix: ['清空未刪除圖片儲存']
     },
     en_US: {
         key: {
@@ -111,9 +111,9 @@ const announcementTranslate = {
             optimize: 'Optimize',
             fix: 'Fix'
         },
-        feat: ['Manual cutting'],
-        optimize: ['Now you can quickly hide the resident character bar', 'Optimize the adaptation to the mobile input method'],
-        fix: ['Drag and upload display error', 'Unable to view scoring points', 'Editor cannot load after copying dialogue']
+        feat: ['Partial Screenshot'],
+        optimize: ['Refined the clear function, now you can clear Dialogue/Role/Settings/Archive/Cut Point separately'],
+        fix: ['Clear did not delete image storage']
     },
     ja_JP: {
         key: {
@@ -121,9 +121,11 @@ const announcementTranslate = {
             optimize: '最適化',
             fix: '修正'
         },
-        feat: ['手動でカット'],
-        optimize: ['今すぐ常駐キャラクターバーを非表示にすることができます', '携帯電話の入力方法への適応を最適化'],
-        fix: ['ドラッグアンドアップロード表示エラー', 'スコアリングポイントを表示できません', 'ダイアログをコピーした後、エディターが読み込めません']
+        ja_JP: {
+            feat: ['部分的なスクリーンショット'],
+            optimize: ['クリアを洗練し、今では ダイアログ/役割/設定/アーカイブ/カットポイント を個別にクリアできます'],
+            fix: ['クリアは画像ストレージを削除しませんでした']
+        }
     }
 }
 
@@ -152,14 +154,7 @@ const t = computed(() => {
     return translate[config.value.lang || 'en_US']
 })
 
-const version = 'v0.2.2-fix2'
-
-const newYearTranslation = {
-    zh_CN: '新年快乐！',
-    zh_TW: '新年快樂！',
-    en_US: 'Happy New Year!',
-    ja_JP: '新年あけましておめでとうございます！'
-}
+const version = 'v0.2.3'
 </script>
 
 <template>
@@ -175,7 +170,6 @@ const newYearTranslation = {
             </template>
         </template>
         <template v-else>
-            <h2 style="color: orangered">{{ newYearTranslation[config.lang || 'en_US'] }}</h2>
             <p>{{ t.default.develop }}</p>
             <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
             <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
