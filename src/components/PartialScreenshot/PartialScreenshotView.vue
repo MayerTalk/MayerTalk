@@ -6,12 +6,13 @@ import {
     partialScreenshotMultiSelect
 } from '@/components/PartialScreenshot/partialScreenshotControl'
 import { chats } from '@/lib/data/data'
+import { t } from '@/lib/lang/translate'
 </script>
 
 <template>
     <div style="display: flex; color: white">
         <div class="column-display container">
-            <div style="width: 40%; display: flex; justify-content: center" title="多选"
+            <div style="width: 40%; display: flex; justify-content: center" :title="t.action.multiSelect"
                  @click="partialScreenshotMultiSelect=!partialScreenshotMultiSelect">
                 <el-icon :size="35" :color="partialScreenshotMultiSelect?'#B6E4F2':'white'">
                     <IconConnection/>
@@ -21,10 +22,10 @@ import { chats } from '@/lib/data/data'
                 {{ Object.keys(partialChats).length }}/{{ chats.length }}
             </div>
             <div style="width: 100%; text-align: center" @click="duringPartialScreenshot=true">
-                确认
+                {{t.action.confirm}}
             </div>
             <div style="width: 100%; text-align: center" @click="disablePartialScreenshotView">
-                返回
+                {{t.action.return}}
             </div>
         </div>
     </div>
