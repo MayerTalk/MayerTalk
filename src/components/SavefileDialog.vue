@@ -6,11 +6,20 @@ import message from '@/lib/utils/message'
 import Save from '@/lib/function/savefile'
 import { dialogWidth } from '@/lib/data/width'
 import { mainShow } from '@/lib/data/showControl'
+import { DataControl } from '@/lib/data/data'
 
 const tableData = ref([])
 
 const savefileName = ref('')
 const ifSave = ref(false)
+
+DataControl.hook.clear.on((params) => {
+    if (params.indexOf('savefile') !== -1) {
+        Save.db.clear(null, 'data')
+        Save.db.clear(null, 'info')
+        loadData()
+    }
+})
 
 function loadData () {
     if (!Save.db.conn) {

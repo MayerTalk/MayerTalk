@@ -9,7 +9,7 @@ import { ensure, formatSize, clickBySelector } from '@/lib/utils/tool'
 import Save from '@/lib/function/savefile'
 import { downloadData, uploadData } from '@/lib/data/versionControl'
 import { mainShow } from '@/lib/data/showControl'
-import { currEditorRef, currRendererRef } from '@/lib/data/stats'
+import { currEditorRef, currRendererRef } from '@/lib/data/state'
 
 import {
     config,
@@ -43,7 +43,7 @@ function getStorageSize () {
 }
 
 function clearStorage () {
-    DataControl.clear(2)
+    DataControl.reset()
     message.notify(t.value.notify.clearedSuccessfullyAndReloading, message.success)
     setTimeout(() => {
         location.reload()
@@ -164,7 +164,7 @@ function clearStorage () {
                     <th>{{ t.noun.local }}</th>
                     <td>{{ storageSize }}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,t.tip.emptyData)">{{ t.action.empty }}
+                        <el-button @click="ensure(clearStorage,t.tip.emptyData)">{{ t.action.reset }}
                         </el-button>
                     </td>
                 </tr>

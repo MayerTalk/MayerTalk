@@ -6,7 +6,8 @@ import SettingsDialog from './components/SettingsDialog.vue'
 import plus1 from '@/lib/function/plus1'
 import { chats, settings } from '@/lib/data/data'
 import { enableSettingSync, rendererSettings } from '@/lib/data/settings'
-import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/control'
+import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/manualCoutPointControl'
+import { partialChats } from '@/components/PartialScreenshot/partialScreenshotControl'
 
 defineEmits(['edit', 'delete', 'plus1'])
 
@@ -43,6 +44,7 @@ defineExpose({
                   :index="index"
                   :plus1="plus1 === index"
                   :cut-point="Object.prototype.hasOwnProperty.call(cutPoints,chats[index].id) && cutPointViewMode"
+                  :select="Object.prototype.hasOwnProperty.call(partialChats,chats[index].id)"
                   :cut-point-active="currCutPoint===chats[index].id"
                   style="position:relative"></Dialogue>
     </div>

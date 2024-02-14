@@ -3,6 +3,7 @@ import { defaultLang } from '@/lib/lang/detect'
 import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import {
+    defaultSettings,
     config,
     chats,
     chars,
@@ -110,7 +111,7 @@ const versionSwitcher = {
         // v0.2.2 -> v0.2.3 / f -> g
         // settings
         const oldSettings = copy(data.settings)
-        const newSettings = { common: {}, editor: { Default: {} }, renderer: { Siracusa: {} } }
+        const newSettings = copy(defaultSettings)
         const commonKey = ['maxHeight', 'autoCut', 'manualCut', 'watermark', 'author', 'width']
         const editorKey = ['characterSelectorPermanent']
         const rendererKey = ['background', 'showCharName', 'showCharNameSettings']

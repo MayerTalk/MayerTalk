@@ -7,8 +7,10 @@ import { copy, blob2base64, md5, uuid, Textarea, bool } from '@/lib/utils/tool'
 import DataBase from '../utils/db'
 import Hook from '@/lib/utils/hook'
 
+const defaultSettings = { common: {}, editor: { Default: {} }, renderer: { Siracusa: {} } }
+
 const config = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
-const settings = ref({})
+const settings = ref(copy(defaultSettings))
 const chars = ref({})
 const chats = ref([])
 const images = ref({})
@@ -357,9 +359,17 @@ const DataControl = {
             this.hook.switch.call()
         }
     },
-    clear (level) {
-        this.hook.clear.call(level)
-        if (level === 0) {
+    clear (params) {
+        this.hook.clear.call(params)
+        const needSave = []
+        if (params.indexOf('chars') !== -1) {
+            // 清空角色
+            // 由于对话与角色绑定，所以默认也清除对话
+            chars.value = {}
+            chats.value = []
+            this.image.set({})
+            needSave.push('chars', 'chats', 'images')
+        } else if (params.indexOf('chats') !== -1) {
             // 清空对话
             for (let i = 0; i < chats.value.length; i++) {
                 const chat = chats.value[i]
@@ -368,21 +378,23 @@ const DataControl = {
                 }
             }
             chats.value = []
-            message.notify(t.value.notify.emptiedSuccessfully, message.success)
-            this.save(['chats', 'images'])
-        } else if (level === 1) {
-            // 清空对话 + 角色
-            chars.value = {}
-            chats.value = []
-            images.value = {}
-            message.notify(t.value.notify.emptiedSuccessfully, message.success)
-            this.save(['chars', 'chats', 'images'])
-        } else if (level === 2) {
-            // 清空本地数据
-            localStorage.clear()
-            indexedDB.deleteDatabase('data')
-            indexedDB.deleteDatabase('savefile')
+            needSave.push('chats', 'images')
         }
+        if (params.indexOf('settings') !== -1) {
+            settings.value = copy(defaultSettings)
+            needSave.push('settings')
+        }
+        if (params.indexOf('savefile') !== -1) {
+            // 利用ClearHook传递给savefile.js处理
+            // 备忘用
+        }
+        this.save(needSave)
+        message.notify(t.value.notify.emptiedSuccessfully, message.success)
+    },
+    reset () {
+        localStorage.clear()
+        indexedDB.deleteDatabase('data')
+        indexedDB.deleteDatabase('savefile')
     },
     char: {
         new (data) {
@@ -464,6 +476,7 @@ DataControl.hook.switch.on(() => {
 })
 
 export {
+    defaultSettings,
     config,
     settings,
     chats,

@@ -13,15 +13,11 @@ import SettingsDialog from './components/SettingsDialog.vue'
 import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
 import WindowResize from '@/lib/utils/windowResize'
-import { cutPointViewMode, cutPointFocusHook, cutPointQuickEditMode } from '@/components/ManualCutPoint/control'
-import { currRendererRef } from '@/lib/data/stats'
+import { cutPointViewMode, cutPointFocusHook, cutPointQuickEditMode } from '@/components/ManualCutPoint/manualCoutPointControl'
+import { currRendererRef, duringScreenshot, ModeChange } from '@/lib/data/state'
 import { defaultShow } from '@/editor/Default/lib/showControl'
-
-import {
-    clickBySelector,
-    getDialogue,
-    Textarea
-} from '@/lib/utils/tool'
+import { duringPartialScreenshot, partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
+import { clickBySelector, getDialogue, Textarea } from '@/lib/utils/tool'
 import {
     chats,
     chars,
@@ -46,7 +42,7 @@ import { windowWidth } from '@/lib/data/width'
 import Input from '@/lib/function/input'
 import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.vue'
 import CollapseItem from '@/components/CollapseItem/CollapseItem.vue'
-import { mainShow } from '@/lib/data/showControl'
+import PartialScreenshotView from '@/components/PartialScreenshot/PartialScreenshotView.vue'
 
 const EditCharRef = ref(null)
 const EditDialogueRef = ref(null)
@@ -116,7 +112,7 @@ const ResizeWindow = {
     },
     resize () {
         const max = commonSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
-        if (preScreenshot.value) {
+        if (duringScreenshot.value) {
             rendererWidth.value.window = max
             rendererWidth.value.image = commonSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
@@ -165,11 +161,9 @@ onMounted(() => {
 })
 
 const scroll = ref()
-const preScreenshot = ref(false)
 const ifShowMoreType = ref(false)
 const arrowStyle = ref({})
 provide('scroll', scroll)
-provide('preScreenshot', preScreenshot)
 
 function roll360 () {
     if (ifShowMoreType.value) {
@@ -237,18 +231,9 @@ onUnmounted(DialogueHook.copy.on((params) => {
 
 const scrollHeight = ref(window.innerHeight - 90 + 'px')
 
-const ScreenshotStateControl = {
-    start () {
-        preScreenshot.value = true
-        ResizeWindow.resize()
-    },
-    done () {
-        preScreenshot.value = false
-        setTimeout(() => {
-            ResizeWindow.resize()
-        })
-    }
-}
+watch(duringScreenshot, () => {
+    ResizeWindow.resize()
+})
 
 const currScrollTop = ref(0)
 
@@ -261,17 +246,13 @@ onUnmounted(Input.hook.on((params) => {
     }
 }))
 
-watch(cutPointViewMode, () => {
-    // setTimeout(() => {
-    //     resizeScroll()
-    // }, 500)
-    nextTick(() => {
-        resizeScroll()
-    })
-    if (cutPointViewMode.value === false) {
+ModeChange.on((event) => {
+    if (event.target.value === true) {
+        resizeScroll(document.querySelector('#operate-bar > div').scrollHeight - event.height)
+    } else {
         setTimeout(() => {
-            mainShow.screenshotHelper.value = true
-        }, 250)
+            resizeScroll()
+        }, 500)
     }
 })
 
@@ -297,6 +278,18 @@ function handleEditDialogue (index) {
     }
 }
 
+let beforePartialScreenshotScrollTop = 0
+watch(duringPartialScreenshot, (value) => {
+    // 保持部分截图前后scrollTop仍一致
+    if (value) {
+        beforePartialScreenshotScrollTop = currScrollTop.value
+    } else {
+        nextTick(() => {
+            scroll.value.setScrollTop(beforePartialScreenshotScrollTop)
+        })
+    }
+})
+
 const defaultSettings = {
     characterSelectorPermanent: true
 }
@@ -313,10 +306,7 @@ defineExpose({
 
 <template>
     <!--Editor components start-->
-    <ScreenshotHelper
-        @start="ScreenshotStateControl.start"
-        @done="ScreenshotStateControl.done"
-    />
+    <ScreenshotHelper/>
     <NavigationBar ref="NavigationBarRef"/>
     <EditCharDialog ref="EditCharRef"/>
     <EditDialogueDialog ref="EditDialogueRef" @showCopy="defaultShow.copy.value=true"/>
@@ -339,6 +329,7 @@ defineExpose({
                 <div id="operate-bar" class="operate-bar" :style="{width: windowWidth + 'px'}">
                     <CollapseItem mode="">
                         <ManualCutPointView v-if="cutPointViewMode"/>
+                        <PartialScreenshotView v-else-if="partialScreenshotViewMode"/>
                         <div v-else style="display: flex; flex-wrap: wrap;align-items: flex-end">
                             <div class="button-bar">
                                 <el-icon color="#707070" :size="35"

@@ -26,7 +26,8 @@ import {
     CoffeeCup,
     Notebook,
     Top,
-    Bottom
+    Bottom,
+    Connection
 } from '@element-plus/icons-vue'
 
 const app = createApp(App)
@@ -55,5 +56,6 @@ app.component('IconCoffeeCup', CoffeeCup)
 app.component('IconNotebook', Notebook)
 app.component('IconTop', Top)
 app.component('IconBottom', Bottom)
+app.component('IconConnection', Connection)
 
 app.mount('#app')

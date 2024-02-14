@@ -10,12 +10,34 @@ import {
 import { rendererSettings } from '@/lib/data/settings'
 import { Suffix } from '@/lib/data/character'
 import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
+import { DialogueHook } from '@/lib/function/dialogue'
+import { duringScreenshot, selectMode } from '@/lib/data/state'
 
 const rendererWidth = inject('rendererWidth')
 const charDirection = inject('charDirection')
-const preScreenshot = inject('preScreenshot')
-const props = defineProps(['data', 'index', 'plus1', 'cutPoint', 'cutPointActive'])
-defineEmits(['edit', 'delete', 'plus1'])
+const props = defineProps({
+    data: {},
+    index: {
+        type: Number
+    },
+    plus1: {
+        type: Boolean,
+        default: false
+    },
+    cutPoint: {
+        type: Boolean,
+        default: false
+    },
+    cutPointActive: {
+        type: Boolean,
+        default: false
+    },
+    select: {
+        type: Boolean,
+        default: false
+    }
+})
+const emit = defineEmits(['edit', 'delete', 'plus1'])
 
 const data = computed(() => props.data)
 const index = computed(() => props.index)
@@ -23,7 +45,7 @@ const index = computed(() => props.index)
 const char = computed(() => {
     return chars.value[data.value.char] || {}
 })
-const id = ref(uuid())
+const imageUpdateId = ref(uuid())
 const right = computed(() => {
     if (data.value.char) {
         // opposite is deprecated
@@ -36,7 +58,7 @@ const right = computed(() => {
 
 function resizeImage () {
     if (data.value.type === 'image') {
-        id.value = uuid()
+        imageUpdateId.value = uuid()
     }
 }
 
@@ -48,12 +70,30 @@ watch(charDirection, () => {
     // 头像列改变时调整图片大小
     resizeImage()
 })
+
+function handleClick (event) {
+    let next = true
+    const eventData = {
+        data: {
+            id: data.value.id,
+            index: index.value
+        },
+        raw: event,
+        preventDefault () {
+            next = false
+        }
+    }
+    DialogueHook.click.call(eventData)
+    if (next) {
+        emit(event.ctrlKey ? 'delete' : 'edit', index.value)
+    }
+}
 </script>
 
 <template>
-    <div class="dialogue" :id="data.id">
+    <div class="dialogue" :id="data.id" :style="{opacity:selectMode?(select?'1':'0.3'):null}">
         <div style="display: flex; width: 100%; margin-bottom: 10px;"
-             @click="(event) => {$emit(event.ctrlKey ? 'delete' : 'edit', index)}"
+             @click="handleClick"
              :style="{justifyContent:(right?'flex-end':'flex-start')}">
             <div v-if="data.type==='title'" style="flex-grow: 1">
                 <div
@@ -92,8 +132,8 @@ watch(charDirection, () => {
                             </div>
                         </div>
                         <img v-if="images[data.content]"
-                             :id="data.id" :key="id" :src="images[data.content].src"
-                             :style="{width: preScreenshot?rendererWidth.image:'100%'}"
+                             :id="data.id" :key="imageUpdateId" :src="images[data.content].src"
+                             :style="{width: duringScreenshot?rendererWidth.image:'100%'}"
                         >
                         <span v-else>loading image...</span>
                     </div>
@@ -159,7 +199,7 @@ watch(charDirection, () => {
                 </div>
             </template>
         </div>
-        <div v-if="plus1 && !preScreenshot" class="plus1" @click="$emit('plus1',index)">
+        <div v-if="plus1 && !duringScreenshot" class="plus1" @click="$emit('plus1',index)">
             <p>+1</p>
         </div>
         <CutPointDialogueWrapper v-if="cutPoint" :active="cutPointActive"/>

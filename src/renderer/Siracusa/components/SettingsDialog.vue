@@ -5,7 +5,7 @@ import { rendererSettings, rawRendererSettings, setRendererSettings } from '@/li
 import { t } from '@/lib/lang/translate'
 import { dialogWidth } from '@/lib/data/width'
 import { setKeyFalseDelete } from '@/lib/utils/tool'
-import { currRendererRef } from '@/lib/data/stats'
+import { currRendererRef } from '@/lib/data/state'
 
 const defaultSettings = computed(() => currRendererRef.value.defaultSettings)
 
