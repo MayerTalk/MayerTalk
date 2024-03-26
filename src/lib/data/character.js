@@ -58,7 +58,7 @@ function loadChar (series) {
                 data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
             }
             data.series = series
-            CharDict[charId] = data
+            CharDict[`${series}.${charId}`] = data
         }
     }, null, true, characterHost)
 }
@@ -152,16 +152,25 @@ const Search = class Search {
         this.t = t
         // raw list 用于溯源
         this.raw_list = copy(list)
-        this.list = list
-        // 继承上一次别名搜索结果，避免闪烁出现
-        for (const charId of this.searchManager.aliasAddition) {
-            if (this.list.indexOf(charId) === -1) {
-                this.list.push(charId)
-            }
-        }
+        this.list = []
         this.lang = lang
         this.res = []
         self.showed = false
+    }
+
+    genList () {
+        // 合并raw_list(源石搜索结果)与extraSearch
+        const list = copy(this.raw_list)
+        for (const key in this.searchManager.extraResult) {
+            if (Object.prototype.hasOwnProperty.call(this.searchManager.extraResult, key)) {
+                this.searchManager.extraResult[key].forEach((charId) => {
+                    if (list.indexOf(charId) === -1) {
+                        list.push(charId)
+                    }
+                })
+            }
+        }
+        this.list = list
     }
 
     // 对搜索结果进行排序
@@ -170,7 +179,7 @@ const Search = class Search {
     }
 
     // 生成可供渲染的结果
-    gen () {
+    genResult () {
         this.res = []
         for (let i = 0; i < this.list.length; i++) {
             const charId = this.list[i]
@@ -213,8 +222,8 @@ const Search = class Search {
         }
     }
 
-    // 启动别名搜索
-    searchAlias (success, error) {
+    searchExtra () {
+        // 额外搜索 (包括别名, npc)
         if (AliasApi.cancelTokens.length) {
             for (const item of AliasApi.cancelTokens) {
                 item.cancel()
@@ -225,46 +234,56 @@ const Search = class Search {
             url: 'alias/search',
             data: {
                 lang: 7, // zh_CN + en_US + ja_JP
-                output: 4, // ID
-                type: 39, // OPERATOR + TOKEN + ENEMY
+                output: 4, // ID + TYPE
+                type: 39, // OPERATOR + TOKEN + ENEMY + NPC
                 mode: 14, // IN + PINYIN + IGNORE_CASE
                 text: this.search // 搜素文本
                 // 详细参数可在 https://alias.arkfans.top/docs/api/api.html 查看
             },
-            success,
-            error
+            success: this.handleExtraSearch('arknights'),
+            error: this.handleExtraSearchFail('arknights')
         })
     }
 
-    // 处理别名搜索结果
-    aliasHandler (callback) {
+    handleExtraSearch (key, series = null) {
+        series = series || key
         return (response) => {
-            this.list = this.raw_list
-            this.searchManager.aliasAddition = []
-            callback && callback(response)
-            this.sort()
-            this.gen()
+            const list = []
+            response.data.forEach((data) => {
+                const charId = `${series}.${data}`
+                if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
+                    list.push(charId)
+                }
+            })
+            this.searchManager.extraResult[key] = list
+            this.output()
             if (this.showed && this.t === this.searchManager.searchResultFullShow && this.res.length) {
                 this.searchManager.result.value = this.res
             }
         }
     }
 
+    handleExtraSearchFail (key) {
+        return (response) => {
+            delete this.searchManager.extraResult[key]
+            this.output()
+            if (this.showed && this.t === this.searchManager.searchResultFullShow && this.res.length) {
+                this.searchManager.result.value = this.res
+            }
+        }
+    }
+
+    output () {
+        this.genList()
+        this.sort()
+        this.genResult()
+    }
+
     // 运行搜索
     run () {
-        this.sort()
-        this.gen()
+        this.output()
         this.show()
-        this.searchAlias(this.aliasHandler((resp) => {
-            for (const charId of resp.data) {
-                if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
-                    if (this.list.indexOf(charId) === -1) {
-                        this.list.push(charId)
-                    }
-                    this.searchManager.aliasAddition.push(charId)
-                }
-            }
-        }), this.aliasHandler())
+        this.searchExtra()
     }
 }
 
@@ -283,7 +302,7 @@ function parseSearch (param) {
 const SearchManager = class SearchManager {
     constructor () {
         this.result = ref(null)
-        this.aliasAddition = []
+        this.extraResult = {}
         this.searchResultFullShow = 0
     }
 
@@ -315,7 +334,7 @@ const SearchManager = class SearchManager {
             const manager = new Search(this, param, t, list, config.value.lang)
             manager.run()
         } else {
-            this.aliasAddition = []
+            this.extraResult = {}
             this.result.value = []
         }
     }
