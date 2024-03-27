@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { loadChar } from '@/lib/data/character'
+import { loadSeries } from '@/lib/data/character'
 import { dialogWidth } from '@/lib/data/width'
 import SelectCharInstance from './SelectCharInstance.vue'
 import { closeShowHook } from '@/lib/data/showControl'
@@ -29,7 +29,7 @@ onUnmounted(closeShowHook.on(() => {
 
 <template>
     <el-dialog v-model="ifShow" :title="t.action.selectChar" :width="dialogWidth" top="10vh"
-               @open="loadChar('arknights');selector.autoFocus()"
+               @open="loadSeries.arknights();selector.autoFocus()"
                @closed="selector.search=''">
         <SelectCharInstance max-height="60vh" ref="selector" @select="(v) => {$emit('select',v);ifShow=false}"/>
     </el-dialog>

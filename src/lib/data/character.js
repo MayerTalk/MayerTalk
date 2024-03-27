@@ -18,10 +18,18 @@ const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP', 'code']
 
 function parseAvatarUrl (url, series, charId) {
     // 生成可访问的头像url
-    return 'avatar/' +
-        encodeURIComponent(series) + '/' +
-        encodeURIComponent(url.indexOf('id:') === 0 ? url.slice(3) : charId + url) +
-        Suffix
+    if (series === 'arknights_npc') {
+        return 'avatar/' +
+            encodeURIComponent(series) + '/' +
+            encodeURIComponent(charId) + '/' +
+            encodeURIComponent(url) +
+            Suffix
+    } else {
+        return 'avatar/' +
+            encodeURIComponent(series) + '/' +
+            encodeURIComponent(url.indexOf('id:') === 0 ? url.slice(3) : charId + url) +
+            Suffix
+    }
 }
 
 function parseCharData (data) {
@@ -155,6 +163,7 @@ const Search = class Search {
         this.list = []
         this.lang = lang
         this.res = []
+        this.nameCache = {}
         self.showed = false
     }
 
@@ -184,7 +193,7 @@ const Search = class Search {
         for (let i = 0; i < this.list.length; i++) {
             const charId = this.list[i]
             // [charId, charName]
-            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN])
+            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN || this.nameCache[charId]])
             // for (let j = 0; j < CharDict[charId].avatars.length; j++) {
             //     this.res.push([CharDict[charId].avatars[j], CharDict[charId].avatars[j], CharDict[charId].names[this.lang]])
             // }
@@ -234,7 +243,7 @@ const Search = class Search {
             url: 'alias/search',
             data: {
                 lang: 7, // zh_CN + en_US + ja_JP
-                output: 4, // ID + TYPE
+                output: 6, // NAME + ID
                 type: 39, // OPERATOR + TOKEN + ENEMY + NPC
                 mode: 14, // IN + PINYIN + IGNORE_CASE
                 text: this.search // 搜素文本
@@ -243,6 +252,17 @@ const Search = class Search {
             success: this.handleExtraSearch('arknights'),
             error: this.handleExtraSearchFail('arknights')
         })
+        AliasApi.get({
+            url: 'npc/search',
+            data: {
+                output: 6, // NAME + ID
+                mode: 14, // IN + PINYIN + IGNORE_CASE
+                text: this.search // 搜素文本
+                // 详细参数可在 https://alias.arkfans.top/docs/api/api.html 查看
+            },
+            success: this.handleExtraSearch('arknights_npc'),
+            error: this.handleExtraSearchFail('arknights_npc')
+        })
     }
 
     handleExtraSearch (key, series = null) {
@@ -250,24 +270,25 @@ const Search = class Search {
         return (response) => {
             const list = []
             response.data.forEach((data) => {
-                const charId = `${series}.${data}`
+                const charId = `${series}.${data[1]}`
+                this.nameCache[charId] = data[0]
                 if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
                     list.push(charId)
                 }
             })
             this.searchManager.extraResult[key] = list
             this.output()
-            if (this.showed && this.t === this.searchManager.searchResultFullShow && this.res.length) {
+            if (this.showed && this.t === this.searchManager.searchResultFullShow) {
                 this.searchManager.result.value = this.res
             }
         }
     }
 
     handleExtraSearchFail (key) {
-        return (response) => {
+        return () => {
             delete this.searchManager.extraResult[key]
             this.output()
-            if (this.showed && this.t === this.searchManager.searchResultFullShow && this.res.length) {
+            if (this.showed && this.t === this.searchManager.searchResultFullShow) {
                 this.searchManager.result.value = this.res
             }
         }
@@ -340,10 +361,18 @@ const SearchManager = class SearchManager {
     }
 }
 
+const loadSeries = {
+    arknights () {
+        loadChar('arknights')
+        loadChar('arknights_npc')
+    }
+}
+
 export {
     Suffix,
     CharDict,
     loadChar,
+    loadSeries,
     sortChar,
     SearchManager
 }
