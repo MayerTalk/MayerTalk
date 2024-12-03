@@ -27,6 +27,7 @@ function setShowCharNameSettings (type, value) {
 
 <template>
     <table>
+        <tbody>
         <tr>
             <th>{{ t.noun.background }}</th>
             <td>
@@ -48,18 +49,21 @@ function setShowCharNameSettings (type, value) {
                 </div>
             </td>
         </tr>
+        </tbody>
     </table>
     <el-dialog v-model="ifShowEditShowCharName" :title="t.action.pleaseSelectTypeOfCharacterToShow" :width="dialogWidth"
                @closed="DataControl.save('settings')">
         <table>
-            <tr v-for="(text, type) in t.name.typeDict" :key="type">
-                <th>{{ text }}</th>
-                <td>
-                    <el-switch :model-value="showCharNameSettings[type]"
-                               @update:model-value="(value) => {setShowCharNameSettings(type,value)}"
-                               style="margin-left: 10px"/>
-                </td>
-            </tr>
+            <tbody>
+                <tr v-for="(text, type) in t.name.typeDict" :key="type">
+                    <th>{{ text }}</th>
+                    <td>
+                        <el-switch :model-value="showCharNameSettings[type]"
+                                   @update:model-value="(value) => {setShowCharNameSettings(type,value)}"
+                                   style="margin-left: 10px"/>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </el-dialog>
 </template>
