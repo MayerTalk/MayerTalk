@@ -9,7 +9,10 @@ import { defaultSettings, commonSettings, setCommonSettings, rendererSettings } 
 import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
 import { cutPointViewMode, sortedCutPoints, enableCutPointView } from '@/components/ManualCutPoint/manualCoutPointControl'
-import { enablePartialScreenshotView, duringPartialScreenshot } from '@/components/PartialScreenshot/partialScreenshotControl'
+import {
+    enablePartialScreenshotView,
+    duringPartialScreenshot
+} from '@/components/PartialScreenshot/partialScreenshotControl'
 import { mainShow } from '@/lib/data/showControl'
 import { duringScreenshot } from '@/lib/data/state'
 
@@ -408,6 +411,7 @@ defineExpose({
             <CollapseItem>
                 <div v-show="commonSettings.watermark" style="padding: 0 0 10px 10px">
                     <table>
+                        <tbody>
                         <tr>
                             <th>{{ t.noun.title }}</th>
                             <td>
@@ -421,6 +425,7 @@ defineExpose({
                                           @update:model-value="(v) => setCommonSettings('author',v)"></el-input>
                             </td>
                         </tr>
+                        </tbody>
                     </table>
                 </div>
             </CollapseItem>
@@ -485,26 +490,30 @@ defineExpose({
             <div class="column-display" style="padding: 0 20px">
                 <div style="width: 100%">
                     <table>
-                        <tr>
-                            <th>{{ t.noun.characterCount }}:</th>
-                            <td>{{ Object.keys(chars).length }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ t.noun.chatCount }}:</th>
-                            <td>{{ chats.length }}</td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <th>{{ t.noun.characterCount }}:</th>
+                                <td>{{ Object.keys(chars).length }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ t.noun.chatCount }}:</th>
+                                <td>{{ chats.length }}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 <div style="width: 100%">
                     <table>
-                        <tr>
-                            <th>{{ t.noun.wordCount }}:</th>
-                            <td>{{ wordCount }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ t.noun.screenshotLength }}:</th>
-                            <td>{{ ExpectLength.result }}px</td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <th>{{ t.noun.wordCount }}:</th>
+                                <td>{{ wordCount }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ t.noun.screenshotLength }}:</th>
+                                <td>{{ ExpectLength.result }}px</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -514,7 +523,7 @@ defineExpose({
                 @click="() => {DataControl.save(['settings']); enablePartialScreenshotView()}"
                 :disabled="duringPartialScreenshot"
                 style="width: 30%"
-            >{{t.action.partialScreenshot}}
+            >{{ t.action.partialScreenshot }}
             </el-button>
             <el-button
                 @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"

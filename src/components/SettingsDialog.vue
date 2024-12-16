@@ -63,6 +63,7 @@ function clearStorage () {
                 <div class="line-right"></div>
             </div>
             <table>
+                <tbody>
                 <tr class="tr">
                     <th>{{ t.noun.editor }}</th>
                     <td>
@@ -107,6 +108,7 @@ function clearStorage () {
                                   :placeholder="'' + defaultSettings.width"/>
                     </td>
                 </tr>
+                </tbody>
             </table>
             <!--Editor Settings-->
             <div style="display: flex; align-items: center">
@@ -158,8 +160,8 @@ function clearStorage () {
                     {{ t.noun.savefile }}
                 </el-button>
             </div>
-
             <table>
+                <tbody>
                 <tr>
                     <th>{{ t.noun.local }}</th>
                     <td>{{ storageSize }}</td>
@@ -168,6 +170,7 @@ function clearStorage () {
                         </el-button>
                     </td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </el-dialog>
