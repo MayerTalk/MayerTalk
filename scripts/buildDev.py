@@ -68,7 +68,7 @@ with open(join('src', 'AnnounceDialog.vue'), mode='rt', encoding='utf-8') as f:
 with open(join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
     f.write(announce_dev)
 
-with open(join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:
+with open(join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
     f.write(f'export default {json.dumps(info)}')
 
 os.system('')
