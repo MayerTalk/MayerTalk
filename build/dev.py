@@ -65,7 +65,7 @@ with open(os.path.join('src', 'AnnounceDialog.git.vue'), mode='rt', encoding='ut
 with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
     f.write(announce_git)
 
-with open(os.path.join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:
+with open(os.path.join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
     f.write(f'export default {json.dumps(info)}')
 
 os.system(f'npm run build -- --base=/{version}/')
