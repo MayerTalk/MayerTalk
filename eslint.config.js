@@ -16,12 +16,14 @@ export default [
         name: 'app/all',
         languageOptions: {
             parserOptions: {
-                ecmaVersion: 'esnext',
+                ecmaVersion: 'latest',
                 sourceType: 'module',
             },
         },
         rules: {
-            indent: ['error', 4, {SwitchCase: 1}],
+            indent: ['error', 4, { SwitchCase: 1 }],
+            quotes: ['error', 'single'],
+            'object-curly-spacing': ['error', 'always'],
             'generator-star-spacing': 'off',
             'no-throw-literal': 'off',
             'no-return-assign': 'off',

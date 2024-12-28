@@ -5,36 +5,35 @@ import html2canvas from 'html2canvas'
 import message from './message'
 import { IsMobile } from '@/lib/data/constance'
 import Input from '@/lib/function/input'
+import type { Ref } from 'vue';
+import type { Callback, CallBackData, OptionalCallback } from '@/lib/utils/types';
 
-function copy (obj) {
+function copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj))
 }
 
-function saveData (name, data) {
-    let dataStr = null
+function saveData(name: string, data: object | string | number) {
+    let dataStr: string
     if (typeof data === 'object') {
         dataStr = JSON.stringify(data)
-    }
-    if (typeof data === 'string' || typeof data === 'number') {
+    } else {
         dataStr = data.toString()
     }
-    if (dataStr) {
-        localStorage.setItem(name, dataStr)
-    }
+    localStorage.setItem(name, dataStr)
 }
 
-function getData (name) {
+function getData<T>(name: string): T | null {
     let data = localStorage.getItem(name)
     if (data) {
         try {
             data = JSON.parse(data)
-        } catch (e) {
+        } catch {
         }
-        return data
     }
+    return data as T | null
 }
 
-function getCanvas (node, options, cb) {
+function getCanvas(node: HTMLElement, options: object, cb: CallBackData<HTMLCanvasElement>) {
     html2canvas(node, options).then(canvas => {
         cb(canvas)
     }).catch(err => {
@@ -43,19 +42,24 @@ function getCanvas (node, options, cb) {
     })
 }
 
-function downloadCanvas (canvas, cb, options) {
+function downloadCanvas(canvas: HTMLCanvasElement, cb: OptionalCallback, options: {
+    filename?: string,
+    title?: string
+}) {
     canvas.toBlob((blob) => {
-        try {
+        if (blob) {
             const url = blob2url(blob)
             download(url, options.filename || 'mayertalk-' + (options.title || Date.now()) + '.jpg')
-            cb && cb()
-        } catch (e) {
+            if (cb) {
+                cb()
+            }
+        } else {
             message.notify(t.value.notify.downloadCanvasFailed, message.error)
         }
     }, 'image/jpeg')
 }
 
-function download (url, filename) {
+function download(url: string, filename: string) {
     const el = document.createElement('a')
     document.body.appendChild(el)
     el.download = filename
@@ -64,19 +68,19 @@ function download (url, filename) {
     el.remove()
 }
 
-function blob2url (blob) {
-    let url = null
-    if (window.createObjectURL !== undefined) {
-        url = window.createObjectURL(blob)
-    } else if (window.URL.createObjectURL !== undefined) {
+function blob2url(blob: Blob): string {
+    let url: string | null = null
+    if (window.URL.createObjectURL !== undefined) {
         url = window.URL.createObjectURL(blob)
     } else if (window.webkitURL !== undefined) {
         url = window.webkitURL.createObjectURL(blob)
+    } else {
+        throw Error('blob2url failed')
     }
-    return url
+    return url as string
 }
 
-function blob2base64 (blob, callback) {
+function blob2base64(blob: Blob, callback: CallBackData<string | ArrayBuffer | null>) {
     const reader = new FileReader()
     reader.onloadend = () => {
         callback(reader.result)
@@ -84,9 +88,9 @@ function blob2base64 (blob, callback) {
     reader.readAsDataURL(blob)
 }
 
-function image2square (image) {
+function image2square(image: HTMLImageElement) {
     const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d')!
     const w = image.width
     const h = image.height
     const crop = Math.floor(Math.abs(w - h) / 2)
@@ -102,25 +106,30 @@ function image2square (image) {
     return canvas
 }
 
-function ensure (done, text) {
+function ensure(done: Callback, text: string) {
     message.confirm(text, t.value.noun.hint, () => {
         done()
     })
 }
 
-function ensureClose (done) {
+function ensureClose(done: Callback) {
     ensure(done, t.value.notify.whetherQuitEditing)
 }
 
-function clickBySelector (selector) {
-    document.querySelector(selector).click()
+type ClickableHTMLElement = HTMLElement & { click: () => void }
+
+function clickBySelector(selector: string) {
+    const el = document.querySelector(selector) as ClickableHTMLElement | null
+    if (el) {
+        el.click()
+    }
 }
 
-function getDialogue (id) {
+function getDialogue(id: string) {
     return document.getElementById(id)
 }
 
-function doAfter (fn, callback, cd = 0) {
+function doAfter<T>(fn: () => T, callback: CallBackData<T>, cd = 0) {
     if (fn()) {
         callback(fn())
     } else {
@@ -130,7 +139,7 @@ function doAfter (fn, callback, cd = 0) {
     }
 }
 
-function doAfterRefMounted (ref, callback) {
+function doAfterRefMounted(ref: Ref, callback: CallBackData<boolean>) {
     doAfter(() => {
         return ref.value && ref
     }, callback, 0)
@@ -138,7 +147,7 @@ function doAfterRefMounted (ref, callback) {
 
 const SizeUnit = ['B', 'KB', 'MB', 'GB', 'TB']
 
-function formatSize (size, unit = SizeUnit[0]) {
+function formatSize(size: number, unit = SizeUnit[0]) {
     for (let i = 1; size > 1024; i++) {
         size /= 1024
         unit = SizeUnit[i]
@@ -146,10 +155,14 @@ function formatSize (size, unit = SizeUnit[0]) {
     return size.toFixed(2) + unit
 }
 
-const Textarea = {
-    el: null,
-    focus () {
-        // message.notify(Date.now() - this.lastFocusout)
+
+const Textarea: {
+    el: NonNullable<HTMLInputElement>,
+    focus: () => void
+} = {
+    el: null!,
+    focus() {
+    // message.notify(Date.now() - this.lastFocusout)
         if (!IsMobile || Input.inputting()) {
             // 非手机(自动focus) or 输入法唤起状态(保持输入法唤起)
             this.el.focus()
@@ -158,29 +171,29 @@ const Textarea = {
 }
 doAfter(() => {
     return document.getElementById('textarea')
-},
-(el) => {
-    Textarea.el = el
+}, (el) => {
+    Textarea.el = el as HTMLInputElement
 })
 
-function bool (obj) {
-    if (['string', 'number', 'boolean'].indexOf(typeof obj) !== -1) {
-        return Boolean(obj)
-    } else if (obj.length === 0) {
-        return false
-    } else if (Object.keys(obj).length === 0) {
-        return false
+function bool(obj: string | number | boolean | object): boolean {
+    if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
+        return Boolean(obj);
+    } else if (Array.isArray(obj) && obj.length === 0) {
+        return false;
+    } else if (typeof obj === 'object' && Object.keys(obj).length === 0) {
+        return false;
     }
-    return true
+    return true;
 }
 
-function sync (dst, srcDefault, srcTarget) {
+
+function sync(dst: object, srcDefault: object, srcTarget: object) {
     // target default variable
     for (const key in srcDefault) {
         if (Object.prototype.hasOwnProperty.call(srcDefault, key)) {
             if (typeof srcDefault[key] === 'object') {
                 dst[key] = {}
-                sync(dst[key], srcDefault[key], srcTarget[key] || {}, key)
+                sync(dst[key], srcDefault[key], srcTarget[key] || {})
             } else {
                 dst[key] = srcDefault[key]
             }
@@ -195,13 +208,13 @@ function sync (dst, srcDefault, srcTarget) {
     }
 }
 
-function parseFilename (filename) {
+function parseFilename(filename: string): string {
     // 检查文件名，去除非法字符，并缩减长度
     const newFilename = filename.replace(/[\\/:*?"<>|]/, '')
     return newFilename.length <= 64 ? newFilename : newFilename.slice(0, 64)
 }
 
-function setKeyFalseDelete (obj, key, value, falseCheck = null) {
+function setKeyFalseDelete(obj: object, key: string, value: string | number | boolean | object, falseCheck = null) {
     if (!(falseCheck || bool)(value)) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             delete obj[key]
