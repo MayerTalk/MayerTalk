@@ -10,14 +10,15 @@ const Input = {
         if (IsMobile && this.height - window.innerHeight > this.threshold) {
             return this.height - window.innerHeight
         }
+        return false
     },
-    hook: new Hook()
+    hook: new Hook<{ status: boolean, diff: number }>()
 }
 
 let lastHeight = window.innerHeight
 
 if (IsMobile) {
-    WindowResize.onResize(() => {
+    WindowResize.on(() => {
         if (lastHeight !== window.innerHeight) {
             if (window.innerWidth !== Input.width) {
                 Input.height = window.innerHeight

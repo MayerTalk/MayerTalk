@@ -205,7 +205,7 @@ function resizeScroll (offset = 0) {
 watch(textarea, () => {
     resizeScroll()
 })
-onUnmounted(WindowResize.onResize(() => {
+onUnmounted(WindowResize.on(() => {
     resizeScroll()
     resizeBody()
 }))
