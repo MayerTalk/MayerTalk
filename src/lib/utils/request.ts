@@ -1,17 +1,16 @@
 import axios from 'axios'
 import type { AxiosResponse, AxiosError, Canceler } from 'axios';
-
 axios.defaults.withCredentials = false
 
 interface RequestsConfig {
     host: string
 }
 
-interface RequestsOptions {
+interface RequestsOptions<T> {
     host?: string
     url: string,
     data?: object,
-    success?: (response: AxiosResponse) => void,
+    success?: (response: AxiosResponse<T>) => void,
     error?: (err: AxiosError) => void,
     complete?: () => void,
     json?: object,
@@ -27,7 +26,7 @@ export default class Requests {
         this.cancelTokens = []
     }
 
-    httpRequests(method: string, options: RequestsOptions) {
+    httpRequests<T>(method: string, options: RequestsOptions<T>) {
         const url = options.url
         const data = options.data || {}
         const success = options.success
@@ -57,7 +56,7 @@ export default class Requests {
             config.headers[name] = headers[name]
         }
 
-        axios(config)
+        axios<T>(config)
             .then(
                 response => {
                     if (success) {
@@ -81,7 +80,7 @@ export default class Requests {
             )
     }
 
-    get(options: RequestsOptions) {
-        this.httpRequests('get', options)
+    get<T>(options: RequestsOptions<T>) {
+        this.httpRequests<T>('get', options)
     }
 }

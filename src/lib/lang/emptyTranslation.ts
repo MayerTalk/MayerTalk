@@ -1,3 +1,5 @@
+import type { Translation } from './translation';
+
 const emptyTranslation = {
     empty: true,
     notify: {
@@ -169,6 +171,6 @@ const emptyTranslation = {
             title: ''
         }
     }
-}
+} as Translation
 
 export default emptyTranslation

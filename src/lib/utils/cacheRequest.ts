@@ -5,36 +5,53 @@ import type { AxiosError, AxiosResponse } from 'axios';
 
 const staticApi = new Request({ host: StaticUrl })
 
-function cacheRequest<T>(url: string, key: string, cb: (resp: AxiosResponse<T> | AxiosError, success?: boolean) => void, versionUrl?: string, fetchFirst = true, host?: string) {
+interface cacheRequestOptions<T> {
+    url: string
+    key: string,
+    success?: (resp: AxiosResponse<T>) => void,
+    error?: (error: AxiosError) => void,
+    versionUrl?: string,
+    fetchFirst?: boolean,
+    host?: string
+}
+
+function cacheRequest<T>(options: cacheRequestOptions<T>) {
     // url: 静态站下资源链接& key: localStorage.cache.key& cb: 回调& versionUrl:默认从url中提取
-    const name = 'cache.' + key
+    const url = options.url
+    const fetchFirst = options.fetchFirst
+
+    const name = 'cache.' + options.key
     const cache = getData<string | null>(name) || ''
     const relUrl = url.split('/')[url.split('/').length - 1].split('.').length > 1 ? url : url + '.json'
 
-    function fetch(v:string) {
-        staticApi.get({
-            host,
+    function fetch(v: string) {
+        staticApi.get<T>({
+            host: options.host,
             url: relUrl,
             data: {
                 v
             },
-            success(resp) {
-                cb(resp)
+            success(resp: AxiosResponse<T>) {
+                if (options.success) {
+                    options.success(resp)
+                }
             },
-            error(resp) {
-                cb(resp, false)
+            error(err) {
+                if (options.error) {
+                    options.error(err)
+                }
             }
         })
     }
 
-    const relVersionUrl = versionUrl || 'version/' +
+    const relVersionUrl = options.versionUrl || 'version/' +
         relUrl.split('.').slice(0, relUrl.split('.').length - 1).join('.') + '.txt'
 
     if (fetchFirst) {
         fetch(cache)
     }
-    staticApi.get({
-        host,
+    staticApi.get<string>({
+        host: options.host,
         url: relVersionUrl,
         data: {
             t: Date.now() + ''

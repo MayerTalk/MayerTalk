@@ -52,23 +52,31 @@ function loadChar (series) {
         return
     }
 
-    cacheRequest('char/' + series, 'characterVersion.' + series, (resp) => {
-        loaded.indexOf(series) === -1 && loaded.push(series)
-        for (const charId in resp.data) {
-            if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
-                continue
+    cacheRequest({
+        url: 'char/'+ series,
+        key: 'characterVersion.' + series,
+        success:(resp) => {
+            if (loaded.indexOf(series) === -1) {
+                loaded.push(series)
             }
-            const data = parseCharData(resp.data[charId])
-            for (const avatarId in data.avatars) {
-                if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
+            for (const charId in resp.data) {
+                if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
                     continue
                 }
-                data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
+                const data = parseCharData(resp.data[charId])
+                for (const avatarId in data.avatars) {
+                    if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
+                        continue
+                    }
+                    data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
+                }
+                data.series = series
+                CharDict[`${series}.${charId}`] = data
             }
-            data.series = series
-            CharDict[`${series}.${charId}`] = data
-        }
-    }, null, true, characterHost)
+        },
+        fetchFirst:true,
+        host: characterHost
+    })
 }
 
 // const seriesSort = {
