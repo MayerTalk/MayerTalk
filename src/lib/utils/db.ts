@@ -9,7 +9,7 @@ class DataBase<Record> {
         this.conn = null
     }
 
-    open(onupgradeneeded?: () => void, callback?: () => void) {
+    open(onupgradeneeded?: (ev:IDBVersionChangeEvent) => void, callback?: () => void) {
         const request = window.indexedDB.open(this.db)
         request.onupgradeneeded = onupgradeneeded as ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => void) | null
         request.onsuccess = () => {

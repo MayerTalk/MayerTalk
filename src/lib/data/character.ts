@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import type { Ref } from 'vue'
 
 import Request from '@/lib/utils/request'
 import { cacheRequest } from '@/lib/utils/cacheRequest'
@@ -7,74 +8,83 @@ import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
 import { characterHost } from '@/lib/dev'
 import { config } from '@/lib/data/data'
 import { IsSafari } from '@/lib/data/constance'
+import type { AxiosResponse } from 'axios';
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 
-const CharDict = {}
-const loaded = []
+const CharDict: Record<string, CharacterData> = {}
+const loaded = new Set<string>()
 const Suffix = IsSafari ? '.png' : '.webp'
 
-const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP', 'code']
 
-function parseAvatarUrl (url, series, charId) {
-    // 生成可访问的头像url
-    if (series === 'arknights_npc') {
-        return 'avatar/' +
-            encodeURIComponent(series) + '/' +
-            encodeURIComponent(charId) + '/' +
-            encodeURIComponent(url) +
-            Suffix
-    } else {
-        return 'avatar/' +
-            encodeURIComponent(series) + '/' +
-            encodeURIComponent(url.indexOf('id:') === 0 ? url.slice(3) : charId + url) +
-            Suffix
-    }
+type CharacterRequestData = [
+    names: Array<string>,
+    avatars: Array<string>,
+    tags: Array<string>
+]
+
+const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP', 'code'] as const
+type LangType = typeof langOrder[number]
+type CharacterNames = Partial<Record<LangType, string>>;
+
+interface CharacterData {
+    names: CharacterNames;
+    avatars: Array<string>;
+    tags: Array<string>;
+    series: string;
 }
 
-function parseCharData (data) {
-    const names = {}
+function parseAvatarUrl(url: string, series: string, charId: string) {
+    const basePath = `avatar/${encodeURIComponent(series)}`;
+    const fileName = series === 'arknights_npc'
+        ? `${encodeURIComponent(charId)}/${encodeURIComponent(url)}`
+        : encodeURIComponent(url.startsWith('id:') ? url.slice(3) : charId + url);
+    return `${basePath}/${fileName}${Suffix}`;
+}
+
+
+function parseCharData(data: CharacterRequestData, charId: string, series: string): CharacterData {
+    const names: CharacterNames = {}
+    const avatars: Array<string> = []
+
     for (let i = 0; i < langOrder.length; i++) {
         if (data[0][i]) {
             names[langOrder[i]] = data[0][i].toLowerCase()
         }
     }
+    data[1].forEach((avatarId) => {
+        avatars.push(parseAvatarUrl(avatarId, series, charId))
+    })
+
     return {
         names,
-        avatars: data[1],
-        tags: data[2]
+        avatars,
+        tags: data[2],
+        series
     }
 }
 
-function loadChar (series) {
+function loadChar(series: string) {
     // 从资源站加载头像
-    if (loaded.indexOf(series) !== -1) {
-        return
+    if (loaded.has(series)) {
+        return;
     }
 
-    cacheRequest({
-        url: 'char/'+ series,
+    cacheRequest<Record<string, CharacterRequestData>>({
+        url: 'char/' + series,
         key: 'characterVersion.' + series,
-        success:(resp) => {
-            if (loaded.indexOf(series) === -1) {
-                loaded.push(series)
+        success: (resp) => {
+            if (!loaded.has(series)) {
+                loaded.add(series)
             }
             for (const charId in resp.data) {
                 if (!Object.prototype.hasOwnProperty.call(resp.data, charId)) {
                     continue
                 }
-                const data = parseCharData(resp.data[charId])
-                for (const avatarId in data.avatars) {
-                    if (!Object.prototype.hasOwnProperty.call(data.avatars, avatarId)) {
-                        continue
-                    }
-                    data.avatars[avatarId] = parseAvatarUrl(data.avatars[avatarId], series, charId)
-                }
-                data.series = series
-                CharDict[`${series}.${charId}`] = data
+                CharDict[`${series}.${charId}`] = parseCharData(resp.data[charId], charId, series)
             }
         },
-        fetchFirst:true,
+        fetchFirst: true,
         host: characterHost
     })
 }
@@ -88,9 +98,9 @@ const TagSort = {
     token: 1002,
     trap: 1003,
     enemy: 1004
-}
+} as const
 
-function sortByLength (a, b, lang) {
+function sortByLength(a: CharacterData, b: CharacterData, lang: LangType) {
     // 按名称长短排序
     const A = a.names[lang]
     const B = b.names[lang]
@@ -102,12 +112,12 @@ function sortByLength (a, b, lang) {
     return A.length - B.length
 }
 
-function sortBySeries (a, b) {
+function sortBySeries(a: CharacterData, b: CharacterData) {
     // 按系列排序
     return (TagSort[a.series] || 100) - (TagSort[b.series] || 100)
 }
 
-function sortByTag (a, b) {
+function sortByTag(a: CharacterData, b: CharacterData) {
     // 按Tag排序
     for (let i = 0; i < a.tags.length && i < b.tags.length; i++) {
         if (a.tags[i] === b.tags[i]) {
@@ -118,16 +128,17 @@ function sortByTag (a, b) {
     return 0
 }
 
-function firstSort (a, b, lang) {
+function firstSort(a: CharacterData, b: CharacterData, lang: LangType) {
     // 基础排序
     return sortBySeries(a, b) || sortByTag(a, b) || sortByLength(a, b, lang)
 }
 
-const sortDict = {
+type SortFunction = (a: CharacterData, b: CharacterData) => number;
+const sortDict: Record<string, SortFunction> = {
     // 语种特殊排序
     zh_CN: (a, b) => {
-        const A = a.names.fpy
-        const B = b.names.fpy
+        const A = a.names.fpy || ''
+        const B = b.names.fpy || ''
         if (A === B) {
             return 0
         } else {
@@ -135,8 +146,8 @@ const sortDict = {
         }
     },
     zh_TW: (a, b) => {
-        const A = a.names.fpy
-        const B = b.names.fpy
+        const A = a.names.fpy || ''
+        const B = b.names.fpy || ''
         if (A === B) {
             return 0
         } else {
@@ -145,24 +156,35 @@ const sortDict = {
     }
 }
 
-function sortChar (list, lang) {
+function sortChar(list: Array<string>, lang: LangType) {
     // 联合排序
-    sortDict[lang]
-        ? list.sort((a, b) => {
+    if (Object.prototype.hasOwnProperty.call(sortDict, lang)) {
+        list.sort((a, b) => {
             const A = CharDict[a]
             const B = CharDict[b]
             return firstSort(A, B, lang) || sortDict[lang](A, B)
         })
-        : list.sort((a, b) => {
+    } else {
+        list.sort((a, b) => {
             const A = CharDict[a]
             const B = CharDict[b]
             return firstSort(A, B, lang)
         })
+    }
 }
 
-const Search = class Search {
+class Search {
+    searchManager: SearchManager
+    search: string
+    t: number
+    raw_list: Array<string>
+    list: Array<string>
+    lang: LangType
+    res: Array<[string, string]>
+    showed: boolean
+
     // 管理单次搜索
-    constructor (searchManager, search, t, list, lang = 'zh_CN') {
+    constructor(searchManager: SearchManager, search: string, t: number, list: Array<string>, lang: LangType = 'zh_CN') {
         this.searchManager = searchManager
         this.search = search
         this.t = t
@@ -171,45 +193,38 @@ const Search = class Search {
         this.list = []
         this.lang = lang
         this.res = []
-        this.nameCache = {}
-        self.showed = false
+        this.showed = false
     }
 
-    genList () {
+    genList() {
         // 合并raw_list(源石搜索结果)与extraSearch
-        const list = copy(this.raw_list)
+        const list = new Set([...this.raw_list]);
         for (const key in this.searchManager.extraResult) {
             if (Object.prototype.hasOwnProperty.call(this.searchManager.extraResult, key)) {
-                this.searchManager.extraResult[key].forEach((charId) => {
-                    if (list.indexOf(charId) === -1) {
-                        list.push(charId)
-                    }
-                })
+                this.searchManager.extraResult[key].forEach((charId) => list.add(charId));
             }
         }
-        this.list = list
+        this.list = Array.from(list);
     }
 
     // 对搜索结果进行排序
-    sort () {
+    sort() {
         sortChar(this.list, this.lang)
     }
 
     // 生成可供渲染的结果
-    genResult () {
+    genResult() {
         this.res = []
         for (let i = 0; i < this.list.length; i++) {
             const charId = this.list[i]
             // [charId, charName]
-            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN || this.nameCache[charId]])
-            // for (let j = 0; j < CharDict[charId].avatars.length; j++) {
-            //     this.res.push([CharDict[charId].avatars[j], CharDict[charId].avatars[j], CharDict[charId].names[this.lang]])
-            // }
+            // 优先设置的语种，如无使用zh_CN
+            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN || 'UnknownCharacter'])
         }
     }
 
     // 大批量结果优化，延迟输出
-    show () {
+    show() {
         if (this.res.length) {
             // 优化：延迟输出
             // TODO use virtual list
@@ -239,7 +254,7 @@ const Search = class Search {
         }
     }
 
-    searchExtra () {
+    searchExtra() {
         // 额外搜索 (包括别名, npc)
         if (AliasApi.cancelTokens.length) {
             for (const item of AliasApi.cancelTokens) {
@@ -252,7 +267,7 @@ const Search = class Search {
             data: {
                 lang: 7, // zh_CN + en_US + ja_JP
                 output: 6, // NAME + ID
-                type: 39, // OPERATOR + TOKEN + ENEMY + NPC
+                type: 39, // OPERATOR + TOKEN(召唤物) + ENEMY + NPC
                 mode: 14, // IN + PINYIN + IGNORE_CASE
                 text: this.search // 搜素文本
                 // 详细参数可在 https://alias.arkfans.top/docs/api/api.html 查看
@@ -273,13 +288,12 @@ const Search = class Search {
         })
     }
 
-    handleExtraSearch (key, series = null) {
+    handleExtraSearch(key: string, series?: string) {
         series = series || key
-        return (response) => {
-            const list = []
+        return (response: AxiosResponse<Array<CharacterRequestData>>) => {
+            const list: Array<string> = []
             response.data.forEach((data) => {
                 const charId = `${series}.${data[1]}`
-                this.nameCache[charId] = data[0]
                 if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
                     list.push(charId)
                 }
@@ -292,7 +306,7 @@ const Search = class Search {
         }
     }
 
-    handleExtraSearchFail (key) {
+    handleExtraSearchFail(key: string) {
         return () => {
             delete this.searchManager.extraResult[key]
             this.output()
@@ -302,14 +316,14 @@ const Search = class Search {
         }
     }
 
-    output () {
+    output() {
         this.genList()
         this.sort()
         this.genResult()
     }
 
     // 运行搜索
-    run () {
+    run() {
         this.output()
         this.show()
         this.searchExtra()
@@ -317,25 +331,30 @@ const Search = class Search {
 }
 
 // 处理搜索文本
-function parseSearch (param) {
+function parseSearch(param: string) {
     // TODO i18n 根据lang决定是否处理
-    // 部分输入法拼音输入阶段会携带” ' “，导致拼音搜索失效
+    // 部分输入法拼音输入阶段会携带“ ' ”，导致拼音搜索失效
     param = param.replaceAll('\'', '')
-    // “6/MSP” 不清楚此字符为何，但出现在部分输入法拼音输入阶段
+    // “6/MSP”，U+2006，“六分之一空格” 出现在部分输入法拼音输入阶段
     param = param.replaceAll(' ', '')
     // 全宽拉丁处理
     param = fullWidth2HalfLatin(param)
     return param
 }
 
-const SearchManager = class SearchManager {
-    constructor () {
+class SearchManager {
+    result: Ref<Array<[string, string]> | null>
+    extraResult: Record<string,Array<string>>
+    searchResultFullShow: number
+
+
+    constructor() {
         this.result = ref(null)
         this.extraResult = {}
         this.searchResultFullShow = 0
     }
 
-    search (param) {
+    search(param?: string) {
         if (!param) {
             this.result.value = null
             return
@@ -346,7 +365,7 @@ const SearchManager = class SearchManager {
         this.searchResultFullShow = t
         if (param) {
             const searchLower = param.toLowerCase()
-            const list = []
+            const list: Array<string> = []
             for (const charId in CharDict) {
                 if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
                     const char = CharDict[charId]
@@ -360,7 +379,7 @@ const SearchManager = class SearchManager {
                     }
                 }
             }
-            const manager = new Search(this, param, t, list, config.value.lang)
+            const manager = new Search(this, param, t, list, config.value.lang as LangType)
             manager.run()
         } else {
             this.extraResult = {}
@@ -370,7 +389,7 @@ const SearchManager = class SearchManager {
 }
 
 const loadSeries = {
-    arknights () {
+    arknights() {
         loadChar('arknights')
         loadChar('arknights_npc')
     }

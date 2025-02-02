@@ -37,7 +37,7 @@ const translate = {
     },
     en_US: {
         title: 'About',
-        about: "Arknights Dialogue Editor, developed based on the dialogue of the Arknights 'IL Siracusano' activity, is currently still in beta stage",
+        about: 'Arknights Dialogue Editor, developed based on the dialogue of the Arknights \'IL Siracusano\' activity, is currently still in beta stage',
         devSite: 'Development site',
         contributor: 'Contributor',
         statement: 'Statement',

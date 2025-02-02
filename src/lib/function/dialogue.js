@@ -40,7 +40,7 @@ function copyDialogue (index, data = {}, config = {}) {
         id: data.id || uuid()
     }
     if (data.type === 'image') {
-        DataControl.image.count(data.content)
+        DataControl.images.count(data.content)
     }
     chats.value.push(data)
     DialogueHook.copy.call({
@@ -65,7 +65,7 @@ function createTextDialogue (type, config = {}) {
 }
 
 function createImageDialogue (fileUpload, config = {}) {
-    DataControl.image.new(fileUpload, (id) => {
+    DataControl.images.new(fileUpload, (id) => {
         createDialogue({
             content: id,
             type: 'image'
@@ -75,9 +75,9 @@ function createImageDialogue (fileUpload, config = {}) {
 }
 
 function uploadImage (data, fileUpload) {
-    DataControl.image.new(fileUpload, (id) => {
+    DataControl.images.new(fileUpload, (id) => {
         if (data.type === 'image') {
-            DataControl.image.delete(data.content)
+            DataControl.images.delete(data.content)
         }
         data.content = id
     })
@@ -87,7 +87,7 @@ function uploadImage (data, fileUpload) {
 function deleteDialogue (index, config = {}) {
     const chat = chats.value.splice(index, 1)[0]
     if (chat.type === 'image') {
-        DataControl.image.delete(chat.content)
+        DataControl.images.delete(chat.content)
     }
     if (config.save === undefined || config.save) {
         DataControl.save('chats')

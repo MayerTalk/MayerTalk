@@ -80,10 +80,10 @@ function blob2url(blob: Blob): string {
     return url as string
 }
 
-function blob2base64(blob: Blob, callback: CallBackData<string | ArrayBuffer | null>) {
+function blob2base64(blob: Blob, callback: CallBackData<string>) {
     const reader = new FileReader()
     reader.onloadend = () => {
-        callback(reader.result)
+        callback(reader.result as string)
     }
     reader.readAsDataURL(blob)
 }

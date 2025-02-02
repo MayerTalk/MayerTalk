@@ -9,7 +9,7 @@ interface CallFunction<T> {
 }
 
 
-class Hook<T> {
+class Hook<T = undefined> {
     hooks: { [id: string]: (params: T) => void }
 
 
