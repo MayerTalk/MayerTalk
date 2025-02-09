@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { Textarea, uuid } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
-import tipControl from '@/lib/function/tip'
+import TipControl from '@/lib/function/tip'
 import {
     chats,
     currCharId,
@@ -10,35 +10,49 @@ import {
 } from '@/lib/data/data'
 import Hook from '@/lib/utils/hook'
 
+import type * as DT from '@/lib/data/dataTypes'
+
 const textarea = ref('')
 
 const DialogueHook = {
-    create: new Hook(),
+    create: new Hook<{
+        data: DT.ChatsRecord,
+        config: unknown // 未使用 预留
+    }>(),
     update: new Hook(),
-    copy: new Hook(),
+    copy: new Hook<{
+        data: DT.ChatsRecord,
+        index: number,
+        config: CopyDialogueConfig
+    }>(),
     click: new Hook()
 }
 
-function createDialogue (data, config = {}) {
-    data = {
-        content: data.content,
-        type: data.type,
-        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
-        id: data.id || uuid(),
+function createDialogue(param: Partial<DT.ChatsRecord>, config = {}) {
+    const data: DT.ChatsRecord = {
+        content: param.content,
+        type: param.type,
+        char: Object.prototype.hasOwnProperty.call(param, 'char') ? param.char : currCharId.value,
+        id: param.id || uuid(),
         data: {}
-    }
+    } as DT.ChatsRecord
     chats.value.push(data)
     DataControl.save('chats')
     DialogueHook.create.call({ data, config })
 }
 
-function copyDialogue (index, data = {}, config = {}) {
-    data = {
+interface CopyDialogueConfig {
+    locate?: boolean,
+    save?: boolean
+}
+
+function copyDialogue(index: number, param: Partial<DT.ChatsRecord> = {}, config: CopyDialogueConfig = {}) {
+    const data: DT.ChatsRecord = {
         ...chats.value[index],
-        ...data,
-        char: Object.prototype.hasOwnProperty.call(data, 'char') ? data.char : currCharId.value,
-        id: data.id || uuid()
-    }
+        ...param,
+        char: Object.prototype.hasOwnProperty.call(param, 'char') ? param.char : currCharId.value,
+        id: param.id || uuid()
+    } as DT.ChatsRecord
     if (data.type === 'image') {
         DataControl.images.count(data.content)
     }
@@ -50,7 +64,8 @@ function copyDialogue (index, data = {}, config = {}) {
     })
 }
 
-function createTextDialogue (type, config = {}) {
+// TODO optimize type hint
+function createTextDialogue(type: string, config = {}) {
     if (textarea.value) {
         createDialogue({
             content: textarea.value,
@@ -60,23 +75,28 @@ function createTextDialogue (type, config = {}) {
         textarea.value = ''
     } else {
         message.notify(t.value.notify.pleaseEnterTextInTheInputBox, message.info)
-        tipControl.setTmpTip(t.value.notify.pleaseEnterTextHere)
+        TipControl.setTmpTip(t.value.notify.pleaseEnterTextHere)
     }
 }
 
-function createImageDialogue (fileUpload, config = {}) {
+function createImageDialogue(fileUpload: File, config = {}) {
     DataControl.images.new(fileUpload, (id) => {
         createDialogue({
             content: id,
             type: 'image'
-        })
-    }, config)
+        }, config)
+    })
     return false
 }
 
-function uploadImage (data, fileUpload) {
+function uploadImage(data: DT.ChatsRecord, fileUpload: File): false {
     DataControl.images.new(fileUpload, (id) => {
+        if (!id) {
+            // TODO raise Expectation
+            return false
+        }
         if (data.type === 'image') {
+            // 如果对话类型为image，删除旧图片
             DataControl.images.delete(data.content)
         }
         data.content = id
@@ -84,7 +104,9 @@ function uploadImage (data, fileUpload) {
     return false
 }
 
-function deleteDialogue (index, config = {}) {
+function deleteDialogue(index: number, config: {
+    save?: boolean
+} = {}) {
     const chat = chats.value.splice(index, 1)[0]
     if (chat.type === 'image') {
         DataControl.images.delete(chat.content)
@@ -94,8 +116,8 @@ function deleteDialogue (index, config = {}) {
     }
 }
 
-function findDialoguesById (id1, id2) {
-    const dialogues = []
+function findDialoguesById(id1:string, id2:string) {
+    const dialogues:Array<string> = []
     let select = false
     for (let i = 0; i < chats.value.length; i++) {
         const data = chats.value[i]

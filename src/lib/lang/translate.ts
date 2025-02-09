@@ -5,7 +5,7 @@ import { saveData, getData } from '@/lib/utils/tool'
 import { cacheRequest } from '@/lib/utils/cacheRequest'
 import { emptyTranslation } from '@/lib/lang/constant'
 import { translationHost } from '@/lib/dev'
-import tipControl from '@/lib/function/tip'
+import TipControl from '@/lib/function/tip'
 import type { Translation } from '@/lib/lang/translation';
 
 const cacheKey = 'cache.data.translation.'
@@ -15,7 +15,7 @@ const translate: Ref<Translation> = ref({}) as Ref<Translation>
 
 function setTranslation(data: Translation) {
     translate.value = data
-    tipControl.setTips(data.tip.pool)
+    TipControl.setTips(data.tip.pool)
 }
 
 function updateTranslation(lang: string, firstUpdate = false, retry = true) {

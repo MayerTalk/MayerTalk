@@ -4,7 +4,7 @@ import { DialogueHook } from '@/lib/function/dialogue'
 
 const plus1 = ref(-1)
 
-function handlePlus1 (index) {
+function handlePlus1(index: number) {
     if (index > 0) {
         const c1 = chats.value[index]
         const c2 = chats.value[index - 1]
