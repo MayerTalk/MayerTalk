@@ -1,7 +1,9 @@
 # MayerTalk
 
 明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段  
-  
+
+![演示对话](.github/example.jpg)
+
 [快速上手](https://www.mayertalk.top/docs/guide/start.html)  
  
  ## 文档
