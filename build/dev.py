@@ -68,7 +68,7 @@ with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8'
 with open(os.path.join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
     f.write(f'export default {json.dumps(info)}')
 
-os.system(f'npm run build-only --base=/{version}/')
+os.system(f'npm run build-only -- --base=/{version}/')
 
 with open(os.path.join('dist', 'info.json'), mode='wt', encoding='utf-8') as f:
     json.dump(info, f, ensure_ascii=False)
