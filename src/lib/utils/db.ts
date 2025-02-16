@@ -9,7 +9,7 @@ class DataBase<Record> {
         this.conn = null
     }
 
-    open(onupgradeneeded?: (ev:IDBVersionChangeEvent) => void, callback?: () => void) {
+    open(onupgradeneeded?: (ev: IDBVersionChangeEvent) => void, callback?: () => void) {
         const request = window.indexedDB.open(this.db)
         request.onupgradeneeded = onupgradeneeded as ((this: IDBOpenDBRequest, ev: IDBVersionChangeEvent) => void) | null
         request.onsuccess = () => {
@@ -32,7 +32,7 @@ class DataBase<Record> {
         return this.transaction(table, 'readwrite').put(data)
     }
 
-    get(key: IDBValidKey, table = this.table):IDBRequest<Record> {
+    get(key: IDBValidKey, table = this.table): IDBRequest<Record> {
         return this.transaction(table).get(key)
     }
 
@@ -40,8 +40,10 @@ class DataBase<Record> {
         return this.transaction(table, 'readwrite').delete(key)
     }
 
-    clear(success: () => void, table = this.table) {
-        this.transaction(table, 'readwrite').clear().onsuccess = success
+    clear(success?: () => void, table = this.table) {
+        if (success) {
+            this.transaction(table, 'readwrite').clear().onsuccess = success
+        }
     }
 }
 

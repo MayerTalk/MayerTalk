@@ -12,7 +12,7 @@ interface InfoRecord {
     id: string
     size: number
     time: number
-    name: number
+    name: string
 }
 
 interface DataRecord {

@@ -81,7 +81,8 @@ const emptyTranslation = {
         cutBelow: '',
         reset: '',
         multiSelect: '',
-        partialScreenshot: ''
+        partialScreenshot: '',
+        operate: ''
     },
     noun: {
         character: '',
@@ -99,7 +100,6 @@ const emptyTranslation = {
         name: '',
         lastEdit: '',
         size: '',
-        operate: '',
         avatarPosition: '',
         left: '',
         right: '',
