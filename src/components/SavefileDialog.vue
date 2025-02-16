@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { ensure, formatSize } from '@/lib/utils/tool'
@@ -7,21 +7,31 @@ import Save from '@/lib/function/savefile'
 import { dialogWidth } from '@/lib/data/width'
 import { mainShow } from '@/lib/data/showControl'
 import { DataControl } from '@/lib/data/data'
+import type { Ref } from 'vue'
 
-const tableData = ref([])
+interface TableRecord {
+    id: string
+    name: string
+    size: number
+    sizeString: string
+    time: number
+    timeString: string
+}
+
+const tableData: Ref<Array<TableRecord>> = ref([])
 
 const savefileName = ref('')
 const ifSave = ref(false)
 
 DataControl.hook.clear.on((params) => {
-    if (params.indexOf('savefile') !== -1) {
-        Save.db.clear(null, 'data')
-        Save.db.clear(null, 'info')
+    if (params && params.indexOf('savefile') !== -1) {
+        Save.db.clear(undefined, 'data')
+        Save.db.clear(undefined, 'info')
         loadData()
     }
 })
 
-function loadData () {
+function loadData() {
     if (!Save.db.conn) {
         setTimeout(() => {
             loadData()
@@ -46,7 +56,7 @@ function loadData () {
     }
 }
 
-function newSave () {
+function newSave() {
     if (savefileName.value.length === 0) {
         message.notify(t.value.notify.pleaseEnterSavefileName, message.warning)
         return
@@ -59,7 +69,7 @@ function newSave () {
     })
 }
 
-function syncSave (row) {
+function syncSave(row: TableRecord) {
     ensure(() => {
         Save.save(row.id, () => {
             message.notify(t.value.notify.savedSuccessfully, message.success)
@@ -68,7 +78,7 @@ function syncSave (row) {
     }, t.value.notify.whetherToSaveSavefile + '「' + row.name + '」')
 }
 
-function loadSave (row) {
+function loadSave(row: TableRecord) {
     if (Save.saved) {
         Save.load(row.id, () => {
             message.notify(t.value.notify.loadedSuccessfully, message.success)
@@ -84,7 +94,7 @@ function loadSave (row) {
     }
 }
 
-function deleteSave (row) {
+function deleteSave(row: TableRecord) {
     ensure(() => {
         Save.delete(row.id, () => {
             loadData()

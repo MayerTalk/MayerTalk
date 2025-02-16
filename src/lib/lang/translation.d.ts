@@ -80,6 +80,7 @@ export interface Translation {
         reset: string,
         multiSelect: string,
         partialScreenshot: string
+        operate: string,
     },
     noun: {
         character: string,
@@ -97,7 +98,6 @@ export interface Translation {
         name: string,
         lastEdit: string,
         size: string,
-        operate: string,
         avatarPosition: string,
         left: string,
         right: string,
