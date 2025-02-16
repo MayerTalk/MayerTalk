@@ -1,9 +1,10 @@
 import { ref, computed } from 'vue'
 import WindowResize from '@/lib/utils/windowResize'
 import { defaultWindowWidth } from '@/lib/data/constance'
+import type { Ref } from 'vue'
 
-const windowWidth = ref(Math.min(defaultWindowWidth, window.innerWidth))
-WindowResize.onResize(() => {
+const windowWidth:Ref<number> = ref(Math.min(defaultWindowWidth, window.innerWidth))
+WindowResize.on(() => {
     windowWidth.value = Math.min(defaultWindowWidth, window.innerWidth)
 })
 const dialogWidth = computed(() => {

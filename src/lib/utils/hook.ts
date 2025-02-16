@@ -1,7 +1,19 @@
 import { uuid } from '@/lib/utils/tool'
 
-class Hook {
-    constructor (onFunction = null, callFunction = null) {
+interface OnFunction<T> {
+    (hook: Hook<T>, fn: (params: T) => void): () => void
+}
+
+interface CallFunction<T> {
+    (hook: Hook<T>, params: T): void
+}
+
+
+class Hook<T = undefined> {
+    hooks: { [id: string]: (params: T) => void }
+
+
+    constructor(onFunction?: OnFunction<T>, callFunction?: CallFunction<T>) {
         this.hooks = {}
         if (onFunction) {
             this.on = (fn) => onFunction(this, fn)
@@ -11,7 +23,7 @@ class Hook {
         }
     }
 
-    on (fn) {
+    on(fn: (params: T) => void) {
         const id = uuid()
         this.hooks[id] = fn
         return () => {
@@ -19,7 +31,7 @@ class Hook {
         }
     }
 
-    call (params) {
+    call(params: T) {
         for (const key in this.hooks) {
             if (Object.prototype.hasOwnProperty.call(this.hooks, key)) {
                 this.hooks[key](params)

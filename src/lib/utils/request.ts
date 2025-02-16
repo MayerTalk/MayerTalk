@@ -1,14 +1,32 @@
 import axios from 'axios'
-
+import type { AxiosResponse, AxiosError, Canceler } from 'axios';
 axios.defaults.withCredentials = false
 
+interface RequestsConfig {
+    host: string
+}
+
+interface RequestsOptions<T> {
+    host?: string
+    url: string,
+    data?: object,
+    success?: (response: AxiosResponse<T>) => void,
+    error?: (err: AxiosError) => void,
+    complete?: () => void,
+    json?: object,
+    headers?: { [key: string]: string }
+}
+
 export default class Requests {
-    constructor (config) {
+    host: string
+    cancelTokens: Array<{ cancel: Canceler }>
+
+    constructor(config: RequestsConfig) {
         this.host = config.host
         this.cancelTokens = []
     }
 
-    httpRequests (method, options) {
+    httpRequests<T>(method: string, options: RequestsOptions<T>) {
         const url = options.url
         const data = options.data || {}
         const success = options.success
@@ -38,25 +56,31 @@ export default class Requests {
             config.headers[name] = headers[name]
         }
 
-        axios(config)
+        axios<T>(config)
             .then(
                 response => {
-                    success && success(response)
+                    if (success) {
+                        success(response)
+                    }
                 }
             )
             .catch(
                 err => {
-                    error && error(err)
+                    if (error) {
+                        error(err)
+                    }
                 }
             )
             .finally(
                 () => {
-                    complete && complete()
+                    if (complete) {
+                        complete()
+                    }
                 }
             )
     }
 
-    get (options) {
-        this.httpRequests('get', options)
+    get<T>(options: RequestsOptions<T>) {
+        this.httpRequests<T>('get', options)
     }
 }

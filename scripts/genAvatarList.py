@@ -37,7 +37,7 @@ hash = hashlib.sha256(str(avatars).encode('utf-8')).hexdigest()[:8]
 
 with open(join('public', 'avatar.js'), mode='wt', encoding='utf-8') as f:
     f.write(js)
-with open(join('src', 'main.js'), mode='rt', encoding='utf-8') as f:
+with open(join('src', 'main.ts'), mode='rt', encoding='utf-8') as f:
     main_js = re.sub(r"app\.provide\('avatarsJs',.+", f"app.provide('avatarsJs','avatar.js?v={hash}');", f.read())
-with open(join('src', 'main.js'), mode='wt', encoding='utf-8') as f:
+with open(join('src', 'main.ts'), mode='wt', encoding='utf-8') as f:
     f.write(main_js)

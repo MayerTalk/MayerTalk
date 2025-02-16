@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
 import Hook from '@/lib/utils/hook'
 
+// TODO refactor
 const currEditorRef = ref(null)
 const currRendererRef = ref(null)
 const selectMode = computed(() => {
