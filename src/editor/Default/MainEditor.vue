@@ -44,7 +44,7 @@ import {
     DialogueHook
 } from '@/lib/function/dialogue'
 import message from '@/lib/utils/message'
-import tipControl from '@/lib/function/tip'
+import TipControl from '@/lib/function/tip'
 import { windowWidth } from '@/lib/data/width'
 import Input from '@/lib/function/input'
 import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.vue'
@@ -205,12 +205,12 @@ function resizeScroll (offset = 0) {
 watch(textarea, () => {
     resizeScroll()
 })
-onUnmounted(WindowResize.onResize(() => {
+onUnmounted(WindowResize.on(() => {
     resizeScroll()
     resizeBody()
 }))
 onMounted(resizeScroll)
-tipControl.hook = () => {
+TipControl.hook = () => {
     nextTick(() => {
         resizeScroll()
     })
@@ -349,7 +349,7 @@ defineExpose({
                                 </el-icon>
                             </div>
                             <textarea class="textarea" id="textarea" v-model="textarea"
-                                      :placeholder="tipControl.tip.value"
+                                      :placeholder="TipControl.tip.value"
                                       @keydown.ctrl.enter="createTextDialogue('chat')"
                                       @input="AtRef.processInput"></textarea>
                             <div class="button-bar">
@@ -397,10 +397,10 @@ defineExpose({
                             <div class="char-bar">
                                 <el-scrollbar :max-height="120" style="width: calc(100% - 55px)">
                                     <div class="container">
-                                        <div v-for="(char, id) in chars" :key="id"
+                                        <div v-for="id in Object.keys(chars)" :key="id"
                                              :class="[id === currCharId?'char-curr':'char']"
                                              @click="DataControl.curr.setChar(id)">
-                                            <img :src="avatars[id]">
+                                            <img alt="" :src="avatars[id]">
                                         </div>
                                         <div class="option add"
                                              @click="EditCharRef.open(true)">

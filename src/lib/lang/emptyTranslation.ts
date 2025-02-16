@@ -1,3 +1,5 @@
+import type { Translation } from './translation';
+
 const emptyTranslation = {
     empty: true,
     notify: {
@@ -79,7 +81,8 @@ const emptyTranslation = {
         cutBelow: '',
         reset: '',
         multiSelect: '',
-        partialScreenshot: ''
+        partialScreenshot: '',
+        operate: ''
     },
     noun: {
         character: '',
@@ -97,7 +100,6 @@ const emptyTranslation = {
         name: '',
         lastEdit: '',
         size: '',
-        operate: '',
         avatarPosition: '',
         left: '',
         right: '',
@@ -169,6 +171,6 @@ const emptyTranslation = {
             title: ''
         }
     }
-}
+} as Translation
 
 export default emptyTranslation

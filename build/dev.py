@@ -65,13 +65,13 @@ with open(os.path.join('src', 'AnnounceDialog.git.vue'), mode='rt', encoding='ut
 with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
     f.write(announce_git)
 
-with open(os.path.join('src', 'info.dev.js'), mode='wt', encoding='utf-8') as f:
+with open(os.path.join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
     f.write(f'export default {json.dumps(info)}')
 
-os.system(f'npm run build -- --base=/{version}/')
+os.system(f'npm run build-only -- --base=/{version}/')
 
 with open(os.path.join('dist', 'info.json'), mode='wt', encoding='utf-8') as f:
-    json.dump(info, f)
+    json.dump(info, f, ensure_ascii=False)
 
 print(f'''\033[1;32mbuild
 \033[0;36mexpire: {time.strftime("%Y-%m-%d %X", time.localtime(info["expire"]))}

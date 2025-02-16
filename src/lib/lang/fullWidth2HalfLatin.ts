@@ -1,10 +1,11 @@
-// 全宽拉丁转为半款
+// 全宽拉丁转为半宽
 
-const dictionary = {}
+const dictionary: { [key: string]: string } = {}
 let preReg = ''
 
-function parse (seq) {
-    const f = JSON.parse('"\\u' + (seq + 65296).toString(16) + '"')
+function parse(seq: number) {
+    // f: 全宽拉丁
+    const f: string = JSON.parse('"\\u' + (seq + 65296).toString(16) + '"')
     preReg += f + '|'
     dictionary[f] = JSON.parse('"\\u00' + (seq + 48).toString(16) + '"')
 }
@@ -22,10 +23,9 @@ for (let i = 49; i < 75; i++) {
     parse(i)
 }
 
-preReg = preReg.slice(0, -1)
-const reg = new RegExp(preReg, 'g')
+const reg = new RegExp(preReg.slice(0, -1), 'g')
 
-function fullWidth2HalfLatin (text) {
+function fullWidth2HalfLatin(text: string) {
     return text.replaceAll(reg, (i) => {
         return dictionary[i]
     })

@@ -31,7 +31,7 @@ function getStorageSize () {
             size += localStorage.getItem(key).length
         }
     }
-    size += DataControl.image.lastSave.length
+    size += DataControl.images.lastSave.length
     Save.getInfo((data) => {
         for (const key in data) {
             if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -63,11 +63,12 @@ function clearStorage () {
                 <div class="line-right"></div>
             </div>
             <table>
+                <tbody>
                 <tr class="tr">
                     <th>{{ t.noun.editor }}</th>
                     <td>
                         <el-select v-model="config.editor">
-                            <el-option v-for="(renderer, key) in Editors" :key="key" :value="key"
+                            <el-option v-for="(_, key) in Editors" :key="key" :value="key"
                                        :label="t.name.editor[key]"/>
                         </el-select>
                     </td>
@@ -76,7 +77,7 @@ function clearStorage () {
                     <th>{{ t.noun.renderer }}</th>
                     <td>
                         <el-select v-model="config.renderer">
-                            <el-option v-for="(renderer, key) in Renderers" :key="key" :value="key"
+                            <el-option v-for="(_, key) in Renderers" :key="key" :value="key"
                                        :label="t.name.renderer[key]"/>
                         </el-select>
                     </td>
@@ -107,6 +108,7 @@ function clearStorage () {
                                   :placeholder="'' + defaultSettings.width"/>
                     </td>
                 </tr>
+                </tbody>
             </table>
             <!--Editor Settings-->
             <div style="display: flex; align-items: center">
@@ -158,8 +160,8 @@ function clearStorage () {
                     {{ t.noun.savefile }}
                 </el-button>
             </div>
-
             <table>
+                <tbody>
                 <tr>
                     <th>{{ t.noun.local }}</th>
                     <td>{{ storageSize }}</td>
@@ -168,6 +170,7 @@ function clearStorage () {
                         </el-button>
                     </td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </el-dialog>

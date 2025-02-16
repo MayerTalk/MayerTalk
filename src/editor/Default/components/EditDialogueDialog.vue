@@ -48,7 +48,7 @@ function close () {
 
 function clearDialogueData () {
     if (!editDialogue.value && dialogueData.value.type === 'image') {
-        DataControl.image.delete(dialogueData.value.content)
+        DataControl.images.delete(dialogueData.value.content)
     }
     dialogueData.value = { data: {} }
 }
@@ -131,7 +131,7 @@ defineExpose({
         >
             <div class="container">
                 <el-scrollbar v-if="images[dialogueData.content]">
-                    <img :src="images[dialogueData.content].src" style="width:100%"/>
+                    <img alt="" :src="images[dialogueData.content].src" style="width:100%"/>
                 </el-scrollbar>
 
                 <el-icon v-else class="avatar-uploader-icon">

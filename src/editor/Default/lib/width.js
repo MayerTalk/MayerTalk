@@ -12,7 +12,7 @@ function refreshValidSpace () {
 }
 
 refreshValidSpace()
-WindowResize.onResize(refreshValidSpace)
+WindowResize.on(refreshValidSpace)
 
 let sidebarPlaceholderNode = {}
 const sidebarWidth = ref(0)

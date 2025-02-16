@@ -1,42 +1,31 @@
-<script setup>
-import { ref, computed } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { dialogWidth } from '@/lib/data/width'
 import { DataControl } from '@/lib/data/data'
 import { copy } from '@/lib/utils/tool'
+import type { Ref } from 'vue';
 
-const props = defineProps({
-    modelValue: null
-})
-const emit = defineEmits([
-    'update:modelValue'
-])
+const ifShow = defineModel<boolean>()
 
-const ifShow = computed({
-    get () {
-        return props.modelValue
-    },
-    set (value) {
-        emit('update:modelValue', value)
-    }
-})
+const clearList: Ref<Array<string>> = ref([])
 
-const clearList = ref([])
-
-function handleChange (newValue) {
+function handleChange(newValue: Array<string>) {
     if (newValue.indexOf('chars') !== -1 && clearList.value.indexOf('chats') === -1) {
+        // 选中chars时，强制同步选择chats
         newValue.push('chats')
     } else if (newValue.indexOf('chats') === -1 && clearList.value.indexOf('chars') !== -1) {
-        newValue.pop('chars')
+        // 取消选中chats时，强制同步取消选择chars
+        newValue.splice(newValue.indexOf('chars'), 1)
     }
     clearList.value = newValue
 }
 
-function clear () {
+function clear() {
     const data = copy(clearList.value)
     ifShow.value = false
-    const typeGroup = []
+    const typeGroup:Array<string> = []
     for (let i = 0; i < data.length; i++) {
         if (['chats', 'chars'].indexOf(data[i]) === -1) {
             typeGroup.push(t.value.noun[data[i]])
@@ -57,11 +46,11 @@ function clear () {
     <el-dialog v-model="ifShow" :title="t.notify.pleaseSelectTheTypeToClear" :width="dialogWidth"
                @closed="clearList=[]">
         <el-checkbox-group :model-value="clearList" @update:model-value="handleChange" style="padding: 0 20px">
-            <el-checkbox label="chats" style="width: 50%;margin: 0"> {{ t.noun.chat }}</el-checkbox>
-            <el-checkbox label="settings" style="width: 50%;margin: 0"> {{ t.noun.settings }}</el-checkbox>
-            <el-checkbox label="chars" style="width: 50%;margin: 0"> {{ t.noun.char }}</el-checkbox>
-            <el-checkbox label="savefile" style="width: 50%;margin: 0"> {{ t.noun.savefile }}</el-checkbox>
-            <el-checkbox label="cutPoint" style="width: 50%;margin: 0">{{t.noun.cutPoint}}</el-checkbox>
+            <el-checkbox value="chats" style="width: 50%;margin: 0"> {{ t.noun.chat }}</el-checkbox>
+            <el-checkbox value="settings" style="width: 50%;margin: 0"> {{ t.noun.settings }}</el-checkbox>
+            <el-checkbox value="chars" style="width: 50%;margin: 0"> {{ t.noun.char }}</el-checkbox>
+            <el-checkbox value="savefile" style="width: 50%;margin: 0"> {{ t.noun.savefile }}</el-checkbox>
+            <el-checkbox value="cutPoint" style="width: 50%;margin: 0">{{ t.noun.cutPoint }}</el-checkbox>
         </el-checkbox-group>
         <div class="column-display" style="margin-top: 10px; display: flex; justify-content: flex-end">
             <el-button style="width: 20%" @click="ifShow=false">{{ t.action.cancel }}</el-button>

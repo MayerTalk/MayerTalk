@@ -14,14 +14,14 @@ const langDict = {
     en: 'en_US'
 }
 
-let defaultLang = null
+let defaultLang:string = ''
 
 for (const lang of navigator.languages) {
     if (Object.prototype.hasOwnProperty.call(langDict, lang)) {
         defaultLang = langDict[lang]
         break
     } else if (Object.prototype.hasOwnProperty.call(langDict, lang.split('-')[0])) {
-        defaultLang = langDict[lang.split('-')]
+        defaultLang = langDict[lang.split('-')[0]]
         break
     }
 }

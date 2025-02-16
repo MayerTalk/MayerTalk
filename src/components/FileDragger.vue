@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { uploadData } from '@/lib/data/versionControl'
-import { t } from '../lib/lang/translate'
+import { t } from '@/lib/lang/translate'
 
 const ifShow = ref(false)
 let dragStatus = false

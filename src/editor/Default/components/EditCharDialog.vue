@@ -51,7 +51,7 @@ function open (create, data) {
 function clearCharData () {
     // 清除遗留数据
     if (createChar.value && Object.prototype.hasOwnProperty.call(charData.value, 'avatar')) {
-        DataControl.image.delete(charData.value.avatar)
+        DataControl.images.delete(charData.value.avatar)
     }
     charData.value = {}
     defaultName.value = ''
@@ -64,8 +64,8 @@ function uploadAvatar (uploadFile) {
         const image = new Image()
         image.onload = () => {
             image2square(image).toBlob((blob) => {
-                DataControl.image.new(blob, (id) => {
-                    DataControl.image.delete(charData.value.avatar)
+                DataControl.images.new(blob, (id) => {
+                    DataControl.images.delete(charData.value.avatar)
                     charData.value.avatar = id
                 })
             })
@@ -105,7 +105,7 @@ function editChar () {
 
 function handleSelect (char) {
     if (Object.prototype.hasOwnProperty.call(charData.value, 'avatar')) {
-        DataControl.image.delete(charData.value.avatar)
+        DataControl.images.delete(charData.value.avatar)
     }
     [charData.value.avatar, defaultName.value] = char
 }
@@ -140,7 +140,7 @@ defineExpose({
                     accept="image/png, image/jpeg, image/gif"
                     :before-upload="(file) => {defaultName='';return uploadAvatar(file)}"
                 >
-                    <div class="container"><img v-if="charData.avatar"
+                    <div class="container"><img v-if="charData.avatar" alt=""
                                                 :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : StaticUrl + charData.avatar"/>
                         <el-icon v-else class="avatar-uploader-icon">
                             <IconPlus/>
