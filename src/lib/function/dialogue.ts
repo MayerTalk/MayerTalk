@@ -10,32 +10,42 @@ import {
 } from '@/lib/data/data'
 import Hook from '@/lib/utils/hook'
 
-import type * as DT from '@/lib/data/dataTypes'
+import type { ChatsRecord } from '@/lib/data/dataTypes'
 
 const textarea = ref('')
 
 const DialogueHook = {
     create: new Hook<{
-        data: DT.ChatsRecord,
+        data: ChatsRecord,
         config: unknown // 未使用 预留
     }>(),
-    update: new Hook(),
+    update: new Hook<{
+        id: string,
+        data: ChatsRecord
+    }>(),
     copy: new Hook<{
-        data: DT.ChatsRecord,
+        data: ChatsRecord,
         index: number,
         config: CopyDialogueConfig
     }>(),
-    click: new Hook()
+    click: new Hook<{
+        data: {
+            id: string,
+            index: number,
+        },
+        raw: PointerEvent,
+        preventDefault: () => void
+    }>()
 }
 
-function createDialogue(param: Partial<DT.ChatsRecord>, config = {}) {
-    const data: DT.ChatsRecord = {
+function createDialogue(param: Partial<ChatsRecord>, config = {}) {
+    const data: ChatsRecord = {
         content: param.content,
         type: param.type,
         char: Object.prototype.hasOwnProperty.call(param, 'char') ? param.char : currCharId.value,
         id: param.id || uuid(),
         data: {}
-    } as DT.ChatsRecord
+    } as ChatsRecord
     chats.value.push(data)
     DataControl.save('chats')
     DialogueHook.create.call({ data, config })
@@ -46,13 +56,13 @@ interface CopyDialogueConfig {
     save?: boolean
 }
 
-function copyDialogue(index: number, param: Partial<DT.ChatsRecord> = {}, config: CopyDialogueConfig = {}) {
-    const data: DT.ChatsRecord = {
+function copyDialogue(index: number, param: Partial<ChatsRecord> = {}, config: CopyDialogueConfig = {}) {
+    const data: ChatsRecord = {
         ...chats.value[index],
         ...param,
         char: Object.prototype.hasOwnProperty.call(param, 'char') ? param.char : currCharId.value,
         id: param.id || uuid()
-    } as DT.ChatsRecord
+    } as ChatsRecord
     if (data.type === 'image') {
         DataControl.images.count(data.content)
     }
@@ -89,7 +99,7 @@ function createImageDialogue(fileUpload: File, config = {}) {
     return false
 }
 
-function uploadImage(data: DT.ChatsRecord, fileUpload: File): false {
+function uploadImage(data: ChatsRecord, fileUpload: File): false {
     DataControl.images.new(fileUpload, (id) => {
         if (!id) {
             // TODO raise Expectation
@@ -116,8 +126,8 @@ function deleteDialogue(index: number, config: {
     }
 }
 
-function findDialoguesById(id1:string, id2:string) {
-    const dialogues:Array<string> = []
+function findDialoguesById(id1: string, id2: string) {
+    const dialogues: Array<string> = []
     let select = false
     for (let i = 0; i < chats.value.length; i++) {
         const data = chats.value[i]

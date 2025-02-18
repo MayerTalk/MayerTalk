@@ -12,9 +12,11 @@ export interface CharsData {
 export interface ChatsRecord {
     char: string,
     content: string
-    data: object,
+    data: {
+        cutPoint?: boolean
+    },
     id: string,
-    type: string
+    type: string,
 }
 
 export type ChatsData = ChatsRecord[]
@@ -62,10 +64,6 @@ export interface StorageType {
     chats: Storage<ChatsData>
     images: ImageStorage,
     version?: string
-}
-
-export type StorageDataType = {
-    [key in StorageKey]: object
 }
 
 export interface OperateRecord {

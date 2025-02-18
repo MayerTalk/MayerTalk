@@ -1,46 +1,49 @@
-<script setup>
+<script setup lang="ts">
 // copy from https://github.com/element-plus/element-plus/blob/dev/packages/components/collapse-transition/src/collapse-transition.vue
-const reset = (el) => {
+
+import type { CollapseItem } from '@/components/CollapseItem/CollapseItem';
+
+const reset = (el: CollapseItem) => {
     el.style.maxHeight = ''
-    el.style.overflow = el.dataset.oldOverflow
-    el.style.paddingTop = el.dataset.oldPaddingTop
-    el.style.paddingBottom = el.dataset.oldPaddingBottom
+    el.style.overflow = el.dataset.oldOverflow || 'visible'
+    el.style.paddingTop = el.dataset.oldPaddingTop || ''
+    el.style.paddingBottom = el.dataset.oldPaddingBottom || ''
 }
 
 const on = {
-    beforeEnter (el) {
+    beforeEnter(el: CollapseItem) {
         if (!el.dataset) el.dataset = {}
 
         el.dataset.oldPaddingTop = el.style.paddingTop
         el.dataset.oldPaddingBottom = el.style.paddingBottom
 
-        el.style.maxHeight = 0
-        el.style.paddingTop = 0
-        el.style.paddingBottom = 0
+        el.style.maxHeight = '0'
+        el.style.paddingTop = '0'
+        el.style.paddingBottom = '0'
     },
 
-    enter (el) {
+    enter(el: CollapseItem) {
         el.dataset.oldOverflow = el.style.overflow
         if (el.scrollHeight !== 0) {
             el.style.maxHeight = `${el.scrollHeight}px`
         } else {
-            el.style.maxHeight = 0
+            el.style.maxHeight = '0'
         }
-        el.style.paddingTop = el.dataset.oldPaddingTop
-        el.style.paddingBottom = el.dataset.oldPaddingBottom
+        el.style.paddingTop = el.dataset.oldPaddingTop || ''
+        el.style.paddingBottom = el.dataset.oldPaddingBottom || ''
         el.style.overflow = 'hidden'
     },
 
-    afterEnter (el) {
+    afterEnter(el: CollapseItem) {
         el.style.maxHeight = ''
-        el.style.overflow = el.dataset.oldOverflow
+        el.style.overflow = el.dataset.oldOverflow || 'visible'
     },
 
-    enterCancelled (el) {
+    enterCancelled(el: CollapseItem) {
         reset(el)
     },
 
-    beforeLeave (el) {
+    beforeLeave(el: CollapseItem) {
         if (!el.dataset) el.dataset = {}
         el.dataset.oldPaddingTop = el.style.paddingTop
         el.dataset.oldPaddingBottom = el.style.paddingBottom
@@ -50,19 +53,19 @@ const on = {
         el.style.overflow = 'hidden'
     },
 
-    leave (el) {
+    leave(el: CollapseItem) {
         if (el.scrollHeight !== 0) {
-            el.style.maxHeight = 0
-            el.style.paddingTop = 0
-            el.style.paddingBottom = 0
+            el.style.maxHeight = '0'
+            el.style.paddingTop = '0'
+            el.style.paddingBottom = '0'
         }
     },
 
-    afterLeave (el) {
+    afterLeave(el) {
         reset(el)
     },
 
-    leaveCancelled (el) {
+    leaveCancelled(el) {
         reset(el)
     }
 }
