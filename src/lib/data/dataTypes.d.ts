@@ -1,4 +1,5 @@
 import { ImageStorage, Storage } from './data';
+import { GenericSettings } from '@/lib/data/settings';
 
 export interface CharsRecord {
     name: string,
@@ -28,9 +29,9 @@ export interface ConfigData {
 }
 
 export interface SettingsData {
-    common: object,
-    editor: { [editor: string]: object },
-    renderer: { [renderer: string]: object }
+    common: GenericSettings,
+    editor: Record<string, object>
+    renderer: Record<string, object>
 }
 
 export interface ImagesRecord {

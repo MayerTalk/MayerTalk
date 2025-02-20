@@ -4,8 +4,8 @@ import Dialogue from './components/DialogueItem.vue'
 import SettingsDialog from './components/SettingsDialog.vue'
 
 import plus1 from '@/lib/function/plus1'
-import { chats, settings } from '@/lib/data/data'
-import { enableSettingSync, rendererSettings } from '@/lib/data/settings'
+import { chats } from '@/lib/data/data'
+import { rendererSettings } from '@/renderer/Siracusa';
 import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/manualCoutPointControl'
 import { partialChats } from '@/components/PartialScreenshot/partialScreenshotControl'
 
@@ -13,22 +13,9 @@ defineEmits(['edit', 'delete', 'plus1'])
 
 const rendererWidth = inject('rendererWidth')
 
-const defaultSettings = {
-    background: '#303030',
-    showCharName: false,
-    showCharNameSettings: {
-        chat: true,
-        monologue: true,
-        image: true
-    }
-}
-enableSettingSync(rendererSettings.value, defaultSettings, () => {
-    return settings.value.renderer.Siracusa
-})
-
 defineExpose({
     SettingsDialog,
-    defaultSettings
+    rendererSettings
 })
 </script>
 

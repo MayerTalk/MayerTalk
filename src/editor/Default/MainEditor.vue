@@ -30,11 +30,10 @@ import {
     chars,
     config,
     avatars,
-    settings,
     currCharId,
     DataControl
 } from '@/lib/data/data'
-import { commonSettings, editorSettings, enableSettingSync, rendererSettings } from '@/lib/data/settings'
+import { currRendererSettings, genericSettings } from '@/lib/data/settings'
 import {
     textarea,
     createTextDialogue,
@@ -110,18 +109,18 @@ provide('charDirection', charDirection)
 
 const ResizeWindow = {
     time: 0,
-    get (size) {
+    get(size) {
         return (this.time === 1 ? size : Math.ceil(this.time * size)) + 'px'
     },
     size: {
         avatar: 60,
         fontsize: 16
     },
-    resize () {
-        const max = commonSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
+    resize() {
+        const max = genericSettings.value.width + (charDirection.value[0] && charDirection.value[1] ? 120 : 60)
         if (duringScreenshot.value) {
             rendererWidth.value.window = max
-            rendererWidth.value.image = commonSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
+            rendererWidth.value.image = genericSettings.value.width - (charDirection.value[0] && charDirection.value[1] ? 20 : 10) - 16 + 'px'
             this.time = 1
         } else {
             const w = Math.min(max, window.innerWidth)
@@ -147,13 +146,13 @@ watch(charDirection, () => {
     ResizeWindow.resize()
 })
 watch(() => {
-    return commonSettings.value.width
+    return genericSettings.value.width
 }, () => {
     ResizeWindow.resize()
 })
 DataControl.hook.changeSavefile.on(ResizeWindow.resize)
 
-function resizeBody (offset = 0) {
+function resizeBody(offset = 0) {
     const el = document.getElementById('body')
     el.style.height = window.innerHeight - offset + 'px'
     nextTick(() => {
@@ -172,7 +171,7 @@ const ifShowMoreType = ref(false)
 const arrowStyle = ref({})
 provide('scroll', scroll)
 
-function roll360 () {
+function roll360() {
     if (ifShowMoreType.value) {
         arrowStyle.value = {
             transform: 'rotate(180deg)',
@@ -191,7 +190,7 @@ function roll360 () {
     }
 }
 
-function resizeScroll (offset = 0) {
+function resizeScroll(offset = 0) {
     const el = document.getElementById('textarea')
     if (el) {
         el.style.height = '20px'
@@ -267,7 +266,7 @@ onUnmounted(cutPointFocusHook.on((id) => {
     scroll.value.setScrollTop(getDialogue(id).offsetTop - window.innerHeight / 2 + getDialogue(id).offsetHeight)
 }))
 
-function handleEditDialogue (index) {
+function handleEditDialogue(index) {
     if (cutPointViewMode.value && cutPointQuickEditMode.value) {
         const data = chats.value[index].data
         if (Object.prototype.hasOwnProperty.call(data, 'cutPoint') && data.cutPoint) {
@@ -297,12 +296,6 @@ watch(duringPartialScreenshot, (value) => {
     }
 })
 
-const defaultSettings = {
-    characterSelectorPermanent: true
-}
-enableSettingSync(editorSettings.value, defaultSettings, () => {
-    return settings.value.editor?.Default || {}
-})
 
 defineExpose({
     scroll,
@@ -321,7 +314,7 @@ defineExpose({
     <CreateOptionDialog ref="CreateOption"/>
     <CopyDialog @coped="() => {EditDialogueRef.close()}"/>
     <!--Editor components end-->
-    <div id="body" :style="{background: rendererSettings.background}">
+    <div id="body" :style="{background: currRendererSettings.background}">
         <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s;position: relative">
             <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => {currScrollTop=v.scrollTop}">

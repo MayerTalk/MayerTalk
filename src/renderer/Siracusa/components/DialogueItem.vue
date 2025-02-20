@@ -7,7 +7,7 @@ import {
     images,
     avatars
 } from '@/lib/data/data'
-import { rendererSettings } from '@/lib/data/settings'
+import { rendererSettings } from '@/renderer/Siracusa'
 import { Suffix } from '@/lib/data/character'
 import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
 import { DialogueHook } from '@/lib/function/dialogue'
@@ -56,7 +56,7 @@ const right = computed(() => {
     }
 })
 
-function resizeImage () {
+function resizeImage() {
     if (data.value.type === 'image') {
         imageUpdateId.value = uuid()
     }
@@ -71,7 +71,7 @@ watch(charDirection, () => {
     resizeImage()
 })
 
-function handleClick (event) {
+function handleClick(event) {
     let next = true
     const eventData = {
         data: {
@@ -79,7 +79,7 @@ function handleClick (event) {
             index: index.value
         },
         raw: event,
-        preventDefault () {
+        preventDefault() {
             next = false
         }
     }

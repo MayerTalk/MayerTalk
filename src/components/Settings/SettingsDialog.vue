@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { t, updateTranslation } from '@/lib/lang/translate'
 import { supportLang, langShow } from '@/lib/lang/constant'
@@ -10,21 +10,20 @@ import Save from '@/lib/function/savefile'
 import { downloadData, uploadData } from '@/lib/data/versionControl'
 import { mainShow } from '@/lib/data/showControl'
 import { currEditorRef, currRendererRef } from '@/lib/data/state'
+import SettingsNumberInput from '@/components/Settings/SettingsNumberInput.vue';
 
 import {
     config,
-    settings,
     DataControl
 } from '@/lib/data/data'
 import {
-    setCommonSettings,
-    defaultSettings
+    DEFAULT_GENERIC_SETTINGS, genericSettings
 } from '@/lib/data/settings'
 import { dialogWidth } from '@/lib/data/width'
 
 const storageSize = ref(t.value.notify.calculating + '...')
 
-function getStorageSize () {
+function getStorageSize() {
     let size = 0
     for (const key in localStorage) {
         if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
@@ -42,7 +41,7 @@ function getStorageSize () {
     })
 }
 
-function clearStorage () {
+function clearStorage() {
     DataControl.reset()
     message.notify(t.value.notify.clearedSuccessfullyAndReloading, message.success)
     setTimeout(() => {
@@ -56,7 +55,7 @@ function clearStorage () {
     <el-dialog v-model="mainShow.settings.value" :title="t.noun.settings" :width="dialogWidth"
                @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
         <div id="settings">
-            <!--Common Settings-->
+            <!--Generic Settings-->
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
                 <h2 style="margin: 10px 0">{{ t.noun.common }}</h2>
@@ -68,7 +67,7 @@ function clearStorage () {
                     <th>{{ t.noun.editor }}</th>
                     <td>
                         <el-select v-model="config.editor">
-                            <el-option v-for="(_, key) in Editors" :key="key" :value="key"
+                            <el-option v-for="key in Object.keys(Editors)" :key="key" :value="key"
                                        :label="t.name.editor[key]"/>
                         </el-select>
                     </td>
@@ -77,7 +76,7 @@ function clearStorage () {
                     <th>{{ t.noun.renderer }}</th>
                     <td>
                         <el-select v-model="config.renderer">
-                            <el-option v-for="(_, key) in Renderers" :key="key" :value="key"
+                            <el-option v-for="key in Object.keys(Renderers)" :key="key" :value="key"
                                        :label="t.name.renderer[key]"/>
                         </el-select>
                     </td>
@@ -93,19 +92,20 @@ function clearStorage () {
                 <tr>
                     <th>{{ t.noun.imageQuality }}</th>
                     <td>
-                        <el-input v-model="settings.common.imageQuality" :clearable="true"
-                                  @change="(v) => {setCommonSettings('imageQuality',+v,(v) => v > 0)}"
-                                  @clear="setCommonSettings('imageQuality',false)"
-                                  :placeholder="'' + defaultSettings.imageQuality"/>
+                        <SettingsNumberInput
+                            v-model="genericSettings.imageQuality"
+                            :default-value="DEFAULT_GENERIC_SETTINGS.imageQuality"
+                        />
                     </td>
                 </tr>
                 <tr>
                     <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br/>({{ t.tip.settings.dialogWidth }})</span>
                     </th>
                     <td>
-                        <el-input :model-value="settings.common.width" :clearable="true"
-                                  @update:model-value="(v) => {{setCommonSettings('width',+v,(v) => v > 0)}}"
-                                  :placeholder="'' + defaultSettings.width"/>
+                        <SettingsNumberInput
+                            v-model="genericSettings.width"
+                            :default-value="DEFAULT_GENERIC_SETTINGS.width"
+                        />
                     </td>
                 </tr>
                 </tbody>

@@ -10,10 +10,11 @@ import Hook from '@/lib/utils/hook'
 import type * as DT from '@/lib/data/dataTypes';
 import type { CharsRecord } from '@/lib/data/dataTypes';
 
-// TODO refactor
-const defaultSettings = { common: {}, editor: { Default: {} }, renderer: { Siracusa: {} } }
+// TODO 将common更名为generic
+const defaultSettings = { common: {}, editor: {}, renderer: {} }
 
 const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
+// settings: 原始settings (不含default)
 const settings: Ref<DT.SettingsData> = ref(copy(defaultSettings))
 const chars: Ref<DT.CharsData> = ref({})
 const chats: Ref<DT.ChatsData> = ref([])
@@ -247,6 +248,7 @@ class ImageStorage {
 
 
 interface DataControlHooks {
+    beforeUpdate: Hook<Array<DT.StorageKey>>
     update: Hook;
     switch: Hook;
     clear: Hook<Array<string> | undefined>;
@@ -277,6 +279,7 @@ const DataControl = new class DataControl {
         this.version = []
         this.index = -1
         this.hook = {
+            beforeUpdate: new Hook<Array<DT.StorageKey>>(),
             update: new Hook(),
             switch: new Hook(),
             clear: new Hook(),
@@ -370,6 +373,16 @@ const DataControl = new class DataControl {
         }
     }
 
+    getNeedUpdate() {
+        const updateList: Array<DT.StorageKey> = []
+        for (const key in this.storage) {
+            if (Object.prototype.hasOwnProperty.call(this.storage, key) && this.storage[key].update) {
+                updateList.push(key as DT.StorageKey)
+            }
+        }
+        return updateList
+    }
+
     save(update?: DT.StorageKey | Array<DT.StorageKey>) {
         // 保存更新节点，用于撤回/重做
         if (this.index > -1) {
@@ -379,6 +392,7 @@ const DataControl = new class DataControl {
         if (update) {
             this.update(update)
         }
+        this.hook.beforeUpdate.call(this.getNeedUpdate())
         const operator: Array<DT.OperateRecord> = []
         for (const key in this.storage) {
             if (Object.prototype.hasOwnProperty.call(this.storage, key)) {
