@@ -126,8 +126,8 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
         const rendererKey = ['background', 'showCharName', 'showCharNameSettings']
         const group: Array<[Array<string>, object]> = [
             [commonKey, newSettings.common],
-            [editorKey, newSettings.editor.Default],
-            [rendererKey, newSettings.renderer.Siracusa]
+            [editorKey, (newSettings.editor as { Default: object }).Default],
+            [rendererKey, (newSettings.renderer as { Siracusa: object }).Siracusa]
         ]
         for (const key in oldSettings) {
             for (let i = 0; i < group.length; i++) {
