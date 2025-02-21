@@ -109,15 +109,17 @@ function setCurrCutPoint(index: number) {
 }
 
 function getClosetCutPoint() {
-    const scrollTop = currEditorRef.value.currScrollTop + window.innerHeight / 2
-    for (let i = 1; i < sortedCutPoints.value.length; i++) {
-        const dialogue = getDialogue(sortedCutPoints.value[i].id)
-        if (dialogue && dialogue.offsetTop > scrollTop) {
-            if (scrollTop - dialogue.offsetTop >
-                dialogue.offsetTop - scrollTop) {
-                return i
-            } else {
-                return i - 1
+    if (currEditorRef.value) {
+        const scrollTop = currEditorRef.value.currScrollTop + window.innerHeight / 2
+        for (let i = 1; i < sortedCutPoints.value.length; i++) {
+            const dialogue = getDialogue(sortedCutPoints.value[i].id)
+            if (dialogue && dialogue.offsetTop > scrollTop) {
+                if (scrollTop - dialogue.offsetTop >
+                    dialogue.offsetTop - scrollTop) {
+                    return i
+                } else {
+                    return i - 1
+                }
             }
         }
     }

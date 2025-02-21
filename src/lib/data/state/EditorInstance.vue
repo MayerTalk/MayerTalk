@@ -5,12 +5,12 @@ import { ElScrollbar } from 'element-plus';
 
 
 const SettingsDialog: ComponentPublicInstance = {} as ComponentPublicInstance
-const scrollTop = ref(0)
+const currScrollTop = ref(0)
 const scroll = ref<InstanceType<typeof ElScrollbar> | null>(null)
 
 defineExpose({
     scroll,
-    scrollTop,
+    currScrollTop,
     SettingsDialog
 })
 </script>
