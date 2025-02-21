@@ -34,7 +34,7 @@ interface SettingsOptions<T> {
     default: T
 }
 
-class SettingsManager<T> {
+class SettingsManager<T extends object> {
     type: 'generic' | 'editor' | 'renderer'
     key: string
     default: T
@@ -86,7 +86,7 @@ const GenericSettingsManager = new SettingsManager<GenericSettings>({
     default: DEFAULT_GENERIC_SETTINGS
 })
 const genericSettings = GenericSettingsManager.ref
-const currRendererSettings: ComputedRef<GenericSettings> = computed(() => {
+const currRendererSettings: ComputedRef<RendererGenericSettings> = computed(() => {
     if (currRendererRef.value) {
         return currRendererRef.value.rendererSettings
     } else {
