@@ -20,6 +20,13 @@ function copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj))
 }
 
+function ensureValue<T>(value: T, key: string = 'Val'): NonNullable<T> {
+    if (value === null || value === undefined) {
+        throw new Error(`${key} is not a valid value`)
+    }
+    return value
+}
+
 function saveData(name: string, data: object | string | number) {
     let dataStr: string
     if (typeof data === 'object') {
@@ -114,14 +121,14 @@ function image2square(image: HTMLImageElement) {
     return canvas
 }
 
-function ensure(done: Callback, text: string) {
+function ensureMessage(done: Callback, text: string) {
     message.confirm(text, t.value.noun.hint, () => {
         done()
     })
 }
 
 function ensureClose(done: Callback) {
-    ensure(done, t.value.notify.whetherQuitEditing)
+    ensureMessage(done, t.value.notify.whetherQuitEditing)
 }
 
 type ClickableHTMLElement = HTMLElement & { click: () => void }
@@ -133,8 +140,9 @@ function clickBySelector(selector: string) {
     }
 }
 
-function getDialogue(id: string) {
-    return document.getElementById(id)
+function getDialogue(id: string): HTMLElement {
+    const dialog = document.getElementById(id)
+    return ensureValue(dialog, `Dialogue ${id} not found`)
 }
 
 function doAfter<T>(fn: () => T, callback: CallBackData<T>, cd = 0) {
@@ -243,8 +251,8 @@ function excludeDefault<T>(value: object, defaultValue: Readonly<object>): T {
         if (!hasOwn(value, key)) continue
         const resultVal = result[key]
         const defaultValueVal = defaultValue[key]
-        if (isObject(resultVal) && hasOwn(defaultValue,key) && isObject(defaultValueVal)) {
-            const processed = excludeDefault(resultVal,defaultValueVal)
+        if (isObject(resultVal) && hasOwn(defaultValue, key) && isObject(defaultValueVal)) {
+            const processed = excludeDefault(resultVal, defaultValueVal)
             result[key] = processed
 
             if (Object.keys(processed as object).length === 0) {
@@ -262,6 +270,7 @@ export {
     copy,
     uuid,
     hasOwn,
+    ensureValue,
     isObject,
     saveData,
     getData,
@@ -269,7 +278,7 @@ export {
     blob2url,
     blob2base64,
     image2square,
-    ensure,
+    ensureMessage,
     ensureClose,
     clickBySelector,
     getDialogue,

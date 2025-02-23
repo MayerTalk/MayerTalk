@@ -5,7 +5,7 @@ import { supportLang, langShow } from '@/lib/lang/constant'
 import Editors from '@/editor'
 import Renderers from '@/renderer'
 import message from '@/lib/utils/message'
-import { ensure, formatSize, clickBySelector } from '@/lib/utils/tool'
+import { ensureMessage, formatSize, clickBySelector } from '@/lib/utils/tool'
 import Save from '@/lib/function/savefile'
 import { downloadData, uploadData } from '@/lib/data/versionControl'
 import { mainShow } from '@/lib/data/showControl'
@@ -166,7 +166,7 @@ function clearStorage() {
                     <th>{{ t.noun.local }}</th>
                     <td>{{ storageSize }}</td>
                     <td>
-                        <el-button @click="ensure(clearStorage,t.tip.emptyData)">{{ t.action.reset }}
+                        <el-button @click="ensureMessage(clearStorage,t.tip.emptyData)">{{ t.action.reset }}
                         </el-button>
                     </td>
                 </tr>

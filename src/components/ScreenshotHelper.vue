@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { computed, inject, nextTick, onUnmounted, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/utils/tool'
+import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter, ensureValue } from '@/lib/utils/tool'
 import { TypeSeries } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { t } from '@/lib/lang/translate'
@@ -18,12 +18,15 @@ import { duringScreenshot } from '@/lib/data/state'
 import SettingsTextInput from '@/components/Settings/SettingsTextInput.vue'
 import SettingsNumberInput from '@/components/Settings/SettingsNumberInput.vue'
 import { DEFAULT_GENERIC_SETTINGS, genericSettings } from '@/lib/data/settings'
+import type { Ref } from 'vue'
 
 const emit = defineEmits(['start', 'done'])
 
-let screenshotNode = null
-let watermarkNode = null
-const rendererWidth = inject('rendererWidth')
+let screenshotNode: HTMLElement | null = null
+let watermarkNode: HTMLElement | null = null
+const rendererWidth= inject<Ref<{
+    window: number
+}>>('rendererWidth')
 const title = ref('')
 const realScale = computed(() => {
     return genericSettings.value.imageQuality * 1.5
@@ -36,9 +39,21 @@ onUnmounted(DataControl.hook.changeSavefile.on(() => {
     title.value = ''
 }))
 
-function downloadScreenshot(cb = null, options = {}) {
-    getCanvas(options.screenshotNode || screenshotNode, {
-        windowWidth: rendererWidth.value.window + 20,
+interface DownloadScreenshotOptions {
+    screenshotNode?: HTMLElement
+    options?: object
+    watermarkCanvas?: HTMLCanvasElement,
+    filename?: string
+    title?: string
+}
+
+function downloadScreenshot(cb?: () => void, options: DownloadScreenshotOptions = {}) {
+    const node = options.screenshotNode || screenshotNode
+    if (!node) {
+        throw new Error('Unable to download screenshot')
+    }
+    getCanvas(node, {
+        windowWidth: ensureValue(rendererWidth, 'rendererWidth').value.window + 20,
         scale: realScale.value,
         useCORS: true,
         ...(options.options || {})
@@ -46,6 +61,9 @@ function downloadScreenshot(cb = null, options = {}) {
         if (options.watermarkCanvas) {
             const finalCanvas = document.createElement('canvas')
             const ctx = finalCanvas.getContext('2d')
+            if (!ctx) {
+                throw new Error('Unable to render canvas context')
+            }
             finalCanvas.width = canvas.width
             finalCanvas.height = options.watermarkCanvas.height + canvas.height - 1
             ctx.drawImage(options.watermarkCanvas, 0, 0)
@@ -69,26 +87,33 @@ const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
     // -10 dialogue margin-bottom
     const res = Math.floor(genericSettings.value.maxHeight / realScale.value) - 30 -
-        (genericSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) - 10
+        (genericSettings.value.watermark && watermarkNode ? watermarkNode.scrollHeight - 1 : 0) - 10
     return res > 0 ? res : 1
 })
 
-function dialogueOffsetTop(el) {
+function dialogueOffsetTop(el: HTMLElement) {
     // offsetTop 包含 renderer paddingTop 20px
     return el.offsetTop - 20
 }
 
-function getAutoCutGroup(start, end, maxHeight) {
+interface GetAutoCutGroupOptions {
+    start: number
+    end?: number
+    maxHeight: number
+}
+
+function getAutoCutGroup(options: GetAutoCutGroupOptions) {
     if (!genericSettings.value.autoCut) {
         return []
     }
+    const { start, end, maxHeight } = options
     const chatsData = end ? chats.value.slice(start, end) : chats.value.slice(start)
     const offset = dialogueOffsetTop(getDialogue(chatsData[0].id))
     const totalHeight = end
         ? dialogueOffsetTop(getDialogue(chats.value[end].id)) - dialogueOffsetTop(getDialogue(chatsData[0].id))
-        : screenshotNode.scrollHeight - 30 - offset
+        : screenshotNode ? screenshotNode.scrollHeight - 30 - offset : 0
 
-    function offsetTop(el) {
+    function offsetTop(el: HTMLElement) {
         return dialogueOffsetTop(el) - offset
     }
 
@@ -97,7 +122,7 @@ function getAutoCutGroup(start, end, maxHeight) {
         return []
     }
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
-    const points = []
+    const points: Array<number> = []
     // 已裁分Height
     let croppedHeight = 10
     // 最后一次裁分index
@@ -177,11 +202,15 @@ function getScreenshotGroup() {
     const maxHeight = realMaxHeight.value
     let lastCut = 0
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
-    const points = []
+    const points: Array<number> = []
     if (genericSettings.value.manualCut && !duringPartialScreenshot.value) {
         for (let i = 0; i < chats.value.length - 1; i++) {
             if (chats.value[i].data.cutPoint) {
-                getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
+                getAutoCutGroup({
+                    start: lastCut,
+                    end: i + 1,
+                    maxHeight
+                }).forEach((point) => {
                     points.push(point + lastCut)
                 })
                 points.push(i + 1)
@@ -189,7 +218,10 @@ function getScreenshotGroup() {
             }
         }
     }
-    getAutoCutGroup(lastCut, null, maxHeight).forEach((point) => {
+    getAutoCutGroup({
+        start: lastCut,
+        maxHeight
+    }).forEach((point) => {
         points.push(point + lastCut)
     })
     return points
@@ -208,11 +240,12 @@ const longScreenshot = computed(() => {
     return chats.value.length > 200
 })
 
-function _screenshot(ensure = false, watermarkCanvas = null) {
+function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
+    ensureValue(screenshotNode, 'screenshotNode')
     const group = getScreenshotGroup()
     const options = {
         watermarkCanvas,
-        title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
+        title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now().toString()
     }
     if (group.length > 0) {
         if (group.length > 10 && !ensure) {
@@ -224,15 +257,23 @@ function _screenshot(ensure = false, watermarkCanvas = null) {
             return
         }
         const chatsData = copy(chats.value)
-        const next = (i) => {
+        const next = (i: number) => {
             if (i > group.length) {
-                longScreenshot.value && message.notify(t.value.notify.screenshottedCompletely, message.success)
+                if (longScreenshot.value) {
+                    message.notify(t.value.notify.screenshottedCompletely, message.success)
+                }
                 done()
-                screenshotNode.style.height = null
+                if (!screenshotNode) throw new Error('screenshotNode not found')
+                screenshotNode.style.height = ''
+
                 setTimeout(() => {
                     chats.value = chatsData
                     setTimeout(() => {
-                        longScreenshot.value ? message.notify(t.value.notify.recoveredSuccessfully, message.success) : message.notify(t.value.notify.multiScreenshotEnd, message.success)
+                        if (longScreenshot.value) {
+                            message.notify(t.value.notify.recoveredSuccessfully, message.success)
+                        } else {
+                            message.notify(t.value.notify.multiScreenshotEnd, message.success)
+                        }
                     }, 50)
                 }, 500)
                 // 截图结束
@@ -240,8 +281,10 @@ function _screenshot(ensure = false, watermarkCanvas = null) {
             }
             chats.value = chatsData.slice(group[i - 1], group[i])
             setTimeout(() => {
-                screenshotNode.style.height = null
+                if (!screenshotNode) throw new Error('screenshotNode not found')
+                screenshotNode.style.height = ''
                 screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
+
                 setTimeout(() => {
                     downloadScreenshot(() => {
                         message.notify(t.value.notify.screenshottedSuccessfully + ' [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
@@ -253,25 +296,31 @@ function _screenshot(ensure = false, watermarkCanvas = null) {
                 }, 100)
             }, 100)
         }
-        longScreenshot.value ? message.notify(t.value.notify.startToScreenshot, message.warning) : message.notify(t.value.notify.multiScreenshotStart, message.warning)
+        if (longScreenshot.value) {
+            message.notify(t.value.notify.startToScreenshot, message.warning)
+        } else {
+            message.notify(t.value.notify.multiScreenshotStart, message.warning)
+        }
         setTimeout(() => {
             next(0)
         }, 500)
     } else {
         // 将height定为整数，防止截图下方出现白条
+        if (!screenshotNode) throw new Error('screenshotNode not found')
         screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
         setTimeout(() => {
             downloadScreenshot(() => {
-                screenshotNode.style.height = null
+                if (!screenshotNode) throw new Error('screenshotNode not found')
+                screenshotNode.style.height = ''
                 done()
             }, options)
         }, 100)
     }
 }
 
-function getWatermarkCanvas(cb) {
-    getCanvas(watermarkNode, {
-        windowWidth: rendererWidth.value.window + 20,
+function getWatermarkCanvas(cb: (canvas: HTMLCanvasElement) => void) {
+    getCanvas(ensureValue(watermarkNode, 'watermarkNode'), {
+        windowWidth: ensureValue(rendererWidth, 'rendererWidth').value.window + 20,
         scale: realScale.value,
         useCORS: true
     }, cb)
@@ -293,9 +342,11 @@ function screenshot() {
 }
 
 const expectCutNumber = computed(() => {
-    const heights = []
+    ensureValue(screenshotNode, 'screenshotNode')
+    if (!screenshotNode) throw new Error('screenshotNode not found')
+    const heights: Array<number> = []
     if (genericSettings.value.manualCut && sortedCutPoints.value.length && !duringPartialScreenshot.value) {
-        const parts = []
+        const parts: Array<number> = []
         for (let i = 0; i < sortedCutPoints.value.length; i++) {
             const el = getDialogue(sortedCutPoints.value[i].id)
             if (!el) {
@@ -334,9 +385,9 @@ const expectCutNumber = computed(() => {
 
 const ExpectLength = {
     calc() {
-        this.result.value = Math.ceil((screenshotNode.scrollHeight +
+        this.result.value = Math.ceil((ensureValue(screenshotNode, 'screenshotNode').scrollHeight +
                 (30 * (expectCutNumber.value - 1)) +
-                (genericSettings.value.watermark ? (watermarkNode.scrollHeight - 1) * expectCutNumber.value : 0)) *
+                (genericSettings.value.watermark ? (ensureValue(watermarkNode, 'watermarkNode').scrollHeight - 1) * expectCutNumber.value : 0)) *
             realScale.value)
     },
     mount() {
@@ -534,10 +585,11 @@ defineExpose({
     </el-dialog>
     <Teleport to="body">
         <div style="position: absolute; top: 0;z-index: -1; overflow: hidden"
-             :style="{width: rendererWidth.window+'px'}">
+             :style="{width: rendererWidth? rendererWidth.window+'px':'0'}">
             <div id="watermark" style="position: absolute; top: 0; background: white">
-                <div :style="{width: rendererWidth.window+'px', background: currRendererSettings.background}"
-                     class="watermark-bar">
+                <div
+                    :style="{width: rendererWidth? rendererWidth.window+'px':'0', background: currRendererSettings.background}"
+                    class="watermark-bar">
                     <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 6px 0; opacity: 1"><i>MayerTalk</i></h1>
                     <div>
                         <p v-if="title" style="margin-bottom: 3px">{{ t.noun.title }}: {{ title }}</p>
