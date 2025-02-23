@@ -147,6 +147,7 @@ loadData()
     </el-dialog>
 </template>
 
+<!--suppress CssUnusedSymbol -->
 <style>
 /*noinspection CssUnusedSymbol*/
 .el-table__inner-wrapper .cell {
