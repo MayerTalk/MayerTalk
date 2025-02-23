@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { ensure, formatSize } from '@/lib/utils/tool'
+import { ensureMessage, formatSize } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import Save from '@/lib/function/savefile'
 import { dialogWidth } from '@/lib/data/width'
@@ -70,7 +70,7 @@ function newSave() {
 }
 
 function syncSave(row: TableRecord) {
-    ensure(() => {
+    ensureMessage(() => {
         Save.save(row.id, () => {
             message.notify(t.value.notify.savedSuccessfully, message.success)
             loadData()
@@ -85,7 +85,7 @@ function loadSave(row: TableRecord) {
             loadData()
         })
     } else {
-        ensure(() => {
+        ensureMessage(() => {
             Save.load(row.id, () => {
                 message.notify(t.value.notify.loadedSuccessfully, message.success)
                 loadData()
@@ -95,7 +95,7 @@ function loadSave(row: TableRecord) {
 }
 
 function deleteSave(row: TableRecord) {
-    ensure(() => {
+    ensureMessage(() => {
         Save.delete(row.id, () => {
             loadData()
             message.notify(t.value.notify.deletedSuccessfully, message.success)
@@ -147,6 +147,7 @@ loadData()
     </el-dialog>
 </template>
 
+<!--suppress CssUnusedSymbol -->
 <style>
 .el-table__inner-wrapper .cell {
     padding: 0 5px;
