@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onUnmounted, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter, ensureValue } from '@/lib/utils/tool'
+import {
+    getCanvas,
+    downloadCanvas,
+    copy,
+    getDialogue,
+    parseFilename,
+    doAfter,
+    ensureValue,
+    assertNonValue
+} from '@/lib/utils/tool'
 import { TypeSeries } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { t } from '@/lib/lang/translate'
@@ -24,7 +33,7 @@ const emit = defineEmits(['start', 'done'])
 
 let screenshotNode: HTMLElement | null = null
 let watermarkNode: HTMLElement | null = null
-const rendererWidth= inject<Ref<{
+const rendererWidth = inject<Ref<{
     window: number
 }>>('rendererWidth')
 const title = ref('')
@@ -241,7 +250,6 @@ const longScreenshot = computed(() => {
 })
 
 function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
-    ensureValue(screenshotNode, 'screenshotNode')
     const group = getScreenshotGroup()
     const options = {
         watermarkCanvas,
@@ -263,8 +271,7 @@ function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
                     message.notify(t.value.notify.screenshottedCompletely, message.success)
                 }
                 done()
-                if (!screenshotNode) throw new Error('screenshotNode not found')
-                screenshotNode.style.height = ''
+                ensureValue(screenshotNode,'screenshotNode').style.height = ''
 
                 setTimeout(() => {
                     chats.value = chatsData
@@ -281,7 +288,7 @@ function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
             }
             chats.value = chatsData.slice(group[i - 1], group[i])
             setTimeout(() => {
-                if (!screenshotNode) throw new Error('screenshotNode not found')
+                assertNonValue(screenshotNode, 'screenshotNode')
                 screenshotNode.style.height = ''
                 screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
 
@@ -306,12 +313,11 @@ function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
         }, 500)
     } else {
         // 将height定为整数，防止截图下方出现白条
-        if (!screenshotNode) throw new Error('screenshotNode not found')
+        assertNonValue(screenshotNode, 'screenshotNode')
         screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
         setTimeout(() => {
             downloadScreenshot(() => {
-                if (!screenshotNode) throw new Error('screenshotNode not found')
-                screenshotNode.style.height = ''
+                ensureValue(screenshotNode,'screenshotNode').style.height = ''
                 done()
             }, options)
         }, 100)
@@ -342,8 +348,7 @@ function screenshot() {
 }
 
 const expectCutNumber = computed(() => {
-    ensureValue(screenshotNode, 'screenshotNode')
-    if (!screenshotNode) throw new Error('screenshotNode not found')
+    assertNonValue(screenshotNode, 'screenshotNode')
     const heights: Array<number> = []
     if (genericSettings.value.manualCut && sortedCutPoints.value.length && !duringPartialScreenshot.value) {
         const parts: Array<number> = []

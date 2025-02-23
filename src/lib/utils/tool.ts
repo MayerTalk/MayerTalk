@@ -20,11 +20,17 @@ function copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj))
 }
 
-function ensureValue<T>(value: T, key: string = 'Val'): NonNullable<T> {
+function ensureValue<T>(value: T, name: string = 'Val'): NonNullable<T> {
     if (value === null || value === undefined) {
-        throw new Error(`${key} is not a valid value`)
+        throw new Error(`${name} is not a valid value`)
     }
-    return value
+    return value as NonNullable<T>
+}
+
+function assertNonValue<T>(value: T, name: string = 'Val'): asserts value is NonNullable<T> {
+    if (value === null || value === undefined) {
+        throw new Error(`${name} is not a valid value`)
+    }
 }
 
 function saveData(name: string, data: object | string | number) {
@@ -271,6 +277,7 @@ export {
     uuid,
     hasOwn,
     ensureValue,
+    assertNonValue,
     isObject,
     saveData,
     getData,
