@@ -7,19 +7,19 @@ import { editorSettings } from '@/editor/Default'
 
 const validSpace = ref(0)
 
-function refreshValidSpace () {
+function refreshValidSpace() {
     validSpace.value = window.innerWidth - defaultWindowWidth
 }
 
 refreshValidSpace()
 WindowResize.on(refreshValidSpace)
 
-let sidebarPlaceholderNode = {}
+let sidebarPlaceholderNode: HTMLElement | null = null
 const sidebarWidth = ref(0)
 
-function getSidebarWidth () {
+function getSidebarWidth() {
     // +1 border
-    return sidebarPlaceholderNode.scrollWidth + 1 || 80
+    return sidebarPlaceholderNode ? sidebarPlaceholderNode.scrollWidth + 1 : 80
 }
 
 doAfter(() => {
@@ -34,7 +34,7 @@ DataControl.hook.update.on(() => {
     sidebarWidth.value = getSidebarWidth()
 })
 
-const ifShowPermanentSelectChar = computed(() => {
+const ifShowPermanentSelectChar = computed<boolean>(() => {
     return editorSettings.value.characterSelectorPermanent && validSpace.value - sidebarWidth.value - (421 + 22 * 2) > 0
 })
 

@@ -10,7 +10,7 @@ import {
     ensureValue,
     assertNonValue
 } from '@/lib/utils/tool'
-import { TypeSeries } from '@/lib/data/constance'
+import { ChatSeries } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { t } from '@/lib/lang/translate'
 import { chats, chars, DataControl } from '@/lib/data/data'
@@ -271,7 +271,7 @@ function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
                     message.notify(t.value.notify.screenshottedCompletely, message.success)
                 }
                 done()
-                ensureValue(screenshotNode,'screenshotNode').style.height = ''
+                ensureValue(screenshotNode, 'screenshotNode').style.height = ''
 
                 setTimeout(() => {
                     chats.value = chatsData
@@ -317,7 +317,7 @@ function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
         screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
         setTimeout(() => {
             downloadScreenshot(() => {
-                ensureValue(screenshotNode,'screenshotNode').style.height = ''
+                ensureValue(screenshotNode, 'screenshotNode').style.height = ''
                 done()
             }, options)
         }, 100)
@@ -391,8 +391,8 @@ const expectCutNumber = computed(() => {
 const ExpectLength = {
     calc() {
         this.result.value = Math.ceil((ensureValue(screenshotNode, 'screenshotNode').scrollHeight +
-                (30 * (expectCutNumber.value - 1)) +
-                (genericSettings.value.watermark ? (ensureValue(watermarkNode, 'watermarkNode').scrollHeight - 1) * expectCutNumber.value : 0)) *
+            (30 * (expectCutNumber.value - 1)) +
+            (genericSettings.value.watermark ? (ensureValue(watermarkNode, 'watermarkNode').scrollHeight - 1) * expectCutNumber.value : 0)) *
             realScale.value)
     },
     mount() {
@@ -430,7 +430,7 @@ const wordCount = computed(() => {
     let count = 0
     for (let i = 0; i < chats.value.length; i++) {
         const chat = chats.value[i]
-        const type = TypeSeries[chat.type]
+        const type = ChatSeries[chat.type]
         if (type === 'Text') {
             count += chat.content.length
         } else if (type === 'TextArray') {
@@ -456,13 +456,13 @@ defineExpose({
 
 <template>
     <el-dialog v-model="mainShow.screenshotHelper.value" :width="dialogWidth" :title="t.noun.screenshot"
-               @close="handleClose">
+        @close="handleClose">
         <div>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
                     <h2 style="margin: 0 10px 0 0">{{ t.noun.watermark }}</h2>
-                    <el-switch v-model="genericSettings.watermark"/>
+                    <el-switch v-model="genericSettings.watermark" />
                     <div class="line-right"></div>
                 </div>
             </div>
@@ -470,19 +470,19 @@ defineExpose({
                 <div v-show="genericSettings.watermark" style="padding: 0 0 10px 10px">
                     <table>
                         <tbody>
-                        <tr>
-                            <th>{{ t.noun.title }}</th>
-                            <td>
-                                <el-input v-model="title" clearable></el-input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{{ t.noun.author }}</th>
-                            <td>
-                                <SettingsTextInput v-model="genericSettings.author"
-                                                   :default-value="DEFAULT_GENERIC_SETTINGS.author"/>
-                            </td>
-                        </tr>
+                            <tr>
+                                <th>{{ t.noun.title }}</th>
+                                <td>
+                                    <el-input v-model="title" clearable></el-input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ t.noun.author }}</th>
+                                <td>
+                                    <SettingsTextInput v-model="genericSettings.author"
+                                        :default-value="DEFAULT_GENERIC_SETTINGS.author" />
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -492,14 +492,13 @@ defineExpose({
                     <div style="display: flex; align-items: center; width: 100%">
                         <div class="line-left" style="width: 20px;"></div>
                         <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
-                        <el-switch v-model="genericSettings.manualCut"/>
+                        <el-switch v-model="genericSettings.manualCut" />
                         <div class="line-right"></div>
                     </div>
                 </div>
                 <CollapseItem>
                     <div v-show="genericSettings.manualCut" style="padding: 0 0 10px 10px">
-                        <div class="column-display"
-                             style="display: flex; align-items: center; padding-top: 5px">
+                        <div class="column-display" style="display: flex; align-items: center; padding-top: 5px">
                             <div style="width: 100%">
                                 {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
                             </div>
@@ -514,20 +513,17 @@ defineExpose({
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
                     <h2 style="margin: 0 10px 0 0">{{ t.noun.autoCut }}</h2>
-                    <el-switch v-model="genericSettings.author"/>
+                    <el-switch v-model="genericSettings.author" />
                     <div class="line-right"></div>
                 </div>
             </div>
             <CollapseItem>
                 <div v-show="genericSettings.autoCut" style="padding: 0 0 10px 10px">
-                    <div class="column-display"
-                         style="display: flex; align-items: center; padding-top: 5px">
+                    <div class="column-display" style="display: flex; align-items: center; padding-top: 5px">
                         <div style="width: 100%"> {{ t.noun.maxLength }}
-                            <SettingsNumberInput
-                                v-model="genericSettings.maxHeight"
+                            <SettingsNumberInput v-model="genericSettings.maxHeight"
                                 :default-value="DEFAULT_GENERIC_SETTINGS.maxHeight"
-                                style="width: 100px; margin-left: 10px"
-                            />
+                                style="width: 100px; margin-left: 10px" />
                         </div>
                         <div style="width: 100%">
                             {{ t.noun.expectCutNumber }}: {{ expectCutNumber }}
@@ -546,54 +542,49 @@ defineExpose({
                 <div style="width: 100%">
                     <table>
                         <tbody>
-                        <tr>
-                            <th>{{ t.noun.characterCount }}:</th>
-                            <td>{{ Object.keys(chars).length }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ t.noun.chatCount }}:</th>
-                            <td>{{ chats.length }}</td>
-                        </tr>
+                            <tr>
+                                <th>{{ t.noun.characterCount }}:</th>
+                                <td>{{ Object.keys(chars).length }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ t.noun.chatCount }}:</th>
+                                <td>{{ chats.length }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
                 <div style="width: 100%">
                     <table>
                         <tbody>
-                        <tr>
-                            <th>{{ t.noun.wordCount }}:</th>
-                            <td>{{ wordCount }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ t.noun.screenshotLength }}:</th>
-                            <td>{{ ExpectLength.result }}px</td>
-                        </tr>
+                            <tr>
+                                <th>{{ t.noun.wordCount }}:</th>
+                                <td>{{ wordCount }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ t.noun.screenshotLength }}:</th>
+                                <td>{{ ExpectLength.result }}px</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
-            <el-button
-                @click="() => {DataControl.save(['settings']); enablePartialScreenshotView()}"
-                :disabled="duringPartialScreenshot"
-                style="width: 30%"
-            >{{ t.action.partialScreenshot }}
+            <el-button @click="() => { DataControl.save(['settings']); enablePartialScreenshotView() }"
+                :disabled="duringPartialScreenshot" style="width: 30%">{{ t.action.partialScreenshot }}
             </el-button>
             <el-button
-                @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"
-                style="width: 30%"
-            >{{ t.action.generate }}
+                @click="() => { DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value = false }"
+                style="width: 30%">{{ t.action.generate }}
             </el-button>
         </div>
 
     </el-dialog>
     <Teleport to="body">
         <div style="position: absolute; top: 0;z-index: -1; overflow: hidden"
-             :style="{width: rendererWidth? rendererWidth.window+'px':'0'}">
+            :style="{ width: rendererWidth ? rendererWidth.window + 'px' : '0' }">
             <div id="watermark" style="position: absolute; top: 0; background: white">
-                <div
-                    :style="{width: rendererWidth? rendererWidth.window+'px':'0', background: currRendererSettings.background}"
+                <div :style="{ width: rendererWidth ? rendererWidth.window + 'px' : '0', background: currRendererSettings.background }"
                     class="watermark-bar">
                     <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 6px 0; opacity: 1"><i>MayerTalk</i></h1>
                     <div>
@@ -643,7 +634,6 @@ table {
     padding: 5px 10px;
     font-size: 16px;
 }
-
 .watermark-bar p {
     margin: 0;
 }

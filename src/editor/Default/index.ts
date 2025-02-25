@@ -1,4 +1,4 @@
-import { SettingsManager } from '@/lib/data/settings.ts';
+import { SettingsManager } from '@/lib/data/settings';
 
 interface EditorSettings {
     characterSelectorPermanent: boolean

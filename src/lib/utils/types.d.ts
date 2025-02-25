@@ -4,7 +4,7 @@ export interface Callback {
 
 export type OptionalCallback = Callback | undefined
 
-export interface CallBackData<T> {
+export interface CallBackWithData<T> {
     (data: T): void
 }
 

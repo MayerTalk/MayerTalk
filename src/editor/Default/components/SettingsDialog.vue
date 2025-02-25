@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { editorSettings } from '@/editor/Default'
 import { t } from '@/lib/lang/translate'
 </script>
@@ -6,15 +6,15 @@ import { t } from '@/lib/lang/translate'
 <template>
     <table>
         <tbody>
-        <tr>
-            <th>{{ t.noun.characterSelectorPermanent }}<span
-                style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
-            <td>
-                <el-switch v-model="editorSettings.characterSelectorPermanent" style="margin-left: 10px"/>
-            </td>
-        </tr>
+            <tr>
+                <th>{{ t.noun.characterSelectorPermanent }}<span style="color:grey;"><br />({{
+                    t.tip.settings.characterSelectorPermanent }})</span></th>
+                <td>
+                    <el-switch v-model="editorSettings.characterSelectorPermanent" style="margin-left: 10px" />
+                </td>
+            </tr>
         </tbody>
     </table>
 </template>
 
-<style scoped src="@/style/settings.css"/>
+<style scoped src="@/style/settings.css" />

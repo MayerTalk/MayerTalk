@@ -1,5 +1,5 @@
-<script setup>
-import { onUnmounted, ref } from 'vue'
+<script setup lang="ts">
+import { onUnmounted, ref, useTemplateRef } from 'vue'
 import { t } from '@/lib/lang/translate'
 import SelectCharDialog from './SelectCharDialog.vue'
 
@@ -9,6 +9,10 @@ import message from '@/lib/utils/message'
 import { blob2url, image2square, doAfterRefMounted } from '@/lib/utils/tool'
 import { dialogWidth } from '@/lib/data/width'
 import { closeShowHook } from '@/lib/data/showControl'
+import type { ElInput, UploadFile } from 'element-plus';
+import type { CharsRecord } from '@/lib/data/dataTypes';
+
+// TODO fix 使用素材库创建角色后，短暂出现角色默认名称
 
 const ifShow = ref(false)
 
@@ -18,14 +22,14 @@ onUnmounted(closeShowHook.on(() => {
     }
 }))
 
-const charData = ref({})
+const charData = ref < Partial < CharsRecord >> ({})
 const createChar = ref(false)
 const defaultName = ref('')
-const inputRef = ref(null)
+const inputRef = useTemplateRef < InstanceType < typeof ElInput >> ('inputRef')
 
 const ifShowSelectChar = ref(false)
 
-function open (create, data) {
+function open(create: boolean, data?: CharsRecord) {
     // 启动角色编辑 create:是否创建角色
     createChar.value = create
     if (create) {
@@ -34,7 +38,7 @@ function open (create, data) {
         } else {
             charData.value = { name: '' }
         }
-    } else if (currCharId.value) {
+    } else if (currCharId.value && currCharData.value) {
         charData.value = currCharData.value
     } else {
         message.notify(t.value.notify.pleaseSelectCharacter, message.warning)
@@ -48,26 +52,30 @@ function open (create, data) {
     }
 }
 
-function clearCharData () {
+function clearCharData() {
     // 清除遗留数据
-    if (createChar.value && Object.prototype.hasOwnProperty.call(charData.value, 'avatar')) {
+    if (createChar.value && charData.value.avatar) {
         DataControl.images.delete(charData.value.avatar)
     }
     charData.value = {}
     defaultName.value = ''
 }
 
-function uploadAvatar (uploadFile) {
+function uploadAvatar(uploadFile) {
     // 上传头像
     const url = blob2url(uploadFile)
     if (url) {
         const image = new Image()
         image.onload = () => {
             image2square(image).toBlob((blob) => {
-                DataControl.images.new(blob, (id) => {
-                    DataControl.images.delete(charData.value.avatar)
-                    charData.value.avatar = id
-                })
+                if (blob) {
+                    DataControl.images.new(blob, (id) => {
+                        if (charData.value.avatar) {
+                            DataControl.images.delete(charData.value.avatar)
+                            charData.value.avatar = id
+                        }
+                    })
+                }
             })
         }
         image.src = url
@@ -75,7 +83,7 @@ function uploadAvatar (uploadFile) {
     return false
 }
 
-function editChar () {
+function editChar() {
     // 创建/删除角色
     if (createChar.value) {
         if (charData.value.name === '' && !defaultName.value) {
@@ -85,7 +93,12 @@ function editChar () {
         if (charData.value.name === '') {
             charData.value.name = defaultName.value
         }
-        DataControl.curr.setChar(DataControl.char.new(charData.value))
+        if (charData.value.avatar === undefined) {
+            // TODO add translation
+            message.notify(t.value.notify.avatarIsRequired, message.error)
+            return
+        }
+        DataControl.curr.setChar(DataControl.char.new(charData.value as CharsRecord))
         ifShow.value = false
         charData.value = {}
         message.notify(t.value.notify.createdSuccessfully, message.success)
@@ -103,14 +116,14 @@ function editChar () {
     }
 }
 
-function handleSelect (char) {
-    if (Object.prototype.hasOwnProperty.call(charData.value, 'avatar')) {
+function handleSelect(char:{avatar:string, name:string}) {
+    if (charData.value.avatar) {
         DataControl.images.delete(charData.value.avatar)
     }
-    [charData.value.avatar, defaultName.value] = char
+    [charData.value.avatar, defaultName.value] = ['avatar','name'].map((key) => char[key])
 }
 
-function handleInputEnter () {
+function handleInputEnter() {
     if (createChar.value) {
         if (charData.value.avatar) {
             editChar()
@@ -128,42 +141,33 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :title="createChar?t.action.createCharacter:t.action.editCharacter" :width="dialogWidth"
-               @closed="() => {DataControl.save('chars'); clearCharData()}">
+    <el-dialog v-model="ifShow" :title="createChar ? t.action.createCharacter : t.action.editCharacter" :width="dialogWidth"
+        @closed="() => { DataControl.save('chars'); clearCharData() }">
         <div style="display: flex; flex-wrap: wrap">
             <div style="width: 100%; display: flex;">
-                <el-upload
-                    action="#"
-                    drag
-                    :show-file-list="false"
-                    class="avatar-uploader"
+                <el-upload action="#" drag :show-file-list="false" class="avatar-uploader"
                     accept="image/png, image/jpeg, image/gif"
-                    :before-upload="(file) => {defaultName='';return uploadAvatar(file)}"
-                >
+                    :before-upload="(file: UploadFile) => { defaultName = ''; return uploadAvatar(file)}">
                     <div class="container"><img v-if="charData.avatar" alt=""
-                                                :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : StaticUrl + charData.avatar"/>
+                            :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : StaticUrl + charData.avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
-                            <IconPlus/>
+                            <IconPlus />
                         </el-icon>
                     </div>
                 </el-upload>
                 <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                     {{ t.noun.name }}：
                     <el-input v-model="charData.name" style="margin-top: 10px" :placeholder="defaultName" ref="inputRef"
-                              @keypress.enter="handleInputEnter"></el-input>
+                        @keypress.enter="handleInputEnter"></el-input>
                     <div style="margin-top: 5px">
                         {{ t.noun.avatarPosition }}
-                        <el-switch
-                            v-model="charData.right"
-                            :active-text="t.noun.left"
-                            :inactive-text="t.noun.right"
-                            style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff"
-                        ></el-switch>
+                        <el-switch v-model="charData.right" :active-text="t.noun.left" :inactive-text="t.noun.right"
+                            style="--el-switch-on-color: #a0cfff; --el-switch-off-color: #a0cfff"></el-switch>
                     </div>
                 </div>
             </div>
             <div style="width: 100%; margin-top: 10px">
-                <el-button style="width: 60%" @click="ifShowSelectChar=true">
+                <el-button style="width: 60%" @click="ifShowSelectChar = true">
                     {{ t.action.chooseCharacterFromLibrary }}
                 </el-button>
                 <el-button style="width: calc(40% - 12px)" @click="editChar">
@@ -172,5 +176,5 @@ defineExpose({
             </div>
         </div>
     </el-dialog>
-    <SelectCharDialog v-model="ifShowSelectChar" @select="handleSelect"/>
+    <SelectCharDialog v-model="ifShowSelectChar" @select="handleSelect" />
 </template>

@@ -6,9 +6,9 @@ import message from './message'
 import { IsMobile } from '@/lib/data/constance'
 import Input from '@/lib/function/input'
 import type { Ref } from 'vue';
-import type { Callback, CallBackData, OptionalCallback } from '@/lib/utils/types';
+import type { Callback, CallBackWithData, OptionalCallback } from '@/lib/utils/types';
 
-function hasOwn(obj: object, key: string): boolean {
+function hasOwn<T extends object, K extends string>(obj: T, key: K): obj is T & Record<K, unknown> {
     return Object.prototype.hasOwnProperty.call(obj, key);
 }
 
@@ -54,7 +54,7 @@ function getData<T>(name: string): T | null {
     return data as T | null
 }
 
-function getCanvas(node: HTMLElement, options: object, cb: CallBackData<HTMLCanvasElement>) {
+function getCanvas(node: HTMLElement, options: object, cb: CallBackWithData<HTMLCanvasElement>) {
     html2canvas(node, options).then(canvas => {
         cb(canvas)
     }).catch(err => {
@@ -101,7 +101,7 @@ function blob2url(blob: Blob): string {
     return url as string
 }
 
-function blob2base64(blob: Blob, callback: CallBackData<string>) {
+function blob2base64(blob: Blob, callback: CallBackWithData<string>) {
     const reader = new FileReader()
     reader.onloadend = () => {
         callback(reader.result as string)
@@ -151,9 +151,10 @@ function getDialogue(id: string): HTMLElement {
     return ensureValue(dialog, `Dialogue ${id} not found`)
 }
 
-function doAfter<T>(fn: () => T, callback: CallBackData<T>, cd = 0) {
-    if (fn()) {
-        callback(fn())
+function doAfter<T>(fn: () => T | null, callback: CallBackWithData<NonNullable<T>>, cd = 0) {
+    const res = fn()
+    if (res) {
+        callback(res)
     } else {
         setTimeout(() => {
             doAfter(fn, callback, cd)
@@ -161,9 +162,9 @@ function doAfter<T>(fn: () => T, callback: CallBackData<T>, cd = 0) {
     }
 }
 
-function doAfterRefMounted(ref: Ref, callback: CallBackData<boolean>) {
+function doAfterRefMounted<T>(ref: Ref<T>, callback: CallBackWithData<Ref<NonNullable<T>>>) {
     doAfter(() => {
-        return ref.value && ref
+        return ref.value ? ref as Ref<NonNullable<T>> : null
     }, callback, 0)
 }
 
@@ -237,14 +238,14 @@ function withDefault<T extends object>(value: object, defaultValue: Readonly<T>)
     for (const key in defaultValue) {
         if (!hasOwn(defaultValue, key)) continue
 
-        if (!hasOwn(result, key)) {
-            result[key] = copy(defaultValue[key])
-        } else {
+        if (Object.prototype.hasOwnProperty.call(result, key)) {
             const resultVal = result[key]
             const defaultValueVal = copy(defaultValue[key])
             if (isObject(resultVal) && isObject(defaultValueVal)) {
                 result[key] = withDefault(resultVal, defaultValueVal) as typeof defaultValueVal
             }
+        } else {
+            result[key] = copy(defaultValue[key])
         }
     }
     return result

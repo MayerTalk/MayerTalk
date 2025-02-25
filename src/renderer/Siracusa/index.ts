@@ -1,5 +1,5 @@
-import { SettingsManager } from '@/lib/data/settings.ts';
-import type { RendererGenericSettings } from '@/lib/data/settings.ts';
+import { SettingsManager } from '@/lib/data/settings';
+import type { RendererGenericSettings } from '@/lib/data/settings';
 
 interface RendererSettings extends RendererGenericSettings {
     showCharName: boolean,

@@ -1,7 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { t } from '@/lib/lang/translate'
-import message from '@/lib/utils/message'
 import { DataControl } from '@/lib/data/data'
 import CollapseItem from '@/components/CollapseItem'
 import { mobileView } from '@/editor/Default/lib/width'
@@ -9,10 +8,13 @@ import { IsMobile } from '@/lib/data/constance'
 import { defaultShow } from '@/editor/Default/lib/showControl'
 import { mainShow } from '@/lib/data/showControl'
 import ClearDialog from '@/components/ClearDialog.vue'
+import type { Ref } from 'vue'
 
-defineEmits(['showNavigation'])
+defineEmits<{
+    showNavigation: []
+}>()
 
-const sidebarContainerStyle = ref(mobileView.value ? 'fixed' : 'relative')
+const sidebarContainerStyle = ref<'fixed' | 'relative'>(mobileView.value ? 'fixed' : 'relative')
 
 watch(mobileView, () => {
     if (mobileView.value) {
@@ -40,39 +42,16 @@ watch(mobileView, () => {
     }
 })
 
-function toGuide () {
+function toGuide() {
     location.href = '/docs/guide/start.html'
 }
 
 const ifShowClear = ref(false)
 
-function clearChats () {
-    message.confirm(
-        t.value.notify.aboutToClearAllChats,
-        t.value.noun.hint,
-        () => {
-            DataControl.clear(0)
-            DataControl.curr.setDialogue(0)
-            ifShowClear.value = false
-        }
-    )
-}
-
-function clearAll () {
-    message.confirm(
-        t.value.notify.aboutToClearAllCharactersAndChats,
-        t.value.noun.hint,
-        () => {
-            DataControl.clear(1)
-            DataControl.curr.setChar('', true)
-            DataControl.curr.setDialogue(0)
-            ifShowClear.value = false
-        }
-    )
-}
-
-function openOtherDialog (show) {
-    show.value = true
+function openOtherDialog(show: Ref<boolean> | null) {
+    if (show) {
+        show.value = true
+    }
     if (mobileView.value && defaultShow.sidebar.value) {
         defaultShow.sidebar.value = false
     }
@@ -82,61 +61,62 @@ function openOtherDialog (show) {
 
 <template>
     <CollapseItem row>
-        <div v-show="defaultShow.sidebar.value" class="drawer-container" id="sidebar-container" :style="{position: sidebarContainerStyle}">
+        <div v-show="defaultShow.sidebar.value" class="drawer-container" id="sidebar-container"
+            :style="{ position: sidebarContainerStyle }">
             <div class="drawer" id="sidebar">
                 <el-scrollbar>
                     <div class="bar" @click="openOtherDialog(mainShow.screenshotHelper)">
                         <el-icon color="lightgrey" :size="35">
-                            <IconCrop/>
+                            <IconCrop />
                         </el-icon>
                         {{ t.action.screenshot }}
                     </div>
                     <div class="bar" @click="openOtherDialog(mainShow.announcement)">
                         <el-icon color="lightgrey" :size="35">
-                            <IconNotification/>
+                            <IconNotification />
                         </el-icon>
                         {{ t.noun.announcement }}
                     </div>
                     <div class="bar" @click="toGuide">
                         <el-icon :size="35">
-                            <IconNotebook/>
+                            <IconNotebook />
                         </el-icon>
                         {{ t.noun.guide }}
                     </div>
-                    <div class="bar" @click="ifShowClear=true">
+                    <div class="bar" @click="ifShowClear = true">
                         <el-icon color="lightgrey" :size="35">
-                            <IconDelete/>
+                            <IconDelete />
                         </el-icon>
                         {{ t.action.empty }}
                     </div>
-                    <ClearDialog v-model="ifShowClear"/>
+                    <ClearDialog v-model="ifShowClear" />
                     <div class="bar" @click="DataControl.withdraw">
                         <el-icon color="lightgrey" :size="35">
-                            <IconBack/>
+                            <IconBack />
                         </el-icon>
                         {{ t.action.withdraw }}
                     </div>
                     <div class="bar" @click="DataControl.redo">
                         <el-icon color="lightgrey" :size="35">
-                            <IconRight/>
+                            <IconRight />
                         </el-icon>
                         {{ t.action.redo }}
                     </div>
-                    <div class="bar" @click="$emit('showNavigation');openOtherDialog({})">
+                    <div class="bar" @click="$emit('showNavigation'); openOtherDialog(null)">
                         <el-icon color="lightgrey" :size="35">
-                            <IconCompass/>
+                            <IconCompass />
                         </el-icon>
                         {{ t.action.goto }}
                     </div>
                     <div class="bar" @click="openOtherDialog(mainShow.settings)">
                         <el-icon color="lightgrey" :size="35">
-                            <IconSetting/>
+                            <IconSetting />
                         </el-icon>
                         {{ t.noun.settings }}
                     </div>
                     <div class="bar" @click="openOtherDialog(mainShow.about)">
                         <el-icon color="lightgrey" :size="35">
-                            <IconCoffeeCup/>
+                            <IconCoffeeCup />
                         </el-icon>
                         {{ t.noun.about }}
                     </div>
@@ -145,19 +125,20 @@ function openOtherDialog (show) {
         </div>
     </CollapseItem>
     <Transition name="fade">
-        <div v-if="defaultShow.sidebar.value && mobileView" @click="defaultShow.sidebar.value=false" class="drawer-mask"></div>
+        <div v-if="defaultShow.sidebar.value && mobileView" @click="defaultShow.sidebar.value = false"
+            class="drawer-mask"></div>
     </Transition>
     <div id="sidebar-placeholder" class="drawer-placeholder">
         <!--sidebar占位符，用于在sidebar隐藏时计算sidebar width-->
         <div class="bar">
             <el-icon :size="35">
-                <IconCoffeeCup/>
+                <IconCoffeeCup />
             </el-icon>
             <div>
-                <p v-for="key in ['screenshot','empty', 'withdraw','redo','goto']" :key="key"> {{
-                        t.action[key]
-                    }}</p>
-                <p v-for="key in ['announcement','guide','settings','about']" :key="key"> {{ t.noun[key] }}</p>
+                <p v-for="key in ['screenshot', 'empty', 'withdraw', 'redo', 'goto']" :key="key"> {{
+                    t.action[key]
+                }}</p>
+                <p v-for="key in ['announcement', 'guide', 'settings', 'about']" :key="key"> {{ t.noun[key] }}</p>
             </div>
         </div>
     </div>

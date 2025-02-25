@@ -1,5 +1,5 @@
-<script setup>
-import { ref, computed, watch, provide, nextTick, onMounted, onUnmounted } from 'vue'
+<script setup lang="ts">
+import { ref, useTemplateRef, computed, watch, provide, nextTick, onMounted, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import Renderers from '@/renderer'
 import SideBar from './components/SideBar.vue'
@@ -24,7 +24,7 @@ import {
     duringPartialScreenshot,
     partialScreenshotViewMode
 } from '@/components/PartialScreenshot/partialScreenshotControl'
-import { clickBySelector, getDialogue, Textarea } from '@/lib/utils/tool'
+import { clickBySelector, ensureValue, getDialogue, Textarea } from '@/lib/utils/tool'
 import {
     chats,
     chars,
@@ -50,19 +50,20 @@ import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.v
 import CollapseItem from '@/components/CollapseItem/CollapseItem.vue'
 import PartialScreenshotView from '@/components/PartialScreenshot/PartialScreenshotView.vue'
 
-const EditCharRef = ref(null)
-const EditDialogueRef = ref(null)
-const AtRef = ref(null)
-const CreateOption = ref(null)
-const NavigationBarRef = ref(null)
+const EditCharRef = useTemplateRef<InstanceType<typeof EditCharDialog>>('EditCharRef')
+const EditDialogueRef = useTemplateRef<InstanceType<typeof EditDialogueDialog>>('EditDialogueRef')
+const AtRef = useTemplateRef<InstanceType<typeof AtDialog>>('AtRef')
+const CreateOption = useTemplateRef<InstanceType<typeof CreateOptionDialog>>('CreateOption')
+const NavigationBarRef = useTemplateRef<InstanceType<typeof NavigationBar>>('NavigationBarRef')
 
 const controller = new AbortController()
 document.addEventListener('keydown', event => {
-    if (event.ctrlKey) {
+    if (event.ctrlKey && event.target) {
+        const target = event.target as HTMLElement
         if (event.code === 'KeyC') {
-            if (['TEXTAREA', 'INPUT'].indexOf(event.target.nodeName) === -1 || event.altKey) {
+            if (['TEXTAREA', 'INPUT'].indexOf(target.nodeName) === -1 || event.altKey) {
                 event.preventDefault()
-                EditCharRef.value.open(true)
+                ensureValue(EditCharRef.value, 'EditCharRef').open(true)
             }
         } else if (event.code.indexOf('Digit') === 0 || event.code.indexOf('Numpad') === 0) {
             event.preventDefault()
@@ -71,7 +72,7 @@ document.addEventListener('keydown', event => {
             if (index < list.length) {
                 DataControl.curr.setChar(list[index][0])
             } else {
-                EditCharRef.value.open(true)
+                ensureValue(EditCharRef.value).open(true)
             }
         } else if (event.code === 'KeyE') {
             event.preventDefault()
@@ -79,7 +80,7 @@ document.addEventListener('keydown', event => {
                 message.notify(t.value.notify.pleaseSelectCharacter, message.warning)
                 return
             }
-            EditCharRef.value.open(false)
+            ensureValue(EditCharRef.value, 'EditCharRef').open(true)
         }
     }
 }, { signal: controller.signal })
@@ -87,7 +88,17 @@ onUnmounted(() => {
     controller.abort()
 })
 
-const rendererWidth = ref({})
+const rendererWidth = ref<{
+    window: number,
+    avatar: string,
+    fontsize: string,
+    image: string
+}>({
+    window: 0,
+    avatar: '0px',
+    fontsize: '0px',
+    image: '0px'
+})
 provide('rendererWidth', rendererWidth)
 
 const charDirection = computed(() => {
@@ -109,7 +120,7 @@ provide('charDirection', charDirection)
 
 const ResizeWindow = {
     time: 0,
-    get(size) {
+    get(size: number) {
         return (this.time === 1 ? size : Math.ceil(this.time * size)) + 'px'
     },
     size: {
@@ -153,7 +164,7 @@ watch(() => {
 DataControl.hook.changeSavefile.on(ResizeWindow.resize)
 
 function resizeBody(offset = 0) {
-    const el = document.getElementById('body')
+    const el = ensureValue(document.getElementById('body'), 'body')
     el.style.height = window.innerHeight - offset + 'px'
     nextTick(() => {
         if (el.scrollWidth < window.innerWidth && offset < 5) {
@@ -197,7 +208,7 @@ function resizeScroll(offset = 0) {
         const height = el.scrollHeight > 20 ? el.scrollHeight : 20
         el.style.height = height + 'px'
     }
-    const bar = document.getElementById('operate-bar')
+    const bar = ensureValue(document.getElementById('operate-bar'), 'operate-bar')
     scrollHeight.value = bar.offsetTop + offset + 'px'
 }
 
@@ -254,7 +265,7 @@ onUnmounted(Input.hook.on((params) => {
 
 ModeChange.on((event) => {
     if (event.target.value === true) {
-        resizeScroll(document.querySelector('#operate-bar > div').scrollHeight - event.height)
+        resizeScroll(ensureValue(document.querySelector('#operate-bar > div'), '#operate-bar > div').scrollHeight - event.height)
     } else {
         setTimeout(() => {
             resizeScroll()
@@ -280,7 +291,7 @@ function handleEditDialogue(index) {
         })
         DataControl.save('chats')
     } else {
-        EditDialogueRef.value.open(index)
+        ensureValue(EditDialogueRef.value, 'EditDialogueRef').open(index)
     }
 }
 
@@ -306,80 +317,73 @@ defineExpose({
 
 <template>
     <!--Editor components start-->
-    <ScreenshotHelper/>
-    <NavigationBar ref="NavigationBarRef"/>
-    <EditCharDialog ref="EditCharRef"/>
-    <EditDialogueDialog ref="EditDialogueRef" @showCopy="defaultShow.copy.value=true"/>
-    <AtDialog ref="AtRef"/>
-    <CreateOptionDialog ref="CreateOption"/>
-    <CopyDialog @coped="() => {EditDialogueRef.close()}"/>
+    <ScreenshotHelper />
+    <NavigationBar ref="NavigationBarRef" />
+    <EditCharDialog ref="EditCharRef" />
+    <EditDialogueDialog ref="EditDialogueRef" @showCopy="defaultShow.copy.value = true" />
+    <AtDialog ref="AtRef" />
+    <CreateOptionDialog ref="CreateOption" />
+    <CopyDialog @coped="() => { ensureValue(EditDialogueRef, 'EditDialogueRef').close() }" />
     <!--Editor components end-->
-    <div id="body" :style="{background: currRendererSettings.background}">
-        <PermanentSelectChar @select="args => EditCharRef.open(true,args)"/>
+    <div id="body" :style="{ background: currRendererSettings.background }">
+        <PermanentSelectChar @select="char => ensureValue(EditCharRef, 'EditCharRef').open(true, char)" />
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s;position: relative">
-            <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => {currScrollTop=v.scrollTop}">
+            <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => { currScrollTop = v.scrollTop }">
                 <div class="body" id="renderer-body">
-                    <component :is="Renderers[config.renderer]" ref="currRendererRef"
-                               @edit="handleEditDialogue"
-                               @delete="deleteDialogue"
-                               @plus1="copyDialogue"/>
+                    <component :is="Renderers[config.renderer]" ref="currRendererRef" @edit="handleEditDialogue"
+                        @delete="deleteDialogue" @plus1="copyDialogue" />
                 </div>
             </el-scrollbar>
             <div style="display: flex; justify-content: center">
-                <div id="operate-bar" class="operate-bar" :style="{width: windowWidth + 'px'}">
+                <div id="operate-bar" class="operate-bar" :style="{ width: windowWidth + 'px' }">
                     <CollapseItem mode="">
-                        <ManualCutPointView v-if="cutPointViewMode"/>
-                        <PartialScreenshotView v-else-if="partialScreenshotViewMode"/>
+                        <ManualCutPointView v-if="cutPointViewMode" />
+                        <PartialScreenshotView v-else-if="partialScreenshotViewMode" />
                         <div v-else style="display: flex; flex-wrap: wrap;align-items: flex-end">
                             <div class="button-bar">
-                                <el-icon color="#707070" :size="35"
-                                         style="margin-right: 5px; position: relative" :style="arrowStyle"
-                                         @click="ifShowMoreType = !ifShowMoreType; roll360(); Textarea.focus()">
-                                    <IconArrowUp/>
+                                <el-icon color="#707070" :size="35" style="margin-right: 5px; position: relative"
+                                    :style="arrowStyle"
+                                    @click="ifShowMoreType = !ifShowMoreType; roll360(); Textarea.focus()">
+                                    <IconArrowUp />
                                 </el-icon>
                                 <el-icon @click="createTextDialogue('monologue')" color="#707070" :size="35">
-                                    <IconChatDotSquare/>
+                                    <IconChatDotSquare />
                                 </el-icon>
                             </div>
                             <textarea class="textarea" id="textarea" v-model="textarea"
-                                      :placeholder="TipControl.tip.value"
-                                      @keydown.ctrl.enter="createTextDialogue('chat')"
-                                      @input="AtRef.processInput"></textarea>
+                                :placeholder="TipControl.tip.value" @keydown.ctrl.enter="createTextDialogue('chat')"
+                                @input="(event: Event) => { ensureValue(AtRef, 'AtRef').processInput(event as InputEvent) }"></textarea>
                             <div class="button-bar">
                                 <el-icon @click="createTextDialogue('chat')" color="#808080" :size="35">
-                                    <IconPromotion/>
+                                    <IconPromotion />
                                 </el-icon>
                             </div>
-                            <div class="moretype-bar" :class="{show: ifShowMoreType}">
+                            <div class="moretype-bar" :class="{ show: ifShowMoreType }">
                                 <div class="block" @click="clickBySelector('#uploadImage > div > input')">
-                                    <el-upload id="uploadImage"
-                                               action="#"
-                                               :show-file-list="false"
-                                               class="avatar-uploader"
-                                               accept="image/png, image/jpeg, image/gif"
-                                               :before-upload="createImageDialogue"
-                                               style="position: absolute; width: 0; height: 0"
-                                    ></el-upload>
+                                    <el-upload id="uploadImage" action="#" :show-file-list="false"
+                                        class="avatar-uploader" accept="image/png, image/jpeg, image/gif"
+                                        :before-upload="createImageDialogue"
+                                        style="position: absolute; width: 0; height: 0"></el-upload>
                                     <el-icon color="#707070" :size="35">
-                                        <IconPicture/>
+                                        <IconPicture />
                                     </el-icon>
                                     {{ t.name.typeDict.image }}
                                 </div>
-                                <div class="block" @click="CreateOption.open">
+                                <div class="block" @click="ensureValue(CreateOption, 'createOption').open()">
                                     <el-icon color="#707070" :size="35">
-                                        <IconOperation/>
+                                        <IconOperation />
                                     </el-icon>
                                     {{ t.name.typeDict.option }}
                                 </div>
                                 <div class="block" @click="createTextDialogue('select')">
                                     <el-icon color="#707070" :size="35">
-                                        <IconEdit/>
+                                        <IconEdit />
                                     </el-icon>
                                     {{ t.name.typeDict.select }}
                                 </div>
                                 <div class="block" @click="createTextDialogue('title')">
-                                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
-                                         data-v-029747aa="" style="width: 35px; height: 35px">
+                                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-029747aa=""
+                                        style="width: 35px; height: 35px">
                                         <path
                                             d="m199.04 672.64 193.984 112 224-387.968-193.92-112-224 388.032zm-23.872 60.16 32.896 148.288 144.896-45.696L175.168 732.8zM455.04 229.248l193.92 112 56.704-98.112-193.984-112-56.64 98.112zM104.32 708.8l384-665.024 304.768 175.936L409.152 884.8h.064l-248.448 78.336L104.32 708.8zm384 254.272v-64h448v64h-448z"
                                             fill="#707070"></path>
@@ -391,17 +395,17 @@ defineExpose({
                                 <el-scrollbar :max-height="120" style="width: calc(100% - 55px)">
                                     <div class="container">
                                         <div v-for="id in Object.keys(chars)" :key="id"
-                                             :class="[id === currCharId?'char-curr':'char']"
-                                             @click="DataControl.curr.setChar(id)">
-                                            <img alt="" :src="avatars[id]">
+                                            :class="[id === currCharId ? 'char-curr' : 'char']"
+                                            @click="DataControl.curr.setChar(id)">
+                                            <img alt="" :src="avatars[id] as unknown as string">
                                         </div>
                                         <div class="option add"
-                                             @click="EditCharRef.open(true)">
-                                            <svg class="roll" viewBox="0 0 1024 1024"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 data-v-029747aa="" style="background: #707070">
+                                            @click="ensureValue(EditCharRef, 'EditCharRef').open(true)">
+                                            <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                                                data-v-029747aa="" style="background: #707070">
                                                 <path fill="#858585"
-                                                      d="M512 64a448 448 0 1 1 0 896 448 448 0 0 1 0-896zm-38.4 409.6H326.4a38.4 38.4 0 1 0 0 76.8h147.2v147.2a38.4 38.4 0 0 0 76.8 0V550.4h147.2a38.4 38.4 0 0 0 0-76.8H550.4V326.4a38.4 38.4 0 1 0-76.8 0v147.2z"></path>
+                                                    d="M512 64a448 448 0 1 1 0 896 448 448 0 0 1 0-896zm-38.4 409.6H326.4a38.4 38.4 0 1 0 0 76.8h147.2v147.2a38.4 38.4 0 0 0 76.8 0V550.4h147.2a38.4 38.4 0 0 0 0-76.8H550.4V326.4a38.4 38.4 0 1 0-76.8 0v147.2z">
+                                                </path>
                                             </svg>
                                         </div>
                                     </div>
@@ -409,21 +413,20 @@ defineExpose({
                                 <div style="display: flex; align-items: center; justify-content: center;">
                                     <div class="option edit" style="height: 80%">
                                         <div v-if="currCharId" style="width: 40px; height: 40px"
-                                             @click="EditCharRef.open(false)">
-                                            <svg class="roll" viewBox="0 0 1024 1024"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 data-v-029747aa="">
+                                            @click="ensureValue(EditCharRef, 'EditCharRef').open(false)">
+                                            <svg class="roll" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"
+                                                data-v-029747aa="">
                                                 <path fill="#606060"
-                                                      d="M600.704 64a32 32 0 0 1 30.464 22.208l35.2 109.376c14.784 7.232 28.928 15.36 42.432 24.512l112.384-24.192a32 32 0 0 1 34.432 15.36L944.32 364.8a32 32 0 0 1-4.032 37.504l-77.12 85.12a357.12 357.12 0 0 1 0 49.024l77.12 85.248a32 32 0 0 1 4.032 37.504l-88.704 153.6a32 32 0 0 1-34.432 15.296L708.8 803.904c-13.44 9.088-27.648 17.28-42.368 24.512l-35.264 109.376A32 32 0 0 1 600.704 960H423.296a32 32 0 0 1-30.464-22.208L357.696 828.48a351.616 351.616 0 0 1-42.56-24.64l-112.32 24.256a32 32 0 0 1-34.432-15.36L79.68 659.2a32 32 0 0 1 4.032-37.504l77.12-85.248a357.12 357.12 0 0 1 0-48.896l-77.12-85.248A32 32 0 0 1 79.68 364.8l88.704-153.6a32 32 0 0 1 34.432-15.296l112.32 24.256c13.568-9.152 27.776-17.408 42.56-24.64l35.2-109.312A32 32 0 0 1 423.232 64H600.64zm-23.424 64H446.72l-36.352 113.088-24.512 11.968a294.113 294.113 0 0 0-34.816 20.096l-22.656 15.36-116.224-25.088-65.28 113.152 79.68 88.192-1.92 27.136a293.12 293.12 0 0 0 0 40.192l1.92 27.136-79.808 88.192 65.344 113.152 116.224-25.024 22.656 15.296a294.113 294.113 0 0 0 34.816 20.096l24.512 11.968L446.72 896h130.688l36.48-113.152 24.448-11.904a288.282 288.282 0 0 0 34.752-20.096l22.592-15.296 116.288 25.024 65.28-113.152-79.744-88.192 1.92-27.136a293.12 293.12 0 0 0 0-40.256l-1.92-27.136 79.808-88.128-65.344-113.152-116.288 24.96-22.592-15.232a287.616 287.616 0 0 0-34.752-20.096l-24.448-11.904L577.344 128zM512 320a192 192 0 1 1 0 384 192 192 0 0 1 0-384zm0 64a128 128 0 1 0 0 256 128 128 0 0 0 0-256z"></path>
+                                                    d="M600.704 64a32 32 0 0 1 30.464 22.208l35.2 109.376c14.784 7.232 28.928 15.36 42.432 24.512l112.384-24.192a32 32 0 0 1 34.432 15.36L944.32 364.8a32 32 0 0 1-4.032 37.504l-77.12 85.12a357.12 357.12 0 0 1 0 49.024l77.12 85.248a32 32 0 0 1 4.032 37.504l-88.704 153.6a32 32 0 0 1-34.432 15.296L708.8 803.904c-13.44 9.088-27.648 17.28-42.368 24.512l-35.264 109.376A32 32 0 0 1 600.704 960H423.296a32 32 0 0 1-30.464-22.208L357.696 828.48a351.616 351.616 0 0 1-42.56-24.64l-112.32 24.256a32 32 0 0 1-34.432-15.36L79.68 659.2a32 32 0 0 1 4.032-37.504l77.12-85.248a357.12 357.12 0 0 1 0-48.896l-77.12-85.248A32 32 0 0 1 79.68 364.8l88.704-153.6a32 32 0 0 1 34.432-15.296l112.32 24.256c13.568-9.152 27.776-17.408 42.56-24.64l35.2-109.312A32 32 0 0 1 423.232 64H600.64zm-23.424 64H446.72l-36.352 113.088-24.512 11.968a294.113 294.113 0 0 0-34.816 20.096l-22.656 15.36-116.224-25.088-65.28 113.152 79.68 88.192-1.92 27.136a293.12 293.12 0 0 0 0 40.192l1.92 27.136-79.808 88.192 65.344 113.152 116.224-25.024 22.656 15.296a294.113 294.113 0 0 0 34.816 20.096l24.512 11.968L446.72 896h130.688l36.48-113.152 24.448-11.904a288.282 288.282 0 0 0 34.752-20.096l22.592-15.296 116.288 25.024 65.28-113.152-79.744-88.192 1.92-27.136a293.12 293.12 0 0 0 0-40.256l-1.92-27.136 79.808-88.128-65.344-113.152-116.288 24.96-22.592-15.232a287.616 287.616 0 0 0-34.752-20.096l-24.448-11.904L577.344 128zM512 320a192 192 0 1 1 0 384 192 192 0 0 1 0-384zm0 64a128 128 0 1 0 0 256 128 128 0 0 0 0-256z">
+                                                </path>
                                             </svg>
                                         </div>
                                         <div v-else class="scale"
-                                             @click="defaultShow.sidebar.value=!defaultShow.sidebar.value">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 16 16" focusable="false"
-                                                 style="stroke: #606060">
-                                                <path
-                                                    d="M14 3.5H2v1h12v-1zM14 7.5H2v1h12v-1zM14 11.5H2v1h12v-1z"></path>
+                                            @click="defaultShow.sidebar.value = !defaultShow.sidebar.value">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                focusable="false" style="stroke: #606060">
+                                                <path d="M14 3.5H2v1h12v-1zM14 7.5H2v1h12v-1zM14 11.5H2v1h12v-1z">
+                                                </path>
                                             </svg>
                                         </div>
                                     </div>
@@ -434,13 +437,13 @@ defineExpose({
                 </div>
             </div>
         </div>
-        <SideBar @showNavigation="() => {NavigationBarRef.open()}"/>
+        <SideBar @showNavigation="ensureValue(NavigationBarRef, 'showNavigation').open()" />
     </div>
 </template>
 
-<style src="./style/global.css"/>
-<style src="./style/avatar-uploader.css"/>
+<style src="./style/global.css" />
+<style src="./style/avatar-uploader.css" />
 
-<style src="./style/editor.css" scoped/>
-<style src="./style/operate-bar.css" scoped/>
-<style src="./style/animation.css" scoped/>
+<style src="./style/editor.css" scoped />
+<style src="./style/operate-bar.css" scoped />
+<style src="./style/animation.css" scoped />

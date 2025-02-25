@@ -1,19 +1,11 @@
 import { uuid } from '@/lib/utils/tool'
+import type { ChatType } from './dataTypes';
 
 const StaticUrl = 'https://static.mayertalk.top/'
 
-interface TypeDefault {
-    chat: string
-    monologue: string
-    image: string
-    option: Array<[string, string]> // uuid() 返回字符串
-    select: string
-    title: string
-};
 
-type TypeSeries = typeof TypeSeries;
 
-const TypeDefault: Readonly<TypeDefault> = {
+const CHAT_DEFAULT: Readonly<ChatType> = {
     chat: '', // 聊天内容
     monologue: '', // 独白内容
     image: '', // 图片 URL
@@ -22,7 +14,7 @@ const TypeDefault: Readonly<TypeDefault> = {
     title: '' // 标题
 };
 
-const TypeSeries = {
+const ChatSeries = {
     chat: 'Text',
     monologue: 'Text',
     image: 'Image',
@@ -31,14 +23,17 @@ const TypeSeries = {
     title: 'Text'
 } as const
 
+type ChatSeries = typeof ChatSeries;
+
+
 const defaultWindowWidth: number = 520
 const IsMobile: boolean = /Mobi|Android|iPhone/i.test(navigator.userAgent)
 const IsSafari: boolean = /^(.(?!Chrome))*Safari/.test(navigator.userAgent)
 
 export {
     StaticUrl,
-    TypeDefault,
-    TypeSeries,
+    CHAT_DEFAULT,
+    ChatSeries,
     defaultWindowWidth,
     IsMobile,
     IsSafari

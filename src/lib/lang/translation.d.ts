@@ -40,7 +40,8 @@ export interface Translation {
         downloadCanvasFailed: string,
         emptiedSuccessfully: string,
         multiScreenshotStart: string,
-        multiScreenshotEnd: string
+        multiScreenshotEnd: string,
+        avatarIsRequired: string
     },
     action: {
         add: string,

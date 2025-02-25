@@ -19,6 +19,7 @@ const settings: Ref<DT.SettingsData> = ref(copy(defaultSettings))
 const chars: Ref<DT.CharsData> = ref({})
 const chats: Ref<DT.ChatsData> = ref([])
 const images: Ref<DT.ImagesData> = ref({})
+// TODO optimize avatar 将ComputedRef<string>改为string
 const avatars: Ref<{ [id: string]: ComputedRef<string> }> = ref({})
 const currCharId: Ref<string> = ref('')
 const currCharData: Ref<CharsRecord | null> = ref(null)
@@ -270,7 +271,7 @@ const DataControl = new class DataControl {
     }
     curr: {
         setChar: (id: string, force?: boolean) => boolean,
-        setDialogue: (index: number) => void
+        setDialogue: (index: number) => DT.ChatsRecord | undefined
     }
 
     constructor() {
@@ -337,7 +338,12 @@ const DataControl = new class DataControl {
             },
             setDialogue: (index) => {
                 currDialogueIndex.value = index
-                currDialogueData.value = chats.value[index]
+                if (index === -1) {
+                    currCharData.value = null
+                } else {
+                    currDialogueData.value = chats.value[index]
+                    return chats.value[index]
+                }
             }
         }
 
