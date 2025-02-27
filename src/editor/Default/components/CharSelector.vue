@@ -1,25 +1,35 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue'
+import { useTemplateRef, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { chars, avatars } from '@/lib/data/data'
 import { closeShowHook } from '@/lib/data/showControl'
 import { ElSelect } from 'element-plus';
+import { ensureValue } from '@/lib/utils/tool';
 
-
-const modelValue = defineModel < string | Array < string >> ({ required: true })
-const select = defineModel < InstanceType < typeof ElSelect > | null > ('select')
+const modelValue = defineModel<string | Array<string>>({ required: true })
+const select = useTemplateRef<InstanceType<typeof ElSelect>>('select')
 const multiple = Array.isArray(modelValue.value)
 
-const { narration = false, placeholder = '' } = defineProps < {
+const { narration = false, placeholder = '' } = defineProps<{
     narration?: boolean, // 是否展示旁白
     placeholder?: string,
-} > ()
+}>()
 
 onUnmounted(closeShowHook.on(() => {
     if (modelValue.value) {
         modelValue.value = ''
     }
 }))
+
+function focus() {
+    ensureValue(select.value, 'select').focus()
+}
+
+function blur() {
+    ensureValue(select.value, 'select').blur()
+}
+
+defineExpose({ focus, blur })
 </script>
 
 <template>

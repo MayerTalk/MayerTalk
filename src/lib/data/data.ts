@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { defaultLang } from '@/lib/lang/detect'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
 import { StaticUrl } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { blob2base64, bool, copy, md5, Textarea, uuid } from '@/lib/utils/tool'
@@ -13,7 +13,7 @@ import type { CharsRecord } from '@/lib/data/dataTypes';
 // TODO 将common更名为generic
 const defaultSettings = { common: {}, editor: {}, renderer: {} }
 
-const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
+const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
 // settings: 原始settings (不含default)
 const settings: Ref<DT.SettingsData> = ref(copy(defaultSettings))
 const chars: Ref<DT.CharsData> = ref({})

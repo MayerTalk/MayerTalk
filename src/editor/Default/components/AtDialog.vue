@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, useTemplateRef, onUnmounted } from 'vue'
 import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
 import { closeShowHook } from '@/lib/data/showControl'
@@ -7,13 +7,11 @@ import { closeShowHook } from '@/lib/data/showControl'
 import { textarea } from '@/lib/function/dialogue'
 import { chars } from '@/lib/data/data'
 import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
-
 import { dialogWidth } from '@/lib/data/width'
-import type { ElSelect } from 'element-plus';
 
 const ifShow = ref(false)
 const atWho = ref('')
-const atWhoSelRef = ref<InstanceType<typeof ElSelect> | null>(null)
+const charSelectorRef = useTemplateRef<InstanceType<typeof CharSelector>>('charSelectorRef')
 let insertAt = 0
 onUnmounted(closeShowHook.on(() => {
     if (ifShow.value) {
@@ -28,8 +26,8 @@ function handleAt(id: string) {
         ' ' +
         textarea.value.slice(insertAt)
     atWho.value = ''
-    if (atWhoSelRef.value) {
-        atWhoSelRef.value.blur()
+    if (charSelectorRef.value) {
+        charSelectorRef.value.blur()
     }
     ifShow.value = false
     setTimeout(() => {
@@ -42,7 +40,7 @@ function handleAt(id: string) {
 
 function open() {
     // @提示框显示后聚焦输入
-    doAfterRefMounted(atWhoSelRef, (ref) => {
+    doAfterRefMounted(charSelectorRef, (ref) => {
         // 等待动画结束
         setTimeout(() => {
             ref.value.focus()
@@ -72,7 +70,7 @@ defineExpose({
 
 <template>
     <el-dialog v-model="ifShow" :width="dialogWidth" :title="t.notify.wantToAtWhichCharacter" :modal="false">
-        <CharSelector v-model="atWho" v-model:select="atWhoSelRef" style="width: 100%" @change="handleAt"
+        <CharSelector v-model="atWho" ref="charSelectorRef" style="width: 100%" @change="handleAt"
             @visible-change="(visible: boolean) => { if (!visible) { ifShow = false } }" />
     </el-dialog>
 </template>

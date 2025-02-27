@@ -1,22 +1,25 @@
 import emptyTranslation from '@/lib/lang/emptyTranslation'
 
-const supportLang = [
-    'zh_CN',
-    'zh_TW',
-    'en_US',
-    'ja_JP'
-]
 
-const langShow = {
-    zh_CN: '简中',
-    zh_TW: '繁中',
-    en_US: 'English',
-    ja_JP: '日本語'
+const ORIGIN_DATA = [
+    ['zh_CN', '简中'],
+    ['zh_TW', '繁中'],
+    ['en_US', 'English'],
+    ['ja_JP', '日本語']
+] as const
 
-}
+type SupportLangKey = typeof ORIGIN_DATA[number][0]
+
+const LANG_DICT = Object.fromEntries(ORIGIN_DATA) as Readonly<Record<SupportLangKey, string>>
+
+const SUPPORT_LANG: Readonly<SupportLangKey[]> = Object.keys(LANG_DICT) as SupportLangKey[]
+
 
 export {
-    supportLang,
-    langShow,
+    SUPPORT_LANG,
+    LANG_DICT,
     emptyTranslation
+}
+export type {
+    SupportLangKey
 }

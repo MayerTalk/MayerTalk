@@ -32,7 +32,6 @@ declare module 'vue' {
     SavefileDialog: typeof import('./src/components/SavefileDialog.vue')['default']
     ScreenshotHelper: typeof import('./src/components/ScreenshotHelper.vue')['default']
     SettingsDialog: typeof import('./src/components/Settings/SettingsDialog.vue')['default']
-    SettingsInput: typeof import('./src/components/Settings/SettingsInput.vue')['default']
     SettingsNumberInput: typeof import('./src/components/Settings/SettingsNumberInput.vue')['default']
     SettingsTextInput: typeof import('./src/components/Settings/SettingsTextInput.vue')['default']
   }

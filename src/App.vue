@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import '@/lib/data/versionControl'
 import Editors from './editor'
 import Announce from './AnnounceDialog.vue'

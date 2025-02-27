@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { config } from '@/lib/data/data'
 import { mainShow } from '@/lib/data/showControl'
@@ -8,9 +8,18 @@ const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 const contributors = [
     ['meeboo3', 'meeboo3', '118372959'],
     ['Lightyears', '1MLightyears', '31664721']
-]
+] as const
 
-const translate = {
+interface Translation {
+    title: string
+    about: string
+    devSite: string
+    contributor: string
+    statement: string
+    statementContent: string
+}
+
+const TRANSLATION: Record<string, Translation> = {
     zh_CN: {
         title: '关于',
         about: '明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段',
@@ -43,20 +52,20 @@ const translate = {
         statement: 'Statement',
         statementContent: 'The game images and original text used on this website are only used to better display game information, and their copyrights belong to Arknights/Shanghai Hypergryph Network Technology Co., Ltd.'
     }
-}
+} as const
 
 const t = computed(() => {
-    return translate[config.value.lang || 'en_US']
+    return TRANSLATION[config.value.lang]
 })
 </script>
 
 <template>
     <el-dialog v-model="mainShow.about.value" :title="t.title" :width="dialogWidth">
-        <h2 style="display: inline">MayerTalk(beta)</h2><br/>
+        <h2 style="display: inline">MayerTalk(beta)</h2><br />
         <p>{{ t.about }}</p>
         <p style="display: flex; align-items: center">Github:
             <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin-left: 5px"
-                     target="_blank">
+                target="_blank">
                 MayerTalk/MayerTalk
             </el-link>
         </p>
@@ -68,8 +77,8 @@ const t = computed(() => {
         <h3>{{ t.contributor }}</h3>
         <div class="contributors">
             <div v-for="user in contributors" :title="user[0]" class="avatar" :key="user[2]">
-                <a :href="'https://github.com/'+user[1]" target="_blank">
-                    <img :src="'https://avatars.githubusercontent.com/u/' + user[2] + '?v=4'" alt=""/>
+                <a :href="'https://github.com/' + user[1]" target="_blank">
+                    <img :src="'https://avatars.githubusercontent.com/u/' + user[2] + '?v=4'" alt="" />
                 </a>
             </div>
         </div>

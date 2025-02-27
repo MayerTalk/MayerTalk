@@ -1,6 +1,7 @@
 import { ImageStorage, Storage } from './data';
 import { GenericSettings } from '@/lib/data/settings';
 import { ChatType } from '@/lib/data/constance.ts';
+import type { SupportLangKey } from '../lang/constant';
 
 export interface CharsRecord {
     name: string,
@@ -41,7 +42,7 @@ export type ChatsData = ChatsRecord[]
 
 export interface ConfigData {
     editor: string,
-    lang: string
+    lang: SupportLangKey
     renderer: string
 }
 

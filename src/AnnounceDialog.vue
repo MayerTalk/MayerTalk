@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { saveData, getData } from './lib/utils/tool'
 import { config } from '@/lib/data/data'
 import { IsSafari } from '@/lib/data/constance'
 import { mainShow } from '@/lib/data/showControl'
+import type { SupportLangKey } from './lib/lang/constant'
 
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
@@ -18,7 +19,9 @@ onMounted(() => {
 
 const invalidBrowser = /UCBrowser|Quark|QQBrowser|baidu/.test(navigator.userAgent) // hope detect successfully
 
-const invalidBrowserTranslate = {
+type InvalidTranslation = Array<string>
+
+const INVALID_BROWSER_TRANSLATION: Record<SupportLangKey, InvalidTranslation> = {
     zh_CN: [
         '您当前使用的浏览器无法导出截图，请使用其他浏览器',
         'Q：为什么？',
@@ -47,9 +50,18 @@ const invalidBrowserTranslate = {
         'Q：什麼瀏覽器支持blob？',
         'A：推薦Edge/Chrome'
     ]
+} as const
+
+interface DefaultTranslation {
+    announcement: string
+    develop: string
+    quicklyStart: string
+    community: string
+    feedback: string
+    safariWarning: string
 }
 
-const defaultTranslate = {
+const DEFAULT_TRANSLATION: Record<SupportLangKey, DefaultTranslation> = {
     zh_CN: {
         announcement: '公告',
         develop: '开发阶段，功能尚不完善，还请谅解',
@@ -82,9 +94,20 @@ const defaultTranslate = {
         feedback: 'フィードバック',
         safariWarning: 'ご注意ください、お使いのSafariバージョンはファイルのダウンロードをサポートしていない可能性があります。これによりスクリーンショットとデータのエクスポートが失敗する可能性があります。'
     }
+} as const
+
+interface AnnouncementTranslation {
+    key: {
+        feat: string
+        optimize: string
+        fix: string
+    }
+    feat: string[]
+    optimize: string[]
+    fix: string[]
 }
 
-const announcementTranslate = {
+const ANNOUNCEMENT_TRANSLATION: Record<SupportLangKey, AnnouncementTranslation> = {
     zh_CN: {
         key: {
             feat: '新增',
@@ -121,37 +144,35 @@ const announcementTranslate = {
             optimize: '最適化',
             fix: '修正'
         },
-        ja_JP: {
-            feat: ['部分的なスクリーンショット'],
-            optimize: ['クリアを洗練し、今では ダイアログ/役割/設定/アーカイブ/カットポイント を個別にクリアできます'],
-            fix: ['クリアは画像ストレージを削除しませんでした']
-        }
+        feat: ['部分的なスクリーンショット'],
+        optimize: ['クリアを洗練し、今では ダイアログ/役割/設定/アーカイブ/カットポイント を個別にクリアできます'],
+        fix: ['クリアは画像ストレージを削除しませんでした']
     }
+} as const
+
+interface Translation {
+    invalid: InvalidTranslation
+    default: DefaultTranslation
+    announcement: AnnouncementTranslation
 }
 
-const translate = { zh_CN: {}, en_US: {}, ja_JP: {}, zh_TW: {} }
-
-function syncTranslation (translation, key) {
-    for (const lang in translation) {
-        if (!Object.prototype.hasOwnProperty.call(translation, lang)) {
-            continue
-        }
-        translate[lang][key] = {}
-        for (const k in translation[lang]) {
-            if (!Object.prototype.hasOwnProperty.call(translation[lang], k)) {
-                continue
-            }
-            translate[lang][key][k] = translation[lang][k]
-        }
-    }
+function createTranslation(lang: SupportLangKey): Translation {
+    return {
+        invalid: INVALID_BROWSER_TRANSLATION[lang],
+        default: DEFAULT_TRANSLATION[lang],
+        announcement: ANNOUNCEMENT_TRANSLATION[lang]
+    };
 }
 
-syncTranslation(invalidBrowserTranslate, 'invalid')
-syncTranslation(defaultTranslate, 'default')
-syncTranslation(announcementTranslate, 'announcement')
+const TRANSLATION: Record<SupportLangKey, Translation> = {
+    zh_CN: createTranslation('zh_CN'),
+    zh_TW: createTranslation('zh_TW'),
+    ja_JP: createTranslation('ja_JP'),
+    en_US: createTranslation('en_US')
+} as const;
 
 const t = computed(() => {
-    return translate[config.value.lang || 'en_US']
+    return TRANSLATION[config.value.lang]
 })
 
 const version = 'v0.2.3'
@@ -159,11 +180,11 @@ const version = 'v0.2.3'
 
 <template>
     <el-dialog v-model="mainShow.announcement.value" :title="t.default.announcement + ' ' + version"
-               :width="dialogWidth">
+        :width="dialogWidth">
         <h2 style="display: inline">MayerTalk(beta)</h2>
         <template v-if="invalidBrowser">
             <template v-for="(translation, index) in t.invalid" :key="index">
-                <h2 v-if="index===0" style="color: red">
+                <h2 v-if="index === 0" style="color: red">
                     {{ translation }}
                 </h2>
                 <h3 v-else> {{ translation }}</h3>
@@ -176,28 +197,29 @@ const version = 'v0.2.3'
             <h3>
                 {{ version }}
             </h3>
-            <template v-for="key in ['feat','optimize','fix']" :key="key">
-                <template v-if="announcementTranslate.zh_CN[key]">
+            <template v-for="key in ['feat', 'optimize', 'fix']" :key="key">
+                <template v-if="ANNOUNCEMENT_TRANSLATION.zh_CN[key]">
                     <b>{{ t.announcement.key[key] }}</b>
                     <ul>
-                        <li v-for="(item,index) in t.announcement[key]" :key="index">{{ item }}</li>
+                        <li v-for="(item, index) in t.announcement[key]" :key="index">{{ item }}</li>
                     </ul>
                 </template>
             </template>
         </template>
         <div style="display: flex; margin-top: 10px">
             <el-link href="https://jq.qq.com/?_wv=1027&k=ImatbCzG" type="primary" style="margin-right: 5px"
-                     target="_blank">
+                target="_blank">
                 {{ t.default.community }}
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
             <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;"
-                     target="_blank">
+                target="_blank">
                 Github
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
             <el-link href="https://wj.qq.com/s2/13987607/3993/" type="primary" style="margin-left: 5px;"
-                     target="_blank">{{ t.default.feedback }}
+                target="_blank">{{
+                    t.default.feedback }}
             </el-link>
         </div>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>

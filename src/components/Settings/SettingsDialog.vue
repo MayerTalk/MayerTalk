@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { t, updateTranslation } from '@/lib/lang/translate'
-import { supportLang, langShow } from '@/lib/lang/constant'
+import { SUPPORT_LANG, LANG_DICT, type SupportLangKey } from '@/lib/lang/constant'
 import Editors from '@/editor'
 import Renderers from '@/renderer'
 import message from '@/lib/utils/message'
@@ -27,7 +27,10 @@ function getStorageSize() {
     let size = 0
     for (const key in localStorage) {
         if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
-            size += localStorage.getItem(key).length
+            const obj = localStorage.getItem(key)
+            if (obj) {
+                size += obj.length
+            }
         }
     }
     size += DataControl.images.lastSave.length
@@ -53,7 +56,7 @@ function clearStorage() {
 
 <template>
     <el-dialog v-model="mainShow.settings.value" :title="t.noun.settings" :width="dialogWidth"
-               @closed="DataControl.save(['config','settings'])" @open="getStorageSize">
+        @closed="DataControl.save(['config', 'settings'])" @open="getStorageSize">
         <div id="settings">
             <!--Generic Settings-->
             <div style="display: flex; align-items: center">
@@ -63,67 +66,69 @@ function clearStorage() {
             </div>
             <table>
                 <tbody>
-                <tr class="tr">
-                    <th>{{ t.noun.editor }}</th>
-                    <td>
-                        <el-select v-model="config.editor">
-                            <el-option v-for="key in Object.keys(Editors)" :key="key" :value="key"
-                                       :label="t.name.editor[key]"/>
-                        </el-select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.renderer }}</th>
-                    <td>
-                        <el-select v-model="config.renderer">
-                            <el-option v-for="key in Object.keys(Renderers)" :key="key" :value="key"
-                                       :label="t.name.renderer[key]"/>
-                        </el-select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.language }}</th>
-                    <td>
-                        <el-select v-model="config.lang" @change="(lang) => updateTranslation(lang)">
-                            <el-option v-for="lang in supportLang" :key="lang" :value="lang" :label="langShow[lang]"/>
-                        </el-select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.imageQuality }}</th>
-                    <td>
-                        <SettingsNumberInput
-                            v-model="genericSettings.imageQuality"
-                            :default-value="DEFAULT_GENERIC_SETTINGS.imageQuality"
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br/>({{ t.tip.settings.dialogWidth }})</span>
-                    </th>
-                    <td>
-                        <SettingsNumberInput
-                            v-model="genericSettings.width"
-                            :default-value="DEFAULT_GENERIC_SETTINGS.width"
-                        />
-                    </td>
-                </tr>
+                    <tr class="tr">
+                        <th>{{ t.noun.editor }}</th>
+                        <td>
+                            <el-select v-model="config.editor">
+                                <el-option v-for="key in Object.keys(Editors)" :key="key" :value="key"
+                                    :label="t.name.editor[key]" />
+                            </el-select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ t.noun.renderer }}</th>
+                        <td>
+                            <el-select v-model="config.renderer">
+                                <el-option v-for="key in Object.keys(Renderers)" :key="key" :value="key"
+                                    :label="t.name.renderer[key]" />
+                            </el-select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ t.noun.language }}</th>
+                        <td>
+                            <el-select v-model="config.lang" @change="(lang:SupportLangKey) => updateTranslation(lang)">
+                                <el-option v-for="lang in SUPPORT_LANG" :key="lang" :value="lang"
+                                    :label="LANG_DICT[lang]" />
+                            </el-select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ t.noun.imageQuality }}</th>
+                        <td>
+                            <SettingsNumberInput v-model="genericSettings.imageQuality"
+                                :default-value="DEFAULT_GENERIC_SETTINGS.imageQuality" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br />({{ t.tip.settings.dialogWidth
+                                }})</span>
+                        </th>
+                        <td>
+                            <SettingsNumberInput v-model="genericSettings.width"
+                                :default-value="DEFAULT_GENERIC_SETTINGS.width" />
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <!--Editor Settings-->
-            <div style="display: flex; align-items: center">
-                <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">{{ t.noun.editor }}</h2>
-                <div class="line-right"></div>
-            </div>
-            <component :is="currEditorRef.SettingsDialog"/>
+            <template v-if="currEditorRef">
+                <div style="display: flex; align-items: center">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 10px 0">{{ t.noun.editor }}</h2>
+                    <div class="line-right"></div>
+                </div>
+                <component :is="currEditorRef.SettingsDialog" />
+            </template>
             <!--Renderer Settings-->
-            <div style="display: flex; align-items: center">
-                <div class="line-left" style="width: 20px;"></div>
-                <h2 style="margin: 10px 0">{{ t.noun.renderer }}</h2>
-                <div class="line-right"></div>
-            </div>
-            <component :is="currRendererRef.SettingsDialog"/>
+            <template v-if="currRendererRef">
+                <div style="display: flex; align-items: center">
+                    <div class="line-left" style="width: 20px;"></div>
+                    <h2 style="margin: 10px 0">{{ t.noun.renderer }}</h2>
+                    <div class="line-right"></div>
+                </div>
+                <component :is="currRendererRef.SettingsDialog" />
+            </template>
             <div style="display: flex; align-items: center">
                 <div class="line-left" style="width: 20px;"></div>
                 <h2 style="margin: 10px 0">{{ t.noun.storage }}</h2>
@@ -133,43 +138,38 @@ function clearStorage() {
             <div style="margin: 5px 0 10px 10px">
                 <el-button @click="downloadData" style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
-                        <IconDownload/>
+                        <IconDownload />
                     </el-icon>
                     {{ t.action.export }}
                 </el-button>
                 <el-button @click="clickBySelector('#uploadData > div > input')" style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
-                        <IconUpload/>
+                        <IconUpload />
                     </el-icon>
                     {{ t.action.import }}
-                    <el-upload
-                        id="uploadData"
-                        action="#"
-                        :show-file-list="false"
-                        accept="application/json"
-                        :before-upload="(file) => uploadData(file, () => { mainShow.settings.value=false})"
-                        style="position: absolute" hidden
-                    >
+                    <el-upload id="uploadData" action="#" :show-file-list="false" accept="application/json"
+                        :before-upload="(file) => uploadData(file, () => { mainShow.settings.value = false })"
+                        style="position: absolute" hidden>
                     </el-upload>
                 </el-button>
-                <el-button @click="() => {mainShow.settings.value=false;mainShow.savefile.value=true}"
-                           style="margin: 0 0 5px 10px">
+                <el-button @click="() => { mainShow.settings.value = false; mainShow.savefile.value = true }"
+                    style="margin: 0 0 5px 10px">
                     <el-icon color="grey" :size="20">
-                        <IconCollection/>
+                        <IconCollection />
                     </el-icon>
                     {{ t.noun.savefile }}
                 </el-button>
             </div>
             <table>
                 <tbody>
-                <tr>
-                    <th>{{ t.noun.local }}</th>
-                    <td>{{ storageSize }}</td>
-                    <td>
-                        <el-button @click="ensureMessage(clearStorage,t.tip.emptyData)">{{ t.action.reset }}
-                        </el-button>
-                    </td>
-                </tr>
+                    <tr>
+                        <th>{{ t.noun.local }}</th>
+                        <td>{{ storageSize }}</td>
+                        <td>
+                            <el-button @click="ensureMessage(clearStorage, t.tip.emptyData)">{{ t.action.reset }}
+                            </el-button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -177,4 +177,4 @@ function clearStorage() {
 
 </template>
 
-<style scoped src="@/style/settings.css"/>
+<style scoped src="@/style/settings.css" />

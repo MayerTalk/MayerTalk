@@ -3,7 +3,7 @@ import type { ChatType } from './dataTypes';
 
 const StaticUrl = 'https://static.mayertalk.top/'
 
-
+const SUPPORT_LANG = ['zh_CN', 'zh_TW', 'ja_JP', 'en_US'] as const
 
 const CHAT_DEFAULT: Readonly<ChatType> = {
     chat: '', // 聊天内容
@@ -31,6 +31,7 @@ const IsMobile: boolean = /Mobi|Android|iPhone/i.test(navigator.userAgent)
 const IsSafari: boolean = /^(.(?!Chrome))*Safari/.test(navigator.userAgent)
 
 export {
+    SUPPORT_LANG,
     StaticUrl,
     CHAT_DEFAULT,
     ChatSeries,

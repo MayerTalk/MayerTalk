@@ -14,7 +14,7 @@ const on = {
     beforeEnter(el: CollapseItem) {
         if (!el.dataset) el.dataset = {}
 
-        el.dataset.oldpaddingLeft = el.style.paddingLeft
+        el.dataset.oldPaddingLeft = el.style.paddingLeft
         el.dataset.oldPaddingRight = el.style.paddingRight
 
         el.style.maxWidth = '0'
