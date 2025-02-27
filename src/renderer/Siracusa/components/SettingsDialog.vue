@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { DataControl } from '@/lib/data/data'
 import { t } from '@/lib/lang/translate'
@@ -33,7 +33,7 @@ const ifShowEditShowCharName = ref(false)
         </tr>
         </tbody>
     </table>
-    <el-dialog v-model="ifShowEditShowCharName" :title="t.action.pleaseSelectTypeOfCharacterToShow" :width="dialogWidth"
+    <el-dialog v-model="ifShowEditShowCharName" :title="t.notify.pleaseSelectTypeOfCharacterToShow" :width="dialogWidth"
                @closed="DataControl.save('settings')">
         <table>
             <tbody>

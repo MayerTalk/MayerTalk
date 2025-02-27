@@ -21,3 +21,6 @@ export {
     editorSettings,
     EditorSettingsManager
 }
+export type {
+    EditorSettings
+}

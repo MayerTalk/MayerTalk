@@ -32,3 +32,6 @@ export {
     RendererSettingsManager,
     rendererSettings
 }
+export type {
+    RendererSettings
+}

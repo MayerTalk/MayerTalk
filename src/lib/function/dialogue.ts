@@ -36,7 +36,7 @@ const DialogueHook = {
             id: string,
             index: number,
         },
-        raw: PointerEvent,
+        raw: MouseEvent,
         preventDefault: () => void
     }>()
 }
