@@ -1,4 +1,7 @@
-const langDict = {
+import { hasOwn } from '../utils/tool'
+import type { SupportLangKey } from './constant'
+
+const LANG_2_KEY_DICT: Record<string, SupportLangKey> = {
     // 简中服（简体中文）
     zh: 'zh_CN',
     'zh-CN': 'zh_CN',
@@ -12,24 +15,22 @@ const langDict = {
     ja: 'ja_JP',
     // 国际服（英文）
     en: 'en_US'
-}
+} as const
 
-let defaultLang:string = ''
+let defaultLang: SupportLangKey = 'en_US'
 
 for (const lang of navigator.languages) {
-    if (Object.prototype.hasOwnProperty.call(langDict, lang)) {
-        defaultLang = langDict[lang]
+    if (hasOwn(LANG_2_KEY_DICT, lang)) {
+        defaultLang = LANG_2_KEY_DICT[lang]
         break
-    } else if (Object.prototype.hasOwnProperty.call(langDict, lang.split('-')[0])) {
-        defaultLang = langDict[lang.split('-')[0]]
+    } else if (hasOwn(LANG_2_KEY_DICT, lang.split('-')[0])) {
+        defaultLang = LANG_2_KEY_DICT[lang.split('-')[0]]
         break
     }
 }
 
-if (!defaultLang) {
-    defaultLang = 'en_US'
-}
+const DEFAULT_LANG = defaultLang
 
 export {
-    defaultLang
+    DEFAULT_LANG
 }

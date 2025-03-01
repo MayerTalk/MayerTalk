@@ -5,12 +5,15 @@ import { copy } from '@/lib/utils/tool'
 import { ModeChange } from '@/lib/data/state'
 import { chats } from '@/lib/data/data'
 
-const partialChats = ref({})
-let lastClick = null
+import type { ChatsData } from '@/lib/data/dataTypes';
+import type { Ref } from 'vue'
+
+const partialChats: Ref<Record<string, boolean>> = ref({})
+let lastClick: [id: string, activate: boolean] | null = null
 const partialScreenshotViewMode = ref(false)
 const duringPartialScreenshot = ref(false)
 const partialScreenshotMultiSelect = ref(false)
-let oldData = {}
+let oldData: ChatsData = []
 
 watch(partialScreenshotViewMode, () => {
     ModeChange.call({
@@ -25,15 +28,15 @@ closeShowHook.on(() => {
     }
 })
 
-function enablePartialScreenshotView () {
-    closeShowHook.call()
+function enablePartialScreenshotView() {
+    closeShowHook.call(undefined)
     partialScreenshotMultiSelect.value = false
     lastClick = null
     partialChats.value = {}
     partialScreenshotViewMode.value = true
 }
 
-function disablePartialScreenshotView () {
+function disablePartialScreenshotView() {
     partialScreenshotViewMode.value = false
     lastClick = null
     partialChats.value = {}
@@ -76,7 +79,7 @@ DialogueHook.click.on((event) => {
 watch(duringPartialScreenshot, (value) => {
     if (value) {
         oldData = copy(chats.value)
-        const newData = []
+        const newData: ChatsData = []
         for (let i = 0; i < oldData.length; i++) {
             if (Object.prototype.hasOwnProperty.call(partialChats.value, oldData[i].id)) {
                 newData.push(oldData[i])

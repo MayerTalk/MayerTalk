@@ -1,6 +1,6 @@
 import type { Translation } from './translation';
 
-const emptyTranslation = {
+const emptyTranslation: Translation = {
     empty: true,
     notify: {
         cannotDeleteLastOption: '',
@@ -42,7 +42,8 @@ const emptyTranslation = {
         downloadCanvasFailed: '',
         emptiedSuccessfully: '',
         multiScreenshotStart: '',
-        multiScreenshotEnd: ''
+        multiScreenshotEnd: '',
+        avatarIsRequired: ''
     },
     action: {
         add: '',
@@ -171,6 +172,5 @@ const emptyTranslation = {
             title: ''
         }
     }
-} as Translation
-
+}
 export default emptyTranslation

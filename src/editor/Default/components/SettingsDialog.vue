@@ -1,5 +1,5 @@
-<script setup>
-import { editorSettings, setEditorSettings } from '@/lib/data/settings'
+<script setup lang="ts">
+import { editorSettings } from '@/editor/Default'
 import { t } from '@/lib/lang/translate'
 </script>
 
@@ -7,15 +7,14 @@ import { t } from '@/lib/lang/translate'
     <table>
         <tbody>
             <tr>
-                <th>{{ t.noun.characterSelectorPermanent }}<span
-                    style="color:grey;"><br/>({{ t.tip.settings.characterSelectorPermanent }})</span></th>
+                <th>{{ t.noun.characterSelectorPermanent }}<span style="color:grey;"><br />({{
+                    t.tip.settings.characterSelectorPermanent }})</span></th>
                 <td>
-                    <el-switch :model-value="editorSettings.characterSelectorPermanent" style="margin-left: 10px"
-                               @update:model-value="(v) => {setEditorSettings('characterSelectorPermanent',v,(v) => {return !v})}"</el-switch>
+                    <el-switch v-model="editorSettings.characterSelectorPermanent" style="margin-left: 10px" />
                 </td>
             </tr>
         </tbody>
     </table>
 </template>
 
-<style scoped src="@/style/settings.css"/>
+<style scoped src="@/style/settings.css" />

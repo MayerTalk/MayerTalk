@@ -6,12 +6,12 @@ import { t } from '@/lib/lang/translate'
 const ifShow = ref(false)
 let dragStatus = false
 
-function open () {
+function open() {
     dragStatus = true
     ifShow.value = true
 }
 
-function close () {
+function close() {
     if (dragStatus && ifShow.value) {
         dragStatus = false
         setTimeout(() => {
@@ -23,10 +23,13 @@ function close () {
     }
 }
 
-function handleEvent (event) {
+function handleEvent(event: DragEvent) {
+
     event.preventDefault()
     if (event.type === 'drop') {
-        uploadData(event.dataTransfer.files[0])
+        if (event.dataTransfer && event.dataTransfer.files.length) {
+            uploadData(event.dataTransfer.files[0])
+        }
         close()
     } else if (event.type === 'dragenter') {
         open()

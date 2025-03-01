@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 import { computed, ref } from 'vue'
 import { t } from '@/lib/lang/translate'
-import { defaultLang } from '@/lib/lang/detect'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
 import { StaticUrl } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { blob2base64, bool, copy, md5, Textarea, uuid } from '@/lib/utils/tool'
@@ -10,14 +10,16 @@ import Hook from '@/lib/utils/hook'
 import type * as DT from '@/lib/data/dataTypes';
 import type { CharsRecord } from '@/lib/data/dataTypes';
 
-// TODO refactor
-const defaultSettings = { common: {}, editor: { Default: {} }, renderer: { Siracusa: {} } }
+// TODO 将common更名为generic
+const defaultSettings = { common: {}, editor: {}, renderer: {} }
 
-const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: defaultLang })
+const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
+// settings: 原始settings (不含default)
 const settings: Ref<DT.SettingsData> = ref(copy(defaultSettings))
 const chars: Ref<DT.CharsData> = ref({})
 const chats: Ref<DT.ChatsData> = ref([])
 const images: Ref<DT.ImagesData> = ref({})
+// TODO optimize avatar 将ComputedRef<string>改为string
 const avatars: Ref<{ [id: string]: ComputedRef<string> }> = ref({})
 const currCharId: Ref<string> = ref('')
 const currCharData: Ref<CharsRecord | null> = ref(null)
@@ -247,6 +249,7 @@ class ImageStorage {
 
 
 interface DataControlHooks {
+    beforeUpdate: Hook<Array<DT.StorageKey>>
     update: Hook;
     switch: Hook;
     clear: Hook<Array<string> | undefined>;
@@ -268,7 +271,7 @@ const DataControl = new class DataControl {
     }
     curr: {
         setChar: (id: string, force?: boolean) => boolean,
-        setDialogue: (index: number) => void
+        setDialogue: (index: number) => DT.ChatsRecord | undefined
     }
 
     constructor() {
@@ -277,6 +280,7 @@ const DataControl = new class DataControl {
         this.version = []
         this.index = -1
         this.hook = {
+            beforeUpdate: new Hook<Array<DT.StorageKey>>(),
             update: new Hook(),
             switch: new Hook(),
             clear: new Hook(),
@@ -334,7 +338,12 @@ const DataControl = new class DataControl {
             },
             setDialogue: (index) => {
                 currDialogueIndex.value = index
-                currDialogueData.value = chats.value[index]
+                if (index === -1) {
+                    currCharData.value = null
+                } else {
+                    currDialogueData.value = chats.value[index]
+                    return chats.value[index]
+                }
             }
         }
 
@@ -370,6 +379,16 @@ const DataControl = new class DataControl {
         }
     }
 
+    getNeedUpdate() {
+        const updateList: Array<DT.StorageKey> = []
+        for (const key in this.storage) {
+            if (Object.prototype.hasOwnProperty.call(this.storage, key) && this.storage[key].update) {
+                updateList.push(key as DT.StorageKey)
+            }
+        }
+        return updateList
+    }
+
     save(update?: DT.StorageKey | Array<DT.StorageKey>) {
         // 保存更新节点，用于撤回/重做
         if (this.index > -1) {
@@ -379,6 +398,7 @@ const DataControl = new class DataControl {
         if (update) {
             this.update(update)
         }
+        this.hook.beforeUpdate.call(this.getNeedUpdate())
         const operator: Array<DT.OperateRecord> = []
         for (const key in this.storage) {
             if (Object.prototype.hasOwnProperty.call(this.storage, key)) {

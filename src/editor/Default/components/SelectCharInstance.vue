@@ -1,46 +1,65 @@
-<script setup>
-import { ref, watch, computed } from 'vue'
+<script setup lang="ts">
+import { ref, useTemplateRef, watch, computed } from 'vue'
 import { t } from '@/lib/lang/translate'
 import { StaticUrl, IsMobile } from '@/lib/data/constance'
 import { SearchManager, CharDict, Suffix } from '@/lib/data/character'
-import { doAfterRefMounted } from '@/lib/utils/tool'
+import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
 import { dialogWidth } from '@/lib/data/width'
+import type { ElInput } from 'element-plus'
 
-const { maxHeight } = defineProps({
-    maxHeight: {
-        type: String,
-        default: null
-    }
-})
-const emit = defineEmits(['select'])
+
+const { maxHeight = null } = defineProps<{
+    maxHeight?: string | null
+}>()
+
+const emit = defineEmits<{
+    select: [char: CharSelectResult]
+}>()
+
 const ifShowSubSelect = ref(false)
 
 const search = ref('')
 const searchManager = new SearchManager()
 const searchResult = searchManager.result
-const inputRef = ref(null)
-const currSelect = ref([])
-const avatarBarRef = ref(null)
+const inputRef = useTemplateRef<InstanceType<typeof ElInput>>('inputRef')
+const currSelect = ref<CharSelect | null>(null)
+const avatarBarRef = useTemplateRef<HTMLDivElement>('avatarBarRef')
 const avatarBarFrameWidth = ref('0px')
-doAfterRefMounted(avatarBarRef, () => {
-    avatarBarFrameWidth.value = Math.floor(avatarBarRef.value.scrollWidth / 4) - 2 + 'px'
+doAfterRefMounted(avatarBarRef, (ref) => {
+    avatarBarFrameWidth.value = Math.floor(ref.value.scrollWidth / 4) - 2 + 'px'
 })
 const avatarBarFrameDialogWidth = computed(() => {
     return Math.floor((dialogWidth.value - 48) / 4) + 'px'
 })
 
-const defaultChar = [
-    ['avatar/arknights/doctor' + Suffix, t.value.character.doctor],
-    ['avatar/arknights/PRTS' + Suffix, 'PRTS'],
-    ['avatar/arknights/mon3tr' + Suffix, 'mon3tr'],
-    ['avatar/arknights/char_003_kalts' + Suffix, t.value.character.kalts]
-]
+interface CharSelectResult {
+    avatar: string,
+    name: string
+}
+type CharSelect = [charId: string, charName: string]
+
+const defaultChar: Array<CharSelectResult> = function () {
+    const res: Array<CharSelectResult> = []
+    const characters = [
+        ['avatar/arknights/doctor', t.value.character.doctor],
+        ['avatar/arknights/PRTS', 'PRTS'],
+        ['avatar/arknights/mon3tr', 'mon3tr'],
+        ['avatar/arknights/char_003_kalts', t.value.character.kalts]
+    ];
+    characters.forEach(element => {
+        res.push({
+            avatar: element[0] + Suffix,
+            name: element[1]
+        })
+    });
+    return res
+}()
 
 watch(search, () => {
     searchManager.search(search.value)
 })
 
-function autoFocus () {
+function autoFocus() {
     if (!IsMobile) {
         doAfterRefMounted(inputRef, (r) => {
             setTimeout(() => {
@@ -50,12 +69,15 @@ function autoFocus () {
     }
 }
 
-function handleSelect (char) {
+function handleSelect(char: CharSelect) {
     if (CharDict[char[0]].avatars.length > 1) {
         currSelect.value = char
         ifShowSubSelect.value = true
     } else {
-        emit('select', [CharDict[char[0]].avatars[0], char[1]])
+        emit('select', {
+            avatar: CharDict[char[0]].avatars[0],
+            name: char[1]
+        })
     }
 }
 
@@ -71,17 +93,19 @@ defineExpose({
         <el-scrollbar :max-height="maxHeight" style="width: 100%">
             <div class="avatar-bar" ref="avatarBarRef">
                 <template v-if="!searchResult">
+                    <!-- 无搜索时默认角色 -->
                     <div class="frame" v-for="char in defaultChar" :key="char[1]"
-                         :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">
-                        <img :src="StaticUrl + char[0]" loading="lazy" :title="char[1]"
-                             @click="() => {$emit('select',char)}">
+                        :style="{ width: avatarBarFrameWidth, height: avatarBarFrameWidth }">
+                        <img :src="StaticUrl + char.avatar" loading="lazy" :title="char.name"
+                            @click="() => { $emit('select', char) }">
                     </div>
                 </template>
                 <template v-else>
+                    <!-- 展示搜索结果 -->
                     <div class="frame" v-for="char in searchResult" :key="char[0]"
-                         :style="{width: avatarBarFrameWidth, height: avatarBarFrameWidth}">
+                        :style="{ width: avatarBarFrameWidth, height: avatarBarFrameWidth }">
                         <img :src="StaticUrl + CharDict[char[0]].avatars[0]" loading="lazy" :title="char[1]"
-                             @click="handleSelect(char)">
+                            @click="handleSelect(char)">
                         <div class="subscript" v-if="CharDict[char[0]].avatars.length > 1">
                             {{ CharDict[char[0]].avatars.length - 1 }}+
                         </div>
@@ -91,17 +115,20 @@ defineExpose({
         </el-scrollbar>
     </template>
     <div v-else
-         style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: darkgray">
+        style="height: 150px; display: flex; justify-content: center; align-items: center; flex-flow: column;color: darkgray">
         <p>No Result</p>
         <p>Tips: {{ t.tip.selectCharDialog }}</p>
     </div>
     <el-dialog v-model="ifShowSubSelect" :title="t.action.selectAvatar" :width="dialogWidth" top="10vh">
-        <div class="avatar-bar" style="margin-top: 0">
+        <div v-if="currSelect" class="avatar-bar" style="margin-top: 0">
             <div class="frame" v-for="avatar in CharDict[currSelect[0]].avatars" :key="avatar"
-                 :style="{width: avatarBarFrameDialogWidth, height: avatarBarFrameDialogWidth}">
+                :style="{ width: avatarBarFrameDialogWidth, height: avatarBarFrameDialogWidth }">
                 <img :src="StaticUrl + avatar" loading="lazy" :title="currSelect[1]"
-                     @click="() => {$emit('select',[avatar, currSelect[1]]);ifShowSubSelect=false}">
+                    @click="() => { $emit('select', { avatar, name: ensureValue(currSelect, 'currSelect')[1] }); ifShowSubSelect = false }">
             </div>
+        </div>
+        <div v-else>
+            Oops! Something went wrong.
         </div>
     </el-dialog>
 </template>
@@ -136,7 +163,8 @@ defineExpose({
 
 .avatar-bar img:hover {
     width: calc(100% - 2px);
-    height: calc(100% - 2px);;
+    height: calc(100% - 2px);
+    ;
     border: grey solid 1px;
 }
 </style>

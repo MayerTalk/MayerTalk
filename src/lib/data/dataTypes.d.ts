@@ -1,34 +1,55 @@
 import { ImageStorage, Storage } from './data';
+import { GenericSettings } from '@/lib/data/settings';
+import { ChatType } from '@/lib/data/constance.ts';
+import type { SupportLangKey } from '../lang/constant';
 
 export interface CharsRecord {
     name: string,
-    avatar: string
+    avatar: string,
+    right?: boolean
 }
 
 export interface CharsData {
     [id: string]: CharsRecord
 }
 
-export interface ChatsRecord {
-    char: string,
-    content: string
-    data: object,
-    id: string,
-    type: string
+export interface ChatType {
+    chat: string
+    monologue: string
+    image: string
+    option: Array<[string, string]> // uuid() 返回字符串
+    select: string
+    title: string
 }
+
+/*
+TODO: 优化ChatsRecord类型定义，新建dialogue.ts文件，从常量定义中自动生成类型定义
+*/
+
+export type ChatsRecord = {
+    [T in keyof ChatType]: {
+        char: string
+        content: ChatType[T]
+        data: {
+            cutPoint?: boolean
+        }
+        id: string
+        type: T
+    }
+}[keyof ChatType] 
 
 export type ChatsData = ChatsRecord[]
 
 export interface ConfigData {
     editor: string,
-    lang: string
+    lang: SupportLangKey
     renderer: string
 }
 
 export interface SettingsData {
-    common: object,
-    editor: { [editor: string]: object },
-    renderer: { [renderer: string]: object }
+    common: GenericSettings,
+    editor: Record<string, object>
+    renderer: Record<string, object>
 }
 
 export interface ImagesRecord {
@@ -62,10 +83,6 @@ export interface StorageType {
     chats: Storage<ChatsData>
     images: ImageStorage,
     version?: string
-}
-
-export type StorageDataType = {
-    [key in StorageKey]: object
 }
 
 export interface OperateRecord {

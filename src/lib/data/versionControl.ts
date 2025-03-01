@@ -1,5 +1,5 @@
 import { t } from '@/lib/lang/translate'
-import { defaultLang } from '@/lib/lang/detect'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
 import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import {
@@ -92,7 +92,7 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
         // v0.1.8 -> v0.1.9 / d -> e
         // i18n & render -> renderer
         if (!Object.prototype.hasOwnProperty.call(data.config, 'lang')) {
-            data.config.lang = defaultLang
+            data.config.lang = DEFAULT_LANG
         }
         if (!Object.prototype.hasOwnProperty.call(data.config, 'renderer')) {
             data.config.renderer = 'Siracusa'
@@ -126,8 +126,8 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
         const rendererKey = ['background', 'showCharName', 'showCharNameSettings']
         const group: Array<[Array<string>, object]> = [
             [commonKey, newSettings.common],
-            [editorKey, newSettings.editor.Default],
-            [rendererKey, newSettings.renderer.Siracusa]
+            [editorKey, (newSettings.editor as { Default: object }).Default],
+            [rendererKey, (newSettings.renderer as { Siracusa: object }).Siracusa]
         ]
         for (const key in oldSettings) {
             for (let i = 0; i < group.length; i++) {
@@ -186,7 +186,7 @@ function downloadData() {
     download(url, 'mayertalk-data-' + Date.now() + '.json')
 }
 
-function uploadData(uploadFile: File, callback: () => void) {
+function uploadData(uploadFile: File, callback?: () => void) {
     const reader = new FileReader()
     reader.onloadend = () => {
         try {

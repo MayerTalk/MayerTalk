@@ -1,4 +1,4 @@
-import Hook from '@/lib/utils/hook.ts';
+import Hook from '@/lib/utils/hook';
 
 const WindowResize = new Hook<undefined>()
 

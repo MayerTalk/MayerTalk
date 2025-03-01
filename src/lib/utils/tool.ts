@@ -6,10 +6,31 @@ import message from './message'
 import { IsMobile } from '@/lib/data/constance'
 import Input from '@/lib/function/input'
 import type { Ref } from 'vue';
-import type { Callback, CallBackData, OptionalCallback } from '@/lib/utils/types';
+import type { Callback, CallBackWithData, OptionalCallback } from '@/lib/utils/types';
+
+function hasOwn<T extends object, K extends string>(obj: T, key: K): obj is T & Record<K, unknown> {
+    return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+function isObject(value: unknown): value is object {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 function copy<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj))
+}
+
+function ensureValue<T>(value: T, name: string = 'Val'): NonNullable<T> {
+    if (value === null || value === undefined) {
+        throw new Error(`${name} is not a valid value`)
+    }
+    return value as NonNullable<T>
+}
+
+function assertNonValue<T>(value: T, name: string = 'Val'): asserts value is NonNullable<T> {
+    if (value === null || value === undefined) {
+        throw new Error(`${name} is not a valid value`)
+    }
 }
 
 function saveData(name: string, data: object | string | number) {
@@ -33,7 +54,7 @@ function getData<T>(name: string): T | null {
     return data as T | null
 }
 
-function getCanvas(node: HTMLElement, options: object, cb: CallBackData<HTMLCanvasElement>) {
+function getCanvas(node: HTMLElement, options: object, cb: CallBackWithData<HTMLCanvasElement>) {
     html2canvas(node, options).then(canvas => {
         cb(canvas)
     }).catch(err => {
@@ -80,7 +101,7 @@ function blob2url(blob: Blob): string {
     return url as string
 }
 
-function blob2base64(blob: Blob, callback: CallBackData<string>) {
+function blob2base64(blob: Blob, callback: CallBackWithData<string>) {
     const reader = new FileReader()
     reader.onloadend = () => {
         callback(reader.result as string)
@@ -106,14 +127,14 @@ function image2square(image: HTMLImageElement) {
     return canvas
 }
 
-function ensure(done: Callback, text: string) {
+function ensureMessage(done: Callback, text: string) {
     message.confirm(text, t.value.noun.hint, () => {
         done()
     })
 }
 
 function ensureClose(done: Callback) {
-    ensure(done, t.value.notify.whetherQuitEditing)
+    ensureMessage(done, t.value.notify.whetherQuitEditing)
 }
 
 type ClickableHTMLElement = HTMLElement & { click: () => void }
@@ -125,13 +146,15 @@ function clickBySelector(selector: string) {
     }
 }
 
-function getDialogue(id: string) {
-    return document.getElementById(id)
+function getDialogue(id: string): HTMLElement {
+    const dialog = document.getElementById(id)
+    return ensureValue(dialog, `Dialogue ${id} not found`)
 }
 
-function doAfter<T>(fn: () => T, callback: CallBackData<T>, cd = 0) {
-    if (fn()) {
-        callback(fn())
+function doAfter<T>(fn: () => T | null, callback: CallBackWithData<NonNullable<T>>, cd = 0) {
+    const res = fn()
+    if (res) {
+        callback(res)
     } else {
         setTimeout(() => {
             doAfter(fn, callback, cd)
@@ -139,9 +162,9 @@ function doAfter<T>(fn: () => T, callback: CallBackData<T>, cd = 0) {
     }
 }
 
-function doAfterRefMounted(ref: Ref, callback: CallBackData<boolean>) {
+function doAfterRefMounted<T>(ref: Ref<T>, callback: CallBackWithData<Ref<NonNullable<T>>>) {
     doAfter(() => {
-        return ref.value && ref
+        return ref.value ? ref as Ref<NonNullable<T>> : null
     }, callback, 0)
 }
 
@@ -162,7 +185,7 @@ const Textarea: {
 } = {
     el: null!,
     focus() {
-    // message.notify(Date.now() - this.lastFocusout)
+        // message.notify(Date.now() - this.lastFocusout)
         if (!IsMobile || Input.inputting()) {
             // 非手机(自动focus) or 输入法唤起状态(保持输入法唤起)
             this.el.focus()
@@ -186,55 +209,84 @@ function bool(obj: string | number | boolean | object): boolean {
     return true;
 }
 
-
-function sync(dst: object, srcDefault: object, srcTarget: object) {
-    // target default variable
-    for (const key in srcDefault) {
-        if (Object.prototype.hasOwnProperty.call(srcDefault, key)) {
-            if (typeof srcDefault[key] === 'object') {
-                dst[key] = {}
-                sync(dst[key], srcDefault[key], srcTarget[key] || {})
-            } else {
-                dst[key] = srcDefault[key]
-            }
-        }
-    }
-    for (const key in srcTarget) {
-        if (Object.prototype.hasOwnProperty.call(srcTarget, key)) {
-            if (typeof srcTarget[key] !== 'object' && (srcTarget[key] || typeof srcTarget[key] === 'boolean')) {
-                dst[key] = srcTarget[key]
-            }
-        }
-    }
-}
-
 function parseFilename(filename: string): string {
     // 检查文件名，去除非法字符，并缩减长度
     const newFilename = filename.replace(/[\\/:*?"<>|]/, '')
     return newFilename.length <= 64 ? newFilename : newFilename.slice(0, 64)
 }
 
-function setKeyFalseDelete(obj: object, key: string, value: string | number | boolean | object, falseCheck = null) {
-    if (!(falseCheck || bool)(value)) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            delete obj[key]
+
+function withDefault<T extends object>(value: object, defaultValue: Readonly<T>): T {
+    const result: T = {} as T
+
+    for (const key in value) {
+        if (!hasOwn(value, key)) continue
+        const v = value[key]
+
+        if (isObject(v) && hasOwn(defaultValue, key)) {
+            const defaultValueVal = v[key]
+            if (isObject(defaultValueVal)) {
+                result[key] = withDefault(v, defaultValueVal)
+            } else {
+                result[key] = v as typeof defaultValueVal
+            }
+        } else {
+            result[key] = v
         }
-    } else {
-        obj[key] = value
     }
+
+    for (const key in defaultValue) {
+        if (!hasOwn(defaultValue, key)) continue
+
+        if (Object.prototype.hasOwnProperty.call(result, key)) {
+            const resultVal = result[key]
+            const defaultValueVal = copy(defaultValue[key])
+            if (isObject(resultVal) && isObject(defaultValueVal)) {
+                result[key] = withDefault(resultVal, defaultValueVal) as typeof defaultValueVal
+            }
+        } else {
+            result[key] = copy(defaultValue[key])
+        }
+    }
+    return result
+}
+
+function excludeDefault<T>(value: object, defaultValue: Readonly<object>): T {
+    const result = copy(value)
+
+    for (const key in result) {
+        if (!hasOwn(value, key)) continue
+        const resultVal = result[key]
+        const defaultValueVal = defaultValue[key]
+        if (isObject(resultVal) && hasOwn(defaultValue, key) && isObject(defaultValueVal)) {
+            const processed = excludeDefault(resultVal, defaultValueVal)
+            result[key] = processed
+
+            if (Object.keys(processed as object).length === 0) {
+                delete result[key]
+            }
+        } else if (resultVal === defaultValueVal) {
+            delete result[key]
+        }
+    }
+    return result as T
 }
 
 export {
     md5,
     copy,
     uuid,
+    hasOwn,
+    ensureValue,
+    assertNonValue,
+    isObject,
     saveData,
     getData,
     download,
     blob2url,
     blob2base64,
     image2square,
-    ensure,
+    ensureMessage,
     ensureClose,
     clickBySelector,
     getDialogue,
@@ -245,7 +297,7 @@ export {
     bool,
     getCanvas,
     downloadCanvas,
-    sync,
     parseFilename,
-    setKeyFalseDelete
+    withDefault,
+    excludeDefault
 }

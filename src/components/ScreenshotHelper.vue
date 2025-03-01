@@ -1,11 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { computed, inject, nextTick, onUnmounted, ref, watch } from 'vue'
-import { getCanvas, downloadCanvas, copy, getDialogue, parseFilename, doAfter } from '@/lib/utils/tool'
-import { TypeSeries } from '@/lib/data/constance'
+import {
+    getCanvas,
+    downloadCanvas,
+    copy,
+    getDialogue,
+    parseFilename,
+    doAfter,
+    ensureValue,
+    assertNonValue
+} from '@/lib/utils/tool'
+import { ChatSeries } from '@/lib/data/constance'
 import message from '@/lib/utils/message'
 import { t } from '@/lib/lang/translate'
-import { chats, chars, settings, DataControl } from '@/lib/data/data'
-import { defaultSettings, commonSettings, setCommonSettings, rendererSettings } from '@/lib/data/settings'
+import { chats, chars, DataControl } from '@/lib/data/data'
+import { currRendererSettings } from '@/lib/data/settings'
 import CollapseItem from '@/components/CollapseItem'
 import { dialogWidth } from '@/lib/data/width'
 import { cutPointViewMode, sortedCutPoints, enableCutPointView } from '@/components/ManualCutPoint/manualCoutPointControl'
@@ -15,15 +24,21 @@ import {
 } from '@/components/PartialScreenshot/partialScreenshotControl'
 import { mainShow } from '@/lib/data/showControl'
 import { duringScreenshot } from '@/lib/data/state'
+import SettingsTextInput from '@/components/Settings/SettingsTextInput.vue'
+import SettingsNumberInput from '@/components/Settings/SettingsNumberInput.vue'
+import { DEFAULT_GENERIC_SETTINGS, genericSettings } from '@/lib/data/settings'
+import type { Ref } from 'vue'
 
 const emit = defineEmits(['start', 'done'])
 
-let screenshotNode = null
-let watermarkNode = null
-const rendererWidth = inject('rendererWidth')
+let screenshotNode: HTMLElement | null = null
+let watermarkNode: HTMLElement | null = null
+const rendererWidth = inject<Ref<{
+    window: number
+}>>('rendererWidth')
 const title = ref('')
 const realScale = computed(() => {
-    return commonSettings.value.imageQuality * 1.5
+    return genericSettings.value.imageQuality * 1.5
 })
 
 onUnmounted(DataControl.hook.clear.on(() => {
@@ -33,9 +48,21 @@ onUnmounted(DataControl.hook.changeSavefile.on(() => {
     title.value = ''
 }))
 
-function downloadScreenshot (cb = null, options = {}) {
-    getCanvas(options.screenshotNode || screenshotNode, {
-        windowWidth: rendererWidth.value.window + 20,
+interface DownloadScreenshotOptions {
+    screenshotNode?: HTMLElement
+    options?: object
+    watermarkCanvas?: HTMLCanvasElement,
+    filename?: string
+    title?: string
+}
+
+function downloadScreenshot(cb?: () => void, options: DownloadScreenshotOptions = {}) {
+    const node = options.screenshotNode || screenshotNode
+    if (!node) {
+        throw new Error('Unable to download screenshot')
+    }
+    getCanvas(node, {
+        windowWidth: ensureValue(rendererWidth, 'rendererWidth').value.window + 20,
         scale: realScale.value,
         useCORS: true,
         ...(options.options || {})
@@ -43,6 +70,9 @@ function downloadScreenshot (cb = null, options = {}) {
         if (options.watermarkCanvas) {
             const finalCanvas = document.createElement('canvas')
             const ctx = finalCanvas.getContext('2d')
+            if (!ctx) {
+                throw new Error('Unable to render canvas context')
+            }
             finalCanvas.width = canvas.width
             finalCanvas.height = options.watermarkCanvas.height + canvas.height - 1
             ctx.drawImage(options.watermarkCanvas, 0, 0)
@@ -65,27 +95,34 @@ doAfter(() => {
 const realMaxHeight = computed(() => {
     // -30 renderer上下padding (20+10)
     // -10 dialogue margin-bottom
-    const res = Math.floor(commonSettings.value.maxHeight / realScale.value) - 30 -
-        (commonSettings.value.watermark ? watermarkNode.scrollHeight - 1 : 0) - 10
+    const res = Math.floor(genericSettings.value.maxHeight / realScale.value) - 30 -
+        (genericSettings.value.watermark && watermarkNode ? watermarkNode.scrollHeight - 1 : 0) - 10
     return res > 0 ? res : 1
 })
 
-function dialogueOffsetTop (el) {
+function dialogueOffsetTop(el: HTMLElement) {
     // offsetTop 包含 renderer paddingTop 20px
     return el.offsetTop - 20
 }
 
-function getAutoCutGroup (start, end, maxHeight) {
-    if (!commonSettings.value.autoCut) {
+interface GetAutoCutGroupOptions {
+    start: number
+    end?: number
+    maxHeight: number
+}
+
+function getAutoCutGroup(options: GetAutoCutGroupOptions) {
+    if (!genericSettings.value.autoCut) {
         return []
     }
+    const { start, end, maxHeight } = options
     const chatsData = end ? chats.value.slice(start, end) : chats.value.slice(start)
     const offset = dialogueOffsetTop(getDialogue(chatsData[0].id))
     const totalHeight = end
         ? dialogueOffsetTop(getDialogue(chats.value[end].id)) - dialogueOffsetTop(getDialogue(chatsData[0].id))
-        : screenshotNode.scrollHeight - 30 - offset
+        : screenshotNode ? screenshotNode.scrollHeight - 30 - offset : 0
 
-    function offsetTop (el) {
+    function offsetTop(el: HTMLElement) {
         return dialogueOffsetTop(el) - offset
     }
 
@@ -94,7 +131,7 @@ function getAutoCutGroup (start, end, maxHeight) {
         return []
     }
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
-    const points = []
+    const points: Array<number> = []
     // 已裁分Height
     let croppedHeight = 10
     // 最后一次裁分index
@@ -170,15 +207,19 @@ function getAutoCutGroup (start, end, maxHeight) {
     return points
 }
 
-function getScreenshotGroup () {
+function getScreenshotGroup() {
     const maxHeight = realMaxHeight.value
     let lastCut = 0
     // 裁分点 len:9 [3,6] -> [0-2,3-5,6-8]
-    const points = []
-    if (commonSettings.value.manualCut && !duringPartialScreenshot.value) {
+    const points: Array<number> = []
+    if (genericSettings.value.manualCut && !duringPartialScreenshot.value) {
         for (let i = 0; i < chats.value.length - 1; i++) {
             if (chats.value[i].data.cutPoint) {
-                getAutoCutGroup(lastCut, i + 1, maxHeight).forEach((point) => {
+                getAutoCutGroup({
+                    start: lastCut,
+                    end: i + 1,
+                    maxHeight
+                }).forEach((point) => {
                     points.push(point + lastCut)
                 })
                 points.push(i + 1)
@@ -186,13 +227,16 @@ function getScreenshotGroup () {
             }
         }
     }
-    getAutoCutGroup(lastCut, null, maxHeight).forEach((point) => {
+    getAutoCutGroup({
+        start: lastCut,
+        maxHeight
+    }).forEach((point) => {
         points.push(point + lastCut)
     })
     return points
 }
 
-function done () {
+function done() {
     duringScreenshot.value = false
     if (duringPartialScreenshot.value) {
         duringPartialScreenshot.value = false
@@ -205,11 +249,11 @@ const longScreenshot = computed(() => {
     return chats.value.length > 200
 })
 
-function _screenshot (ensure = false, watermarkCanvas = null) {
+function _screenshot(ensure = false, watermarkCanvas?: HTMLCanvasElement) {
     const group = getScreenshotGroup()
     const options = {
         watermarkCanvas,
-        title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now()
+        title: title.value && parseFilename(title.value) ? parseFilename(title.value) : Date.now().toString()
     }
     if (group.length > 0) {
         if (group.length > 10 && !ensure) {
@@ -221,15 +265,22 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
             return
         }
         const chatsData = copy(chats.value)
-        const next = (i) => {
+        const next = (i: number) => {
             if (i > group.length) {
-                longScreenshot.value && message.notify(t.value.notify.screenshottedCompletely, message.success)
+                if (longScreenshot.value) {
+                    message.notify(t.value.notify.screenshottedCompletely, message.success)
+                }
                 done()
-                screenshotNode.style.height = null
+                ensureValue(screenshotNode, 'screenshotNode').style.height = ''
+
                 setTimeout(() => {
                     chats.value = chatsData
                     setTimeout(() => {
-                        longScreenshot.value ? message.notify(t.value.notify.recoveredSuccessfully, message.success) : message.notify(t.value.notify.multiScreenshotEnd, message.success)
+                        if (longScreenshot.value) {
+                            message.notify(t.value.notify.recoveredSuccessfully, message.success)
+                        } else {
+                            message.notify(t.value.notify.multiScreenshotEnd, message.success)
+                        }
                     }, 50)
                 }, 500)
                 // 截图结束
@@ -237,8 +288,10 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
             }
             chats.value = chatsData.slice(group[i - 1], group[i])
             setTimeout(() => {
-                screenshotNode.style.height = null
+                assertNonValue(screenshotNode, 'screenshotNode')
+                screenshotNode.style.height = ''
                 screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
+
                 setTimeout(() => {
                     downloadScreenshot(() => {
                         message.notify(t.value.notify.screenshottedSuccessfully + ' [' + (i + 1) + '/' + (group.length + 1) + ']', message.info)
@@ -250,36 +303,41 @@ function _screenshot (ensure = false, watermarkCanvas = null) {
                 }, 100)
             }, 100)
         }
-        longScreenshot.value ? message.notify(t.value.notify.startToScreenshot, message.warning) : message.notify(t.value.notify.multiScreenshotStart, message.warning)
+        if (longScreenshot.value) {
+            message.notify(t.value.notify.startToScreenshot, message.warning)
+        } else {
+            message.notify(t.value.notify.multiScreenshotStart, message.warning)
+        }
         setTimeout(() => {
             next(0)
         }, 500)
     } else {
         // 将height定为整数，防止截图下方出现白条
+        assertNonValue(screenshotNode, 'screenshotNode')
         screenshotNode.style.height = screenshotNode.scrollHeight - 30 + 'px'
         setTimeout(() => {
             downloadScreenshot(() => {
-                screenshotNode.style.height = null
+                ensureValue(screenshotNode, 'screenshotNode').style.height = ''
                 done()
             }, options)
         }, 100)
     }
 }
 
-function getWatermarkCanvas (cb) {
-    getCanvas(watermarkNode, {
-        windowWidth: rendererWidth.value.window + 20,
+function getWatermarkCanvas(cb: (canvas: HTMLCanvasElement) => void) {
+    getCanvas(ensureValue(watermarkNode, 'watermarkNode'), {
+        windowWidth: ensureValue(rendererWidth, 'rendererWidth').value.window + 20,
         scale: realScale.value,
         useCORS: true
     }, cb)
 }
 
-function screenshot () {
+function screenshot() {
     duringScreenshot.value = true
     emit('start')
     cutPointViewMode.value = false
     nextTick(() => {
-        if (commonSettings.value.watermark) {
+        if (genericSettings.value.watermark) {
             getWatermarkCanvas((canvas) => {
                 _screenshot(false, canvas)
             })
@@ -290,9 +348,10 @@ function screenshot () {
 }
 
 const expectCutNumber = computed(() => {
-    const heights = []
-    if (commonSettings.value.manualCut && sortedCutPoints.value.length && !duringPartialScreenshot.value) {
-        const parts = []
+    assertNonValue(screenshotNode, 'screenshotNode')
+    const heights: Array<number> = []
+    if (genericSettings.value.manualCut && sortedCutPoints.value.length && !duringPartialScreenshot.value) {
+        const parts: Array<number> = []
         for (let i = 0; i < sortedCutPoints.value.length; i++) {
             const el = getDialogue(sortedCutPoints.value[i].id)
             if (!el) {
@@ -314,7 +373,7 @@ const expectCutNumber = computed(() => {
     } else {
         heights.push(screenshotNode.scrollHeight - 30)
     }
-    if (commonSettings.value.autoCut) {
+    if (genericSettings.value.autoCut) {
         let cutNumber = 0
         for (let i = 0; i < heights.length; i++) {
             cutNumber += Math.ceil(heights[i] / realMaxHeight.value)
@@ -330,13 +389,13 @@ const expectCutNumber = computed(() => {
 })
 
 const ExpectLength = {
-    calc () {
-        this.result.value = Math.ceil((screenshotNode.scrollHeight +
-                (30 * (expectCutNumber.value - 1)) +
-                (commonSettings.value.watermark ? (watermarkNode.scrollHeight - 1) * expectCutNumber.value : 0)) *
+    calc() {
+        this.result.value = Math.ceil((ensureValue(screenshotNode, 'screenshotNode').scrollHeight +
+            (30 * (expectCutNumber.value - 1)) +
+            (genericSettings.value.watermark ? (ensureValue(watermarkNode, 'watermarkNode').scrollHeight - 1) * expectCutNumber.value : 0)) *
             realScale.value)
     },
-    mount () {
+    mount() {
         onUnmounted(DataControl.hook.change.on(() => {
             nextTick(
                 () => {
@@ -347,10 +406,10 @@ const ExpectLength = {
         watch(
             () => {
                 return [
-                    commonSettings.value.autoCut,
-                    commonSettings.value.manualCut,
-                    commonSettings.value.watermark,
-                    commonSettings.value.maxHeight
+                    genericSettings.value.autoCut,
+                    genericSettings.value.manualCut,
+                    genericSettings.value.watermark,
+                    genericSettings.value.maxHeight
                 ]
             },
             () => {
@@ -371,7 +430,7 @@ const wordCount = computed(() => {
     let count = 0
     for (let i = 0; i < chats.value.length; i++) {
         const chat = chats.value[i]
-        const type = TypeSeries[chat.type]
+        const type = ChatSeries[chat.type]
         if (type === 'Text') {
             count += chat.content.length
         } else if (type === 'TextArray') {
@@ -383,7 +442,7 @@ const wordCount = computed(() => {
     return count
 })
 
-function handleClose () {
+function handleClose() {
     if (!duringScreenshot.value && duringPartialScreenshot.value) {
         duringPartialScreenshot.value = false
     }
@@ -397,34 +456,33 @@ defineExpose({
 
 <template>
     <el-dialog v-model="mainShow.screenshotHelper.value" :width="dialogWidth" :title="t.noun.screenshot"
-               @close="handleClose">
+        @close="handleClose">
         <div>
             <div class="bar">
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
                     <h2 style="margin: 0 10px 0 0">{{ t.noun.watermark }}</h2>
-                    <el-switch :model-value="commonSettings.watermark"
-                               @update:model-value="(v) => setCommonSettings('watermark',v,(v) => !v)"></el-switch>
+                    <el-switch v-model="genericSettings.watermark" />
                     <div class="line-right"></div>
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="commonSettings.watermark" style="padding: 0 0 10px 10px">
+                <div v-show="genericSettings.watermark" style="padding: 0 0 10px 10px">
                     <table>
                         <tbody>
-                        <tr>
-                            <th>{{ t.noun.title }}</th>
-                            <td>
-                                <el-input v-model="title" clearable></el-input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{{ t.noun.author }}</th>
-                            <td>
-                                <el-input :model-value="settings.common.author" clearable
-                                          @update:model-value="(v) => setCommonSettings('author',v)"></el-input>
-                            </td>
-                        </tr>
+                            <tr>
+                                <th>{{ t.noun.title }}</th>
+                                <td>
+                                    <el-input v-model="title" clearable></el-input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ t.noun.author }}</th>
+                                <td>
+                                    <SettingsTextInput v-model="genericSettings.author"
+                                        :default-value="DEFAULT_GENERIC_SETTINGS.author" />
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -434,15 +492,13 @@ defineExpose({
                     <div style="display: flex; align-items: center; width: 100%">
                         <div class="line-left" style="width: 20px;"></div>
                         <h2 style="margin: 0 10px 0 0">{{ t.noun.manualCutting }}</h2>
-                        <el-switch :model-value="commonSettings.manualCut"
-                                   @update:model-value="(v) => setCommonSettings('manualCut',v,(v) => !v)"></el-switch>
+                        <el-switch v-model="genericSettings.manualCut" />
                         <div class="line-right"></div>
                     </div>
                 </div>
                 <CollapseItem>
-                    <div v-show="commonSettings.manualCut" style="padding: 0 0 10px 10px">
-                        <div class="column-display"
-                             style="display: flex; align-items: center; padding-top: 5px">
+                    <div v-show="genericSettings.manualCut" style="padding: 0 0 10px 10px">
+                        <div class="column-display" style="display: flex; align-items: center; padding-top: 5px">
                             <div style="width: 100%">
                                 {{ t.noun.numberOfCuttingPoints }}：{{ sortedCutPoints.length }}
                             </div>
@@ -457,22 +513,17 @@ defineExpose({
                 <div style="display: flex; align-items: center; width: 100%">
                     <div class="line-left" style="width: 20px;"></div>
                     <h2 style="margin: 0 10px 0 0">{{ t.noun.autoCut }}</h2>
-                    <el-switch :model-value="commonSettings.autoCut"
-                               @update:model-value="(v) => setCommonSettings('autoCut',v,(v) => !v)"></el-switch>
+                    <el-switch v-model="genericSettings.author" />
                     <div class="line-right"></div>
                 </div>
             </div>
             <CollapseItem>
-                <div v-show="commonSettings.autoCut" style="padding: 0 0 10px 10px">
-                    <div class="column-display"
-                         style="display: flex; align-items: center; padding-top: 5px">
+                <div v-show="genericSettings.autoCut" style="padding: 0 0 10px 10px">
+                    <div class="column-display" style="display: flex; align-items: center; padding-top: 5px">
                         <div style="width: 100%"> {{ t.noun.maxLength }}
-                            <el-input
-                                :model-value="settings.common.maxHeight" clearable
-                                @update:model-value="(v) => setCommonSettings('maxHeight',+v,(v) => v > 0)"
-                                style="width: 100px; margin-left: 10px"
-                                :placeholder="''+defaultSettings.maxHeight"
-                            />
+                            <SettingsNumberInput v-model="genericSettings.maxHeight"
+                                :default-value="DEFAULT_GENERIC_SETTINGS.maxHeight"
+                                style="width: 100px; margin-left: 10px" />
                         </div>
                         <div style="width: 100%">
                             {{ t.noun.expectCutNumber }}: {{ expectCutNumber }}
@@ -519,30 +570,26 @@ defineExpose({
             </div>
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
-            <el-button
-                @click="() => {DataControl.save(['settings']); enablePartialScreenshotView()}"
-                :disabled="duringPartialScreenshot"
-                style="width: 30%"
-            >{{ t.action.partialScreenshot }}
+            <el-button @click="() => { DataControl.save(['settings']); enablePartialScreenshotView() }"
+                :disabled="duringPartialScreenshot" style="width: 30%">{{ t.action.partialScreenshot }}
             </el-button>
             <el-button
-                @click="() => {DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value=false}"
-                style="width: 30%"
-            >{{ t.action.generate }}
+                @click="() => { DataControl.save(['settings']); screenshot(); mainShow.screenshotHelper.value = false }"
+                style="width: 30%">{{ t.action.generate }}
             </el-button>
         </div>
 
     </el-dialog>
     <Teleport to="body">
         <div style="position: absolute; top: 0;z-index: -1; overflow: hidden"
-             :style="{width: rendererWidth.window+'px'}">
+            :style="{ width: rendererWidth ? rendererWidth.window + 'px' : '0' }">
             <div id="watermark" style="position: absolute; top: 0; background: white">
-                <div :style="{width: rendererWidth.window+'px', background: rendererSettings.background}"
-                     class="watermark-bar">
+                <div :style="{ width: rendererWidth ? rendererWidth.window + 'px' : '0', background: currRendererSettings.background }"
+                    class="watermark-bar">
                     <h1 style="display: inline; flex-grow: 1; margin: 5px 5px 6px 0; opacity: 1"><i>MayerTalk</i></h1>
                     <div>
                         <p v-if="title" style="margin-bottom: 3px">{{ t.noun.title }}: {{ title }}</p>
-                        <p v-if="commonSettings.author">{{ t.noun.author }}: {{ commonSettings.author }}</p>
+                        <p v-if="genericSettings.author">{{ t.noun.author }}: {{ genericSettings.author }}</p>
                     </div>
                 </div>
             </div>
@@ -587,7 +634,6 @@ table {
     padding: 5px 10px;
     font-size: 16px;
 }
-
 .watermark-bar p {
     margin: 0;
 }

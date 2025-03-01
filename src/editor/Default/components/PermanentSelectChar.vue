@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { loadSeries } from '@/lib/data/character'
 import SelectCharInstance from '@/editor/Default/components/SelectCharInstance.vue'
@@ -11,7 +11,9 @@ const realIfShow = computed(() => {
     return localIfShow.value && ifShowPermanentSelectChar.value
 })
 
-defineEmits(['select'])
+defineEmits<{
+    select: [char: { avatar: string, name: string }]
+}>()
 
 loadSeries.arknights()
 </script>
@@ -24,17 +26,17 @@ loadSeries.arknights()
                     <!-- mask & placeholder -->
                 </div>
                 <div class="sub-container">
-                    <SelectCharInstance @select="args => $emit('select',args)"/>
+                    <SelectCharInstance @select="args => $emit('select', args)" />
                 </div>
             </div>
         </CollapseItem>
         <CollapseItem row>
             <div v-show="ifShowPermanentSelectChar" class="lever-container">
                 <div class="lever-placeholder"></div>
-                <div class="lever" @click="localIfShow=!localIfShow">
+                <div class="lever" @click="localIfShow = !localIfShow">
                     <el-icon color="lightgrey" :size="18">
-                        <IconArrowRight :style="{transform: (realIfShow?'rotate(-180deg)':null)}"
-                                        style="transition: all ease-in-out 0.6s"/>
+                        <IconArrowRight :style="{ transform: (realIfShow ? 'rotate(-180deg)' : null) }"
+                            style="transition: all ease-in-out 0.6s" />
                     </el-icon>
                 </div>
             </div>

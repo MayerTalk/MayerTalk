@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { t } from '@/lib/lang/translate'
 import CharSelector from './CharSelector.vue'
@@ -9,11 +9,13 @@ import { currDialogueIndex } from '@/lib/data/data'
 import { dialogWidth } from '@/lib/data/width'
 import { defaultShow } from '@/editor/Default/lib/showControl'
 
-const emit = defineEmits(['coped'])
+const emit = defineEmits<{
+    coped: [status: boolean]
+}>()
 
-const copyChars = ref([])
+const copyChars = ref<Array<string>>([])
 
-function handleCopy () {
+function handleCopy() {
     if (copyChars.value.length === 0) {
         message.notify(t.value.notify.pleaseSelectAtLeastOneCharacter, message.warning)
         return
@@ -30,9 +32,8 @@ function handleCopy () {
 
 <template>
     <el-dialog v-model="defaultShow.copy.value" :title="t.notify.pleaseSelectTheCharToRepeat" :width="dialogWidth"
-               @closed="copyChars = []">
+        @closed="copyChars = []">
         <el-button style="width: 100%;" @click="handleCopy">{{ t.action.repeat }}</el-button>
-        <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true"
-                      :multiple="true" :filterable="false"/>
+        <CharSelector v-model="copyChars" style="width: 100%; margin-top: 5px" :narration="true" :filterable="false" />
     </el-dialog>
 </template>

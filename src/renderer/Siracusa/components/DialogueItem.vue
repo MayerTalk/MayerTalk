@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, inject, computed, watch } from 'vue'
 import { uuid } from '@/lib/utils/tool'
 import { StaticUrl } from '@/lib/data/constance'
@@ -7,47 +7,55 @@ import {
     images,
     avatars
 } from '@/lib/data/data'
-import { rendererSettings } from '@/lib/data/settings'
+import { rendererSettings } from '@/renderer/Siracusa'
 import { Suffix } from '@/lib/data/character'
 import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
 import { DialogueHook } from '@/lib/function/dialogue'
 import { duringScreenshot, selectMode } from '@/lib/data/state'
+import type { ChatsRecord } from '@/lib/data/dataTypes'
+import type { Ref, ComputedRef } from 'vue'
 
-const rendererWidth = inject('rendererWidth')
-const charDirection = inject('charDirection')
-const props = defineProps({
-    data: {},
-    index: {
-        type: Number
-    },
-    plus1: {
-        type: Boolean,
-        default: false
-    },
-    cutPoint: {
-        type: Boolean,
-        default: false
-    },
-    cutPointActive: {
-        type: Boolean,
-        default: false
-    },
-    select: {
-        type: Boolean,
-        default: false
-    }
-})
-const emit = defineEmits(['edit', 'delete', 'plus1'])
+const rendererWidth = inject<Ref<{
+    window: number,
+    avatar: string,
+    fontsize: string,
+    image: string
+}>>('rendererWidth') as Ref<{
+    window: number,
+    avatar: string,
+    fontsize: string,
+    image: string
+}>
+const charDirection = inject<ComputedRef<[left: boolean, right: boolean]>>('charDirection') as ComputedRef<[left: boolean, right: boolean]>
 
-const data = computed(() => props.data)
-const index = computed(() => props.index)
+const {
+    data,
+    index,
+    plus1 = false,
+    cutPoint = false,
+    cutPointActive = false,
+    select = false
+} = defineProps<{
+    data: ChatsRecord,
+    index: number,
+    plus1: boolean,
+    cutPoint: boolean,
+    cutPointActive: boolean,
+    select: boolean
+}>()
+
+const emit = defineEmits<{
+    edit: [index: number],
+    delete: [index: number],
+    plus1: [index: number]
+}>()
 
 const char = computed(() => {
-    return chars.value[data.value.char] || {}
+    return chars.value[data.char] || {}
 })
 const imageUpdateId = ref(uuid())
 const right = computed(() => {
-    if (data.value.char) {
+    if (data.char) {
         // opposite is deprecated
         // return data.opposite ? !char.value.right : !!char.value.right
         return !!char.value.right
@@ -56,8 +64,8 @@ const right = computed(() => {
     }
 })
 
-function resizeImage () {
-    if (data.value.type === 'image') {
+function resizeImage() {
+    if (data.type === 'image') {
         imageUpdateId.value = uuid()
     }
 }
@@ -71,33 +79,35 @@ watch(charDirection, () => {
     resizeImage()
 })
 
-function handleClick (event) {
+function handleClick(event: MouseEvent) {
     let next = true
     const eventData = {
         data: {
-            id: data.value.id,
-            index: index.value
+            id: data.id,
+            index
         },
         raw: event,
-        preventDefault () {
+        preventDefault() {
             next = false
         }
     }
     DialogueHook.click.call(eventData)
     if (next) {
-        emit(event.ctrlKey ? 'delete' : 'edit', index.value)
+        if (event.ctrlKey) {
+            emit('delete', index)
+        } else {
+            emit('edit', index)
+        }
     }
 }
 </script>
 
 <template>
-    <div class="dialogue" :id="data.id" :style="{opacity:selectMode?(select?'1':'0.3'):null}">
-        <div style="display: flex; width: 100%; margin-bottom: 10px;"
-             @click="handleClick"
-             :style="{justifyContent:(right?'flex-end':'flex-start')}">
-            <div v-if="data.type==='title'" style="flex-grow: 1">
-                <div
-                    v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
+    <div class="dialogue" :id="data.id" :style="{ opacity: selectMode ? (select ? '1' : '0.3') : '' }">
+        <div style="display: flex; width: 100%; margin-bottom: 10px;" @click="handleClick"
+            :style="{ justifyContent: (right ? 'flex-end' : 'flex-start') }">
+            <div v-if="data.type === 'title'" style="flex-grow: 1">
+                <div v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
                     class="charName">{{ char.name }}
                 </div>
                 <div class="title-box">
@@ -116,30 +126,28 @@ function handleClick (event) {
                 <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                     <div v-if="right === false">
                         <img :src="StaticUrl + 'avatar-bg' + Suffix">
-                        <img :src="avatars[data.char]">
+                        <img :src="avatars[data.char] as unknown as string">
                     </div>
                 </div>
                 <!--Content Start-->
-                <div :style="{'flex-grow':data.type==='image'?0:1}">
-                    <div
-                        v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
+                <div :style="{ 'flex-grow': data.type === 'image' ? 0 : 1 }">
+                    <div v-if="rendererSettings.showCharName && data.char && rendererSettings.showCharNameSettings[data.type]"
                         class="charName">{{ char.name }}
                     </div>
-                    <div v-if="data.type==='image'" class="box image-box" style="justify-self: flex-start">
-                        <div v-if="data.char" :class="[right? 'right':'left']">
+                    <div v-if="data.type === 'image'" class="box image-box" style="justify-self: flex-start">
+                        <div v-if="data.char" :class="[right ? 'right' : 'left']">
                             <div class="tail">
                                 <div class="tail2"></div>
                             </div>
                         </div>
-                        <img v-if="images[data.content]"
-                             :id="data.id" :key="imageUpdateId" :src="images[data.content].src"
-                             :style="{width: duringScreenshot?rendererWidth.image:'100%'}"
-                        >
+                        <img v-if="images[data.content]" :id="data.id" :key="imageUpdateId"
+                            :src="images[data.content].src"
+                            :style="{ width: duringScreenshot ? rendererWidth.image : '100%' }">
                         <span v-else>loading image...</span>
                     </div>
-                    <template v-else-if="data.type==='chat'">
+                    <template v-else-if="data.type === 'chat'">
                         <div v-if="data.char" class="box dialogue-box">
-                            <div :class="[right? 'right':'left']">
+                            <div :class="[right ? 'right' : 'left']">
                                 <div class="tail">
                                     <div class="tail2"></div>
                                 </div>
@@ -150,7 +158,7 @@ function handleClick (event) {
                             <pre>{{ data.content }}</pre>
                         </div>
                     </template>
-                    <template v-else-if="data.type==='monologue'">
+                    <template v-else-if="data.type === 'monologue'">
                         <div v-if="data.char" class="box monologue-box">
                             <pre>{{ data.content }}</pre>
                         </div>
@@ -158,7 +166,7 @@ function handleClick (event) {
                             <pre>{{ data.content }}</pre>
                         </div>
                     </template>
-                    <template v-else-if="data.type==='option'">
+                    <template v-else-if="data.type === 'option'">
                         <div class="option-box">
                             <div v-for="value in data.content" class="block" :key="value[0]">
                                 <div class="bg">
@@ -172,7 +180,7 @@ function handleClick (event) {
                             </div>
                         </div>
                     </template>
-                    <template v-else-if="data.type==='select'">
+                    <template v-else-if="data.type === 'select'">
                         <div class="box select-box">
                             <div class="triangle-box">
                                 <div class="triangle" style="margin-left: 14px"></div>
@@ -194,19 +202,19 @@ function handleClick (event) {
                 <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                     <div v-if="right === true">
                         <img :src="StaticUrl + '/avatar-bg' + Suffix">
-                        <img :src="avatars[data.char]">
+                        <img :src="avatars[data.char] as unknown as string">
                     </div>
                 </div>
             </template>
         </div>
-        <div v-if="plus1 && !duringScreenshot" class="plus1" @click="$emit('plus1',index)">
+        <div v-if="plus1 && !duringScreenshot" class="plus1" @click="$emit('plus1', index)">
             <p>+1</p>
         </div>
-        <CutPointDialogueWrapper v-if="cutPoint" :active="cutPointActive"/>
+        <CutPointDialogueWrapper v-if="cutPoint" :active="cutPointActive" />
     </div>
 </template>
-<style src="../style/dialogue.css" scoped/>
-<style src="../style/plus1.css" scoped/>
+<style src="../style/dialogue.css" scoped />
+<style src="../style/plus1.css" scoped />
 <style scoped>
 .avatar {
     width: v-bind('rendererWidth.avatar');
@@ -218,6 +226,6 @@ function handleClick (event) {
 }
 
 .charName {
-    text-align: v-bind("right?'right':'left'");
+    text-align: v-bind("right ? 'right' : 'left'");
 }
 </style>
