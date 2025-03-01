@@ -1,7 +1,7 @@
 import { t } from '@/lib/lang/translate'
+import message from '@/lib/utils/message'
 import { DEFAULT_LANG } from '@/lib/lang/detect'
 import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
-import message from '@/lib/utils/message'
 import {
     defaultSettings,
     config,

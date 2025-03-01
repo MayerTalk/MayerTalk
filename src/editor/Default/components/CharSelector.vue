@@ -1,10 +1,14 @@
 <script setup lang="ts">
+// 优化为泛型组件
 import { useTemplateRef, onUnmounted } from 'vue'
+import { ElSelect } from 'element-plus';
+
 import { t } from '@/lib/lang/translate'
+import { ensureValue } from '@/lib/utils/tool';
+
 import { chars, avatars } from '@/lib/data/data'
 import { closeShowHook } from '@/lib/data/showControl'
-import { ElSelect } from 'element-plus';
-import { ensureValue } from '@/lib/utils/tool';
+
 
 const modelValue = defineModel<string | Array<string>>({ required: true })
 const select = useTemplateRef<InstanceType<typeof ElSelect>>('select')
@@ -29,7 +33,10 @@ function blur() {
     ensureValue(select.value, 'select').blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+    focus,
+    blur
+})
 </script>
 
 <template>

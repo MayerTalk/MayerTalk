@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { t } from '@/lib/lang/translate'
-import CharSelector from './CharSelector.vue'
 
+import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { copyDialogue } from '@/lib/function/dialogue'
-import { currDialogueIndex } from '@/lib/data/data'
+
 import { dialogWidth } from '@/lib/data/width'
+import { currDialogueIndex } from '@/lib/data/data'
+
 import { defaultShow } from '@/editor/Default/lib/showControl'
+
+import CharSelector from './CharSelector.vue'
 
 const emit = defineEmits<{
     coped: [status: boolean]

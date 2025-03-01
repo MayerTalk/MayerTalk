@@ -1,8 +1,9 @@
-import { computed, ref } from 'vue'
-import { settings, DataControl } from '@/lib/data/data'
+import { computed, ref, type Ref } from 'vue'
+
 import { withDefault, excludeDefault } from '@/lib/utils/tool'
+
 import { currRendererRef } from '@/lib/data/state'
-import type { Ref, ComputedRef } from 'vue'
+import { settings, DataControl } from '@/lib/data/data'
 
 interface GenericSettings {
     width: number
@@ -79,6 +80,13 @@ class SettingsManager<T extends object> {
             settings.value[this.type][this.key] = value as object
         }
     }
+
+    cancel() {
+        // TODO 组件卸载后调用
+        this.hookCancels.forEach(fn => {
+            fn()
+        })
+    }
 }
 
 const GenericSettingsManager = new SettingsManager<GenericSettings>({
@@ -86,7 +94,7 @@ const GenericSettingsManager = new SettingsManager<GenericSettings>({
     default: DEFAULT_GENERIC_SETTINGS
 })
 const genericSettings = GenericSettingsManager.ref
-const currRendererSettings: ComputedRef<RendererGenericSettings> = computed(() => {
+const currRendererSettings = computed<RendererGenericSettings>(() => {
     if (currRendererRef.value) {
         return currRendererRef.value.rendererSettings
     } else {

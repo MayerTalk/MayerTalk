@@ -1,12 +1,12 @@
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
+import TipControl from '@/lib/function/tip'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
 import { saveData, getData } from '@/lib/utils/tool'
 import { cacheRequest } from '@/lib/utils/cacheRequest'
 import { emptyTranslation, type SupportLangKey } from '@/lib/lang/constant'
+
 import { translationHost } from '@/lib/dev'
-import TipControl from '@/lib/function/tip'
-import { DEFAULT_LANG } from './detect'
 import type { Translation } from '@/lib/lang/translation';
 
 const cacheKey = 'cache.data.translation.'

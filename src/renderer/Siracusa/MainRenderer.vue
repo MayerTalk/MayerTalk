@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { inject } from 'vue'
-import Dialogue from './components/DialogueItem.vue'
-import SettingsDialog from './components/SettingsDialog.vue'
+import { inject, type Ref } from 'vue'
 
 import plus1 from '@/lib/function/plus1'
+
 import { chats } from '@/lib/data/data'
+
 import { rendererSettings } from '@/renderer/Siracusa';
-import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/manualCoutPointControl'
 import { partialChats } from '@/components/PartialScreenshot/partialScreenshotControl'
-import type { Ref } from 'vue'
+import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/manualCoutPointControl'
+
+import Dialogue from './components/DialogueItem.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
 
 defineEmits<{
     edit: [index: number],

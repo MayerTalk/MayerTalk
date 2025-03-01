@@ -1,21 +1,20 @@
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { ref, type Ref } from 'vue'
+import type { AxiosResponse } from 'axios';
 
+import { copy } from '@/lib/utils/tool'
 import Request from '@/lib/utils/request'
 import { cacheRequest } from '@/lib/utils/cacheRequest'
-import { copy } from '@/lib/utils/tool'
 import { fullWidth2HalfLatin } from '@/lib/lang/fullWidth2HalfLatin'
-import { characterHost } from '@/lib/dev'
+
 import { config } from '@/lib/data/data'
+import { characterHost } from '@/lib/dev'
 import { IsSafari } from '@/lib/data/constance'
-import type { AxiosResponse } from 'axios';
 
 const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 
 const CharDict: Record<string, CharacterData> = {}
 const loaded = new Set<string>()
 const Suffix = IsSafari ? '.png' : '.webp'
-
 
 type CharacterRequestData = [
     names: Array<string>,
@@ -344,7 +343,7 @@ function parseSearch(param: string) {
 
 class SearchManager {
     result: Ref<Array<[string, string]> | null>
-    extraResult: Record<string,Array<string>>
+    extraResult: Record<string, Array<string>>
     searchResultFullShow: number
 
 

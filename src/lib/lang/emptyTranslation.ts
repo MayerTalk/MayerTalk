@@ -1,4 +1,4 @@
-import type { Translation } from './translation';
+import type { Translation } from '@/lib/lang/translation';
 
 const emptyTranslation: Translation = {
     empty: true,
@@ -173,4 +173,6 @@ const emptyTranslation: Translation = {
         }
     }
 }
+
+
 export default emptyTranslation

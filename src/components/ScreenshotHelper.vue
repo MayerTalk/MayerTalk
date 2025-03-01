@@ -1,33 +1,55 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onUnmounted, ref, watch } from 'vue'
+import type { Ref } from 'vue'
+
+import { t } from '@/lib/lang/translate'
+import message from '@/lib/utils/message'
 import {
-    getCanvas,
-    downloadCanvas,
     copy,
-    getDialogue,
-    parseFilename,
     doAfter,
+    getCanvas,
+    getDialogue,
     ensureValue,
+    parseFilename,
+    downloadCanvas,
     assertNonValue
 } from '@/lib/utils/tool'
-import { ChatSeries } from '@/lib/data/constance'
-import message from '@/lib/utils/message'
-import { t } from '@/lib/lang/translate'
-import { chats, chars, DataControl } from '@/lib/data/data'
-import { currRendererSettings } from '@/lib/data/settings'
-import CollapseItem from '@/components/CollapseItem'
+
 import { dialogWidth } from '@/lib/data/width'
-import { cutPointViewMode, sortedCutPoints, enableCutPointView } from '@/components/ManualCutPoint/manualCoutPointControl'
-import {
-    enablePartialScreenshotView,
-    duringPartialScreenshot
-} from '@/components/PartialScreenshot/partialScreenshotControl'
 import { mainShow } from '@/lib/data/showControl'
+import { CHAT_SERIES } from '@/lib/data/constance'
 import { duringScreenshot } from '@/lib/data/state'
+import { currRendererSettings } from '@/lib/data/settings'
+import { chats, chars, DataControl } from '@/lib/data/data'
+import { DEFAULT_GENERIC_SETTINGS, genericSettings } from '@/lib/data/settings'
+
+import {
+    sortedCutPoints,
+    cutPointViewMode,
+    enableCutPointView
+} from '@/components/ManualCutPoint/manualCoutPointControl'
+import {
+    duringPartialScreenshot,
+    enablePartialScreenshotView
+} from '@/components/PartialScreenshot/partialScreenshotControl'
+
+import CollapseItem from '@/components/CollapseItem'
 import SettingsTextInput from '@/components/Settings/SettingsTextInput.vue'
 import SettingsNumberInput from '@/components/Settings/SettingsNumberInput.vue'
-import { DEFAULT_GENERIC_SETTINGS, genericSettings } from '@/lib/data/settings'
-import type { Ref } from 'vue'
+
+interface DownloadScreenshotOptions {
+    screenshotNode?: HTMLElement
+    options?: object
+    watermarkCanvas?: HTMLCanvasElement,
+    filename?: string
+    title?: string
+}
+
+interface GetAutoCutGroupOptions {
+    start: number
+    end?: number
+    maxHeight: number
+}
 
 const emit = defineEmits(['start', 'done'])
 
@@ -47,14 +69,6 @@ onUnmounted(DataControl.hook.clear.on(() => {
 onUnmounted(DataControl.hook.changeSavefile.on(() => {
     title.value = ''
 }))
-
-interface DownloadScreenshotOptions {
-    screenshotNode?: HTMLElement
-    options?: object
-    watermarkCanvas?: HTMLCanvasElement,
-    filename?: string
-    title?: string
-}
 
 function downloadScreenshot(cb?: () => void, options: DownloadScreenshotOptions = {}) {
     const node = options.screenshotNode || screenshotNode
@@ -103,12 +117,6 @@ const realMaxHeight = computed(() => {
 function dialogueOffsetTop(el: HTMLElement) {
     // offsetTop 包含 renderer paddingTop 20px
     return el.offsetTop - 20
-}
-
-interface GetAutoCutGroupOptions {
-    start: number
-    end?: number
-    maxHeight: number
 }
 
 function getAutoCutGroup(options: GetAutoCutGroupOptions) {
@@ -430,7 +438,7 @@ const wordCount = computed(() => {
     let count = 0
     for (let i = 0; i < chats.value.length; i++) {
         const chat = chats.value[i]
-        const type = ChatSeries[chat.type]
+        const type = CHAT_SERIES[chat.type]
         if (type === 'Text') {
             count += chat.content.length
         } else if (type === 'TextArray') {
@@ -634,6 +642,7 @@ table {
     padding: 5px 10px;
     font-size: 16px;
 }
+
 .watermark-bar p {
     margin: 0;
 }

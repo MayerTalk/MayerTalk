@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, inject, onMounted, onUnmounted } from 'vue'
+import type { ElInput, ElScrollbar } from 'element-plus'
+import { ref, useTemplateRef, inject, onMounted, onUnmounted, type Ref } from 'vue'
+
 import { t } from '@/lib/lang/translate'
-import { chats } from '@/lib/data/data'
-import { getDialogue, doAfterRefMounted, ensureValue, assertNonValue } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
+import { getDialogue, doAfterRefMounted, ensureValue, assertNonValue } from '@/lib/utils/tool'
+
+import { chats } from '@/lib/data/data'
 import { dialogWidth } from '@/lib/data/width'
 import { closeShowHook } from '@/lib/data/showControl'
-import type { Ref } from 'vue'
-import type { ElInput, ElScrollbar } from 'element-plus'
 
-const ifShow = ref(false)
 const lineno = ref(-1)
+const ifShow = ref(false)
 const inputRef = useTemplateRef<InstanceType<typeof ElInput>>('inputRef')
 const scrollRef = inject<Ref<InstanceType<typeof ElScrollbar>>>('scroll')
 

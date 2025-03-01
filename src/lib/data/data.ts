@@ -1,31 +1,31 @@
-import type { ComputedRef, Ref } from 'vue'
-import { computed, ref } from 'vue'
-import { t } from '@/lib/lang/translate'
-import { DEFAULT_LANG } from '@/lib/lang/detect'
-import { StaticUrl } from '@/lib/data/constance'
-import message from '@/lib/utils/message'
-import { blob2base64, bool, copy, md5, Textarea, uuid } from '@/lib/utils/tool'
-import DataBase from '../utils/db'
+import { computed, ref, type Ref, type ComputedRef } from 'vue'
+
 import Hook from '@/lib/utils/hook'
+import DataBase from '@/lib/utils/db'
+import { t } from '@/lib/lang/translate'
+import message from '@/lib/utils/message'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
+import { blob2base64, bool, copy, md5, Textarea, uuid } from '@/lib/utils/tool'
+
 import type * as DT from '@/lib/data/dataTypes';
+import { STATIC_URL } from '@/lib/data/constance'
 import type { CharsRecord } from '@/lib/data/dataTypes';
 
 // TODO 将common更名为generic
 const defaultSettings = { common: {}, editor: {}, renderer: {} }
 
-const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
+const config = ref<DT.ConfigData>({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
 // settings: 原始settings (不含default)
-const settings: Ref<DT.SettingsData> = ref(copy(defaultSettings))
-const chars: Ref<DT.CharsData> = ref({})
-const chats: Ref<DT.ChatsData> = ref([])
-const images: Ref<DT.ImagesData> = ref({})
+const settings = ref<DT.SettingsData>(copy(defaultSettings))
+const chars = ref<DT.CharsData>({})
+const chats = ref<DT.ChatsData>([])
+const images = ref<DT.ImagesData>({})
 // TODO optimize avatar 将ComputedRef<string>改为string
-const avatars: Ref<{ [id: string]: ComputedRef<string> }> = ref({})
-const currCharId: Ref<string> = ref('')
-const currCharData: Ref<CharsRecord | null> = ref(null)
-const currDialogueIndex: Ref<number> = ref(0)
-const currDialogueData: Ref<DT.ChatsRecord | null> = ref(null)
-
+const avatars = ref<{ [id: string]: ComputedRef<string> }>({})
+const currCharId = ref('')
+const currCharData = ref<CharsRecord | null>(null)
+const currDialogueIndex = ref(0)
+const currDialogueData = ref<DT.ChatsRecord | null>(null)
 
 const Data = {
     config,
@@ -306,7 +306,7 @@ const DataControl = new class DataControl {
                 chars.value[id] = data
                 avatars.value[id] = computed(() => {
                     const avatar = chars.value[id].avatar
-                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : StaticUrl + avatar
+                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : STATIC_URL + avatar
                 })
                 return id
             },
@@ -422,7 +422,7 @@ const DataControl = new class DataControl {
             if (Object.prototype.hasOwnProperty.call(chars.value, key)) {
                 avatars.value[key] = computed(() => {
                     const avatar = chars.value[key].avatar
-                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : StaticUrl + avatar
+                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : STATIC_URL + avatar
                 })
             }
         }
@@ -566,18 +566,18 @@ DataControl.hook.switch.on(() => {
 })
 
 export {
-    defaultSettings,
-    config,
-    settings,
     chats,
     chars,
     images,
+    config,
     avatars,
-    currCharId,
-    currCharData,
-    currDialogueIndex,
-    currDialogueData,
     Storage,
+    settings,
+    currCharId,
+    DataControl,
     ImageStorage,
-    DataControl
+    currCharData,
+    defaultSettings,
+    currDialogueData,
+    currDialogueIndex
 }

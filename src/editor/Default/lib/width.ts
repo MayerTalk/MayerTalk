@@ -1,8 +1,11 @@
 import { computed, ref } from 'vue'
+
 import { doAfter } from '@/lib/utils/tool'
+import WindowResize from '@/lib/utils/windowResize'
+
 import { DataControl } from '@/lib/data/data'
 import { defaultWindowWidth } from '@/lib/data/constance'
-import WindowResize from '@/lib/utils/windowResize'
+
 import { editorSettings } from '@/editor/Default'
 
 const validSpace = ref(0)

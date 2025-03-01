@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+
 import { t } from '@/lib/lang/translate'
-import { ensureMessage, formatSize } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import Save from '@/lib/function/savefile'
+import { ensureMessage, formatSize } from '@/lib/utils/tool'
+
+import { DataControl } from '@/lib/data/data'
 import { dialogWidth } from '@/lib/data/width'
 import { mainShow } from '@/lib/data/showControl'
-import { DataControl } from '@/lib/data/data'
-import type { Ref } from 'vue'
 
 interface TableRecord {
     id: string
@@ -18,10 +19,9 @@ interface TableRecord {
     timeString: string
 }
 
-const tableData: Ref<Array<TableRecord>> = ref([])
-
-const savefileName = ref('')
 const ifSave = ref(false)
+const savefileName = ref('')
+const tableData= ref<Array<TableRecord>>([])
 
 DataControl.hook.clear.on((params) => {
     if (params && params.indexOf('savefile') !== -1) {

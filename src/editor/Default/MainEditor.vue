@@ -1,39 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, computed, watch, provide, nextTick, onMounted, onUnmounted } from 'vue'
+
+// function
 import { t } from '@/lib/lang/translate'
-import Renderers from '@/renderer'
-import SideBar from './components/SideBar.vue'
-import EditCharDialog from './components/EditCharDialog.vue'
-import EditDialogueDialog from './components/EditDialogueDialog.vue'
-import AtDialog from './components/AtDialog.vue'
-import CopyDialog from './components/CopyDialog.vue'
-import CreateOptionDialog from './components/CreateOptionDialog.vue'
-import NavigationBar from './components/NavigationBar.vue'
-import SettingsDialog from './components/SettingsDialog.vue'
-import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
-import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
+import Input from '@/lib/function/input'
+import message from '@/lib/utils/message'
+import TipControl from '@/lib/function/tip'
 import WindowResize from '@/lib/utils/windowResize'
-import {
-    cutPointViewMode,
-    cutPointFocusHook,
-    cutPointQuickEditMode
-} from '@/components/ManualCutPoint/manualCoutPointControl'
-import { currRendererRef, duringScreenshot, ModeChange } from '@/lib/data/state'
-import { defaultShow } from '@/editor/Default/lib/showControl'
-import {
-    duringPartialScreenshot,
-    partialScreenshotViewMode
-} from '@/components/PartialScreenshot/partialScreenshotControl'
 import { clickBySelector, ensureValue, getDialogue, Textarea } from '@/lib/utils/tool'
-import {
-    chats,
-    chars,
-    config,
-    avatars,
-    currCharId,
-    DataControl
-} from '@/lib/data/data'
-import { currRendererSettings, genericSettings } from '@/lib/data/settings'
 import {
     textarea,
     createTextDialogue,
@@ -42,13 +16,50 @@ import {
     deleteDialogue,
     DialogueHook
 } from '@/lib/function/dialogue'
-import message from '@/lib/utils/message'
-import TipControl from '@/lib/function/tip'
+
+// data
 import { windowWidth } from '@/lib/data/width'
-import Input from '@/lib/function/input'
-import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.vue'
+import { currRendererSettings, genericSettings } from '@/lib/data/settings'
+import { currRendererRef, duringScreenshot, ModeChange } from '@/lib/data/state'
+import {
+    chats,
+    chars,
+    config,
+    avatars,
+    currCharId,
+    DataControl
+} from '@/lib/data/data'
+
+// Components Variables
+import Renderers from '@/renderer'
+import { defaultShow } from '@/editor/Default/lib/showControl'
+import {
+    duringPartialScreenshot,
+    partialScreenshotViewMode
+} from '@/components/PartialScreenshot/partialScreenshotControl'
+import {
+    cutPointViewMode,
+    cutPointFocusHook,
+    cutPointQuickEditMode
+} from '@/components/ManualCutPoint/manualCoutPointControl'
+
+// Generic Components
+import ScreenshotHelper from '@/components/ScreenshotHelper.vue'
 import CollapseItem from '@/components/CollapseItem/CollapseItem.vue'
+import ManualCutPointView from '@/components/ManualCutPoint/ManualCutPointView.vue'
 import PartialScreenshotView from '@/components/PartialScreenshot/PartialScreenshotView.vue'
+import PermanentSelectChar from '@/editor/Default/components/PermanentSelectChar.vue'
+
+// Editor Components
+import SideBar from './components/SideBar.vue'
+import AtDialog from './components/AtDialog.vue'
+import CopyDialog from './components/CopyDialog.vue'
+import NavigationBar from './components/NavigationBar.vue'
+import SettingsDialog from './components/SettingsDialog.vue'
+import EditCharDialog from './components/EditCharDialog.vue'
+import EditDialogueDialog from './components/EditDialogueDialog.vue'
+import CreateOptionDialog from './components/CreateOptionDialog.vue'
+
 
 const EditCharRef = useTemplateRef<InstanceType<typeof EditCharDialog>>('EditCharRef')
 const EditDialogueRef = useTemplateRef<InstanceType<typeof EditDialogueDialog>>('EditDialogueRef')

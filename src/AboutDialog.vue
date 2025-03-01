@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 import { config } from '@/lib/data/data'
 import { mainShow } from '@/lib/data/showControl'
 

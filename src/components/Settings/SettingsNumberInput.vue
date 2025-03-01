@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-
 const model = defineModel<number>()
 const { defaultValue, placeholder, validatePositive = true } = defineProps<{
     defaultValue: number,
     placeholder?: string,
     validatePositive?: boolean,
 }>()
-const cache = ref('')
 
+const cache = ref('')
 
 const showModel = computed({
     get() {
-        return cache.value ? cache.value : model.value === defaultValue ? undefined: model.value
+        return cache.value ? cache.value : model.value === defaultValue ? undefined : model.value
     },
     set(param: string) {
         cache.value = param
@@ -40,15 +39,8 @@ function parse(param: string) {
 </script>
 
 <template>
-    <el-input
-        v-model="showModel"
-        @change="sync"
-        clearable
-        @clear="model=defaultValue;cache=''"
-        :placeholder="placeholder || defaultValue.toString()"
-    />
+    <el-input v-model="showModel" @change="sync" clearable @clear="model = defaultValue; cache = ''"
+        :placeholder="placeholder || defaultValue.toString()" />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

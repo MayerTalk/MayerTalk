@@ -1,5 +1,5 @@
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { ref, type Ref } from 'vue'
+
 import { copy } from '@/lib/utils/tool'
 
 type hook = () => void

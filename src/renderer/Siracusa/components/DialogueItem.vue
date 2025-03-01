@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { ref, inject, computed, watch } from 'vue'
-import { uuid } from '@/lib/utils/tool'
-import { StaticUrl } from '@/lib/data/constance'
-import {
-    chars,
-    images,
-    avatars
-} from '@/lib/data/data'
-import { rendererSettings } from '@/renderer/Siracusa'
-import { Suffix } from '@/lib/data/character'
-import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
-import { DialogueHook } from '@/lib/function/dialogue'
-import { duringScreenshot, selectMode } from '@/lib/data/state'
-import type { ChatsRecord } from '@/lib/data/dataTypes'
 import type { Ref, ComputedRef } from 'vue'
+import { ref, inject, computed, watch } from 'vue'
+
+import { uuid } from '@/lib/utils/tool'
+import { DialogueHook } from '@/lib/function/dialogue'
+
+import { Suffix } from '@/lib/data/character'
+import { STATIC_URL } from '@/lib/data/constance'
+import type { ChatsRecord } from '@/lib/data/dataTypes'
+import { chars, images, avatars } from '@/lib/data/data'
+import { duringScreenshot, selectMode } from '@/lib/data/state'
+
+import { rendererSettings } from '@/renderer/Siracusa'
+import CutPointDialogueWrapper from '@/components/ManualCutPoint/CutPointDialogueWrapper.vue'
 
 const rendererWidth = inject<Ref<{
     window: number,
@@ -125,7 +124,7 @@ function handleClick(event: MouseEvent) {
             <template v-else>
                 <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                     <div v-if="right === false">
-                        <img :src="StaticUrl + 'avatar-bg' + Suffix">
+                        <img :src="STATIC_URL + 'avatar-bg' + Suffix">
                         <img :src="avatars[data.char] as unknown as string">
                     </div>
                 </div>
@@ -201,7 +200,7 @@ function handleClick(event: MouseEvent) {
                 <!--Content End-->
                 <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                     <div v-if="right === true">
-                        <img :src="StaticUrl + '/avatar-bg' + Suffix">
+                        <img :src="STATIC_URL + '/avatar-bg' + Suffix">
                         <img :src="avatars[data.char] as unknown as string">
                     </div>
                 </div>
@@ -213,8 +212,8 @@ function handleClick(event: MouseEvent) {
         <CutPointDialogueWrapper v-if="cutPoint" :active="cutPointActive" />
     </div>
 </template>
-<style src="../style/dialogue.css" scoped />
-<style src="../style/plus1.css" scoped />
+<style src="@/renderer/Sicracusa/style/dialogue.css" scoped />
+<style src="@/renderer/Sicracusa/style/plus1.css" scoped />
 <style scoped>
 .avatar {
     width: v-bind('rendererWidth.avatar');

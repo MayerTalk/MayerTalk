@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// 裁分点标识组件
 
 const { active = false } = defineProps<{
     active: boolean

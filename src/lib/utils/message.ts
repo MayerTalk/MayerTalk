@@ -1,6 +1,6 @@
 import { t } from '@/lib/lang/translate'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { ElMessageBoxOptions,MessageParams } from 'element-plus';
+import type { ElMessageBoxOptions, MessageParams } from 'element-plus';
 
 const message = {
     info: 'info',
@@ -17,7 +17,7 @@ const message = {
         )
     },
     confirm(text: string,
-        title:string = t.value.noun.hint,
+        title: string = t.value.noun.hint,
         confirm: () => void,
         cancel: () => void,
         type = message.warning) {

@@ -1,25 +1,23 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+
+import message from '@/lib/utils/message'
+import Save from '@/lib/function/savefile'
 import { t, updateTranslation } from '@/lib/lang/translate'
+import { ensureMessage, formatSize, clickBySelector } from '@/lib/utils/tool'
 import { SUPPORT_LANG, LANG_DICT, type SupportLangKey } from '@/lib/lang/constant'
+
+import { dialogWidth } from '@/lib/data/width'
+import { mainShow } from '@/lib/data/showControl'
+import { config, DataControl } from '@/lib/data/data'
+import { currEditorRef, currRendererRef } from '@/lib/data/state'
+import { downloadData, uploadData } from '@/lib/data/versionControl'
+import { DEFAULT_GENERIC_SETTINGS, genericSettings } from '@/lib/data/settings'
+
 import Editors from '@/editor'
 import Renderers from '@/renderer'
-import message from '@/lib/utils/message'
-import { ensureMessage, formatSize, clickBySelector } from '@/lib/utils/tool'
-import Save from '@/lib/function/savefile'
-import { downloadData, uploadData } from '@/lib/data/versionControl'
-import { mainShow } from '@/lib/data/showControl'
-import { currEditorRef, currRendererRef } from '@/lib/data/state'
 import SettingsNumberInput from '@/components/Settings/SettingsNumberInput.vue';
 
-import {
-    config,
-    DataControl
-} from '@/lib/data/data'
-import {
-    DEFAULT_GENERIC_SETTINGS, genericSettings
-} from '@/lib/data/settings'
-import { dialogWidth } from '@/lib/data/width'
 
 const storageSize = ref(t.value.notify.calculating + '...')
 
@@ -87,7 +85,8 @@ function clearStorage() {
                     <tr>
                         <th>{{ t.noun.language }}</th>
                         <td>
-                            <el-select v-model="config.lang" @change="(lang:SupportLangKey) => updateTranslation(lang)">
+                            <el-select v-model="config.lang"
+                                @change="(lang: SupportLangKey) => updateTranslation(lang)">
                                 <el-option v-for="lang in SUPPORT_LANG" :key="lang" :value="lang"
                                     :label="LANG_DICT[lang]" />
                             </el-select>
@@ -102,7 +101,7 @@ function clearStorage() {
                     </tr>
                     <tr>
                         <th>{{ t.noun.dialogWidth }}<span style="color:grey;"><br />({{ t.tip.settings.dialogWidth
-                                }})</span>
+                        }})</span>
                         </th>
                         <td>
                             <SettingsNumberInput v-model="genericSettings.width"

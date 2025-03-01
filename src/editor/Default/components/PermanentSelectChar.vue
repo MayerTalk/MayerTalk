@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+
 import { loadSeries } from '@/lib/data/character'
-import SelectCharInstance from '@/editor/Default/components/SelectCharInstance.vue'
+
 import { ifShowPermanentSelectChar } from '@/editor/Default/lib/width'
+
 import CollapseItem from '@/components/CollapseItem'
-
-const localIfShow = ref(true)
-
-const realIfShow = computed(() => {
-    return localIfShow.value && ifShowPermanentSelectChar.value
-})
+import SelectCharInstance from '@/editor/Default/components/SelectCharInstance.vue'
 
 defineEmits<{
     select: [char: { avatar: string, name: string }]
 }>()
+
+const localIfShow = ref(true)
+const realIfShow = computed(() => {
+    return localIfShow.value && ifShowPermanentSelectChar.value
+})
 
 loadSeries.arknights()
 </script>

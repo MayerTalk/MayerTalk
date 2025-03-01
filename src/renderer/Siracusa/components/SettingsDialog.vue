@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DataControl } from '@/lib/data/data'
+
 import { t } from '@/lib/lang/translate'
+
+import { DataControl } from '@/lib/data/data'
 import { dialogWidth } from '@/lib/data/width'
-import { DEFAULT_RENDERER_SETTINGS,rendererSettings } from '@/renderer/Siracusa';
+
 import SettingsTextInput from '@/components/Settings/SettingsTextInput.vue';
+import { DEFAULT_RENDERER_SETTINGS,rendererSettings } from '@/renderer/Siracusa';
 
 const ifShowEditShowCharName = ref(false)
 

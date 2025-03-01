@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { onUnmounted, ref, useTemplateRef } from 'vue'
-import { t } from '@/lib/lang/translate'
-import SelectCharDialog from './SelectCharDialog.vue'
+import type { ElInput, UploadRawFile } from 'element-plus';
 
-import { StaticUrl, IsMobile } from '@/lib/data/constance'
-import { DataControl, images, currCharId, currCharData } from '@/lib/data/data'
+import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { blob2url, image2square, doAfterRefMounted } from '@/lib/utils/tool'
+
 import { dialogWidth } from '@/lib/data/width'
 import { closeShowHook } from '@/lib/data/showControl'
-import type { ElInput, UploadFile } from 'element-plus';
 import type { CharsRecord } from '@/lib/data/dataTypes';
+import { STATIC_URL, IsMobile } from '@/lib/data/constance'
+import { DataControl, images, currCharId, currCharData } from '@/lib/data/data'
+
+import SelectCharDialog from './SelectCharDialog.vue'
 
 // TODO fix 使用素材库创建角色后，短暂出现角色默认名称
 
@@ -147,9 +149,9 @@ defineExpose({
             <div style="width: 100%; display: flex;">
                 <el-upload action="#" drag :show-file-list="false" class="avatar-uploader"
                     accept="image/png, image/jpeg, image/gif"
-                    :before-upload="(file: UploadFile) => { defaultName = ''; return uploadAvatar(file)}">
+                    :before-upload="(file: UploadRawFile) => { defaultName = ''; return uploadAvatar(file)}">
                     <div class="container"><img v-if="charData.avatar" alt=""
-                            :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : StaticUrl + charData.avatar" />
+                            :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : STATIC_URL + charData.avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
                             <IconPlus />
                         </el-icon>

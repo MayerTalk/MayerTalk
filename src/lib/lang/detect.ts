@@ -1,5 +1,5 @@
-import { hasOwn } from '../utils/tool'
-import type { SupportLangKey } from './constant'
+import { hasOwn } from '@/lib/utils/tool'
+import type { SupportLangKey } from '@/lib/lang/constant'
 
 const LANG_2_KEY_DICT: Record<string, SupportLangKey> = {
     // 简中服（简体中文）

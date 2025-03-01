@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watch, computed } from 'vue'
-import { t } from '@/lib/lang/translate'
-import { StaticUrl, IsMobile } from '@/lib/data/constance'
-import { SearchManager, CharDict, Suffix } from '@/lib/data/character'
-import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
-import { dialogWidth } from '@/lib/data/width'
 import type { ElInput } from 'element-plus'
+import { ref, useTemplateRef, watch, computed } from 'vue'
+
+import { t } from '@/lib/lang/translate'
+import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
+
+import { dialogWidth } from '@/lib/data/width'
+import { STATIC_URL, IsMobile } from '@/lib/data/constance'
+import { SearchManager, CharDict, Suffix } from '@/lib/data/character'
 
 
 const { maxHeight = null } = defineProps<{
@@ -96,7 +98,7 @@ defineExpose({
                     <!-- 无搜索时默认角色 -->
                     <div class="frame" v-for="char in defaultChar" :key="char[1]"
                         :style="{ width: avatarBarFrameWidth, height: avatarBarFrameWidth }">
-                        <img :src="StaticUrl + char.avatar" loading="lazy" :title="char.name"
+                        <img :src="STATIC_URL + char.avatar" loading="lazy" :title="char.name"
                             @click="() => { $emit('select', char) }">
                     </div>
                 </template>
@@ -104,7 +106,7 @@ defineExpose({
                     <!-- 展示搜索结果 -->
                     <div class="frame" v-for="char in searchResult" :key="char[0]"
                         :style="{ width: avatarBarFrameWidth, height: avatarBarFrameWidth }">
-                        <img :src="StaticUrl + CharDict[char[0]].avatars[0]" loading="lazy" :title="char[1]"
+                        <img :src="STATIC_URL + CharDict[char[0]].avatars[0]" loading="lazy" :title="char[1]"
                             @click="handleSelect(char)">
                         <div class="subscript" v-if="CharDict[char[0]].avatars.length > 1">
                             {{ CharDict[char[0]].avatars.length - 1 }}+
@@ -123,7 +125,7 @@ defineExpose({
         <div v-if="currSelect" class="avatar-bar" style="margin-top: 0">
             <div class="frame" v-for="avatar in CharDict[currSelect[0]].avatars" :key="avatar"
                 :style="{ width: avatarBarFrameDialogWidth, height: avatarBarFrameDialogWidth }">
-                <img :src="StaticUrl + avatar" loading="lazy" :title="currSelect[1]"
+                <img :src="STATIC_URL + avatar" loading="lazy" :title="currSelect[1]"
                     @click="() => { $emit('select', { avatar, name: ensureValue(currSelect, 'currSelect')[1] }); ifShowSubSelect = false }">
             </div>
         </div>
