@@ -4,7 +4,6 @@ import Hook from '@/lib/utils/hook'
 
 import { partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
 
-// TODO use defineComponent
 import EditorInstance from './EditorInstance.vue';
 import RendererInstance from './RendererInstance.vue';
 
