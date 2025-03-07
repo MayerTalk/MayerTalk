@@ -24,10 +24,10 @@ onUnmounted(closeShowHook.on(() => {
     }
 }))
 
-const charData = ref < Partial < CharsRecord >> ({})
+const charData = ref<Partial<CharsRecord>>({})
 const createChar = ref(false)
 const defaultName = ref('')
-const inputRef = useTemplateRef < InstanceType < typeof ElInput >> ('inputRef')
+const inputRef = useTemplateRef<InstanceType<typeof ElInput>>('inputRef')
 
 const ifShowSelectChar = ref(false)
 
@@ -36,7 +36,8 @@ function open(create: boolean, data?: CharsRecord) {
     createChar.value = create
     if (create) {
         if (data) {
-            charData.value = { name: data[1], avatar: data[0] }
+            charData.value = { name: '', avatar: data.avatar }
+            defaultName.value = data.name
         } else {
             charData.value = { name: '' }
         }
@@ -118,11 +119,11 @@ function editChar() {
     }
 }
 
-function handleSelect(char:{avatar:string, name:string}) {
+function handleSelect(char: { avatar: string, name: string }) {
     if (charData.value.avatar) {
         DataControl.images.delete(charData.value.avatar)
     }
-    [charData.value.avatar, defaultName.value] = ['avatar','name'].map((key) => char[key])
+    [charData.value.avatar, defaultName.value] = ['avatar', 'name'].map((key) => char[key])
 }
 
 function handleInputEnter() {
@@ -143,13 +144,13 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :title="createChar ? t.action.createCharacter : t.action.editCharacter" :width="dialogWidth"
-        @closed="() => { DataControl.save('chars'); clearCharData() }">
+    <el-dialog v-model="ifShow" :title="createChar ? t.action.createCharacter : t.action.editCharacter"
+        :width="dialogWidth" @closed="() => { DataControl.save('chars'); clearCharData() }">
         <div style="display: flex; flex-wrap: wrap">
             <div style="width: 100%; display: flex;">
                 <el-upload action="#" drag :show-file-list="false" class="avatar-uploader"
                     accept="image/png, image/jpeg, image/gif"
-                    :before-upload="(file: UploadRawFile) => { defaultName = ''; return uploadAvatar(file)}">
+                    :before-upload="(file: UploadRawFile) => { defaultName = ''; return uploadAvatar(file) }">
                     <div class="container"><img v-if="charData.avatar" alt=""
                             :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : STATIC_URL + charData.avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
