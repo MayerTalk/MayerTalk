@@ -212,8 +212,9 @@ function handleClick(event: MouseEvent) {
         <CutPointDialogueWrapper v-if="cutPoint" :active="cutPointActive" />
     </div>
 </template>
-<style src="@/renderer/Sicracusa/style/dialogue.css" scoped />
-<style src="@/renderer/Sicracusa/style/plus1.css" scoped />
+
+<style src="@/renderer/Siracusa/style/dialogue.css" scoped></style>
+<style src="@/renderer/Siracusa/style/plus1.css" scoped></style>
 <style scoped>
 .avatar {
     width: v-bind('rendererWidth.avatar');

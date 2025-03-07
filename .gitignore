@@ -17,6 +17,7 @@ coverage
 *.local
 __pycache__
 *.dev*
+test_src
 
 /cypress/videos/
 /cypress/screenshots/
