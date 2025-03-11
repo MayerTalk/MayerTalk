@@ -31,6 +31,7 @@ import {
 } from '@/lib/data/data'
 
 // Components Variables
+import { EditorSettingsManager } from '.'
 import Renderers from '@/renderer'
 import { defaultShow } from '@/editor/Default/lib/showControl'
 import {
@@ -98,6 +99,15 @@ document.addEventListener('keydown', event => {
 onUnmounted(() => {
     controller.abort()
 })
+
+onMounted(() => {
+    EditorSettingsManager.mount()
+})
+onUnmounted(() => {
+    EditorSettingsManager.unmount()
+})
+
+
 
 const rendererWidth = ref<{
     window: number,

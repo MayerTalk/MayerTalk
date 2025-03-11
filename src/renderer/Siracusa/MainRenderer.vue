@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { inject, type Ref } from 'vue'
+import { inject, onMounted, onUnmounted, type Ref } from 'vue'
 
 import plus1 from '@/lib/function/plus1'
 
 import { chats } from '@/lib/data/data'
 
-import { rendererSettings } from '@/renderer/Siracusa';
+import { rendererSettings, RendererSettingsManager } from '.';
 import { partialChats } from '@/components/PartialScreenshot/partialScreenshotControl'
 import { cutPoints, currCutPoint, cutPointViewMode } from '@/components/ManualCutPoint/manualCoutPointControl'
 
@@ -23,6 +23,15 @@ const rendererWidth = inject<Ref<{
 }>>('rendererWidth') as Ref<{
     window: number
 }>
+
+onMounted(() => {
+    RendererSettingsManager.mount()
+
+})
+onUnmounted(() => {
+    RendererSettingsManager.unmount()
+})
+
 
 defineExpose({
     SettingsDialog,

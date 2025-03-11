@@ -48,15 +48,6 @@ class SettingsManager<T extends object> {
         this.default = options.default
         this.ref = ref(this.syncSettings()) as Ref<T>
         this.hookCancels = []
-
-        this.hookCancels.push(DataControl.hook.beforeUpdate.on((params) => {
-            if (params.indexOf('settings') !== -1) {
-                this.saveSettings()
-            }
-        }))
-        this.hookCancels.push(DataControl.hook.switch.on(() => {
-            this.syncSettings()
-        }))
     }
 
     getRawSettings(): object {
@@ -81,8 +72,23 @@ class SettingsManager<T extends object> {
         }
     }
 
-    cancel() {
-        // TODO 组件卸载后调用
+    mount() {
+        // 目前settingsManager在<components>/index.ts中使用，需要组件控制其生命周期
+        // 用途：收到保存settings事件时，自动保存settings
+
+        this.hookCancels.push(DataControl.hook.beforeUpdate.on((params) => {
+            if (params.indexOf('settings') !== -1) {
+                this.saveSettings()
+            }
+        }))
+        this.hookCancels.push(DataControl.hook.switch.on(() => {
+            // TODO 多component时验证syncSettings逻辑
+            this.syncSettings()
+        }))
+        this.syncSettings()
+    }
+
+    unmount() {
         this.hookCancels.forEach(fn => {
             fn()
         })
@@ -93,6 +99,8 @@ const GenericSettingsManager = new SettingsManager<GenericSettings>({
     type: 'generic',
     default: DEFAULT_GENERIC_SETTINGS
 })
+GenericSettingsManager.mount() // 挂在通用设置
+
 const genericSettings = GenericSettingsManager.ref
 const currRendererSettings = computed<RendererGenericSettings>(() => {
     if (currRendererRef.value) {
