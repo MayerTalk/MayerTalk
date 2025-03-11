@@ -103,8 +103,8 @@ function createImageDialogue(fileUpload: File, config = {}) {
 function uploadImage(data: ChatsRecord, fileUpload: UploadRawFile): false {
     DataControl.images.new(fileUpload, (id) => {
         if (!id) {
-            // TODO raise Expectation
-            return false
+            // TODO 添加App范围的全局错误处理
+            throw new Error('Failed to upload image')
         }
         if (data.type === 'image') {
             // 如果对话类型为image，删除旧图片
