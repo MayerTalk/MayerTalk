@@ -249,12 +249,12 @@ class ImageStorage {
 
 
 interface DataControlHooks {
-    beforeUpdate: Hook<Array<DT.StorageKey>>
-    update: Hook;
-    switch: Hook;
-    clear: Hook<Array<string> | undefined>;
-    changeSavefile: Hook;
-    change: Hook;
+    beforeUpdate: Hook<Array<DT.StorageKey>> // 会在DataControl.save数据保存前调用
+    update: Hook; // 会在DataControl.save数据保存后调用
+    switch: Hook; // DataControl.withdraw/redo
+    clear: Hook<Array<string>>; // 在DataControl.clear清理数据后调用
+    changeSavefile: Hook; // 切换存档文件后调用
+    change: Hook; //  包含 update/switch/clear/changeSavefile 四种数据变动
 }
 
 const DataControl = new class DataControl {
