@@ -97,7 +97,6 @@ function editChar() {
             charData.value.name = defaultName.value
         }
         if (charData.value.avatar === undefined) {
-            // TODO add translation
             message.notify(t.value.notify.avatarIsRequired, message.error)
             return
         }
