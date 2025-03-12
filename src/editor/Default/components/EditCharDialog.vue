@@ -64,19 +64,21 @@ function clearCharData() {
     defaultName.value = ''
 }
 
-function uploadAvatar(uploadFile) {
+function uploadAvatar(uploadFile: UploadRawFile) {
     // 上传头像
     const url = blob2url(uploadFile)
     if (url) {
         const image = new Image()
         image.onload = () => {
+            console.log('Image loaded');
+
             image2square(image).toBlob((blob) => {
                 if (blob) {
                     DataControl.images.new(blob, (id) => {
                         if (charData.value.avatar) {
                             DataControl.images.delete(charData.value.avatar)
-                            charData.value.avatar = id
                         }
+                        charData.value.avatar = id
                     })
                 }
             })
