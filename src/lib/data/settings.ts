@@ -46,7 +46,8 @@ class SettingsManager<T extends object> {
         this.type = options.type
         this.key = options.key || ''
         this.default = options.default
-        this.ref = ref(this.syncSettings()) as Ref<T>
+        this.ref = ref(null) as unknown as Ref<T>
+        this.syncSettings()
         this.hookCancels = []
     }
 
@@ -58,8 +59,9 @@ class SettingsManager<T extends object> {
         }
     }
 
-    syncSettings(): T {
-        return withDefault<T>(this.getRawSettings(), this.default)
+    syncSettings(): void {
+        // 从localStorage中读取settings，并填充默认值
+        this.ref.value = withDefault<T>(this.getRawSettings(), this.default)
     }
 
     saveSettings(): void {
@@ -99,7 +101,7 @@ const GenericSettingsManager = new SettingsManager<GenericSettings>({
     type: 'generic',
     default: DEFAULT_GENERIC_SETTINGS
 })
-GenericSettingsManager.mount() // 挂在通用设置
+GenericSettingsManager.mount() // 挂载通用设置
 
 const genericSettings = GenericSettingsManager.ref
 const currRendererSettings = computed<RendererGenericSettings>(() => {
