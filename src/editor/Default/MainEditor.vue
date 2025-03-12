@@ -418,7 +418,7 @@ defineExpose({
                                         <div v-for="id in Object.keys(chars)" :key="id"
                                             :class="[id === currCharId ? 'char-curr' : 'char']"
                                             @click="DataControl.curr.setChar(id)">
-                                            <img alt="" :src="avatars[id] as unknown as string">
+                                            <img alt="" :src="avatars[id]">
                                         </div>
                                         <div class="option add"
                                             @click="ensureValue(EditCharRef, 'EditCharRef').open(true)">

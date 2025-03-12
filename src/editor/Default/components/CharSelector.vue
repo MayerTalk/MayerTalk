@@ -45,7 +45,7 @@ defineExpose({
         <el-option v-for="(char, id) in chars" :key="id" :label="char.name" :value="id">
             {{ char.name }}
             <div style="display: flex; align-items: center; height: 100%; float: right">
-                <img :src="(avatars[id] as unknown as string)" style="height: 80%; display: inline" />
+                <img :src="avatars[id]" style="height: 80%; display: inline" />
             </div>
         </el-option>
         <el-option v-if="narration" key="" :label="t.noun.narration" value="" />

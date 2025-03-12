@@ -1,11 +1,11 @@
-import { computed, ref, type Ref, type ComputedRef } from 'vue'
+import { ref, type Ref } from 'vue'
 
 import Hook from '@/lib/utils/hook'
 import DataBase from '@/lib/utils/db'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { DEFAULT_LANG } from '@/lib/lang/detect'
-import { blob2base64, bool, copy, md5, Textarea, uuid } from '@/lib/utils/tool'
+import { blob2base64, bool, copy, hasOwn, md5, Textarea, uuid } from '@/lib/utils/tool'
 
 import type * as DT from '@/lib/data/dataTypes';
 import { STATIC_URL } from '@/lib/data/constance'
@@ -21,7 +21,7 @@ const chars = ref<DT.CharsData>({})
 const chats = ref<DT.ChatsData>([])
 const images = ref<DT.ImagesData>({})
 // TODO optimize avatar 将ComputedRef<string>改为string
-const avatars = ref<{ [id: string]: ComputedRef<string> }>({})
+const avatars = ref<{ [id: string]: string }>({})
 const currCharId = ref('')
 const currCharData = ref<CharsRecord | null>(null)
 const currDialogueIndex = ref(0)
@@ -85,7 +85,9 @@ class Storage<T extends object> {
                     return false
                 }
             }]
-        } catch {
+        } catch (e) {
+            console.error(e)
+            return undefined
         }
     }
 
@@ -100,7 +102,7 @@ class ImageStorage {
     lastSave: string
     update: boolean
     db: DataBase<DT.ImagesRecord>
-    loadedCallback?: (data: DT.ImagesData, next: () => void) => void
+    loadedCallback?: (data: DT.ImagesData, set: (newData?: DT.ImagesData) => boolean) => void
 
 
     constructor(key: string, obj: Ref<DT.ImagesData>) {
@@ -150,10 +152,16 @@ class ImageStorage {
                 } else {
                     if (this.loadedCallback) {
                         this.loadedCallback(
-                            data, () => {
-                                this.lastSave = JSON.stringify(data)
-                                this.obj.value = data
-                                this.update = false
+                            data, (newData?) => {
+                                const currData = newData || data
+                                if (bool(currData)) {
+                                    this.obj.value = currData
+                                    this.lastSave = JSON.stringify(currData)
+                                    this.update = false
+                                    return true
+                                } else {
+                                    return false
+                                }
                             }
                         )
                     } else {
@@ -300,14 +308,11 @@ const DataControl = new class DataControl {
             })
         }
         this.char = {
-            new: (data) => {
-                data = copy(data)
+            new: (char) => {
+                char = copy(char)
                 const id = uuid()
-                chars.value[id] = data
-                avatars.value[id] = computed(() => {
-                    const avatar = chars.value[id].avatar
-                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : STATIC_URL + avatar
-                })
+                chars.value[id] = char
+                avatars.value[id] = this.getCharAvatar(char)
                 return id
             },
             delete: (id) => {
@@ -358,6 +363,11 @@ const DataControl = new class DataControl {
                 }
             }
         }
+    }
+
+    getCharAvatar(char: CharsRecord) {
+        const avatar = char.avatar
+        return hasOwn(images.value, avatar) ? images.value[avatar].src : STATIC_URL + avatar
     }
 
     update(update: DT.StorageKey | Array<DT.StorageKey>) {
@@ -420,40 +430,41 @@ const DataControl = new class DataControl {
         // 生成角色可用的头像链接
         for (const key in chars.value) {
             if (Object.prototype.hasOwnProperty.call(chars.value, key)) {
-                avatars.value[key] = computed(() => {
-                    const avatar = chars.value[key].avatar
-                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : STATIC_URL + avatar
-                })
+                avatars.value[key] = this.getCharAvatar(chars.value[key])
             }
         }
     }
 
-    load(upgradeData?: (data: DT.DataType, next: Partial<Record<DT.StorageKey, () => void>>) => void) {
-        // upgradeData: 交由版本控制进行处理，对旧数据进行升级，再使用n函数设置
+    load(upgradeData?: (data: DT.DataType, setDict: Partial<Record<DT.StorageKey, () => void>>) => void) {
+        // upgradeData: 交由版本控制进行处理，对旧数据进行升级，再使用set函数设置
         // 当储存版本与最新版本相同时，直接读取数据
         const data: Partial<DT.DataType> = {}
-        const next: Partial<Record<DT.StorageKey, () => void>> = {}
+        const setDict: Partial<Record<DT.StorageKey, () => void>> = {}
         for (const key in this.storage) {
             if (Object.prototype.hasOwnProperty.call(this.storage, key)) {
                 if (key !== 'images') {
                     const res = this.storage[key as DT.StorageKey].load()
                     if (res) {
-                        const [d, n] = res
+                        const [d, set] = res
                         data[key] = d
-                        next[key] = n
-                        n()
+                        setDict[key] = set
+                        // 进行默认设置
+                        set()
                     }
                 }
             }
         }
-        this.storage.images.loadedCallback = (d, n) => {
+        this.storage.images.loadedCallback = (d, set) => {
+            // d(data) 需要修饰的数据 set 将修改后的数据同步到obj
             data.images = d
-            next.images = n
-            n()
+            setDict.images = set
+            set()
+            // 加载储存在IndexedDB中的头像数据
+            this.genCharSrc()
         }
 
         if (upgradeData) {
-            upgradeData(data as DT.DataType, next)
+            upgradeData(data as DT.DataType, setDict)
         }
         this.genCharSrc()
     }

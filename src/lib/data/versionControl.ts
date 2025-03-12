@@ -215,15 +215,12 @@ function loadData() {
     if (latestVersion === currVersion) {
         DataControl.load()
     } else {
-        DataControl.load((data, next) => {
-            if (data) {
-
-            }
+        DataControl.load((data, setData) => {
             data.version = currVersion
             switchVersion(data, {
                 load: true
             })
-            Object.entries(next).forEach((obj) => {
+            Object.entries(setData).forEach((obj) => {
                 obj[1]()
             })
         })

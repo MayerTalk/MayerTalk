@@ -125,7 +125,7 @@ function handleClick(event: MouseEvent) {
                 <div v-if="charDirection[0]" class="avatar" style="margin-right: 10px">
                     <div v-if="right === false">
                         <img :src="STATIC_URL + 'avatar-bg' + Suffix">
-                        <img :src="avatars[data.char] as unknown as string">
+                        <img :src="avatars[data.char]">
                     </div>
                 </div>
                 <!--Content Start-->
@@ -201,7 +201,7 @@ function handleClick(event: MouseEvent) {
                 <div v-if="charDirection[1]" class="avatar" style="margin-left: 10px">
                     <div v-if="right === true">
                         <img :src="STATIC_URL + '/avatar-bg' + Suffix">
-                        <img :src="avatars[data.char] as unknown as string">
+                        <img :src="avatars[data.char]">
                     </div>
                 </div>
             </template>
