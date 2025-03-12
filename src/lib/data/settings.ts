@@ -52,7 +52,7 @@ class SettingsManager<T extends object> {
 
     getRawSettings(): object {
         if (this.type === 'generic') {
-            return settings.value.common
+            return settings.value.generic
         } else {
             return settings.value[this.type][this.key] || {}
         }
@@ -66,7 +66,7 @@ class SettingsManager<T extends object> {
         // TODO 优化类型提示
         const value = excludeDefault(this.ref.value as object, this.default as object)
         if (this.type === 'generic') {
-            settings.value.common = value
+            settings.value.generic = value
         } else {
             settings.value[this.type][this.key] = value as object
         }

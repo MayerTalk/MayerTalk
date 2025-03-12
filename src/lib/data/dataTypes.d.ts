@@ -47,7 +47,7 @@ export interface ConfigData {
 }
 
 export interface SettingsData {
-    common: GenericSettings,
+    generic: GenericSettings,
     editor: Record<string, object>
     renderer: Record<string, object>
 }

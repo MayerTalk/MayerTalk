@@ -11,8 +11,7 @@ import type * as DT from '@/lib/data/dataTypes';
 import { STATIC_URL } from '@/lib/data/constance'
 import type { CharsRecord } from '@/lib/data/dataTypes';
 
-// TODO 将common更名为generic
-const defaultSettings = { common: {}, editor: {}, renderer: {} }
+const defaultSettings = { generic: {}, editor: {}, renderer: {} }
 
 const config = ref<DT.ConfigData>({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
 // settings: 原始settings (不含default)
