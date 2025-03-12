@@ -47,7 +47,7 @@ class Storage<T extends object> {
         this.update = false
     }
 
-    save(force?: boolean): DT.OperateRecord | false | undefined {
+    save(force?: boolean): DT.OperationRecord | false | undefined {
         if (this.update || force) {
             this.update = false
             const lastSave = this.lastSave;
@@ -269,7 +269,7 @@ const DataControl = new class DataControl {
     images: ImageStorage
     // storage.images的别名
 
-    version: Array<Array<DT.OperateRecord>>
+    version: Array<Array<DT.OperationRecord>>
     index: number
     hook: DataControlHooks
     char: {
@@ -408,12 +408,12 @@ const DataControl = new class DataControl {
             this.update(update)
         }
         this.hook.beforeUpdate.call(this.getNeedUpdate())
-        const operator: Array<DT.OperateRecord> = []
+        const operator: Array<DT.OperationRecord> = []
         for (const key in this.storage) {
             if (Object.prototype.hasOwnProperty.call(this.storage, key)) {
                 const result = this.storage[key as DT.StorageKey].save()
                 if (result) {
-                    operator.push(result as DT.OperateRecord)
+                    operator.push(result as DT.OperationRecord)
                 }
             }
         }
@@ -479,37 +479,30 @@ const DataControl = new class DataControl {
         this.genCharSrc()
     }
 
-    withdraw() {
-        if (this.index + 1 < this.version.length) {
-            const data = this.version[++this.index]
-            for (let i = 0; i < data.length; i++) {
-                const operator = data[i]
-                if (Object.prototype.hasOwnProperty.call(this.storage, operator.key)) {
-                    if (operator.type === 'modify') {
-                        const storage = this.storage[operator.key]
-                        storage.set(JSON.parse(operator.old), true)
-                        storage.save(true)
-                    }
+    setWithoutPoint(version: Array<DT.OperationRecord>, widhdraw: boolean) {
+        const operate = widhdraw ? 'old' : 'new'
+        for (let i = 0; i < version.length; i++) {
+            const operation = version[i]
+            if (Object.prototype.hasOwnProperty.call(this.storage, operation.key)) {
+                if (operation.type === 'modify') {
+                    const storage = this.storage[operation.key]
+                    storage.set(JSON.parse(operation[operate]), true)
+                    storage.save(true)
                 }
             }
-            this.hook.switch.call(undefined)
+        }
+        this.hook.switch.call(undefined)
+    }
+
+    withdraw() {
+        if (this.index + 1 < this.version.length) {
+            this.setWithoutPoint(this.version[++this.index], true)
         }
     }
 
     redo() {
         if (this.index > -1) {
-            const data = this.version[this.index--]
-            for (let i = 0; i < data.length; i++) {
-                const operator = data[i]
-                if (Object.prototype.hasOwnProperty.call(this.storage, operator.key)) {
-                    if (operator.type === 'modify') {
-                        const storage = this.storage[operator.key]
-                        storage.set(JSON.parse(operator.new), true)
-                        storage.save(true)
-                    }
-                }
-            }
-            this.hook.switch.call(undefined)
+            this.setWithoutPoint(this.version[this.index--], false)
         }
     }
 

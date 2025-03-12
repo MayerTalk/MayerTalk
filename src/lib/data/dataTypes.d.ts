@@ -85,7 +85,7 @@ export interface StorageType {
     version?: string
 }
 
-export interface OperateRecord {
+export interface OperationRecord {
     key: StorageKey,
     old: string,
     new: string
