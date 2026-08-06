@@ -10,6 +10,11 @@
     ],
     "compilerOptions": {
         "composite": true,
+        "lib": [
+            "ES2021",
+            "DOM",
+            "DOM.Iterable"
+        ],
         "sourceMap": true,
         "noImplicitAny": true,
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
