@@ -8,9 +8,19 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+function getDevInfoDefine(): string {
+    const raw = process.env.MAYERTALK_DEV_INFO
+    if (!raw) {
+        return 'null'
+    }
+    return JSON.stringify(JSON.parse(raw))
+}
 
 // https://vite.dev/config/
 export default defineConfig({
+    define: {
+        __MAYERTALK_DEV_INFO__: getDevInfoDefine()
+    },
     plugins: [
         vue(),
         vueDevTools(),

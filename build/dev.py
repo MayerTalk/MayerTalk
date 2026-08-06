@@ -6,6 +6,7 @@ import time
 import json
 import shutil
 import hashlib
+import subprocess
 from datetime import datetime, timezone, timedelta
 
 time.timezone = -28800
@@ -60,21 +61,15 @@ info = {
     'tag': argv('tag') or tag
 }
 
-with open(os.path.join('build', 'templates', 'AnnounceDialog.git.vue'), mode='rt', encoding='utf-8') as f:
-    announce_git = f.read()
-with open(os.path.join('src', 'AnnounceDialog.vue'), mode='rt', encoding='utf-8') as f:
-    original = f.read()
-try:
-    with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
-        f.write(announce_git)
-
-    with open(os.path.join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
-        f.write(f'export default {json.dumps(info)}')
-
-    os.system(f'npm run build-only -- --base=/{version}/')
-finally:
-    with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
-        f.write(original)
+for command in (
+    'npm run type-check',
+    f'npm run build-only -- --mode dev-site --base=/{version}/'
+):
+    subprocess.run(
+        command,
+        shell=True,
+        env={**os.environ, 'MAYERTALK_DEV_INFO': json.dumps(info)}
+    )
 
 with open(os.path.join('dist', 'info.json'), mode='wt', encoding='utf-8') as f:
     json.dump(info, f, ensure_ascii=False)
