@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+
+import { copy } from '@/lib/utils/tool'
 import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
-import { dialogWidth } from '@/lib/data/width'
+
 import { DataControl } from '@/lib/data/data'
-import { copy } from '@/lib/utils/tool'
-import type { Ref } from 'vue';
+import { dialogWidth } from '@/lib/data/width'
 
 const ifShow = defineModel<boolean>()
 
-const clearList: Ref<Array<string>> = ref([])
+const clearList= ref<Array<string>>([])
 
 function handleChange(newValue: Array<string>) {
     if (newValue.indexOf('chars') !== -1 && clearList.value.indexOf('chats') === -1) {

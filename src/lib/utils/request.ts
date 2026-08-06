@@ -1,5 +1,6 @@
 import axios from 'axios'
-import type { AxiosResponse, AxiosError, Canceler } from 'axios';
+import type { AxiosResponse, AxiosError, Canceler } from 'axios'
+
 axios.defaults.withCredentials = false
 
 interface RequestsConfig {

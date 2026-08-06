@@ -1,7 +1,7 @@
-import { ImageStorage, Storage } from './data';
-import { GenericSettings } from '@/lib/data/settings';
 import { ChatType } from '@/lib/data/constance.ts';
-import type { SupportLangKey } from '../lang/constant';
+import { GenericSettings } from '@/lib/data/settings';
+import { ImageStorage, Storage } from '@/lib/data/data';
+import type { SupportLangKey } from '@/lib/lang/constant';
 
 export interface CharsRecord {
     name: string,
@@ -36,7 +36,7 @@ export type ChatsRecord = {
         id: string
         type: T
     }
-}[keyof ChatType] 
+}[keyof ChatType]
 
 export type ChatsData = ChatsRecord[]
 
@@ -47,7 +47,7 @@ export interface ConfigData {
 }
 
 export interface SettingsData {
-    common: GenericSettings,
+    generic: GenericSettings,
     editor: Record<string, object>
     renderer: Record<string, object>
 }
@@ -85,7 +85,7 @@ export interface StorageType {
     version?: string
 }
 
-export interface OperateRecord {
+export interface OperationRecord {
     key: StorageKey,
     old: string,
     new: string

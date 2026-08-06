@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, onUnmounted } from 'vue'
+
 import { t } from '@/lib/lang/translate'
-import CharSelector from './CharSelector.vue'
+import { textarea } from '@/lib/function/dialogue'
+import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
+
+import { chars } from '@/lib/data/data'
+import { dialogWidth } from '@/lib/data/width'
 import { closeShowHook } from '@/lib/data/showControl'
 
-import { textarea } from '@/lib/function/dialogue'
-import { chars } from '@/lib/data/data'
-import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
-import { dialogWidth } from '@/lib/data/width'
+import CharSelector from './CharSelector.vue'
 
-const ifShow = ref(false)
 const atWho = ref('')
+const ifShow = ref(false)
 const charSelectorRef = useTemplateRef<InstanceType<typeof CharSelector>>('charSelectorRef')
 let insertAt = 0
 onUnmounted(closeShowHook.on(() => {
@@ -70,7 +72,7 @@ defineExpose({
 
 <template>
     <el-dialog v-model="ifShow" :width="dialogWidth" :title="t.notify.wantToAtWhichCharacter" :modal="false">
-        <CharSelector v-model="atWho" ref="charSelectorRef" style="width: 100%" @change="handleAt"
+        <CharSelector v-model="atWho as string" ref="charSelectorRef" style="width: 100%" @change="handleAt"
             @visible-change="(visible: boolean) => { if (!visible) { ifShow = false } }" />
     </el-dialog>
 </template>

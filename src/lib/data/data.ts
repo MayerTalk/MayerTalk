@@ -1,31 +1,30 @@
-import type { ComputedRef, Ref } from 'vue'
-import { computed, ref } from 'vue'
-import { t } from '@/lib/lang/translate'
-import { DEFAULT_LANG } from '@/lib/lang/detect'
-import { StaticUrl } from '@/lib/data/constance'
-import message from '@/lib/utils/message'
-import { blob2base64, bool, copy, md5, Textarea, uuid } from '@/lib/utils/tool'
-import DataBase from '../utils/db'
+import { ref, type Ref } from 'vue'
+
 import Hook from '@/lib/utils/hook'
+import DataBase from '@/lib/utils/db'
+import { t } from '@/lib/lang/translate'
+import message from '@/lib/utils/message'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
+import { blob2base64, bool, copy, hasOwn, md5, Textarea, uuid } from '@/lib/utils/tool'
+
 import type * as DT from '@/lib/data/dataTypes';
+import { STATIC_URL } from '@/lib/data/constance'
 import type { CharsRecord } from '@/lib/data/dataTypes';
 
-// TODO 将common更名为generic
-const defaultSettings = { common: {}, editor: {}, renderer: {} }
+const defaultSettings = { generic: {}, editor: {}, renderer: {} }
 
-const config: Ref<DT.ConfigData> = ref({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
+const config = ref<DT.ConfigData>({ editor: 'Default', renderer: 'Siracusa', lang: DEFAULT_LANG })
 // settings: 原始settings (不含default)
-const settings: Ref<DT.SettingsData> = ref(copy(defaultSettings))
-const chars: Ref<DT.CharsData> = ref({})
-const chats: Ref<DT.ChatsData> = ref([])
-const images: Ref<DT.ImagesData> = ref({})
+const settings = ref<DT.SettingsData>(copy(defaultSettings))
+const chars = ref<DT.CharsData>({})
+const chats = ref<DT.ChatsData>([])
+const images = ref<DT.ImagesData>({})
 // TODO optimize avatar 将ComputedRef<string>改为string
-const avatars: Ref<{ [id: string]: ComputedRef<string> }> = ref({})
-const currCharId: Ref<string> = ref('')
-const currCharData: Ref<CharsRecord | null> = ref(null)
-const currDialogueIndex: Ref<number> = ref(0)
-const currDialogueData: Ref<DT.ChatsRecord | null> = ref(null)
-
+const avatars = ref<{ [id: string]: string }>({})
+const currCharId = ref('')
+const currCharData = ref<CharsRecord | null>(null)
+const currDialogueIndex = ref(0)
+const currDialogueData = ref<DT.ChatsRecord | null>(null)
 
 const Data = {
     config,
@@ -48,7 +47,7 @@ class Storage<T extends object> {
         this.update = false
     }
 
-    save(force?: boolean): DT.OperateRecord | false | undefined {
+    save(force?: boolean): DT.OperationRecord | false | undefined {
         if (this.update || force) {
             this.update = false
             const lastSave = this.lastSave;
@@ -85,7 +84,9 @@ class Storage<T extends object> {
                     return false
                 }
             }]
-        } catch {
+        } catch (e) {
+            console.error(e)
+            return undefined
         }
     }
 
@@ -100,7 +101,7 @@ class ImageStorage {
     lastSave: string
     update: boolean
     db: DataBase<DT.ImagesRecord>
-    loadedCallback?: (data: DT.ImagesData, next: () => void) => void
+    loadedCallback?: (data: DT.ImagesData, set: (newData?: DT.ImagesData) => boolean) => void
 
 
     constructor(key: string, obj: Ref<DT.ImagesData>) {
@@ -150,10 +151,16 @@ class ImageStorage {
                 } else {
                     if (this.loadedCallback) {
                         this.loadedCallback(
-                            data, () => {
-                                this.lastSave = JSON.stringify(data)
-                                this.obj.value = data
-                                this.update = false
+                            data, (newData?) => {
+                                const currData = newData || data
+                                if (bool(currData)) {
+                                    this.obj.value = currData
+                                    this.lastSave = JSON.stringify(currData)
+                                    this.update = false
+                                    return true
+                                } else {
+                                    return false
+                                }
                             }
                         )
                     } else {
@@ -249,12 +256,12 @@ class ImageStorage {
 
 
 interface DataControlHooks {
-    beforeUpdate: Hook<Array<DT.StorageKey>>
-    update: Hook;
-    switch: Hook;
-    clear: Hook<Array<string> | undefined>;
-    changeSavefile: Hook;
-    change: Hook;
+    beforeUpdate: Hook<Array<DT.StorageKey>> // 会在DataControl.save数据保存前调用
+    update: Hook; // 会在DataControl.save数据保存后调用
+    switch: Hook; // DataControl.withdraw/redo
+    clear: Hook<Array<string>>; // 在DataControl.clear清理数据后调用
+    changeSavefile: Hook; // 切换存档文件后调用
+    change: Hook; //  包含 update/switch/clear/changeSavefile 四种数据变动
 }
 
 const DataControl = new class DataControl {
@@ -262,7 +269,7 @@ const DataControl = new class DataControl {
     images: ImageStorage
     // storage.images的别名
 
-    version: Array<Array<DT.OperateRecord>>
+    version: Array<Array<DT.OperationRecord>>
     index: number
     hook: DataControlHooks
     char: {
@@ -300,14 +307,11 @@ const DataControl = new class DataControl {
             })
         }
         this.char = {
-            new: (data) => {
-                data = copy(data)
+            new: (char) => {
+                char = copy(char)
                 const id = uuid()
-                chars.value[id] = data
-                avatars.value[id] = computed(() => {
-                    const avatar = chars.value[id].avatar
-                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : StaticUrl + avatar
-                })
+                chars.value[id] = char
+                avatars.value[id] = this.getCharAvatar(char)
                 return id
             },
             delete: (id) => {
@@ -360,6 +364,11 @@ const DataControl = new class DataControl {
         }
     }
 
+    getCharAvatar(char: CharsRecord) {
+        const avatar = char.avatar
+        return hasOwn(images.value, avatar) ? images.value[avatar].src : STATIC_URL + avatar
+    }
+
     update(update: DT.StorageKey | Array<DT.StorageKey>) {
         // 设置更新节点
         if (typeof update === 'string') {
@@ -399,12 +408,12 @@ const DataControl = new class DataControl {
             this.update(update)
         }
         this.hook.beforeUpdate.call(this.getNeedUpdate())
-        const operator: Array<DT.OperateRecord> = []
+        const operator: Array<DT.OperationRecord> = []
         for (const key in this.storage) {
             if (Object.prototype.hasOwnProperty.call(this.storage, key)) {
                 const result = this.storage[key as DT.StorageKey].save()
                 if (result) {
-                    operator.push(result as DT.OperateRecord)
+                    operator.push(result as DT.OperationRecord)
                 }
             }
         }
@@ -420,40 +429,41 @@ const DataControl = new class DataControl {
         // 生成角色可用的头像链接
         for (const key in chars.value) {
             if (Object.prototype.hasOwnProperty.call(chars.value, key)) {
-                avatars.value[key] = computed(() => {
-                    const avatar = chars.value[key].avatar
-                    return Object.prototype.hasOwnProperty.call(images.value, avatar) ? images.value[avatar].src : StaticUrl + avatar
-                })
+                avatars.value[key] = this.getCharAvatar(chars.value[key])
             }
         }
     }
 
-    load(upgradeData?: (data: DT.DataType, next: Partial<Record<DT.StorageKey, () => void>>) => void) {
-        // upgradeData: 交由版本控制进行处理，对旧数据进行升级，再使用n函数设置
+    load(upgradeData?: (data: DT.DataType, setDict: Partial<Record<DT.StorageKey, () => void>>) => void) {
+        // upgradeData: 交由版本控制进行处理，对旧数据进行升级，再使用set函数设置
         // 当储存版本与最新版本相同时，直接读取数据
         const data: Partial<DT.DataType> = {}
-        const next: Partial<Record<DT.StorageKey, () => void>> = {}
+        const setDict: Partial<Record<DT.StorageKey, () => void>> = {}
         for (const key in this.storage) {
             if (Object.prototype.hasOwnProperty.call(this.storage, key)) {
                 if (key !== 'images') {
                     const res = this.storage[key as DT.StorageKey].load()
                     if (res) {
-                        const [d, n] = res
+                        const [d, set] = res
                         data[key] = d
-                        next[key] = n
-                        n()
+                        setDict[key] = set
+                        // 进行默认设置
+                        set()
                     }
                 }
             }
         }
-        this.storage.images.loadedCallback = (d, n) => {
+        this.storage.images.loadedCallback = (d, set) => {
+            // d(data) 需要修饰的数据 set 将修改后的数据同步到obj
             data.images = d
-            next.images = n
-            n()
+            setDict.images = set
+            set()
+            // 加载储存在IndexedDB中的头像数据
+            this.genCharSrc()
         }
 
         if (upgradeData) {
-            upgradeData(data as DT.DataType, next)
+            upgradeData(data as DT.DataType, setDict)
         }
         this.genCharSrc()
     }
@@ -469,37 +479,30 @@ const DataControl = new class DataControl {
         this.genCharSrc()
     }
 
-    withdraw() {
-        if (this.index + 1 < this.version.length) {
-            const data = this.version[++this.index]
-            for (let i = 0; i < data.length; i++) {
-                const operator = data[i]
-                if (Object.prototype.hasOwnProperty.call(this.storage, operator.key)) {
-                    if (operator.type === 'modify') {
-                        const storage = this.storage[operator.key]
-                        storage.set(JSON.parse(operator.old), true)
-                        storage.save(true)
-                    }
+    setWithoutPoint(version: Array<DT.OperationRecord>, widhdraw: boolean) {
+        const operate = widhdraw ? 'old' : 'new'
+        for (let i = 0; i < version.length; i++) {
+            const operation = version[i]
+            if (Object.prototype.hasOwnProperty.call(this.storage, operation.key)) {
+                if (operation.type === 'modify') {
+                    const storage = this.storage[operation.key]
+                    storage.set(JSON.parse(operation[operate]), true)
+                    storage.save(true)
                 }
             }
-            this.hook.switch.call(undefined)
+        }
+        this.hook.switch.call(undefined)
+    }
+
+    withdraw() {
+        if (this.index + 1 < this.version.length) {
+            this.setWithoutPoint(this.version[++this.index], true)
         }
     }
 
     redo() {
         if (this.index > -1) {
-            const data = this.version[this.index--]
-            for (let i = 0; i < data.length; i++) {
-                const operator = data[i]
-                if (Object.prototype.hasOwnProperty.call(this.storage, operator.key)) {
-                    if (operator.type === 'modify') {
-                        const storage = this.storage[operator.key]
-                        storage.set(JSON.parse(operator.new), true)
-                        storage.save(true)
-                    }
-                }
-            }
-            this.hook.switch.call(undefined)
+            this.setWithoutPoint(this.version[this.index--], false)
         }
     }
 
@@ -566,18 +569,18 @@ DataControl.hook.switch.on(() => {
 })
 
 export {
-    defaultSettings,
-    config,
-    settings,
     chats,
     chars,
     images,
+    config,
     avatars,
-    currCharId,
-    currCharData,
-    currDialogueIndex,
-    currDialogueData,
     Storage,
+    settings,
+    currCharId,
+    DataControl,
     ImageStorage,
-    DataControl
+    currCharData,
+    defaultSettings,
+    currDialogueData,
+    currDialogueIndex
 }

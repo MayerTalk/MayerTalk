@@ -1,11 +1,13 @@
 <script setup lang="ts">
 // Dev Server Announcement
 import { computed, onMounted } from 'vue'
+
 import { config } from '@/lib/data/data'
-import info from './info.dev'
 import { mainShow } from '@/lib/data/showControl'
 
-defineEmits(['showGuide'])
+import info from '@/info.dev'
+
+defineEmits<{ showGuide: [boolean] }>()
 
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 
@@ -20,7 +22,7 @@ interface Translation {
     ee: string
 }
 
-const TRANSLATION:Record<string,Translation> = {
+const TRANSLATION: Record<string, Translation> = {
     zh_CN: {
         common: '您正处于开发站点，如有bug请加入交流群反馈',
         ver: 'Github Action 自动部署版本',
@@ -79,12 +81,13 @@ onMounted(() => {
         <p>{{ t.ver }}</p>
         <p>{{ t.endInfo }}</p>
         <div style="display: flex">
-            <el-link href="https://www.mayertalk.top" type="primary" style="margin-right: 5px">{{ t.mainSite }}</el-link>
+            <el-link href="https://www.mayertalk.top" type="primary" style="margin-right: 5px">{{ t.mainSite
+            }}</el-link>
             <span style="border-left: solid 1px darkgrey"></span>
             <el-link href="https://dev.mayertalk.top" type="primary" style="margin: 0 5px">{{ t.devSite }}</el-link>
             <span style="border-left: solid 1px darkgrey"></span>
             <el-link @click="$emit('showGuide', false)" href="javascript:void(0)" type="primary"
-                     style="margin-left: 5px">{{ t.manual }}
+                style="margin-left: 5px">{{ t.manual }}
             </el-link>
         </div>
         <div style="display: flex; margin-top: 10px" v-if="['zh_CN', 'zh_TW'].includes(config.lang)">
@@ -92,14 +95,15 @@ onMounted(() => {
                 交流群：560295639
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="https://wj.qq.com/s2/11537223/aa61/" type="primary" style="margin-left: 5px;">{{ t.feedback }}</el-link>
+            <el-link href="https://wj.qq.com/s2/11537223/aa61/" type="primary" style="margin-left: 5px;">{{ t.feedback
+            }}</el-link>
         </div>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">{{ t.ee }}</div>
     </el-dialog>
 </template>
 
 <style scoped>
-    img {
-        width: 100%;
-    }
+img {
+    width: 100%;
+}
 </style>

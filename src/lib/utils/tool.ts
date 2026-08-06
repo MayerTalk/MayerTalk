@@ -1,12 +1,14 @@
-import { t } from '@/lib/lang/translate'
-import { v4 as uuid } from 'uuid'
 import md5 from 'blueimp-md5'
-import html2canvas from 'html2canvas'
-import message from './message'
-import { IsMobile } from '@/lib/data/constance'
-import Input from '@/lib/function/input'
 import type { Ref } from 'vue';
+import { v4 as uuid } from 'uuid'
+import html2canvas from 'html2canvas'
+
+import { t } from '@/lib/lang/translate'
+import Input from '@/lib/function/input'
+import message from '@/lib/utils/message'
 import type { Callback, CallBackWithData, OptionalCallback } from '@/lib/utils/types';
+
+import { IsMobile } from '@/lib/data/constance'
 
 function hasOwn<T extends object, K extends string>(obj: T, key: K): obj is T & Record<K, unknown> {
     return Object.prototype.hasOwnProperty.call(obj, key);

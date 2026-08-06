@@ -1,17 +1,15 @@
 import { ref } from 'vue'
+import type { UploadRawFile } from 'element-plus'
+
+import Hook from '@/lib/utils/hook'
 import { t } from '@/lib/lang/translate'
-import { Textarea, uuid } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
 import TipControl from '@/lib/function/tip'
-import {
-    chats,
-    currCharId,
-    DataControl
-} from '@/lib/data/data'
-import Hook from '@/lib/utils/hook'
+import { Textarea, uuid } from '@/lib/utils/tool'
+
+import { chats, currCharId, DataControl } from '@/lib/data/data'
 
 import type { ChatsRecord } from '@/lib/data/dataTypes'
-import type { UploadRawFile } from 'element-plus'
 
 const textarea = ref('')
 
@@ -41,7 +39,7 @@ const DialogueHook = {
     }>()
 }
 
-function createDialogue(param: Partial<ChatsRecord>, config:{locate?:boolean} = {}) {
+function createDialogue(param: Partial<ChatsRecord>, config: { locate?: boolean } = {}) {
     const data: ChatsRecord = {
         content: param.content,
         type: param.type,
@@ -78,7 +76,7 @@ function copyDialogue(index: number, param: Partial<ChatsRecord> = {}, config: C
 }
 
 // TODO optimize type hint
-function createTextDialogue(type: Exclude<ChatsRecord['type'],'option'>, config = {}) {
+function createTextDialogue(type: Exclude<ChatsRecord['type'], 'option'>, config = {}) {
     if (textarea.value) {
         createDialogue({
             content: textarea.value,
@@ -105,8 +103,8 @@ function createImageDialogue(fileUpload: File, config = {}) {
 function uploadImage(data: ChatsRecord, fileUpload: UploadRawFile): false {
     DataControl.images.new(fileUpload, (id) => {
         if (!id) {
-            // TODO raise Expectation
-            return false
+            // TODO 添加App范围的全局错误处理
+            throw new Error('Failed to upload image')
         }
         if (data.type === 'image') {
             // 如果对话类型为image，删除旧图片

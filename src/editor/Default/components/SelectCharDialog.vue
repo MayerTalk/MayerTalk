@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useTemplateRef, onUnmounted } from 'vue'
+
 import { t } from '@/lib/lang/translate'
-import { loadSeries } from '@/lib/data/character'
-import { dialogWidth } from '@/lib/data/width'
-import SelectCharInstance from './SelectCharInstance.vue'
-import { closeShowHook } from '@/lib/data/showControl'
 import { doAfterRefMounted } from '@/lib/utils/tool'
 
+import { dialogWidth } from '@/lib/data/width'
+import { loadSeries } from '@/lib/data/character'
+import { closeShowHook } from '@/lib/data/showControl'
+
+import SelectCharInstance from './SelectCharInstance.vue'
 
 defineEmits<{
     select: [char: { avatar: string, name: string }]

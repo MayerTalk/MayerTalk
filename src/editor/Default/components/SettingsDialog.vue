@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { editorSettings } from '@/editor/Default'
 import { t } from '@/lib/lang/translate'
+
+import { editorSettings } from '@/editor/Default'
 </script>
 
 <template>

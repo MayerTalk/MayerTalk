@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onUnmounted, ref, useTemplateRef } from 'vue'
-import { t } from '@/lib/lang/translate'
-import OptionDialog from '../type/OptionDialog.vue'
 
-import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
+import { t } from '@/lib/lang/translate'
 import { createDialogue } from '@/lib/function/dialogue'
+import { copy, uuid, ensureClose, doAfterRefMounted } from '@/lib/utils/tool'
+
 import { dialogWidth } from '@/lib/data/width'
 import { closeShowHook } from '@/lib/data/showControl'
 import type { ChatType } from '@/lib/data/dataTypes.d';
+
+import OptionDialog from '@/editor/Default/type/OptionDialog.vue'
 
 const ifShow = ref(false)
 const options = ref<ChatType['option']>([])

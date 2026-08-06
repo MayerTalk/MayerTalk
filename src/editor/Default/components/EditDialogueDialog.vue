@@ -1,19 +1,23 @@
 <script setup lang="ts">
 import { onUnmounted, ref, useTemplateRef } from 'vue'
-import { t } from '@/lib/lang/translate'
-import CharSelector from './CharSelector.vue'
-import OptionDialog from '../type/OptionDialog.vue'
+import type { ElInput, UploadRawFile } from 'element-plus'
 
-import { CHAT_DEFAULT, ChatSeries, IsMobile } from '@/lib/data/constance'
-import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data/data'
+import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
-import { copy, uuid, ensureClose, doAfterRefMounted, assertNonValue } from '@/lib/utils/tool'
 import { uploadImage, deleteDialogue, DialogueHook } from '@/lib/function/dialogue'
+import { copy, uuid, ensureClose, doAfterRefMounted, assertNonValue } from '@/lib/utils/tool'
+
 import { dialogWidth } from '@/lib/data/width'
-import { defaultShow } from '@/editor/Default/lib/showControl'
 import { closeShowHook } from '@/lib/data/showControl'
 import type { ChatsRecord } from '@/lib/data/dataTypes'
-import type { ElInput, UploadRawFile } from 'element-plus'
+import { CHAT_DEFAULT, CHAT_SERIES, IsMobile } from '@/lib/data/constance'
+import { chats, images, currDialogueIndex, currDialogueData, DataControl } from '@/lib/data/data'
+
+import { defaultShow } from '@/editor/Default/lib/showControl'
+
+import CharSelector from './CharSelector.vue'
+import OptionDialog from '@/editor/Default/type/OptionDialog.vue'
+
 
 const ifShow = ref(false)
 
@@ -23,8 +27,8 @@ onUnmounted(closeShowHook.on(() => {
     }
 }))
 
-const dialogueData = ref<ChatsRecord | null>(null)
 const editDialogue = ref(false)
+const dialogueData = ref<ChatsRecord | null>(null)
 const inputRef = useTemplateRef<InstanceType<typeof ElInput>>('inputRef')
 let currType: keyof typeof CHAT_DEFAULT
 const Editor = {
@@ -37,7 +41,7 @@ function open(index: number) {
     assertNonValue(dialogueData.value, 'dialogueData')
     currType = dialogueData.value.type as keyof typeof CHAT_DEFAULT
     ifShow.value = true
-    if (ChatSeries[dialogueData.value.type] === 'Text' && !IsMobile) {
+    if (CHAT_SERIES[dialogueData.value.type] === 'Text' && !IsMobile) {
         doAfterRefMounted(inputRef, (r) => {
             r.value.focus()
         })
@@ -70,7 +74,7 @@ function handleClose() {
 
 function handleChangeType(value) {
     // 当类型数据格式不同时，重置为默认值
-    if (dialogueData.value && ChatSeries[currType] !== ChatSeries[value]) {
+    if (dialogueData.value && CHAT_SERIES[currType] !== CHAT_SERIES[value]) {
         dialogueData.value.content = CHAT_DEFAULT[dialogueData.value.type]
     }
     currType = value
@@ -126,9 +130,9 @@ defineExpose({
     <el-dialog v-model="ifShow" :title="editDialogue ? t.action.editChat : t.action.insertChat" :width="dialogWidth"
         @closed="handleClose" :before-close="editDialogue ? null : ensureClose">
         <template v-if="dialogueData">
-
             <component v-if="Editor[dialogueData.type]" :is="Editor[dialogueData.type]"
                 v-model="dialogueData.content" />
+                <!-- ↑假报错，typescript检查能通过 -->
             <el-upload v-else-if="dialogueData.type === 'image'" action="#" drag :show-file-list="false"
                 class="image-uploader" accept="image/png, image/jpeg, image/gif"
                 :before-upload="(file: UploadRawFile) => { return uploadImage(dialogueData as ChatsRecord, file) }">
@@ -147,7 +151,7 @@ defineExpose({
                 @keydown.ctrl.enter="ifShow = false"></el-input>
             <div class="edit-bar" style="margin-top: 5px">
                 <div style="width: calc(50% - 2px); display: flex">
-                    <CharSelector v-model="dialogueData.char" narration />
+                    <CharSelector v-model="dialogueData.char as string" narration />
                 </div>
                 <div style="width: calc(50% - 3px); margin-left: 5px; display: flex">
                     <el-select v-model="dialogueData.type" style="flex-grow: 1"

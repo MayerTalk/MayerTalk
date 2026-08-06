@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, type Ref } from 'vue'
+
 import { t } from '@/lib/lang/translate'
+
 import { DataControl } from '@/lib/data/data'
-import CollapseItem from '@/components/CollapseItem'
-import { mobileView } from '@/editor/Default/lib/width'
 import { IsMobile } from '@/lib/data/constance'
-import { defaultShow } from '@/editor/Default/lib/showControl'
 import { mainShow } from '@/lib/data/showControl'
+
+import { mobileView } from '@/editor/Default/lib/width'
+import { defaultShow } from '@/editor/Default/lib/showControl'
+
+import CollapseItem from '@/components/CollapseItem'
 import ClearDialog from '@/components/ClearDialog.vue'
-import type { Ref } from 'vue'
 
 defineEmits<{
     showNavigation: []

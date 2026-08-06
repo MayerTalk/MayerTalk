@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { t } from '@/lib/lang/translate'
+import { chats } from '@/lib/data/data'
+
 import {
-    disablePartialScreenshotView,
     partialChats,
     duringPartialScreenshot,
+    disablePartialScreenshotView,
     partialScreenshotMultiSelect
 } from '@/components/PartialScreenshot/partialScreenshotControl'
-import { chats } from '@/lib/data/data'
-import { t } from '@/lib/lang/translate'
 </script>
 
 <template>

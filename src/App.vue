@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import '@/lib/data/versionControl'
-import Editors from './editor'
-import Announce from './AnnounceDialog.vue'
-import About from './AboutDialog.vue'
-import FileDragger from '@/components/FileDragger.vue'
-import SettingsDialog from '@/components/Settings/SettingsDialog.vue'
-import SavefileDialog from '@/components/SavefileDialog.vue'
 import { config } from '@/lib/data/data'
 import { currEditorRef } from '@/lib/data/state'
+
+import Editors from '@/editor'
+import About from '@/AboutDialog.vue'
+import Announce from '@/AnnounceDialog.vue'
+import FileDragger from '@/components/FileDragger.vue'
+import SavefileDialog from '@/components/SavefileDialog.vue'
+import SettingsDialog from '@/components/Settings/SettingsDialog.vue'
 </script>
 
 <template>
@@ -21,7 +22,7 @@ import { currEditorRef } from '@/lib/data/state'
     <component :is="Editors[config.editor]" ref="currEditorRef"/>
 </template>
 
-<style src="./style/font.css"></style>
+<style src="@/style/font.css"></style>
 <style>
 body, html {
     margin: 0;

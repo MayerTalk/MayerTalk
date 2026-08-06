@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { uploadData } from '@/lib/data/versionControl'
+
 import { t } from '@/lib/lang/translate'
+
+import { uploadData } from '@/lib/data/versionControl'
 
 const ifShow = ref(false)
 let dragStatus = false
@@ -24,7 +26,6 @@ function close() {
 }
 
 function handleEvent(event: DragEvent) {
-
     event.preventDefault()
     if (event.type === 'drop') {
         if (event.dataTransfer && event.dataTransfer.files.length) {

@@ -1,20 +1,21 @@
 import { ref, watch } from 'vue'
-import { DataControl, chats } from '@/lib/data/data'
-import { DialogueHook } from '@/lib/function/dialogue'
+
 import Hook from '@/lib/utils/hook'
 import { bool, getDialogue } from '@/lib/utils/tool'
+import { DialogueHook } from '@/lib/function/dialogue'
+
+import { DataControl, chats } from '@/lib/data/data'
 import { currEditorRef, ModeChange } from '@/lib/data/state'
 import { closeShowHook, mainShow } from '@/lib/data/showControl'
-import type { Ref } from 'vue'
 import type { ChatsRecord } from '@/lib/data/dataTypes';
 
 const currCutPoint = ref('')
 const currCutPointIndex = ref(-1)
 const cutPointViewMode = ref(false)
-
-const cutPoints: Ref<Record<string, ChatsRecord>> = ref({})
-const sortedCutPoints: Ref<Array<ChatsRecord>> = ref([])
 const cutPointQuickEditMode = ref(false)
+const cutPointFocusHook = new Hook<string>()
+const sortedCutPoints = ref<Array<ChatsRecord>>([])
+const cutPoints = ref<Record<string, ChatsRecord>>({})
 let lastUpdate = ''
 
 watch(cutPointViewMode, () => {
@@ -156,7 +157,6 @@ function next() {
     }
 }
 
-const cutPointFocusHook = new Hook<string>()
 
 export {
     cutPoints,

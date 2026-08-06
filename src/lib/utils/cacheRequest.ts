@@ -1,9 +1,11 @@
-import { getData, saveData } from '@/lib/utils/tool'
-import Request from '@/lib/utils/request'
-import { StaticUrl } from '@/lib/data/constance'
-import type { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios'
 
-const staticApi = new Request({ host: StaticUrl })
+import Request from '@/lib/utils/request'
+import { getData, saveData } from '@/lib/utils/tool'
+
+import { STATIC_URL } from '@/lib/data/constance'
+
+const staticApi = new Request({ host: STATIC_URL })
 
 interface cacheRequestOptions<T> {
     url: string

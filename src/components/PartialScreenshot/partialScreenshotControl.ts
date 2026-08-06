@@ -1,19 +1,20 @@
 import { ref, watch } from 'vue'
+
+import { copy } from '@/lib/utils/tool'
 import { closeShowHook, mainShow } from '@/lib/data/showControl'
 import { DialogueHook, findDialoguesById } from '@/lib/function/dialogue'
-import { copy } from '@/lib/utils/tool'
+
 import { ModeChange } from '@/lib/data/state'
 import { chats } from '@/lib/data/data'
-
 import type { ChatsData } from '@/lib/data/dataTypes';
-import type { Ref } from 'vue'
 
-const partialChats: Ref<Record<string, boolean>> = ref({})
-let lastClick: [id: string, activate: boolean] | null = null
-const partialScreenshotViewMode = ref(false)
+
 const duringPartialScreenshot = ref(false)
+const partialScreenshotViewMode = ref(false)
 const partialScreenshotMultiSelect = ref(false)
+const partialChats= ref<Record<string, boolean>>({})
 let oldData: ChatsData = []
+let lastClick: [id: string, activate: boolean] | null = null
 
 watch(partialScreenshotViewMode, () => {
     ModeChange.call({

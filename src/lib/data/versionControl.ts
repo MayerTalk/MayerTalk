@@ -1,7 +1,7 @@
 import { t } from '@/lib/lang/translate'
-import { DEFAULT_LANG } from '@/lib/lang/detect'
-import { getData, saveData, blob2url, download, md5, copy } from '@/lib/utils/tool'
 import message from '@/lib/utils/message'
+import { DEFAULT_LANG } from '@/lib/lang/detect'
+import { getData, saveData, blob2url, download, md5, copy, hasOwn } from '@/lib/utils/tool'
 import {
     defaultSettings,
     config,
@@ -14,7 +14,7 @@ import {
 
 import type * as DT from '@/lib/data/dataTypes';
 
-const latestVersion = 'g'
+const latestVersion = 'h'
 const initialVersion = 'a'
 let currVersion = getData<string>('data.version') || initialVersion
 
@@ -125,6 +125,7 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
         const editorKey = ['characterSelectorPermanent']
         const rendererKey = ['background', 'showCharName', 'showCharNameSettings']
         const group: Array<[Array<string>, object]> = [
+            // @ts-expect-error 旧数据
             [commonKey, newSettings.common],
             [editorKey, (newSettings.editor as { Default: object }).Default],
             [rendererKey, (newSettings.renderer as { Siracusa: object }).Siracusa]
@@ -137,7 +138,7 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
             }
         }
         if (Object.prototype.hasOwnProperty.call(oldSettings, 'scale')) {
-
+            // @ts-expect-error 旧数据
             (newSettings.common as unknown as {
                 imageQuality: number
             }).imageQuality = +((oldSettings as unknown as { scale: number }).scale / 1.5).toFixed(2)
@@ -147,6 +148,18 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
             saveData('data.settings', data.settings)
         }
         return 'g'
+    },
+    g: (data, opt) => {
+        // v0.2.3 -> v0.2.4 / g -> h
+        // rename settings (common -> generic)
+        if (hasOwn(data.settings, 'common')) {
+            data.settings.generic = data.settings.common
+            delete data.settings.common
+        }
+        if (opt.load) {
+            saveData('data.settings', data.settings)
+        }
+        return 'h'
     }
 }
 
@@ -215,15 +228,12 @@ function loadData() {
     if (latestVersion === currVersion) {
         DataControl.load()
     } else {
-        DataControl.load((data, next) => {
-            if (data) {
-
-            }
+        DataControl.load((data, setData) => {
             data.version = currVersion
             switchVersion(data, {
                 load: true
             })
-            Object.entries(next).forEach((obj) => {
+            Object.entries(setData).forEach((obj) => {
                 obj[1]()
             })
         })

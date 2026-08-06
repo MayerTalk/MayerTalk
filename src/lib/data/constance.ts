@@ -1,7 +1,7 @@
 import { uuid } from '@/lib/utils/tool'
 import type { ChatType } from './dataTypes';
 
-const StaticUrl = 'https://static.mayertalk.top/'
+const STATIC_URL = 'https://static.mayertalk.top/'
 
 const SUPPORT_LANG = ['zh_CN', 'zh_TW', 'ja_JP', 'en_US'] as const
 
@@ -12,9 +12,9 @@ const CHAT_DEFAULT: Readonly<ChatType> = {
     option: [[uuid(), '']], // 选项列表，每个选项包含 ID 和文本
     select: '', // 选择结果
     title: '' // 标题
-};
+}
 
-const ChatSeries = {
+const CHAT_SERIES = {
     chat: 'Text',
     monologue: 'Text',
     image: 'Image',
@@ -23,8 +23,6 @@ const ChatSeries = {
     title: 'Text'
 } as const
 
-type ChatSeries = typeof ChatSeries;
-
 
 const defaultWindowWidth: number = 520
 const IsMobile: boolean = /Mobi|Android|iPhone/i.test(navigator.userAgent)
@@ -32,9 +30,9 @@ const IsSafari: boolean = /^(.(?!Chrome))*Safari/.test(navigator.userAgent)
 
 export {
     SUPPORT_LANG,
-    StaticUrl,
+    STATIC_URL,
     CHAT_DEFAULT,
-    ChatSeries,
+    CHAT_SERIES,
     defaultWindowWidth,
     IsMobile,
     IsSafari

@@ -1,12 +1,9 @@
-import { DataControl } from '../data/data'
-import DataBase from '../utils/db'
-import {
-    getDataJson,
-    switchVersion
-} from '../data/versionControl'
 import { uuid } from '@/lib/utils/tool'
 
+import DataBase from '@/lib/utils/db'
+import { DataControl } from '@/lib/data/data'
 import type * as DT from '@/lib/data/dataTypes'
+import { getDataJson, switchVersion } from '@/lib/data/versionControl'
 
 interface InfoRecord {
     id: string

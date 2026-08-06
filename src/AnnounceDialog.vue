@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { saveData, getData } from './lib/utils/tool'
+
+import { saveData, getData } from '@/lib/utils/tool'
+import type { SupportLangKey } from '@/lib/lang/constant'
+
 import { config } from '@/lib/data/data'
 import { IsSafari } from '@/lib/data/constance'
 import { mainShow } from '@/lib/data/showControl'
-import type { SupportLangKey } from './lib/lang/constant'
 
 const dialogWidth = Math.ceil(Math.min(window.innerWidth, 700) * 0.9)
 

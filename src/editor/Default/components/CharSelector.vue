@@ -1,10 +1,14 @@
 <script setup lang="ts">
+// 优化为泛型组件
 import { useTemplateRef, onUnmounted } from 'vue'
+import { ElSelect } from 'element-plus';
+
 import { t } from '@/lib/lang/translate'
+import { ensureValue } from '@/lib/utils/tool';
+
 import { chars, avatars } from '@/lib/data/data'
 import { closeShowHook } from '@/lib/data/showControl'
-import { ElSelect } from 'element-plus';
-import { ensureValue } from '@/lib/utils/tool';
+
 
 const modelValue = defineModel<string | Array<string>>({ required: true })
 const select = useTemplateRef<InstanceType<typeof ElSelect>>('select')
@@ -29,7 +33,10 @@ function blur() {
     ensureValue(select.value, 'select').blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+    focus,
+    blur
+})
 </script>
 
 <template>
@@ -38,7 +45,7 @@ defineExpose({ focus, blur })
         <el-option v-for="(char, id) in chars" :key="id" :label="char.name" :value="id">
             {{ char.name }}
             <div style="display: flex; align-items: center; height: 100%; float: right">
-                <img :src="(avatars[id] as unknown as string)" style="height: 80%; display: inline" />
+                <img :src="avatars[id]" style="height: 80%; display: inline" />
             </div>
         </el-option>
         <el-option v-if="narration" key="" :label="t.noun.narration" value="" />

@@ -1,8 +1,9 @@
-import { computed, ref } from 'vue'
-import { settings, DataControl } from '@/lib/data/data'
+import { computed, ref, type Ref } from 'vue'
+
 import { withDefault, excludeDefault } from '@/lib/utils/tool'
+
 import { currRendererRef } from '@/lib/data/state'
-import type { Ref, ComputedRef } from 'vue'
+import { settings, DataControl } from '@/lib/data/data'
 
 interface GenericSettings {
     width: number
@@ -45,8 +46,37 @@ class SettingsManager<T extends object> {
         this.type = options.type
         this.key = options.key || ''
         this.default = options.default
-        this.ref = ref(this.syncSettings()) as Ref<T>
+        this.ref = ref(null) as unknown as Ref<T>
+        this.syncSettings()
         this.hookCancels = []
+    }
+
+    getRawSettings(): object {
+        if (this.type === 'generic') {
+            return settings.value.generic
+        } else {
+            return settings.value[this.type][this.key] || {}
+        }
+    }
+
+    syncSettings(): void {
+        // 从localStorage中读取settings，并填充默认值
+        this.ref.value = withDefault<T>(this.getRawSettings(), this.default)
+    }
+
+    saveSettings(): void {
+        // TODO 优化类型提示
+        const value = excludeDefault(this.ref.value as object, this.default as object)
+        if (this.type === 'generic') {
+            settings.value.generic = value
+        } else {
+            settings.value[this.type][this.key] = value as object
+        }
+    }
+
+    mount() {
+        // 目前settingsManager在<components>/index.ts中使用，需要组件控制其生命周期
+        // 用途：收到保存settings事件时，自动保存settings
 
         this.hookCancels.push(DataControl.hook.beforeUpdate.on((params) => {
             if (params.indexOf('settings') !== -1) {
@@ -54,30 +84,16 @@ class SettingsManager<T extends object> {
             }
         }))
         this.hookCancels.push(DataControl.hook.switch.on(() => {
+            // TODO 多component时验证syncSettings逻辑
             this.syncSettings()
         }))
+        this.syncSettings()
     }
 
-    getRawSettings(): object {
-        if (this.type === 'generic') {
-            return settings.value.common
-        } else {
-            return settings.value[this.type][this.key] || {}
-        }
-    }
-
-    syncSettings(): T {
-        return withDefault<T>(this.getRawSettings(), this.default)
-    }
-
-    saveSettings(): void {
-        // TODO 优化类型提示
-        const value = excludeDefault(this.ref.value as object, this.default as object)
-        if (this.type === 'generic') {
-            settings.value.common = value
-        } else {
-            settings.value[this.type][this.key] = value as object
-        }
+    unmount() {
+        this.hookCancels.forEach(fn => {
+            fn()
+        })
     }
 }
 
@@ -85,8 +101,10 @@ const GenericSettingsManager = new SettingsManager<GenericSettings>({
     type: 'generic',
     default: DEFAULT_GENERIC_SETTINGS
 })
+GenericSettingsManager.mount() // 挂载通用设置
+
 const genericSettings = GenericSettingsManager.ref
-const currRendererSettings: ComputedRef<RendererGenericSettings> = computed(() => {
+const currRendererSettings = computed<RendererGenericSettings>(() => {
     if (currRendererRef.value) {
         return currRendererRef.value.rendererSettings
     } else {

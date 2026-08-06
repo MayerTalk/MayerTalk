@@ -1,10 +1,11 @@
-import { ref, computed } from 'vue'
-import { partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
-import type { Ref } from 'vue'
+import { ref, computed, type Ref } from 'vue'
+
 import Hook from '@/lib/utils/hook'
 
-import RendererInstance from './RendererInstance.vue';
+import { partialScreenshotViewMode } from '@/components/PartialScreenshot/partialScreenshotControl'
+
 import EditorInstance from './EditorInstance.vue';
+import RendererInstance from './RendererInstance.vue';
 
 const currEditorRef = ref<InstanceType<typeof EditorInstance> | null>(null)
 const currRendererRef = ref<InstanceType<typeof RendererInstance> | null>(null)

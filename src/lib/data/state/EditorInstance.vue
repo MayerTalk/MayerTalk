@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { ComponentPublicInstance } from 'vue';
 import { ElScrollbar } from 'element-plus';
+import { ref, type ComponentPublicInstance } from 'vue'
 
 
 const SettingsDialog: ComponentPublicInstance = {} as ComponentPublicInstance
@@ -16,9 +15,7 @@ defineExpose({
 </script>
 
 <template>
-    <div/>
+    <div />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

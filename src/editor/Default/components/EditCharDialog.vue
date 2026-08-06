@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { onUnmounted, ref, useTemplateRef } from 'vue'
-import { t } from '@/lib/lang/translate'
-import SelectCharDialog from './SelectCharDialog.vue'
+import type { ElInput, UploadRawFile } from 'element-plus';
 
-import { StaticUrl, IsMobile } from '@/lib/data/constance'
-import { DataControl, images, currCharId, currCharData } from '@/lib/data/data'
+import { t } from '@/lib/lang/translate'
 import message from '@/lib/utils/message'
 import { blob2url, image2square, doAfterRefMounted } from '@/lib/utils/tool'
+
 import { dialogWidth } from '@/lib/data/width'
 import { closeShowHook } from '@/lib/data/showControl'
-import type { ElInput, UploadFile } from 'element-plus';
 import type { CharsRecord } from '@/lib/data/dataTypes';
+import { STATIC_URL, IsMobile } from '@/lib/data/constance'
+import { DataControl, images, currCharId, currCharData } from '@/lib/data/data'
+
+import SelectCharDialog from './SelectCharDialog.vue'
 
 // TODO fix 使用素材库创建角色后，短暂出现角色默认名称
 
@@ -22,10 +24,10 @@ onUnmounted(closeShowHook.on(() => {
     }
 }))
 
-const charData = ref < Partial < CharsRecord >> ({})
+const charData = ref<Partial<CharsRecord>>({})
 const createChar = ref(false)
 const defaultName = ref('')
-const inputRef = useTemplateRef < InstanceType < typeof ElInput >> ('inputRef')
+const inputRef = useTemplateRef<InstanceType<typeof ElInput>>('inputRef')
 
 const ifShowSelectChar = ref(false)
 
@@ -34,7 +36,8 @@ function open(create: boolean, data?: CharsRecord) {
     createChar.value = create
     if (create) {
         if (data) {
-            charData.value = { name: data[1], avatar: data[0] }
+            charData.value = { name: '', avatar: data.avatar }
+            defaultName.value = data.name
         } else {
             charData.value = { name: '' }
         }
@@ -61,19 +64,21 @@ function clearCharData() {
     defaultName.value = ''
 }
 
-function uploadAvatar(uploadFile) {
+function uploadAvatar(uploadFile: UploadRawFile) {
     // 上传头像
     const url = blob2url(uploadFile)
     if (url) {
         const image = new Image()
         image.onload = () => {
+            console.log('Image loaded');
+
             image2square(image).toBlob((blob) => {
                 if (blob) {
                     DataControl.images.new(blob, (id) => {
                         if (charData.value.avatar) {
                             DataControl.images.delete(charData.value.avatar)
-                            charData.value.avatar = id
                         }
+                        charData.value.avatar = id
                     })
                 }
             })
@@ -94,7 +99,6 @@ function editChar() {
             charData.value.name = defaultName.value
         }
         if (charData.value.avatar === undefined) {
-            // TODO add translation
             message.notify(t.value.notify.avatarIsRequired, message.error)
             return
         }
@@ -116,11 +120,11 @@ function editChar() {
     }
 }
 
-function handleSelect(char:{avatar:string, name:string}) {
+function handleSelect(char: { avatar: string, name: string }) {
     if (charData.value.avatar) {
         DataControl.images.delete(charData.value.avatar)
     }
-    [charData.value.avatar, defaultName.value] = ['avatar','name'].map((key) => char[key])
+    [charData.value.avatar, defaultName.value] = ['avatar', 'name'].map((key) => char[key])
 }
 
 function handleInputEnter() {
@@ -141,15 +145,15 @@ defineExpose({
 </script>
 
 <template>
-    <el-dialog v-model="ifShow" :title="createChar ? t.action.createCharacter : t.action.editCharacter" :width="dialogWidth"
-        @closed="() => { DataControl.save('chars'); clearCharData() }">
+    <el-dialog v-model="ifShow" :title="createChar ? t.action.createCharacter : t.action.editCharacter"
+        :width="dialogWidth" @closed="() => { DataControl.save('chars'); clearCharData() }">
         <div style="display: flex; flex-wrap: wrap">
             <div style="width: 100%; display: flex;">
                 <el-upload action="#" drag :show-file-list="false" class="avatar-uploader"
                     accept="image/png, image/jpeg, image/gif"
-                    :before-upload="(file: UploadFile) => { defaultName = ''; return uploadAvatar(file)}">
+                    :before-upload="(file: UploadRawFile) => { defaultName = ''; return uploadAvatar(file) }">
                     <div class="container"><img v-if="charData.avatar" alt=""
-                            :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : StaticUrl + charData.avatar" />
+                            :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : STATIC_URL + charData.avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
                             <IconPlus />
                         </el-icon>
