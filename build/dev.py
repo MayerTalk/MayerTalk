@@ -60,15 +60,21 @@ info = {
     'tag': argv('tag') or tag
 }
 
-with open(os.path.join('src', 'AnnounceDialog.git.vue'), mode='rt', encoding='utf-8') as f:
+with open(os.path.join('build', 'templates', 'AnnounceDialog.git.vue'), mode='rt', encoding='utf-8') as f:
     announce_git = f.read()
-with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
-    f.write(announce_git)
+with open(os.path.join('src', 'AnnounceDialog.vue'), mode='rt', encoding='utf-8') as f:
+    original = f.read()
+try:
+    with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
+        f.write(announce_git)
 
-with open(os.path.join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
-    f.write(f'export default {json.dumps(info)}')
+    with open(os.path.join('src', 'info.dev.ts'), mode='wt', encoding='utf-8') as f:
+        f.write(f'export default {json.dumps(info)}')
 
-os.system(f'npm run build-only -- --base=/{version}/')
+    os.system(f'npm run build-only -- --base=/{version}/')
+finally:
+    with open(os.path.join('src', 'AnnounceDialog.vue'), mode='wt', encoding='utf-8') as f:
+        f.write(original)
 
 with open(os.path.join('dist', 'info.json'), mode='wt', encoding='utf-8') as f:
     json.dump(info, f, ensure_ascii=False)
