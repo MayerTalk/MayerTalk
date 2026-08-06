@@ -124,7 +124,9 @@ function handleSelect(char: { avatar: string, name: string }) {
     if (charData.value.avatar) {
         DataControl.images.delete(charData.value.avatar)
     }
-    [charData.value.avatar, defaultName.value] = ['avatar', 'name'].map((key) => char[key])
+    const { avatar, name } = char
+    charData.value.avatar = avatar
+    defaultName.value = name
 }
 
 function handleInputEnter() {

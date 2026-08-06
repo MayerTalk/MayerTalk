@@ -138,10 +138,11 @@ function openOtherDialog(show: Ref<boolean> | null) {
                 <IconCoffeeCup />
             </el-icon>
             <div>
-                <p v-for="key in ['screenshot', 'empty', 'withdraw', 'redo', 'goto']" :key="key"> {{
+                <p v-for="key in ['screenshot', 'empty', 'withdraw', 'redo', 'goto'] as const" :key="key"> {{
                     t.action[key]
                 }}</p>
-                <p v-for="key in ['announcement', 'guide', 'settings', 'about']" :key="key"> {{ t.noun[key] }}</p>
+                <p v-for="key in ['announcement', 'guide', 'settings', 'about'] as const" :key="key"> {{ t.noun[key] }}
+                </p>
             </div>
         </div>
     </div>

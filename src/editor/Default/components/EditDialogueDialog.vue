@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onUnmounted, ref, useTemplateRef } from 'vue'
+import type { Component } from 'vue'
 import type { ElInput, UploadRawFile } from 'element-plus'
 
 import { t } from '@/lib/lang/translate'
@@ -34,6 +35,7 @@ let currType: keyof typeof CHAT_DEFAULT
 const Editor = {
     option: OptionDialog
 }
+const EditorDict: Partial<Record<keyof typeof CHAT_DEFAULT, Component>> = Editor
 
 function open(index: number) {
     editDialogue.value = true
@@ -41,7 +43,7 @@ function open(index: number) {
     assertNonValue(dialogueData.value, 'dialogueData')
     currType = dialogueData.value.type as keyof typeof CHAT_DEFAULT
     ifShow.value = true
-    if (CHAT_SERIES[dialogueData.value.type] === 'Text' && !IsMobile) {
+    if (CHAT_SERIES[dialogueData.value.type as keyof typeof CHAT_DEFAULT] === 'Text' && !IsMobile) {
         doAfterRefMounted(inputRef, (r) => {
             r.value.focus()
         })
@@ -72,10 +74,10 @@ function handleClose() {
     DataControl.save('chats')
 }
 
-function handleChangeType(value) {
+function handleChangeType(value: keyof typeof CHAT_DEFAULT) {
     // 当类型数据格式不同时，重置为默认值
     if (dialogueData.value && CHAT_SERIES[currType] !== CHAT_SERIES[value]) {
-        dialogueData.value.content = CHAT_DEFAULT[dialogueData.value.type]
+        dialogueData.value.content = CHAT_DEFAULT[dialogueData.value.type as keyof typeof CHAT_DEFAULT]
     }
     currType = value
 }
@@ -130,7 +132,8 @@ defineExpose({
     <el-dialog v-model="ifShow" :title="editDialogue ? t.action.editChat : t.action.insertChat" :width="dialogWidth"
         @closed="handleClose" :before-close="editDialogue ? null : ensureClose">
         <template v-if="dialogueData">
-            <component v-if="Editor[dialogueData.type]" :is="Editor[dialogueData.type]"
+            <component v-if="EditorDict[dialogueData.type as keyof typeof CHAT_DEFAULT]"
+                :is="EditorDict[dialogueData.type as keyof typeof CHAT_DEFAULT]"
                 v-model="dialogueData.content" />
                 <!-- ↑假报错，typescript检查能通过 -->
             <el-upload v-else-if="dialogueData.type === 'image'" action="#" drag :show-file-list="false"

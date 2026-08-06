@@ -96,7 +96,7 @@ defineExpose({
             <div class="avatar-bar" ref="avatarBarRef">
                 <template v-if="!searchResult">
                     <!-- 无搜索时默认角色 -->
-                    <div class="frame" v-for="char in defaultChar" :key="char[1]"
+                    <div class="frame" v-for="char in defaultChar" :key="char.name"
                         :style="{ width: avatarBarFrameWidth, height: avatarBarFrameWidth }">
                         <img :src="STATIC_URL + char.avatar" loading="lazy" :title="char.name"
                             @click="() => { $emit('select', char) }">

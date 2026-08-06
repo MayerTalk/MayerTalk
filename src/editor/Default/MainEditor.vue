@@ -163,10 +163,8 @@ const ResizeWindow = {
                 this.time = w / max
             }
         }
-        for (const key in this.size) {
-            if (Object.prototype.hasOwnProperty.call(this.size, key)) {
-                rendererWidth.value[key] = this.get(this.size[key])
-            }
+        for (const key of Object.keys(this.size) as Array<keyof typeof this.size>) {
+            rendererWidth.value[key] = this.get(this.size[key])
         }
     }
 }
@@ -298,7 +296,7 @@ onUnmounted(cutPointFocusHook.on((id) => {
     scroll.value.setScrollTop(getDialogue(id).offsetTop - window.innerHeight / 2 + getDialogue(id).offsetHeight)
 }))
 
-function handleEditDialogue(index) {
+function handleEditDialogue(index: number) {
     if (cutPointViewMode.value && cutPointQuickEditMode.value) {
         const data = chats.value[index].data
         if (Object.prototype.hasOwnProperty.call(data, 'cutPoint') && data.cutPoint) {
@@ -314,6 +312,10 @@ function handleEditDialogue(index) {
     } else {
         ensureValue(EditDialogueRef.value, 'EditDialogueRef').open(index)
     }
+}
+
+function handleScroll(v: { scrollTop: number }) {
+    currScrollTop.value = v.scrollTop
 }
 
 let beforePartialScreenshotScrollTop = 0
@@ -349,9 +351,9 @@ defineExpose({
     <div id="body" :style="{ background: currRendererSettings.background }">
         <PermanentSelectChar @select="char => ensureValue(EditCharRef, 'EditCharRef').open(true, char)" />
         <div style="flex-grow: 1; width: 100%; transition: all ease 0.6s;position: relative">
-            <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="(v) => { currScrollTop = v.scrollTop }">
+            <el-scrollbar :height="scrollHeight" ref="scroll" @scroll="handleScroll">
                 <div class="body" id="renderer-body">
-                    <component :is="Renderers[config.renderer]" ref="currRendererRef" @edit="handleEditDialogue"
+                    <component :is="Renderers[config.renderer as keyof typeof Renderers]" ref="currRendererRef" @edit="handleEditDialogue"
                         @delete="deleteDialogue" @plus1="copyDialogue" />
                 </div>
             </el-scrollbar>
