@@ -113,7 +113,7 @@ function sortByLength(a: CharacterData, b: CharacterData, lang: LangType) {
 
 function sortBySeries(a: CharacterData, b: CharacterData) {
     // 按系列排序
-    return (TagSort[a.series] || 100) - (TagSort[b.series] || 100)
+    return (TagSort[a.series as keyof typeof TagSort] || 100) - (TagSort[b.series as keyof typeof TagSort] || 100)
 }
 
 function sortByTag(a: CharacterData, b: CharacterData) {
@@ -122,7 +122,7 @@ function sortByTag(a: CharacterData, b: CharacterData) {
         if (a.tags[i] === b.tags[i]) {
             continue
         }
-        return TagSort[a.tags[i]] - TagSort[b.tags[i]]
+        return TagSort[a.tags[i] as keyof typeof TagSort] - TagSort[b.tags[i] as keyof typeof TagSort]
     }
     return 0
 }
@@ -368,12 +368,11 @@ class SearchManager {
             for (const charId in CharDict) {
                 if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
                     const char = CharDict[charId]
-                    for (const lang in char.names) {
-                        if (Object.prototype.hasOwnProperty.call(char.names, lang)) {
-                            if (char.names[lang].indexOf(searchLower) !== -1) {
-                                list.push(charId)
-                                break
-                            }
+                    for (const lang of Object.keys(char.names) as LangType[]) {
+                        const name = char.names[lang]
+                        if (name && name.indexOf(searchLower) !== -1) {
+                            list.push(charId)
+                            break
                         }
                     }
                 }

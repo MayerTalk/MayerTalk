@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AxiosResponse, AxiosError, Canceler } from 'axios'
+import type { AxiosRequestConfig, AxiosResponse, AxiosError, Canceler } from 'axios'
 
 axios.defaults.withCredentials = false
 
@@ -36,25 +36,24 @@ export default class Requests {
 
         const post = ['PUT', 'POST', 'PATCH'].indexOf(method.toUpperCase()) >= 0
 
-        const params = post ? 'data' : 'params'
         const payload = post && options.json ? JSON.stringify(data) : data
         const headers = {
             'Content-Type': 'application/json',
             ...options.headers || {}
         }
 
-        const config = {
+        const config: AxiosRequestConfig = {
             url: (options.host || this.host) + url,
-            method,
+            method: method as AxiosRequestConfig['method'],
             headers,
             cancelToken: new axios.CancelToken(cancel => {
                 this.cancelTokens.push({ cancel })
-            }),
-            [params]: payload
+            })
         }
-
-        for (const name in headers) {
-            config.headers[name] = headers[name]
+        if (post) {
+            config.data = payload
+        } else {
+            config.params = payload
         }
 
         axios<T>(config)

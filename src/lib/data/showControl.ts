@@ -14,11 +14,9 @@ const mainShow = {
 const closeShowHook = new Hook()
 
 closeShowHook.on(() => {
-    for (const key in mainShow) {
-        if (Object.prototype.hasOwnProperty.call(mainShow, key)) {
-            if (mainShow[key].value) {
-                mainShow[key].value = false
-            }
+    for (const [, value] of Object.entries(mainShow)) {
+        if (value.value) {
+            value.value = false
         }
     }
 })

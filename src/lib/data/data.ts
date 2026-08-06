@@ -26,14 +26,6 @@ const currCharData = ref<CharsRecord | null>(null)
 const currDialogueIndex = ref(0)
 const currDialogueData = ref<DT.ChatsRecord | null>(null)
 
-const Data = {
-    config,
-    settings,
-    chars,
-    chats,
-    images
-}
-
 class Storage<T extends object> {
     key: DT.StorageKey
     obj: Ref<T>
@@ -69,21 +61,24 @@ class Storage<T extends object> {
         }
     }
 
-    load(): [T, (newData?: T) => boolean] | undefined {
+    load(): { data: T, setter: (newData?: T) => boolean } | undefined {
         try {
             const dataStr = localStorage.getItem('data.' + this.key)
             const data: T = dataStr ? JSON.parse(dataStr) : copy(this.obj.value)
-            return [data, (newData?: T) => {
-                const currData = newData || data
-                if (bool(currData)) {
-                    this.obj.value = currData
-                    this.lastSave = JSON.stringify(currData)
-                    this.update = false
-                    return true
-                } else {
-                    return false
+            return {
+                data,
+                setter: (newData?: T) => {
+                    const currData = newData || data
+                    if (bool(currData)) {
+                        this.obj.value = currData
+                        this.lastSave = JSON.stringify(currData)
+                        this.update = false
+                        return true
+                    } else {
+                        return false
+                    }
                 }
-            }]
+            }
         } catch (e) {
             console.error(e)
             return undefined
@@ -351,17 +346,12 @@ const DataControl = new class DataControl {
             }
         }
 
-        for (const key in Data) {
-            if (Object.prototype.hasOwnProperty.call(Data, key)) {
-                if (key === 'images') {
-                    const storage = new ImageStorage(key, Data[key])
-                    this.storage[key] = storage
-                    this.images = storage
-                } else {
-                    this.storage[key] = new Storage(key as DT.StorageKey, Data[key])
-                }
-            }
-        }
+        this.storage.config = new Storage<DT.ConfigData>('config', config)
+        this.storage.settings = new Storage<DT.SettingsData>('settings', settings)
+        this.storage.chars = new Storage<DT.CharsData>('chars', chars)
+        this.storage.chats = new Storage<DT.ChatsData>('chats', chats)
+        this.storage.images = new ImageStorage('images', images)
+        this.images = this.storage.images
     }
 
     getCharAvatar(char: CharsRecord) {
@@ -390,9 +380,9 @@ const DataControl = new class DataControl {
 
     getNeedUpdate() {
         const updateList: Array<DT.StorageKey> = []
-        for (const key in this.storage) {
-            if (Object.prototype.hasOwnProperty.call(this.storage, key) && this.storage[key].update) {
-                updateList.push(key as DT.StorageKey)
+        for (const key of Object.keys(this.storage) as DT.StorageKey[]) {
+            if (this.storage[key].update) {
+                updateList.push(key)
             }
         }
         return updateList
@@ -439,17 +429,18 @@ const DataControl = new class DataControl {
         // 当储存版本与最新版本相同时，直接读取数据
         const data: Partial<DT.DataType> = {}
         const setDict: Partial<Record<DT.StorageKey, () => void>> = {}
-        for (const key in this.storage) {
-            if (Object.prototype.hasOwnProperty.call(this.storage, key)) {
-                if (key !== 'images') {
-                    const res = this.storage[key as DT.StorageKey].load()
-                    if (res) {
-                        const [d, set] = res
-                        data[key] = d
-                        setDict[key] = set
-                        // 进行默认设置
-                        set()
-                    }
+        for (const key of Object.keys(this.storage) as DT.StorageKey[]) {
+            if (key !== 'images') {
+                const storage = this.storage[key] as Storage<object>
+                const loadResult: { data: object, setter: (newData?: object) => boolean } | undefined = storage.load()
+                if (loadResult) {
+                    const d = loadResult.data
+                    const setter = loadResult.setter
+                    const dataRecord: Record<DT.StorageKey, unknown> = data as Record<DT.StorageKey, unknown>
+                    dataRecord[key] = d
+                    setDict[key] = setter
+                    // 进行默认设置
+                    setter()
                 }
             }
         }
@@ -469,9 +460,13 @@ const DataControl = new class DataControl {
     }
 
     set(data: Partial<DT.DataType>, internal = false) {
-        for (const key in this.storage) {
-            if (Object.prototype.hasOwnProperty.call(this.storage, key) && Object.prototype.hasOwnProperty.call(data, key)) {
-                this.storage[key].set(data[key], internal)
+        for (const key of Object.keys(this.storage) as DT.StorageKey[]) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                if (key === 'images') {
+                    this.storage.images.set(data.images!, internal)
+                } else {
+                    (this.storage[key] as Storage<object>).set(data[key]!)
+                }
                 this.storage[key].update = true
             }
         }

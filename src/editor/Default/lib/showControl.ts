@@ -13,11 +13,9 @@ closeShowHook.on(() => {
     if (mobileView.value && defaultShow.sidebar.value) {
         defaultShow.sidebar.value = false
     }
-    for (const key in defaultShow) {
-        if (key !== 'sidebar' && Object.prototype.hasOwnProperty.call(defaultShow, key)) {
-            if (defaultShow[key].value) {
-                defaultShow[key].value = false
-            }
+    for (const [key, value] of Object.entries(defaultShow)) {
+        if (key !== 'sidebar' && value.value) {
+            value.value = false
         }
     }
 })

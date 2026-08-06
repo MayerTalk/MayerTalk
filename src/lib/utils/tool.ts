@@ -221,30 +221,25 @@ function parseFilename(filename: string): string {
 function withDefault<T extends object>(value: object, defaultValue: Readonly<T>): T {
     const result: T = {} as T
 
-    for (const key in value) {
-        if (!hasOwn(value, key)) continue
-        const v = value[key]
-
+    for (const [key, v] of Object.entries(value)) {
         if (isObject(v) && hasOwn(defaultValue, key)) {
-            const defaultValueVal = v[key]
+            const defaultValueVal = (defaultValue as Record<string, unknown>)[key]
             if (isObject(defaultValueVal)) {
-                result[key] = withDefault(v, defaultValueVal)
+                result[key as keyof T] = withDefault(v, defaultValueVal) as T[keyof T]
             } else {
-                result[key] = v as typeof defaultValueVal
+                result[key as keyof T] = v as T[keyof T]
             }
         } else {
-            result[key] = v
+            result[key as keyof T] = v as T[keyof T]
         }
     }
 
-    for (const key in defaultValue) {
-        if (!hasOwn(defaultValue, key)) continue
-
+    for (const key of Object.keys(defaultValue) as Array<keyof T>) {
         if (Object.prototype.hasOwnProperty.call(result, key)) {
             const resultVal = result[key]
             const defaultValueVal = copy(defaultValue[key])
             if (isObject(resultVal) && isObject(defaultValueVal)) {
-                result[key] = withDefault(resultVal, defaultValueVal) as typeof defaultValueVal
+                result[key] = withDefault(resultVal, defaultValueVal) as T[keyof T]
             }
         } else {
             result[key] = copy(defaultValue[key])
@@ -254,17 +249,15 @@ function withDefault<T extends object>(value: object, defaultValue: Readonly<T>)
 }
 
 function excludeDefault<T>(value: object, defaultValue: Readonly<object>): T {
-    const result = copy(value)
+    const result = copy(value) as Record<string, unknown>
 
-    for (const key in result) {
-        if (!hasOwn(value, key)) continue
-        const resultVal = result[key]
-        const defaultValueVal = defaultValue[key]
+    for (const [key, resultVal] of Object.entries(result)) {
+        const defaultValueVal = (defaultValue as Record<string, unknown>)[key]
         if (isObject(resultVal) && hasOwn(defaultValue, key) && isObject(defaultValueVal)) {
-            const processed = excludeDefault(resultVal, defaultValueVal)
+            const processed = excludeDefault<object>(resultVal, defaultValueVal)
             result[key] = processed
 
-            if (Object.keys(processed as object).length === 0) {
+            if (Object.keys(processed).length === 0) {
                 delete result[key]
             }
         } else if (resultVal === defaultValueVal) {
