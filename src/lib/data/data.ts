@@ -95,7 +95,7 @@ class ImageStorage {
     obj: Ref<DT.ImagesData>
     lastSave: string
     update: boolean
-    db: DataBase<DT.ImagesRecord>
+    db: DataBase
     loadedCallback?: (data: DT.ImagesData, set: (newData?: DT.ImagesData) => boolean) => void
 
 
@@ -105,11 +105,9 @@ class ImageStorage {
         this.lastSave = JSON.stringify(obj.value)
         this.update = false
         this.db = new DataBase('data', 'images')
-        this.db.open((event) => {
-            const target = event.target as IDBOpenDBRequest
-            const conn = target.result
-            if (!conn.objectStoreNames.contains('images')) {
-                conn.createObjectStore('images', { keyPath: 'id' })
+        this.db.open((db) => {
+            if (!db.objectStoreNames.contains('images')) {
+                db.createObjectStore('images', { keyPath: 'id' })
             }
         }, () => {
             this.load()

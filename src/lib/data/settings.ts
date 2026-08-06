@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from 'vue'
+import { computed, shallowRef, type Ref } from 'vue'
 
 import { withDefault, excludeDefault } from '@/lib/utils/tool'
 
@@ -46,7 +46,7 @@ class SettingsManager<T extends object> {
         this.type = options.type
         this.key = options.key || ''
         this.default = options.default
-        this.ref = ref(null) as unknown as Ref<T>
+        this.ref = shallowRef(withDefault<T>(this.getRawSettings(), this.default))
         this.syncSettings()
         this.hookCancels = []
     }

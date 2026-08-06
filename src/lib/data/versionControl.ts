@@ -22,6 +22,27 @@ interface VersionSwitcherOption {
     load?: boolean
 }
 
+interface OldSettingsV6 {
+    maxHeight?: number
+    autoCut?: boolean
+    manualCut?: boolean
+    watermark?: boolean
+    author?: string
+    width?: number
+    scale?: number
+    characterSelectorPermanent?: boolean
+    background?: string
+    showCharName?: boolean
+    showCharNameSettings?: boolean
+    [key: string]: unknown
+}
+
+interface NewSettingsV6 {
+    generic: Record<string, unknown>
+    editor: { Default: Record<string, unknown> }
+    renderer: { Siracusa: Record<string, unknown> }
+}
+
 const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOption) => string> = {
     a: (data) => {
         // v0.0.5 -> v0.1.0 / a -> b
@@ -119,31 +140,30 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
     f: (data, opt) => {
         // v0.2.2 -> v0.2.3 / f -> g
         // settings
-        const oldSettings = copy(data.settings)
-        const newSettings = copy(defaultSettings)
+        const oldSettings = copy(data.settings) as unknown as OldSettingsV6
+        const newSettings = copy(defaultSettings) as unknown as NewSettingsV6
+        newSettings.editor.Default = {}
+        newSettings.renderer.Siracusa = {}
         const commonKey = ['maxHeight', 'autoCut', 'manualCut', 'watermark', 'author', 'width']
         const editorKey = ['characterSelectorPermanent']
         const rendererKey = ['background', 'showCharName', 'showCharNameSettings']
-        const group: Array<[Array<string>, object]> = [
-            // @ts-expect-error 旧数据
-            [commonKey, newSettings.common],
-            [editorKey, (newSettings.editor as { Default: object }).Default],
-            [rendererKey, (newSettings.renderer as { Siracusa: object }).Siracusa]
+        const group: Array<[Array<string>, Record<string, unknown>]> = [
+            [commonKey, newSettings.generic],
+            [editorKey, newSettings.editor.Default],
+            [rendererKey, newSettings.renderer.Siracusa]
         ]
-        for (const key in oldSettings) {
+        for (const key of Object.keys(oldSettings)) {
             for (let i = 0; i < group.length; i++) {
                 if (group[i][0].indexOf(key) !== -1) {
-                    (group[i][1] as Record<string, unknown>)[key] = (oldSettings as unknown as Record<string, unknown>)[key]
+                    group[i][1][key] = oldSettings[key]
                 }
             }
         }
-        if (Object.prototype.hasOwnProperty.call(oldSettings, 'scale')) {
-            // @ts-expect-error 旧数据
-            (newSettings.common as unknown as {
-                imageQuality: number
-            }).imageQuality = +((oldSettings as unknown as { scale: number }).scale / 1.5).toFixed(2)
+        const scale = oldSettings.scale
+        if (scale !== undefined) {
+            newSettings.generic.imageQuality = +(scale / 1.5).toFixed(2)
         }
-        data.settings = newSettings
+        data.settings = newSettings as unknown as DT.SettingsData
         if (opt.load) {
             saveData('data.settings', data.settings)
         }

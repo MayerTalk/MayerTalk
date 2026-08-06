@@ -19,13 +19,12 @@ interface DataRecord {
 
 const Save = class Save {
     // TODO 优化多库类型提示
-    db: DataBase<unknown>
+    db: DataBase
     saved: boolean
 
     constructor(db = 'savefile') {
         this.db = new DataBase(db, '')
-        this.db.open((event) => {
-            const db = (event.target as unknown as { result: IDBDatabase }).result
+        this.db.open((db) => {
             if (!db.objectStoreNames.contains('info')) {
                 db.createObjectStore('info', { keyPath: 'id' })
             }
@@ -59,8 +58,9 @@ const Save = class Save {
     save(id: string, callback?: () => void) {
         const data = getDataJson()
         const time = Date.now()
-        this.db.get(id, 'info').onsuccess = (event) => {
-            const name = (event.target as unknown as { result: InfoRecord }).result.name
+        const infoRequest = this.db.get<InfoRecord>(id, 'info')
+        infoRequest.onsuccess = () => {
+            const name = infoRequest.result.name
             this.db.put({ id, size: JSON.stringify(data).length, time, name }, 'info').onsuccess = () => {
                 if (callback) {
                     callback()
@@ -72,8 +72,9 @@ const Save = class Save {
     }
 
     load(id: string, callback?: () => void) {
-        this.db.get(id, 'data').onsuccess = (event) => {
-            const data = (event.target as unknown as { result: DataRecord }).result.data
+        const dataRequest = this.db.get<DataRecord>(id, 'data')
+        dataRequest.onsuccess = () => {
+            const data = dataRequest.result.data
             switchVersion(data)
             DataControl.set(data, true)
             DataControl.save()
@@ -96,8 +97,9 @@ const Save = class Save {
 
     getInfo(callback: (data: Record<string, InfoRecord>) => void) {
         const data: Record<string, InfoRecord> = {}
-        this.db.transaction('info').openCursor().onsuccess = (event) => {
-            const cursor = (event.target as unknown as { result: IDBCursorWithValue }).result
+        const request = this.db.transaction('info').openCursor()
+        request.onsuccess = () => {
+            const cursor = request.result
             if (cursor) {
                 data[cursor.value.id] = cursor.value
                 cursor.continue()
