@@ -29,9 +29,9 @@ function clear() {
     const typeGroup:Array<string> = []
     for (let i = 0; i < data.length; i++) {
         if (['chats', 'chars'].indexOf(data[i]) === -1) {
-            typeGroup.push(t.value.noun[data[i]])
+            typeGroup.push(t.value.noun[data[i] as keyof typeof t.value.noun])
         } else {
-            typeGroup.push(t.value.noun[data[i].slice(0, -1)])
+            typeGroup.push(t.value.noun[data[i].slice(0, -1) as keyof typeof t.value.noun])
         }
     }
     message.confirm(t.value.notify.aboutToClear + ' ' + typeGroup.join(', '), t.value.noun.hint, () => {

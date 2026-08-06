@@ -355,6 +355,7 @@ function screenshot() {
     })
 }
 
+let lastExpectCutNumber = 0
 const expectCutNumber = computed(() => {
     assertNonValue(screenshotNode, 'screenshotNode')
     const heights: Array<number> = []
@@ -366,7 +367,7 @@ const expectCutNumber = computed(() => {
                 // 多截图导致realMaxHeight变动，而此时部分dialogue被移出，无法获取
                 // 返回最后可用值
                 // TODO 获取是否正在截图 / 优化截图流程
-                return expectCutNumber.value
+                return lastExpectCutNumber
             }
             parts.push(dialogueOffsetTop(el) + el.offsetHeight)
         }
@@ -387,12 +388,15 @@ const expectCutNumber = computed(() => {
             cutNumber += Math.ceil(heights[i] / realMaxHeight.value)
         }
         if (cutNumber > chats.value.length) {
-            return chats.value.length
+            lastExpectCutNumber = chats.value.length
+            return lastExpectCutNumber
         } else {
-            return cutNumber
+            lastExpectCutNumber = cutNumber
+            return lastExpectCutNumber
         }
     } else {
-        return heights.length
+        lastExpectCutNumber = heights.length
+        return lastExpectCutNumber
     }
 })
 
@@ -438,7 +442,7 @@ const wordCount = computed(() => {
     let count = 0
     for (let i = 0; i < chats.value.length; i++) {
         const chat = chats.value[i]
-        const type = CHAT_SERIES[chat.type]
+        const type = CHAT_SERIES[chat.type as keyof typeof CHAT_SERIES]
         if (type === 'Text') {
             count += chat.content.length
         } else if (type === 'TextArray') {

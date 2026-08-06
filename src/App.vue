@@ -19,7 +19,7 @@ import SettingsDialog from '@/components/Settings/SettingsDialog.vue'
     <SettingsDialog/>
     <SavefileDialog/>
     <!--main components end-->
-    <component :is="Editors[config.editor]" ref="currEditorRef"/>
+    <component :is="Editors[config.editor as keyof typeof Editors]" ref="currEditorRef"/>
 </template>
 
 <style src="@/style/font.css"></style>

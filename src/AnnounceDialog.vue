@@ -199,7 +199,7 @@ const version = 'v0.2.3'
             <h3>
                 {{ version }}
             </h3>
-            <template v-for="key in ['feat', 'optimize', 'fix']" :key="key">
+            <template v-for="key in ['feat', 'optimize', 'fix'] as const" :key="key">
                 <template v-if="ANNOUNCEMENT_TRANSLATION.zh_CN[key]">
                     <b>{{ t.announcement.key[key] }}</b>
                     <ul>

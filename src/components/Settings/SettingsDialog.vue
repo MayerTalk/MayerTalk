@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { UploadRawFile } from 'element-plus'
 
 import message from '@/lib/utils/message'
 import Save from '@/lib/function/savefile'
@@ -20,6 +21,8 @@ import SettingsNumberInput from '@/components/Settings/SettingsNumberInput.vue';
 
 
 const storageSize = ref(t.value.notify.calculating + '...')
+const editorKeys = Object.keys(Editors) as Array<keyof typeof Editors>
+const rendererKeys = Object.keys(Renderers) as Array<keyof typeof Renderers>
 
 function getStorageSize() {
     let size = 0
@@ -68,7 +71,7 @@ function clearStorage() {
                         <th>{{ t.noun.editor }}</th>
                         <td>
                             <el-select v-model="config.editor">
-                                <el-option v-for="key in Object.keys(Editors)" :key="key" :value="key"
+                                <el-option v-for="key in editorKeys" :key="key" :value="key"
                                     :label="t.name.editor[key]" />
                             </el-select>
                         </td>
@@ -77,7 +80,7 @@ function clearStorage() {
                         <th>{{ t.noun.renderer }}</th>
                         <td>
                             <el-select v-model="config.renderer">
-                                <el-option v-for="key in Object.keys(Renderers)" :key="key" :value="key"
+                                <el-option v-for="key in rendererKeys" :key="key" :value="key"
                                     :label="t.name.renderer[key]" />
                             </el-select>
                         </td>
@@ -147,7 +150,7 @@ function clearStorage() {
                     </el-icon>
                     {{ t.action.import }}
                     <el-upload id="uploadData" action="#" :show-file-list="false" accept="application/json"
-                        :before-upload="(file) => uploadData(file, () => { mainShow.settings.value = false })"
+                        :before-upload="(file: UploadRawFile) => uploadData(file, () => { mainShow.settings.value = false })"
                         style="position: absolute" hidden>
                     </el-upload>
                 </el-button>

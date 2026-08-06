@@ -61,11 +61,11 @@ const on = {
         }
     },
 
-    afterLeave(el) {
+    afterLeave(el: CollapseItem) {
         reset(el)
     },
 
-    leaveCancelled(el) {
+    leaveCancelled(el: CollapseItem) {
         reset(el)
     }
 }
