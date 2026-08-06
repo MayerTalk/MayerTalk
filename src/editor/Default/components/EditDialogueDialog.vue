@@ -150,8 +150,7 @@ defineExpose({
                 </div>
             </el-upload>
             <el-input v-else v-model="dialogueData.content" :autosize="{ minRows: 1, maxRows: 5 }" resize="none"
-                type="textarea" :disabled="dialogueData.type === 'image'" ref="inputRef"
-                @keydown.ctrl.enter="ifShow = false"></el-input>
+                type="textarea" ref="inputRef" @keydown.ctrl.enter="ifShow = false"></el-input>
             <div class="edit-bar" style="margin-top: 5px">
                 <div style="width: calc(50% - 2px); display: flex">
                     <CharSelector v-model="dialogueData.char as string" narration />

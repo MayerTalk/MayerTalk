@@ -1,7 +1,9 @@
-import { ChatType } from '@/lib/data/constance.ts';
+import type { ChatType } from './dialogue';
 import { GenericSettings } from '@/lib/data/settings';
 import { ImageStorage, Storage } from '@/lib/data/data';
 import type { SupportLangKey } from '@/lib/lang/constant';
+
+export type { ChatType };
 
 export interface CharsRecord {
     name: string,
@@ -12,19 +14,6 @@ export interface CharsRecord {
 export interface CharsData {
     [id: string]: CharsRecord
 }
-
-export interface ChatType {
-    chat: string
-    monologue: string
-    image: string
-    option: Array<[string, string]> // uuid() 返回字符串
-    select: string
-    title: string
-}
-
-/*
-TODO: 优化ChatsRecord类型定义，新建dialogue.ts文件，从常量定义中自动生成类型定义
-*/
 
 export type ChatsRecord = {
     [T in keyof ChatType]: {

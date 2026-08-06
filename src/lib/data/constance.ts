@@ -1,15 +1,14 @@
 import { uuid } from '@/lib/utils/tool'
-import type { ChatType } from './dataTypes';
 
 const STATIC_URL = 'https://static.mayertalk.top/'
 
 const SUPPORT_LANG = ['zh_CN', 'zh_TW', 'ja_JP', 'en_US'] as const
 
-const CHAT_DEFAULT: Readonly<ChatType> = {
+const CHAT_DEFAULT = {
     chat: '', // 聊天内容
     monologue: '', // 独白内容
     image: '', // 图片 URL
-    option: [[uuid(), '']], // 选项列表，每个选项包含 ID 和文本
+    option: [[uuid(), '']] as Array<[string, string]>, // 选项列表，每个选项包含 ID 和文本
     select: '', // 选择结果
     title: '' // 标题
 }
