@@ -11,7 +11,7 @@
     "compilerOptions": {
         "composite": true,
         "sourceMap": true,
-        "noImplicitAny": false, // After completing the TypeScript type annotations, remove this.
+        "noImplicitAny": true,
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
         "paths": {
             "@/*": [

@@ -133,7 +133,7 @@ const versionSwitcher: Record<string, (data: DT.DataType, opt: VersionSwitcherOp
         for (const key in oldSettings) {
             for (let i = 0; i < group.length; i++) {
                 if (group[i][0].indexOf(key) !== -1) {
-                    group[i][1][key] = oldSettings[key]
+                    (group[i][1] as Record<string, unknown>)[key] = (oldSettings as unknown as Record<string, unknown>)[key]
                 }
             }
         }
