@@ -8,7 +8,7 @@ MayerTalk is a Vue 3 + Vite + TypeScript dialogue editor. Keep all application s
 - `src/editor/` and `src/renderer/` – editor and renderer implementations.
 - `src/lib/` – data, logic, language, and utility modules.
 - `src/style/` – global styles and fonts.
-- `build/` and `scripts/` – Python build and asset-generation helpers.
+- `build/` – Python build helpers (including `build/templates/` for dev-site templates).
 - `.github/workflows/` – CI/CD pipelines for `dev` and `main`.
 
 Import from `src/` using the `@` alias (for example `@/lib/utils/tool.ts`).
