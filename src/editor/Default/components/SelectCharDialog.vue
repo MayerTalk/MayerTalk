@@ -5,13 +5,13 @@ import { t } from '@/lib/lang/translate'
 import { doAfterRefMounted } from '@/lib/utils/tool'
 
 import { dialogWidth } from '@/lib/data/width'
-import { loadSeries } from '@/lib/data/character'
+import { loadSeries, type CharacterSelectResult } from '@/lib/data/character'
 import { closeShowHook } from '@/lib/data/showControl'
 
 import SelectCharInstance from './SelectCharInstance.vue'
 
 defineEmits<{
-    select: [char: { avatar: string, name: string }]
+    select: [char: CharacterSelectResult]
 }>()
 const ifShow = defineModel<boolean>()
 const selector = useTemplateRef<InstanceType<typeof SelectCharInstance>>('selector')

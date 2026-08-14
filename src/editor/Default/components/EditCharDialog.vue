@@ -13,6 +13,7 @@ import { STATIC_URL, IsMobile } from '@/lib/data/constance'
 import { DataControl, images, currCharId, currCharData } from '@/lib/data/data'
 
 import SelectCharDialog from './SelectCharDialog.vue'
+import type { CharacterSelectResult } from '@/lib/data/character'
 
 // TODO fix 使用素材库创建角色后，短暂出现角色默认名称
 
@@ -26,18 +27,25 @@ onUnmounted(closeShowHook.on(() => {
 
 const charData = ref<Partial<CharsRecord>>({})
 const createChar = ref(false)
-const defaultName = ref('')
+// 默认名候选，按优先级排序（首个优先级最高）：选中角色名 > 远程接口返回的该角色name备选
+const defaultNames = ref<Array<string>>([])
 const inputRef = useTemplateRef<InstanceType<typeof ElInput>>('inputRef')
 
 const ifShowSelectChar = ref(false)
 
-function open(create: boolean, data?: CharsRecord) {
+function genDefaultNames(name: string, extraNames?: Array<string>) {
+    // 组合默认名候选：选中名优先，远程备选最低优先级；去空、去重、保序
+    const names = [name, ...(extraNames || [])]
+    return names.filter((item, i) => item && names.indexOf(item) === i)
+}
+
+function open(create: boolean, data?: CharsRecord & { extraNames?: Array<string> }) {
     // 启动角色编辑 create:是否创建角色
     createChar.value = create
     if (create) {
         if (data) {
             charData.value = { name: '', avatar: data.avatar }
-            defaultName.value = data.name
+            defaultNames.value = genDefaultNames(data.name, data.extraNames)
         } else {
             charData.value = { name: '' }
         }
@@ -61,7 +69,7 @@ function clearCharData() {
         DataControl.images.delete(charData.value.avatar)
     }
     charData.value = {}
-    defaultName.value = ''
+    defaultNames.value = []
 }
 
 function uploadAvatar(uploadFile: UploadRawFile) {
@@ -91,12 +99,12 @@ function uploadAvatar(uploadFile: UploadRawFile) {
 function editChar() {
     // 创建/删除角色
     if (createChar.value) {
-        if (charData.value.name === '' && !defaultName.value) {
+        if (charData.value.name === '' && !defaultNames.value.length) {
             message.notify(t.value.notify.nameIsRequired, message.error)
             return
         }
         if (charData.value.name === '') {
-            charData.value.name = defaultName.value
+            charData.value.name = defaultNames.value[0]
         }
         if (charData.value.avatar === undefined) {
             message.notify(t.value.notify.avatarIsRequired, message.error)
@@ -120,13 +128,13 @@ function editChar() {
     }
 }
 
-function handleSelect(char: { avatar: string, name: string }) {
+function handleSelect(char: CharacterSelectResult) {
     if (charData.value.avatar) {
         DataControl.images.delete(charData.value.avatar)
     }
-    const { avatar, name } = char
+    const { avatar, name, extraNames } = char
     charData.value.avatar = avatar
-    defaultName.value = name
+    defaultNames.value = genDefaultNames(name, extraNames)
 }
 
 function handleInputEnter() {
@@ -153,7 +161,7 @@ defineExpose({
             <div style="width: 100%; display: flex;">
                 <el-upload action="#" drag :show-file-list="false" class="avatar-uploader"
                     accept="image/png, image/jpeg, image/gif"
-                    :before-upload="(file: UploadRawFile) => { defaultName = ''; return uploadAvatar(file) }">
+                    :before-upload="(file: UploadRawFile) => { defaultNames = []; return uploadAvatar(file) }">
                     <div class="container"><img v-if="charData.avatar" alt=""
                             :src="Object.prototype.hasOwnProperty.call(images, charData.avatar) ? images[charData.avatar].src : STATIC_URL + charData.avatar" />
                         <el-icon v-else class="avatar-uploader-icon">
@@ -163,7 +171,7 @@ defineExpose({
                 </el-upload>
                 <div style="width: calc(100% - 100px); padding: 5px 0 0 10px">
                     {{ t.noun.name }}：
-                    <el-input v-model="charData.name" style="margin-top: 10px" :placeholder="defaultName" ref="inputRef"
+                    <el-input v-model="charData.name" style="margin-top: 10px" :placeholder="defaultNames[0]" ref="inputRef"
                         @keypress.enter="handleInputEnter"></el-input>
                     <div style="margin-top: 5px">
                         {{ t.noun.avatarPosition }}

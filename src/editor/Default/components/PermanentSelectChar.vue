@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-import { loadSeries } from '@/lib/data/character'
+import { loadSeries, type CharacterSelectResult } from '@/lib/data/character'
 
 import { ifShowPermanentSelectChar } from '@/editor/Default/lib/width'
 
@@ -9,7 +9,7 @@ import CollapseItem from '@/components/CollapseItem'
 import SelectCharInstance from '@/editor/Default/components/SelectCharInstance.vue'
 
 defineEmits<{
-    select: [char: { avatar: string, name: string }]
+    select: [char: CharacterSelectResult]
 }>()
 
 const localIfShow = ref(true)

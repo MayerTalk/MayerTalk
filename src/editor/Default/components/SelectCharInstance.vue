@@ -7,7 +7,7 @@ import { doAfterRefMounted, ensureValue } from '@/lib/utils/tool'
 
 import { dialogWidth } from '@/lib/data/width'
 import { STATIC_URL, IsMobile } from '@/lib/data/constance'
-import { SearchManager, CharDict, Suffix } from '@/lib/data/character'
+import { SearchManager, CharDict, Suffix, type CharacterSelectResult } from '@/lib/data/character'
 
 
 const { maxHeight = null } = defineProps<{
@@ -15,7 +15,7 @@ const { maxHeight = null } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    select: [char: CharSelectResult]
+    select: [char: CharacterSelectResult]
 }>()
 
 const ifShowSubSelect = ref(false)
@@ -34,14 +34,10 @@ const avatarBarFrameDialogWidth = computed(() => {
     return Math.floor((dialogWidth.value - 48) / 4) + 'px'
 })
 
-interface CharSelectResult {
-    avatar: string,
-    name: string
-}
 type CharSelect = [charId: string, charName: string]
 
-const defaultChar: Array<CharSelectResult> = function () {
-    const res: Array<CharSelectResult> = []
+const defaultChar: Array<CharacterSelectResult> = function () {
+    const res: Array<CharacterSelectResult> = []
     const characters = [
         ['avatar/arknights/doctor', t.value.character.doctor],
         ['avatar/arknights/PRTS', 'PRTS'],
@@ -78,9 +74,20 @@ function handleSelect(char: CharSelect) {
     } else {
         emit('select', {
             avatar: CharDict[char[0]].avatars[0],
-            name: char[1]
+            name: char[1],
+            extraNames: searchManager.getExtraNames(char[0])
         })
     }
+}
+
+function handleSubSelect(avatar: string) {
+    const char = ensureValue(currSelect.value, 'currSelect')
+    emit('select', {
+        avatar,
+        name: char[1],
+        extraNames: searchManager.getExtraNames(char[0])
+    })
+    ifShowSubSelect.value = false
 }
 
 defineExpose({
@@ -126,7 +133,7 @@ defineExpose({
             <div class="frame" v-for="avatar in CharDict[currSelect[0]].avatars" :key="avatar"
                 :style="{ width: avatarBarFrameDialogWidth, height: avatarBarFrameDialogWidth }">
                 <img :src="STATIC_URL + avatar" loading="lazy" :title="currSelect[1]"
-                    @click="() => { $emit('select', { avatar, name: ensureValue(currSelect, 'currSelect')[1] }); ifShowSubSelect = false }">
+                    @click="handleSubSelect(avatar)">
             </div>
         </div>
         <div v-else>

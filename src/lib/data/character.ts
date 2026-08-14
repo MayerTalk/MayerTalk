@@ -15,12 +15,26 @@ const AliasApi = new Request({ host: 'https://alias.arkfans.top/' })
 const CharDict: Record<string, CharacterData> = {}
 const loaded = new Set<string>()
 const Suffix = IsSafari ? '.png' : '.webp'
+const UnknownCharacter = 'UnknownCharacter'
 
 type CharacterRequestData = [
     names: Array<string>,
     avatars: Array<string>,
     tags: Array<string>
 ]
+
+// output=6 时搜索结果固定为 [name, id]
+type CharacterSearchData = [
+    name: string,
+    id: string
+]
+
+// 角色选择结果：avatar 为头像路径，name 为优先名称，extraNames 为远程接口返回的 name 备选（最低优先级）
+interface CharacterSelectResult {
+    avatar: string
+    name: string
+    extraNames?: Array<string>
+}
 
 const langOrder = ['zh_CN', 'zh_TW', 'py', 'fpy', 'en_US', 'ja_JP', 'code'] as const
 type LangType = typeof langOrder[number]
@@ -200,7 +214,7 @@ class Search {
         const list = new Set([...this.raw_list]);
         for (const key in this.searchManager.extraResult) {
             if (Object.prototype.hasOwnProperty.call(this.searchManager.extraResult, key)) {
-                this.searchManager.extraResult[key].forEach((charId) => list.add(charId));
+                this.searchManager.extraResult[key].forEach((item) => list.add(item[0]));
             }
         }
         this.list = Array.from(list);
@@ -217,8 +231,10 @@ class Search {
         for (let i = 0; i < this.list.length; i++) {
             const charId = this.list[i]
             // [charId, charName]
-            // 优先设置的语种，如无使用zh_CN
-            this.res.push([charId, CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN || 'UnknownCharacter'])
+            // 优先设置的语种，如无使用zh_CN；CharDict名称缺失时回退远程接口返回的name
+            const charDictName = CharDict[charId].names[this.lang] || CharDict[charId].names.zh_CN
+            const name = charDictName || this.searchManager.getExtraNames(charId)[0] || UnknownCharacter
+            this.res.push([charId, name])
         }
     }
 
@@ -289,17 +305,22 @@ class Search {
 
     handleExtraSearch(key: string, series?: string) {
         series = series || key
-        return (response: AxiosResponse<Array<CharacterRequestData>>) => {
-            const list: Array<string> = []
+        return (response: AxiosResponse<Array<CharacterSearchData>>) => {
+            // 忽略过期搜索的响应，避免污染当前搜索
+            if (this.t !== this.searchManager.searchResultFullShow) {
+                return
+            }
+            const list: Array<[charId: string, name: string]> = []
             response.data.forEach((data) => {
                 const charId = `${series}.${data[1]}`
                 if (Object.prototype.hasOwnProperty.call(CharDict, charId)) {
-                    list.push(charId)
+                    // [charId, name]，name 作为 defaultName 的低优先级备选
+                    list.push([charId, data[0]])
                 }
             })
             this.searchManager.extraResult[key] = list
             this.output()
-            if (this.showed && this.t === this.searchManager.searchResultFullShow) {
+            if (this.showed) {
                 this.searchManager.result.value = this.res
             }
         }
@@ -307,9 +328,13 @@ class Search {
 
     handleExtraSearchFail(key: string) {
         return () => {
+            // 忽略过期搜索的响应，避免误删当前搜索的数据
+            if (this.t !== this.searchManager.searchResultFullShow) {
+                return
+            }
             delete this.searchManager.extraResult[key]
             this.output()
-            if (this.showed && this.t === this.searchManager.searchResultFullShow) {
+            if (this.showed) {
                 this.searchManager.result.value = this.res
             }
         }
@@ -343,7 +368,7 @@ function parseSearch(param: string) {
 
 class SearchManager {
     result: Ref<Array<[string, string]> | null>
-    extraResult: Record<string, Array<string>>
+    extraResult: Record<string, Array<[charId: string, name: string]>>
     searchResultFullShow: number
 
 
@@ -351,6 +376,21 @@ class SearchManager {
         this.result = ref(null)
         this.extraResult = {}
         this.searchResultFullShow = 0
+    }
+
+    getExtraNames(charId: string) {
+        // 收集远程接口返回的该角色name备选（最低优先级），去重保序
+        const names: Array<string> = []
+        for (const key in this.extraResult) {
+            if (Object.prototype.hasOwnProperty.call(this.extraResult, key)) {
+                this.extraResult[key].forEach((item) => {
+                    if (item[0] === charId && names.indexOf(item[1]) === -1) {
+                        names.push(item[1])
+                    }
+                })
+            }
+        }
+        return names
     }
 
     search(param?: string) {
@@ -363,6 +403,8 @@ class SearchManager {
         const t = Date.now()
         this.searchResultFullShow = t
         if (param) {
+            // 清空上一次搜索的残留结果，避免干扰当前搜索
+            this.extraResult = {}
             const searchLower = param.toLowerCase()
             const list: Array<string> = []
             for (const charId in CharDict) {
@@ -395,9 +437,11 @@ const loadSeries = {
 
 export {
     Suffix,
+    UnknownCharacter,
     CharDict,
     loadChar,
     loadSeries,
     sortChar,
-    SearchManager
+    SearchManager,
+    type CharacterSelectResult
 }
