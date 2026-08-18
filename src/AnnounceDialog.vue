@@ -311,14 +311,9 @@ const version = 'v0.2.3'
                 {{ t.default.community }}
             </el-link>
             <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin: 0 5px;"
+            <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin-left: 5px;"
                 target="_blank">
                 Github
-            </el-link>
-            <span style="border-left: solid 1px darkgrey"></span>
-            <el-link href="https://wj.qq.com/s2/13987607/3993/" type="primary" style="margin-left: 5px;"
-                target="_blank">{{
-                    t.default.feedback }}
             </el-link>
         </div>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">咕咕</div>
