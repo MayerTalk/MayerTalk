@@ -61,7 +61,6 @@ const INVALID_BROWSER_TRANSLATION: Record<SupportLangKey, InvalidTranslation> = 
 
 interface DefaultTranslation {
     announcement: string
-    develop: string
     quicklyStart: string
     community: string
     feedback: string
@@ -71,7 +70,6 @@ interface DefaultTranslation {
 const DEFAULT_TRANSLATION: Record<SupportLangKey, DefaultTranslation> = {
     zh_CN: {
         announcement: '公告',
-        develop: '开发阶段，功能尚不完善，还请谅解',
         quicklyStart: '快速上手 (首次使用推荐阅读)',
         community: '交流群：560295639',
         feedback: '反馈',
@@ -79,7 +77,6 @@ const DEFAULT_TRANSLATION: Record<SupportLangKey, DefaultTranslation> = {
     },
     zh_TW: {
         announcement: '公告',
-        develop: '開發階段，功能尚不完善，還請諒解',
         quicklyStart: '快速上手 (首次使用推薦閱讀)',
         community: '交流群：560295639',
         feedback: '反饋',
@@ -87,17 +84,15 @@ const DEFAULT_TRANSLATION: Record<SupportLangKey, DefaultTranslation> = {
     },
     en_US: {
         announcement: 'Announcement',
-        develop: 'In development stage, the function is not perfect, please understand',
         quicklyStart: 'Quick Start (Recommended for first-time users)',
-        community: 'Communication group: 560295639',
+        community: 'Communication group: 560295639 (tencent qq)',
         feedback: 'Feedback',
         safariWarning: 'Please note that the Safari version you are using may not support downloading files, which will cause screenshots and data export to fail.'
     },
     ja_JP: {
         announcement: 'アナウンス',
-        develop: '開発段階、機能はまだ完全ではありません、ご理解ください',
         quicklyStart: 'クイックスタート（初めての方におすすめ）',
-        community: 'コミュニケーショングループ：560295639',
+        community: 'コミュニケーショングループ：560295639 (tencent qq)',
         feedback: 'フィードバック',
         safariWarning: 'ご注意ください、お使いのSafariバージョンはファイルのダウンロードをサポートしていない可能性があります。これによりスクリーンショットとデータのエクスポートが失敗する可能性があります。'
     }
@@ -121,9 +116,9 @@ const ANNOUNCEMENT_TRANSLATION: Record<SupportLangKey, AnnouncementTranslation> 
             optimize: '优化',
             fix: '修复'
         },
-        feat: ['部分截图'],
-        optimize: ['细化了清空，现在可分别清空 对话/角色/设置/存档/裁分点'],
-        fix: ['清空未删除图片储存']
+        feat: [],
+        optimize: [],
+        fix: []
     },
     zh_TW: {
         key: {
@@ -131,9 +126,9 @@ const ANNOUNCEMENT_TRANSLATION: Record<SupportLangKey, AnnouncementTranslation> 
             optimize: '優化',
             fix: '修復'
         },
-        feat: ['部分截圖'],
-        optimize: ['細化了清空，現在可分別清空 對話/角色/設置/存檔/裁分點'],
-        fix: ['清空未刪除圖片儲存']
+        feat: [],
+        optimize: [],
+        fix: []
     },
     en_US: {
         key: {
@@ -141,9 +136,9 @@ const ANNOUNCEMENT_TRANSLATION: Record<SupportLangKey, AnnouncementTranslation> 
             optimize: 'Optimize',
             fix: 'Fix'
         },
-        feat: ['Partial Screenshot'],
-        optimize: ['Refined the clear function, now you can clear Dialogue/Role/Settings/Archive/Cut Point separately'],
-        fix: ['Clear did not delete image storage']
+        feat: [],
+        optimize: [],
+        fix: []
     },
     ja_JP: {
         key: {
@@ -151,9 +146,43 @@ const ANNOUNCEMENT_TRANSLATION: Record<SupportLangKey, AnnouncementTranslation> 
             optimize: '最適化',
             fix: '修正'
         },
-        feat: ['部分的なスクリーンショット'],
-        optimize: ['クリアを洗練し、今では ダイアログ/役割/設定/アーカイブ/カットポイント を個別にクリアできます'],
-        fix: ['クリアは画像ストレージを削除しませんでした']
+        feat: [],
+        optimize: [],
+        fix: []
+    }
+} as const
+
+interface MajorUpdateTranslation {
+    title: string
+    content: string
+    note: string
+    hidden: string
+}
+
+const MAJOR_UPDATE_TRANSLATION: Record<SupportLangKey, MajorUpdateTranslation> = {
+    zh_CN: {
+        title: '重大更新',
+        content: '现已支持NPC头像与差分🎉',
+        note: '注：NPC差分仍在完善，如遇到了角色缺失或名称错误，欢迎加群反馈',
+        hidden: '预言家，你还记得我吗'
+    },
+    zh_TW: {
+        title: '重大更新',
+        content: '現已支持NPC頭像與差分🎉',
+        note: '註：NPC差分仍在完善，如遇到了角色缺失或名稱錯誤，歡迎加群反饋',
+        hidden: '預言家，你還記得我嗎'
+    },
+    ja_JP: {
+        title: 'メジャーアップデート',
+        content: 'NPCアバターと差分をサポートしました🎉',
+        note: '注：NPC差分はまだ改善中です。キャラクターが欠けている、または名前が間違っている場合は、グループにフィードバックしてください',
+        hidden: '予言者よ、まだ私を覚えているか'
+    },
+    en_US: {
+        title: 'Major Update',
+        content: 'NPC avatars and differences are now supported 🎉',
+        note: 'Note: NPC differences are still being improved. If you encounter missing characters or name errors, please join the group for feedback',
+        hidden: 'Orcale, do you still remember me?'
     }
 } as const
 
@@ -161,13 +190,15 @@ interface Translation {
     invalid: InvalidTranslation
     default: DefaultTranslation
     announcement: AnnouncementTranslation
+    majorUpdate: MajorUpdateTranslation
 }
 
 function createTranslation(lang: SupportLangKey): Translation {
     return {
         invalid: INVALID_BROWSER_TRANSLATION[lang],
         default: DEFAULT_TRANSLATION[lang],
-        announcement: ANNOUNCEMENT_TRANSLATION[lang]
+        announcement: ANNOUNCEMENT_TRANSLATION[lang],
+        majorUpdate: MAJOR_UPDATE_TRANSLATION[lang]
     };
 }
 
@@ -247,19 +278,19 @@ const devT = computed<DevTranslation>(() => {
     return translation
 })
 
-const version = 'v0.2.3'
+const version = 'v1.0.0'
 </script>
 
 <template>
     <el-dialog v-if="devInfo" v-model="mainShow.announcement.value" :title="'DevSite ' + devInfo.tag"
         :width="dialogWidth">
-        <h2 style="display: inline">MayerTalk(dev)</h2>
+        <h1 style="display: inline">MayerTalk(dev)</h1>
         <p>{{ devT.common }}</p>
         <p>{{ devT.ver }}</p>
         <p>{{ devT.endInfo }}</p>
         <div style="display: flex">
             <el-link href="https://www.mayertalk.top" type="primary" style="margin-right: 5px">{{ devT.mainSite
-            }}</el-link>
+                }}</el-link>
             <span style="border-left: solid 1px darkgrey"></span>
             <el-link href="https://dev.mayertalk.top" type="primary" style="margin: 0 5px">{{ devT.devSite }}</el-link>
             <span style="border-left: solid 1px darkgrey"></span>
@@ -274,13 +305,13 @@ const version = 'v0.2.3'
             <span style="border-left: solid 1px darkgrey"></span>
             <el-link href="https://wj.qq.com/s2/11537223/aa61/" type="primary" style="margin-left: 5px;">{{
                 devT.feedback
-            }}</el-link>
+                }}</el-link>
         </div>
         <div style="position: absolute; bottom: 0; right: 0; color: #EEEEEE">{{ devT.ee }}</div>
     </el-dialog>
-    <el-dialog v-else v-model="mainShow.announcement.value" :title="t.default.announcement + ' ' + version"
+    <el-dialog v-else v-model="mainShow.announcement.value" :title="t.default.announcement"
         :width="dialogWidth">
-        <h2 style="display: inline">MayerTalk(beta)</h2>
+        <h1 style="display: inline">MayerTalk {{ version }}</h1>
         <template v-if="invalidBrowser">
             <template v-for="(translation, index) in t.invalid" :key="index">
                 <h2 v-if="index === 0" style="color: red">
@@ -290,15 +321,15 @@ const version = 'v0.2.3'
             </template>
         </template>
         <template v-else>
-            <p>{{ t.default.develop }}</p>
-            <el-link href="/docs/guide/start.html" type="primary">{{ t.default.quicklyStart }}</el-link>
+            <br/>
             <h3 v-if="IsSafari">{{ t.default.safariWarning }}</h3>
-            <h3>
-                {{ version }}
-            </h3>
+            <h2>{{ t.majorUpdate.title }}</h2>
+            <p class="rainbow-text">{{ t.majorUpdate.content }}</p>
+            <p>{{ t.majorUpdate.note }}</p>
+            <p style="color: #EEEEEE">{{ t.majorUpdate.hidden }}</p>
             <template v-for="key in ['feat', 'optimize', 'fix'] as const" :key="key">
-                <template v-if="ANNOUNCEMENT_TRANSLATION.zh_CN[key]">
-                    <b>{{ t.announcement.key[key] }}</b>
+                <template v-if="ANNOUNCEMENT_TRANSLATION.zh_CN[key] && t.announcement[key].length !== 0">
+                    <h2>{{ t.announcement.key[key] }}</h2>
                     <ul>
                         <li v-for="(item, index) in t.announcement[key]" :key="index">{{ item }}</li>
                     </ul>
@@ -324,7 +355,59 @@ const version = 'v0.2.3'
 ul {
     margin: 5px 0;
 }
+
 img {
     width: 100%;
+}
+
+/* ===== 动态流动彩虹文字 ===== */
+.rainbow-text {
+    /* ② 彩虹渐变背景（宽度拉长 3 倍，方便移动） */
+    background: linear-gradient(90deg,
+            #ff0000,
+            /* 红 */
+            #ff7f00,
+            /* 橙 */
+            #ffff00,
+            /* 黄 */
+            #00ff00,
+            /* 绿 */
+            #0000ff,
+            /* 蓝 */
+            #4b0082,
+            /* 靛 */
+            #9400d3,
+            /* 紫 */
+            #ff0000
+            /* 回到红色，形成循环 */
+        );
+    background-size: 300% 100%;
+    /* 宽度 300%，高度 100% */
+
+    /* ③ 将背景裁剪到文字形状（关键步骤） */
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    /* ④ 文字本身透明，露出背景 */
+    color: transparent;
+
+    /* ⑤ 绑定流动动画，4 秒一次，无限循环 */
+    animation: flowRainbow 4s linear infinite;
+
+    /* ⑥ 可选：增加一点发光阴影，提升质感 */
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+/* ===== 流动动画关键帧 ===== */
+@keyframes flowRainbow {
+    0% {
+        background-position: 0% 0%;
+        /* 起始位置 */
+    }
+
+    100% {
+        background-position: 300% 0%;
+        /* 终点位置，与 background-size 匹配 */
+    }
 }
 </style>

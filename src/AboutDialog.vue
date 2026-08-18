@@ -23,7 +23,7 @@ interface Translation {
 const TRANSLATION: Record<string, Translation> = {
     zh_CN: {
         title: '关于',
-        about: '明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，目前仍处于beta阶段',
+        about: '明日方舟对话编辑器，以明日方舟「叙拉古人」活动对话为蓝本开发，现已发布正式版',
         devSite: '开发站点',
         contributor: '贡献者',
         statement: '声明',
@@ -31,7 +31,7 @@ const TRANSLATION: Record<string, Translation> = {
     },
     zh_TW: {
         title: '關於',
-        about: '明日方舟對話編輯器，以明日方舟「叙拉古人」活動對話為藍本開發，目前仍處於beta階段',
+        about: '明日方舟對話編輯器，以明日方舟「叙拉古人」活動對話為藍本開發，現已發佈正式版',
         devSite: '開發站點',
         contributor: '貢獻者',
         statement: '聲明',
@@ -39,7 +39,7 @@ const TRANSLATION: Record<string, Translation> = {
     },
     ja_JP: {
         title: '約',
-        about: 'アークナイツ対話エディター、アークナイツ「シラクザーノ」イベントの対話を基に開発され、現在まだベータ段階にあります',
+        about: 'アークナイツ対話エディター、アークナイツ「シラクザーノ」イベントの対話を基に開発されました',
         devSite: '開発サイト',
         contributor: '貢献者',
         statement: '声明',
@@ -47,7 +47,7 @@ const TRANSLATION: Record<string, Translation> = {
     },
     en_US: {
         title: 'About',
-        about: 'Arknights Dialogue Editor, developed based on the dialogue of the Arknights \'IL Siracusano\' activity, is currently still in beta stage',
+        about: 'Arknights Dialogue Editor, developed based on the dialogue of the Arknights \'IL Siracusano\' activity, now officially released',
         devSite: 'Development site',
         contributor: 'Contributor',
         statement: 'Statement',
@@ -62,7 +62,7 @@ const t = computed(() => {
 
 <template>
     <el-dialog v-model="mainShow.about.value" :title="t.title" :width="dialogWidth">
-        <h2 style="display: inline">MayerTalk(beta)</h2><br />
+        <h2 style="display: inline">MayerTalk</h2><br />
         <p>{{ t.about }}</p>
         <p style="display: flex; align-items: center">Github:
             <el-link href="https://github.com/MayerTalk/MayerTalk" type="primary" style="margin-left: 5px"
